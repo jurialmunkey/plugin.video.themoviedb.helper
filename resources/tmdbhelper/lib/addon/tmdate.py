@@ -103,7 +103,7 @@ def get_region_date(date_obj, region_fmt='dateshort', del_fmt=':%S'):
     from xbmc import getRegion
     xbmc_region = getRegion(region_fmt).replace(del_fmt, '')  # Strip seconds from formatting durations
     date_string = date_obj.strftime(xbmc_region.encode('unicode-escape').decode())  # Avoid UnicodeEncode errors in strftime
-    return date_string.encode().decode('unicode-escape')  # Restore Unicode characters
+    return date_string.encode('raw-unicode-escape').decode('unicode-escape')  # Restore format literals and preserve localized names
 
 
 def is_future_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False, use_today=False, days=0):
