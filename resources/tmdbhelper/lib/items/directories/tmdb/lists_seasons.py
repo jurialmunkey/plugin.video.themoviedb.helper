@@ -31,6 +31,11 @@ class ListSeasons(ContainerDirectory):
             except (KeyError, TypeError, AttributeError):
                 pass
 
+        # Groups
+        if get_setting('seasons_groups'):
+            sync = BaseViewFactory('groupsseason', 'tv', tmdb_id)
+            items.extend(sync.data or [])
+
         return items
 
     def get_items(self, tmdb_id, limit=None, **kwargs):

@@ -98,6 +98,7 @@ class TMDb(TMDbAPI):
         'release_dates': (ATR_STANDARD, ('person', 'movie', )),
         'external_ids': (ATR_STANDARD, ('person', 'movie', 'tv', 'season', 'episode', )),
         'content_ratings': (ATR_STANDARD, ('tv', )),
+        'episode_groups': (ATR_STANDARD, ('tv', )),
         'movie_credits': (ATR_STANDARD, ('person', )),
         'tv_credits': (ATR_STANDARD, ('person', )),
         'credits': (ATR_EXTENDED, ('movie', 'episode', )),

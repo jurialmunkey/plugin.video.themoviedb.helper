@@ -158,6 +158,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="seasons_groups" type="boolean" label="32542" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="seasons_upnext" type="boolean" label="32015" help="">
                     <level>0</level>
                     <default>true</default>

@@ -1,6 +1,6 @@
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.items.container import ContainerDirectory
-from tmdbhelper.lib.items.directories.tmdb.lists_view_db import ListSeries
+from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.directories.tmdb.lists_related import ListRecommendations
 from tmdbhelper.lib.items.directories.tmdb.lists_seasons import ListFlatSeasons
 
@@ -19,7 +19,7 @@ class ListNextRecommendation(ContainerDirectory):
 
         def _get_next_collection():
             collection_tmdb_id = self.get_collection_tmdb_id(tmdb_id=tmdb_id)
-            items = ListSeries(-1, '').get_items(tmdb_id=collection_tmdb_id, tmdb_type='collection') or []
+            items = BaseViewFactory('seriesmovies', 'collection', collection_tmdb_id).data or []  # Every film, not just the first page
             items = sorted(items, key=lambda i: i['infolabels'].get('year') or 9999)
             try:
                 iyear = next((i for i in items if try_int(i['unique_ids'].get('tmdb')) == try_int(tmdb_id)), None)

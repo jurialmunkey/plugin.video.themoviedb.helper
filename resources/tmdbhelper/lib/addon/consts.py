@@ -164,6 +164,9 @@ ROUTE_NOID = {
     'trakt_history': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListHistory'}},
+    'trakt_history_stats': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_stats',
+        'import_attr': 'ListHistoryStats'}},
     'trakt_mostwatched': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListMostWatched'}},
@@ -453,6 +456,15 @@ ROUTE_TMDBID = {
     'seasons': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListSeasons'}},
+    'episode_groups': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_episode_groups',
+        'import_attr': 'ListEpisodeGroups'}},
+    'episode_group_seasons': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_episode_groups',
+        'import_attr': 'ListEpisodeGroupSeasons'}},
+    'episode_group_season_episodes': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_episode_groups',
+        'import_attr': 'ListEpisodeGroupEpisodes'}},
     'flatseasons': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_seasons',
         'import_attr': 'ListFlatSeasons'}},

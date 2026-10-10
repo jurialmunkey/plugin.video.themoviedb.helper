@@ -2,6 +2,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.addon.thread import ParallelThread
+from tmdbhelper.lib.api.trakt.ratings import map_trakt_ratings
 from jurialmunkey.parser import try_int
 
 
@@ -9,6 +10,24 @@ class RatingsDict(BaseList):
     expiry_time = 7 * 86400
     cached_data_table = table = 'ratings'
     cached_data_conditions = 'id=? AND expiry>=?'
+
+    rating_attribs = (
+        'omdb_ratings',
+        'mdblist_ratings',
+        'trakt_ratings',
+        'tmdb_ratings',
+        'imdb_top250',
+    )
+
+    ratings_style = {
+        'tmdb_rating': lambda v: f'{(v / 10):.1f}',
+        'trakt_rating': lambda v: f'{(v / 10):.1f}',
+        'imdb_rating': lambda v: f'{(v / 10):.1f}',
+        'metacriticuser_rating': lambda v: f'{(v / 10):.1f}',
+        'letterboxd_rating': lambda v: f'{(v / 20):.1f}',  # 5 Star rating
+        'rogerebert_rating': lambda v: f'{(v / 25):.1f}',  # 4 Star rating
+        'myanimelist_rating': lambda v: f'{(v / 10):.1f}',
+    }
 
     @property
     def cached_data_values(self):
@@ -72,19 +91,17 @@ class RatingsDict(BaseList):
             return {}
 
     @cached_property
+    def trakt_ratings_uri(self):
+        return f'{self.trakt_type}s/{self.imdb_id}/ratings'
+
+    @cached_property
     def trakt_ratings(self):
         if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authenticator.is_authorized or not self.imdb_id:
             return {}
-        data = self.common_apis.trakt_api.get_response_json(f'{self.trakt_type}s/{self.imdb_id}/ratings')
+        data = self.common_apis.trakt_api.get_response_json(self.trakt_ratings_uri, extended='all')
         if not data:
             return {}
-        try:
-            return {
-                'trakt_rating': int(float(data['rating']) * 10),  # Convert /10 float to /100 int
-                'trakt_votes': int(data['votes']),
-            }
-        except (KeyError, TypeError, IndexError, ValueError):
-            return {}
+        return map_trakt_ratings(data)
 
     @cached_property
     def tmdb_ratings(self):
@@ -101,28 +118,23 @@ class RatingsDict(BaseList):
 
     @cached_property
     def online_data_mapped(self):
+        return self.get_online_data_mapped()
+
+    def get_online_data_mapped(self):
         """ function called when local cache does not have any data """
-        data = {}
 
         def get_data_attr(attr):
-            data.update(getattr(self, attr))
+            data = getattr(self, attr)
+            return data or {}
 
-        attribs = (
-            'omdb_ratings',
-            'mdblist_ratings',
-            'trakt_ratings',
-            'tmdb_ratings',
-            'imdb_top250',
-        )
+        # precache some property values before threading
+        for attr in ('mediatype', 'trakt_type', 'imdb_id'):
+            getattr(self, attr)
 
-        self.mediatype = self.get_mediatype()
-        self.trakt_type = self.get_trakt_type()
-        self.imdb_id = self.get_imdb_id()
+        with ParallelThread(self.rating_attribs, get_data_attr) as pt:
+            items = pt.queue
 
-        with ParallelThread(attribs, get_data_attr):
-            pass
-
-        return data
+        return {k: v for d in items for k, v in d.items()}
 
     def configure_mapped_data(self, data):
         def get_value(k):
@@ -140,16 +152,6 @@ class RatingsDict(BaseList):
         data = self.get_unmapped_data()
         if not data:
             return
-
-        ratings_style = {
-            'tmdb_rating': lambda v: f'{(v / 10):.1f}',
-            'trakt_rating': lambda v: f'{(v / 10):.1f}',
-            'imdb_rating': lambda v: f'{(v / 10):.1f}',
-            'metacriticuser_rating': lambda v: f'{(v / 10):.1f}',
-            'letterboxd_rating': lambda v: f'{(v / 20):.1f}',  # 5 Star rating
-            'rogerebert_rating': lambda v: f'{(v / 25):.1f}',  # 4 Star rating
-            'myanimelist_rating': lambda v: f'{(v / 10):.1f}',
-        }
 
         mapped_data = {}
 
@@ -176,7 +178,7 @@ class RatingsDict(BaseList):
             mapped_data[f'starred_{k}'] = f'{(v / 20):.1f}'
 
             try:
-                mapped_data[k] = ratings_style[k](v)
+                mapped_data[k] = self.ratings_style[k](v)
             except KeyError:
                 mapped_data[k] = v
 
@@ -200,3 +202,61 @@ class RatingsDict(BaseList):
         if not return_data:
             return
         return self.get_cached_data()
+
+
+class RatingsSeasonsDict(RatingsDict):
+    rating_attribs = (
+        'mdblist_ratings',
+        'trakt_ratings',
+    )
+
+    def get_mediatype(self):
+        return 'season'
+
+    def get_trakt_type(self):
+        return 'show'
+
+    def get_online_data_mapped(self):
+        if self.season is None:
+            return
+        if self.tmdb_type != 'tv':
+            return
+        return super().get_online_data_mapped()
+
+    @property
+    def item_id(self):
+        return self.get_season_id(self.tmdb_type, self.tmdb_id, self.season)
+
+    @cached_property
+    def trakt_ratings_uri(self):
+        return f'{self.trakt_type}s/{self.imdb_id}/seasons/{self.season}/ratings'
+
+    @cached_property
+    def mdblist_ratings(self):
+        if not self.common_apis.mdblist_api:
+            return {}
+        return self.common_apis.mdblist_api.get_season_ratings(self.trakt_type, self.tmdb_id, self.season) or {}
+
+
+class RatingsEpisodesDict(RatingsSeasonsDict):
+    def get_mediatype(self):
+        return 'episode'
+
+    def get_online_data_mapped(self):
+        if self.episode is None:
+            return
+        return super().get_online_data_mapped()
+
+    @property
+    def item_id(self):
+        return self.get_episode_id(self.tmdb_type, self.tmdb_id, self.season, self.episode)
+
+    @cached_property
+    def trakt_ratings_uri(self):
+        return f'{self.trakt_type}s/{self.imdb_id}/seasons/{self.season}/episodes/{self.episode}/ratings'
+
+    @cached_property
+    def mdblist_ratings(self):
+        if not self.common_apis.mdblist_api:
+            return {}
+        return self.common_apis.mdblist_api.get_episode_ratings(self.trakt_type, self.tmdb_id, self.season, self.episode) or {}

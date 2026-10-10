@@ -2,7 +2,7 @@ from jurialmunkey.parser import boolean
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized
-from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from tmdbhelper.lib.api.contains import CommonContainerAPIs, CommonRatingsAPIs
 from tmdbhelper.lib.addon.logger import TimerList
 
 
@@ -68,6 +68,10 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if self.params.get('info') == 'details':
             return True
         return boolean(self.params.get('detailed', False))
+
+    @cached_property
+    def is_ratings(self):
+        return boolean(self.params.get('ratings', False))
 
     @cached_property
     def is_translated(self):
@@ -300,6 +304,29 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.log_timers = self.log_timers
         return lidc
 
+    def build_ratings_item(self, li):
+        if not li or not li.tmdb_id:
+            return li
+        if li.tmdb_type not in ('movie', 'tv'):
+            return li
+
+        ratings_api = CommonRatingsAPIs()
+        ratings_api.tmdb_type = li.tmdb_type
+        ratings_api.tmdb_id = li.tmdb_id
+        ratings_api.season = li.season
+        ratings_api.episode = li.episode
+
+        li.infoproperties.update(ratings_api.all_ratings_no_awards)
+        return li
+
+    def build_ratings_items(self, items):
+        if not self.is_ratings:
+            return items
+        from tmdbhelper.lib.addon.thread import ParallelThread
+        with ParallelThread(items, self.build_ratings_item) as pt:
+            items = pt.queue
+        return [i for i in items if i]
+
     def build_detailed_item(self, li):
         if li.infoproperties.get('label_override'):
             li.label = f"{li.infoproperties['label_override']}"
@@ -312,6 +339,7 @@ class ContainerDirectory(ContainerDirectoryCommon):
     def build_detailed_items(self, items):
         with TimerList(self.timer_lists, '--build', log_threshold=0.001, logging=self.log_timers):
             items = self.lidc.configure_listitems_threaded(items)
+            items = self.build_ratings_items(items)
             return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
 
 

@@ -24,6 +24,15 @@ class BaseDirItemDetailsSeasons(BaseDirItem):
         return {'info': get_flatseasons_info_param()}
 
 
+class BaseDirItemDetailsGroups(BaseDirItem):
+    priority = 115
+    label_type = 'localize'
+    label_localized = 32541
+    params = {'info': 'episode_groups'}
+    art_icon = 'resources/icons/themoviedb/episodes.png'
+    types = ('tv', )
+
+
 class BaseDirItemDetailsCollection(BaseDirItem):
     priority = 120
     label_type = 'localize'
