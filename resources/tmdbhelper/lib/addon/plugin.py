@@ -59,6 +59,8 @@ CONVERSION_TABLE = {
         'tvshow': {'tmdb': 'tv', 'trakt': 'show', 'ftv': 'tv'},
         'season': {'tmdb': 'season', 'trakt': 'season', 'ftv': 'tv'},
         'episode': {'tmdb': 'episode', 'trakt': 'episode', 'ftv': 'tv'},
+        'episode_group': {'tmdb': 'episode_group'},
+        'episode_group_season': {'tmdb': 'episode_group_season'},
         'actor': {'tmdb': 'person'},
         'director': {'tmdb': 'person'},
         'set': {'tmdb': 'collection'}
@@ -84,6 +86,8 @@ CONVERSION_TABLE = {
         'genre': {'plural': lambda: get_localized(135), 'container': 'genres', 'dbtype': 'genre'},
         'season': {'plural': lambda: get_localized(33054), 'container': 'seasons', 'trakt': 'season', 'dbtype': 'season'},
         'episode': {'plural': lambda: get_localized(20360), 'container': 'episodes', 'trakt': 'episode', 'dbtype': 'episode'},
+        'episode_group': {'plural': lambda: get_localized(32541), 'container': 'tvshows', 'dbtype': 'episode_group'},
+        'episode_group_season': {'plural': lambda: get_localized(33054), 'container': 'seasons', 'dbtype': 'episode_group_season'},
         'video': {'plural': lambda: get_localized(10025), 'container': 'videos', 'dbtype': 'video'}
     }
 }

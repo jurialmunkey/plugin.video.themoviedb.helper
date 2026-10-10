@@ -1,4 +1,3 @@
-from copy import deepcopy
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
 
@@ -6,8 +5,8 @@ from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
 class EpisodeGroupItemMapper(ItemMapper):
 
     @cached_property
-    def tvshow_item(self):
-        return self.meta['tvshow_item']
+    def tmdb_id(self):
+        return self.meta['tmdb_id']
 
     @cached_property
     def group(self):
@@ -18,31 +17,85 @@ class EpisodeGroupItemMapper(ItemMapper):
         return self.group['title'] or ''
 
     def get_infolabels(self):
-        infolabels = deepcopy(self.tvshow_item.get('infolabels') or {})
-        infolabels.update({'title': self.label, 'plot': self.group['plot']})
-        return infolabels
+        return {'mediatype': 'tvshow', 'title': self.label, 'plot': self.group['plot']}
 
     def get_infoproperties(self):
-        return deepcopy(self.tvshow_item.get('infoproperties') or {})
+        return {'label_override': self.label}
 
     def get_unique_ids(self):
-        unique_ids = dict(self.tvshow_item.get('unique_ids') or {})
-        unique_ids['group_tmdb'] = self.group['tmdb_id']
+        return {'tmdb': self.tmdb_id, 'group_tmdb': self.group['tmdb_id']}
+
+    def get_params(self):
+        return {
+            'info': 'episode_group_seasons', 'tmdb_type': 'tv',
+            'tmdb_id': self.tmdb_id, 'group_id': self.group['tmdb_id'],
+        }
+
+    def get_item(self):
+        item = super().get_item()
+        # A blank group plot should clear the parent show's plot during detail merging.
+        item['infolabels']['plot'] = self.group['plot']
+        item['is_folder'] = True
+        return item
+
+
+class EpisodeGroupSeasonItemMapper(EpisodeGroupItemMapper):
+
+    def get_infoproperties(self):
+        infoproperties = super().get_infoproperties()
+        infoproperties.update({
+            key: self.group[key]
+            for key in ('totalepisodes', 'airedepisodes', 'watchedepisodes')
+        })
+        infoproperties['group_season'] = self.group['ordering']
+        return infoproperties
+
+    def get_unique_ids(self):
+        unique_ids = super().get_unique_ids()
+        unique_ids.update({
+            'tvshow.tmdb': self.tmdb_id,
+            'group_tmdb': self.group['group_id'],
+            'season_group_tmdb': self.group['tmdb_id'],
+        })
         return unique_ids
 
     def get_params(self):
-        params = dict(self.tvshow_item.get('params') or {})
-        params.update({'info': 'details', 'tmdb_type': 'tv', 'tmdb_id': self.unique_ids['tmdb']})
+        params = super().get_params()
+        params.update({
+            'info': 'episode_group_season_episodes',
+            'group_id': self.group['group_id'],
+            'season_group_id': self.group['tmdb_id'],
+        })
         return params
 
-    def get_art(self):
-        return dict(self.tvshow_item.get('art') or {})
 
-    def get_context_menu(self):
-        return list(self.tvshow_item.get('context_menu') or [])
+class EpisodeGroupEpisodeItemMapper(EpisodeGroupItemMapper):
 
-    def get_item(self):
-        item = deepcopy(self.tvshow_item)
-        item.update(super().get_item())
-        item['is_folder'] = True
-        return item
+    def get_infolabels(self):
+        infolabels = super().get_infolabels()
+        infolabels.update({
+            'mediatype': 'episode',
+            'season': self.group['season'], 'episode': self.group['episode'],
+        })
+        return infolabels
+
+    def get_infoproperties(self):
+        infoproperties = super().get_infoproperties()
+        infoproperties.update({
+            'group_season': self.group['group_ordering'],
+            'group_episode': self.group['ordering'],
+        })
+        return infoproperties
+
+    def get_unique_ids(self):
+        return {
+            'tmdb': self.group['tmdb_id'], 'tvshow.tmdb': self.tmdb_id,
+            'group_tmdb': self.group['group_id'],
+            'season_group_tmdb': self.group['season_group_id'],
+        }
+
+    def get_params(self):
+        return {
+            'info': 'details', 'tmdb_type': 'tv', 'tmdb_id': self.tmdb_id,
+            'season': self.group['season'], 'episode': self.group['episode'],
+        }

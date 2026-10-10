@@ -509,6 +509,76 @@ class ItemMapperMethods:
 
         return data
 
+    def get_episode_groups(self, items, **kwargs):
+        data = []
+        for item in (items.get('results') or []):
+            if not item.get('id'):
+                continue
+            item_id = f'episode_group.{item["id"]}'
+            data.append(ExtendedMap('episode_groups', item_id, True, {
+                'id': item_id,
+                'tmdb_id': item['id'],
+                'tvshow_id': f'tv.{self.tmdb_id}',
+                'plot': item.get('description'),
+                'title': item.get('name'),
+                'type': item.get('type'),
+            }))
+            data.append(ExtendedMap('baseitem', item_id, False, {
+                'id': item_id,
+                'mediatype': 'episode_group',
+                'expiry': 0,
+                'language': self.language,
+            }))
+        return data
+
+    def get_episode_group_seasons(self, items, **kwargs):
+        self.item['item']['type'] = self.data.get('type')
+        data = []
+        real_seasons = {}
+        real_episodes = {}
+        for group in items:
+            item_id = f'episode_group_season.{group["id"]}'
+            data.append(ExtendedMap('episode_group_seasons', item_id, True, {
+                'id': item_id,
+                'tmdb_id': group['id'],
+                'tvshow_id': f'tv.{self.tmdb_id}',
+                'group_id': self.data['id'],
+                'plot': group.get('description', self.data.get('description')),
+                'title': group.get('name'),
+                'ordering': group.get('order'),
+                'type': group.get('type', self.data.get('type')),
+            }))
+            data.append(ExtendedMap('baseitem', item_id, False, {
+                'id': item_id,
+                'mediatype': 'episode_group_season',
+                'expiry': 0,
+                'language': self.language,
+            }))
+            for episode in group.get('episodes') or []:
+                season_number = episode['season_number']
+                episode_number = episode['episode_number']
+                episode_id = f'tv.{self.tmdb_id}.{season_number}.{episode_number}'
+                real_seasons[season_number] = {'season_number': season_number}
+                real_episodes[episode_id] = episode
+                data.append(ExtendedMap('episode_group_season_episodes', (item_id, episode_id), True, {
+                    'id': episode_id,
+                    'tmdb_id': episode['id'],
+                    'tvshow_id': f'tv.{self.tmdb_id}',
+                    'season_group_id': group['id'],
+                    'group_id': self.data['id'],
+                    'season': season_number,
+                    'episode': episode_number,
+                    'ordering': episode.get('order'),
+                }))
+                for key, source in (('title', 'name'), ('plot', 'overview')):
+                    custom_key = f'episode.{episode["id"]}.{key}'
+                    data.append(ExtendedMap('custom', (item_id, custom_key), True, {
+                        'parent_id': item_id, 'key': custom_key, 'value': episode.get(source),
+                    }))
+        data.extend(self.get_seasons(real_seasons.values()))
+        data.extend(self.get_episodes(real_episodes.values()))
+        return data
+
     def get_fanart_tv(self, items, **kwargs):
         if not items:
             return
@@ -841,18 +911,6 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
                     'subkeys': ('results', ),
                     'name': 'rating', 'iso_country': 'iso_3166_1'}
             }],
-            'episode_groups': [{
-                'keys': [('episode_groups', None)],
-                'func': self.split_array,
-                'kwargs': {
-                    'subkeys': ('results', ),
-                    'haskeys': ('id', ),
-                    'tmdb_id': 'id',
-                    'tvshow_id': lambda i: f'tv.{self.tmdb_id}',
-                    'plot': 'description',
-                    'title': 'name',
-                    'type': 'type'}
-            }],
             'release_dates': [{
                 'keys': [('certification', None)],
                 'func': self.get_certifications,
@@ -938,6 +996,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'parts': self.get_parts,
             'seasons': self.get_seasons,
             'episodes': self.get_episodes,
+            'episode_groups': self.get_episode_groups,
+            'groups': self.get_episode_group_seasons,
             'created_by': self.get_creators,
             'credits': self.get_credits,
             'aggregate_credits': self.get_aggregate_credits,
@@ -952,6 +1012,7 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'title': ('item', 'title'),
             'tagline': ('item', 'tagline'),
             'overview': ('item', 'plot'),
+            'description': ('item', 'plot'),
             'original_title': ('item', 'originaltitle'),
             'original_name': ('item', 'originaltitle'),
             'status': ('item', 'status'),
@@ -1053,6 +1114,8 @@ class ItemMapper(_ItemMapper, ItemMapperMethods):
             'movie': (),
             'tvshow': (),
             'episode_groups': (),
+            'episode_group_seasons': (),
+            'episode_group_season_episodes': (),
             'season': (),
             'episode': (),
             'person': (),

@@ -37,6 +37,16 @@ def import_episode():
     return Episode
 
 
+def import_episode_group():
+    from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.episode_group import EpisodeGroup
+    return EpisodeGroup
+
+
+def import_episode_group_season():
+    from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.episode_group_season import EpisodeGroupSeason
+    return EpisodeGroupSeason
+
+
 def import_person():
     from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.person import Person
     return Person
@@ -52,6 +62,8 @@ FACTORY_ROUTES = {
     'tvshow': import_tvshow,
     'season': import_season,
     'episode': import_episode,
+    'episode_group': import_episode_group,
+    'episode_group_season': import_episode_group_season,
     'person': import_person,
     'set': import_set,
 }

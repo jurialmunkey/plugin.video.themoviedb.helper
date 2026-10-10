@@ -3,7 +3,6 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.database.tabledef import (
     MOVIE_COLUMNS,
     TVSHOW_COLUMNS,
-    EPISODE_GROUP_COLUMNS,
     SEASON_COLUMNS,
     EPISODE_COLUMNS,
     BELONGS_COLUMNS,
@@ -245,13 +244,6 @@ class Movie(ItemDetailsList):
 class Tvshow(ItemDetailsList):
     table = 'tvshow'
     keys = tuple(TVSHOW_COLUMNS.keys())
-
-
-class EpisodeGroups(ItemDetailsList):
-    table = 'episode_groups'
-    keys = tuple(EPISODE_GROUP_COLUMNS.keys())
-    conditions = 'tvshow_id=?'
-    conflict_constraint = 'tmdb_id'
 
 
 class Season(ItemDetailsList):

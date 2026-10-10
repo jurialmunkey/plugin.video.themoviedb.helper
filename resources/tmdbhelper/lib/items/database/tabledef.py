@@ -142,9 +142,14 @@ TVSHOW_COLUMNS = {
 }
 
 EPISODE_GROUP_COLUMNS = {
-    'tmdb_id': {
+    'id': {
         'data': 'TEXT PRIMARY KEY',
-        'indexed': True
+        'foreign_key': 'baseitem(id)',
+    },
+    'tmdb_id': {
+        'data': 'TEXT',
+        'indexed': True,
+        'unique': True,
     },
     'tvshow_id': {
         'data': 'TEXT',
@@ -158,6 +163,78 @@ EPISODE_GROUP_COLUMNS = {
         'data': 'TEXT',
     },
     'type': {
+        'data': 'INTEGER',
+    },
+}
+
+EPISODE_GROUP_SEASON_COLUMNS = {
+    'id': {
+        'data': 'TEXT PRIMARY KEY',
+        'foreign_key': 'baseitem(id)',
+    },
+    'tmdb_id': {
+        'data': 'TEXT',
+        'indexed': True,
+        'unique': True,
+    },
+    'tvshow_id': {
+        'data': 'TEXT',
+        'foreign_key': 'tvshow(id)',
+        'indexed': True,
+    },
+    'group_id': {
+        'data': 'TEXT',
+        'foreign_key': 'episode_groups(tmdb_id)',
+        'indexed': True,
+    },
+    'plot': {
+        'data': 'TEXT',
+    },
+    'title': {
+        'data': 'TEXT',
+    },
+    'ordering': {
+        'data': 'INTEGER',
+    },
+    'type': {
+        'data': 'INTEGER',
+    },
+}
+
+EPISODE_GROUP_SEASON_EPISODE_COLUMNS = {
+    'id': {
+        'data': 'TEXT',
+        'foreign_key': 'episode(id)',
+        'indexed': True,
+        'unique': True,
+    },
+    'tmdb_id': {
+        'data': 'INTEGER',
+        'indexed': True,
+    },
+    'tvshow_id': {
+        'data': 'TEXT',
+        'foreign_key': 'tvshow(id)',
+        'indexed': True,
+    },
+    'season_group_id': {
+        'data': 'TEXT',
+        'foreign_key': 'episode_group_seasons(tmdb_id)',
+        'indexed': True,
+        'unique': True,
+    },
+    'group_id': {
+        'data': 'TEXT',
+        'foreign_key': 'episode_groups(tmdb_id)',
+        'indexed': True,
+    },
+    'season': {
+        'data': 'INTEGER',
+    },
+    'episode': {
+        'data': 'INTEGER',
+    },
+    'ordering': {
         'data': 'INTEGER',
     },
 }
