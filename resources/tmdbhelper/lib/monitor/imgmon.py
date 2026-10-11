@@ -76,6 +76,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self.pre_window = 1
         self.cur_base_window = 0
         self.pre_base_window = 1
+        self.pre_container_content = None
 
     @property
     def is_artwork_disabled(self):
@@ -117,8 +118,12 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         if self.is_same_base_window(update=True) and not self.get_cur_info():
             return False
 
+        container_content = self.container_content
+        content_changed = container_content != self.pre_container_content
+        self.pre_container_content = container_content
+
         # Check if the item has changed before retrieving details again
-        if not self.is_same_item(update=True) or not self.is_same_window(update=True):
+        if not self.is_same_item(update=True) or not self.is_same_window(update=True) or content_changed:
             return True
 
         # Set refresh time if not set yet and still on same item
@@ -170,7 +175,8 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self.cur_blurcrop_properties = self.get_image_manipulations(
             use_winprops=False,
             built_artwork=self.remote_artwork.get(self.pre_item),
-            allow_list=self._allow_list
+            allow_list=self._allow_list,
+            container_content=self.container_content
         ) if not self.is_artwork_disabled else {}
         return self.cur_blurcrop_properties
 

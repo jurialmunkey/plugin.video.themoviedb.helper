@@ -533,7 +533,13 @@ class ImageManipulations(WindowPropertySetter):
             if img_get.artwork_fallback:
                 return img_get.artwork_fallback
 
-    def get_image_manipulations(self, use_winprops=False, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', )):
+    def get_blur_fallback(self, container_content=None):
+        container_content = container_content or get_infolabel('Container.Content')
+        fallback = self.get_property(f'Blur.Fallback.{container_content.lower()}') if container_content else None
+        fallback = fallback or self.get_property('Blur.Fallback')
+        return fallback
+
+    def get_image_manipulations(self, use_winprops=False, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', ), container_content=None):
         images = {}
 
         _manipulations = (
@@ -549,7 +555,7 @@ class ImageManipulations(WindowPropertySetter):
                     source=self.get_property('Blur.SourceImage'),
                     build_fallback=True,
                     built_artwork=built_artwork)
-                or self.get_property('Blur.Fallback')},
+                or self.get_blur_fallback(container_content)},
             {'method': 'desaturate',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"),
                 'images': lambda: self.get_artwork(
