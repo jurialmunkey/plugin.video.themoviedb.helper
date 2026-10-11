@@ -67,6 +67,7 @@ class HistoryStatsItemMapper(ItemMapper):
             'day': format_date_obj(self.watched_date, '%A'),
             'day_short': format_date_obj(self.watched_date, '%a'),
             'day_letter': format_date_obj(self.watched_date, '%a')[:1],
+            'day_ordinal': format_date_obj(self.watched_date, '%w'),
             'year': format_date_obj(self.watched_date, '%Y'),
             'custom': format_date_obj(self.watched_date, get_infolabel('Skin.String(TMDbHelper.Date.Format)') or '%d %b %Y'),
             'month': format_date_obj(self.watched_date, '%B'),
