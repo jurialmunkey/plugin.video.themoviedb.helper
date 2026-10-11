@@ -2044,6 +2044,11 @@ msgctxt "#32382"
 msgid "Hide Episode Groups"
 msgstr "Nascondi gruppi di episodi"
 
+#: /resources/tmdbhelper/lib/script/method/image_functions.py
+msgctxt "#32399"
+msgid "Retrieving Artwork"
+msgstr "Recupero delle immagini"
+
 #: /resources/settings.xml
 msgctxt "#32383"
 msgid "Hide Episode Groups and Specials"
@@ -2053,6 +2058,16 @@ msgstr "Nascondi gruppi di episodi e speciali"
 msgctxt "#32384"
 msgid "Hide Episode Groups and Up Next"
 msgstr "Nascondi gruppi di episodi e il prossimo"
+
+#: /resources/settings.xml
+msgctxt "#32402"
+msgid "Scrobble items on MDbList while watching"
+msgstr "Registra le visualizzazioni su MDbList durante la riproduzione"
+
+#: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr "Sincronizza"
 
 #: /resources/settings.xml
 msgctxt "#32385"
@@ -2073,6 +2088,11 @@ msgstr "Usa un nome file .nfo alternativo"
 msgctxt "#32391"
 msgid "Select update type"
 msgstr "Seleziona il tipo di aggiornamento"
+
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "History"
+msgstr "Cronologia"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
@@ -2119,6 +2139,11 @@ msgstr "Riproduci file dalla libreria locale di Kodi"
 msgctxt "#32401"
 msgid "TMDb detailed information"
 msgstr "Informazioni dettagliate TMDb"
+
+#: /resources/settings.xml
+msgctxt "#32417"
+msgid "MDbList support is currently experimental"
+msgstr "Il supporto a MDbList è attualmente sperimentale"
 
 #: /resources/settings.xml
 msgctxt "#32404"
@@ -2715,6 +2740,38 @@ msgctxt "#32536"
 msgid "Unspecified"
 msgstr "Non specificato"
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32537"
+msgid "Availability"
+msgstr "Disponibilità"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32538"
+msgid "My favorites"
+msgstr "I miei preferiti"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32539"
+msgid "Streaming now"
+msgstr "In streaming ora"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32540"
+msgid "All digital releases"
+msgstr "Tutte le uscite digitali"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_details.py
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_episode_groups.py
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/groupsseason.py
+msgctxt "#32541"
+msgid "Groups"
+msgstr "Gruppi"
+
+#: /resources/settings.xml
+msgctxt "#32542"
+msgid "Additional season: Groups"
+msgstr "Stagione aggiuntiva: Gruppi"
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr "Indiano (India)"
@@ -2866,6 +2923,10 @@ msgstr "Mandarino (Taiwan)"
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "Zulu (Sud Africa)"
+
+msgctxt "#30068"
+msgid "Croatian (Croatia)"
+msgstr "Croato (Croazia)"
 
 #: /resources/settings.xml
 msgctxt "#32001"
