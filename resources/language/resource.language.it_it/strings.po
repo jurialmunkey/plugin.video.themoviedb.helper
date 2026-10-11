@@ -1393,7 +1393,7 @@ msgstr "Senza generi"
 #: /resources/lib/userdiscover.py
 msgctxt "#32265"
 msgid "With Companies"
-msgstr "Con le aziende"
+msgstr "Con le case di produzione"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32266"
@@ -1912,7 +1912,7 @@ msgstr "Inserisci nuovo nome"
 #: /resources/lib/addon/plugin.py
 msgctxt "#32360"
 msgid "Companies"
-msgstr "Aziende"
+msgstr "Case di produzione"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32361"
