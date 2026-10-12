@@ -110,6 +110,8 @@ class AiringNextItemGetter:
         if not self.tmdb_id:
             return {}
         meta = self.lidc.get_item('tv', self.tmdb_id)
+        if not meta:
+            return {}
         meta = meta.get('infoproperties')
         if not meta:
             return {}
