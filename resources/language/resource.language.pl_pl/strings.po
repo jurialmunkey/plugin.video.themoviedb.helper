@@ -842,7 +842,7 @@ msgstr "Automatyczna aktualizacja biblioteki z list(y)"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
-msgid "Do you wish to update the library from the Trakt list(s) now?"
+msgid "Do you wish to update the library from the list(s) now?"
 msgstr "Czy chcesz teraz zaktualizować bibliotekę z list(y)?"
 
 #: /resources/lib/script.py
