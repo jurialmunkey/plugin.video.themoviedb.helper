@@ -52,7 +52,7 @@ class ListMDbListCustomProperties(ListMDbListLocalProperties):
 
     @cached_property
     def offset(self):
-        return ((self.page - 1) * 20)
+        return ((self.page - 1) * self.limit)
 
     @cached_property
     def response_kwgs(self):
