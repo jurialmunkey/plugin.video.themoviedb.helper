@@ -55,7 +55,7 @@ class ListMDbListLocalProperties(ListStandardProperties):
             ('seasons', len(self.seasons)),
             ('episodes', len(self.episodes)),
         ]
-        container_content = sorted(container_content, key=lambda x: x[1])
+        container_content = sorted(container_content, key=lambda x: x[1], reverse=True)
         return container_content[0][0]
 
     @property

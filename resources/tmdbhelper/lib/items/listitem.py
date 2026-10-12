@@ -609,17 +609,6 @@ class _Episode(_Video):
     ftv_type = 'tv'
     thumb_override = 0
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_format = self.init_label_format()
-
-    def init_label_format(self):
-        if boolean(self.infoproperties.pop('no_label_formatting', False)):
-            return '{label}'
-        if not self.episode or self.season is None:
-            return '{label}'
-        return '{season}x{episode:0>2}. {label}'
-
     @property
     def playcount(self):
         return try_int(self.infolabels.get('playcount'), fallback=None)
@@ -665,8 +654,22 @@ class _Episode(_Video):
     def title(self):
         return self.infolabels.get('title') or self.label
 
+    @property
+    def label_season(self):
+        return self.infoproperties.get('group_season') or self.season
+
+    @property
+    def label_episode(self):
+        return self.infoproperties.get('group_episode') or self.episode
+
+    @cached_property
+    def label_format(self):
+        if not self.label_episode or self.label_season is None:
+            return '{label}'
+        return '{season}x{episode:0>2}. {label}'
+
     def finalise_label(self):
-        self.label = self.label_format.format(season=self.season, episode=self.episode, label=self.title)
+        self.label = self.label_format.format(season=self.label_season, episode=self.label_episode, label=self.title)
         self.label = super().finalise_label()
         return self.label
 

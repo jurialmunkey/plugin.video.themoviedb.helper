@@ -71,19 +71,28 @@ class EpisodeGroupSeasonItemMapper(EpisodeGroupItemMapper):
 
 class EpisodeGroupEpisodeItemMapper(EpisodeGroupItemMapper):
 
+    @cached_property
+    def group_season(self):
+        return self.group['group_ordering']
+
+    @cached_property
+    def group_episode(self):
+        return self.group['ordering'] + 1
+
     def get_infolabels(self):
         infolabels = super().get_infolabels()
         infolabels.update({
             'mediatype': 'episode',
             'season': self.group['season'], 'episode': self.group['episode'],
+            'code': f'{self.group_season}x{self.group_episode:02d}',
         })
         return infolabels
 
     def get_infoproperties(self):
         infoproperties = super().get_infoproperties()
         infoproperties.update({
-            'group_season': self.group['group_ordering'],
-            'group_episode': self.group['ordering'],
+            'group_season': self.group_season,
+            'group_episode': self.group_episode,
         })
         return infoproperties
 

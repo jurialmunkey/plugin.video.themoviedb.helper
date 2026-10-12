@@ -835,12 +835,12 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32131"
-msgid "Auto-update library from Trakt list(s)"
+msgid "Auto-update library from list(s)"
 msgstr ""
 
 #: /resources/lib/script.py
 msgctxt "#32132"
-msgid "Do you wish to update the library from the Trakt list(s) now?"
+msgid "Do you wish to update the library from the list(s) now?"
 msgstr ""
 
 #: /resources/lib/script.py
@@ -2740,6 +2740,21 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32542"
 msgid "Additional season: Groups"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32543"
+msgid "Curated Lists"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32544"
+msgid "Official Lists"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32545"
+msgid "Streaming Charts"
 msgstr ""
 
 msgctxt "#30030"

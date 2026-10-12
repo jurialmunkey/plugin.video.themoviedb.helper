@@ -78,3 +78,10 @@ class ListEpisodeGroupSeasons(ListEpisodeGroups):
 
 class ListEpisodeGroupEpisodes(ListEpisodeGroups):
     list_properties_class = ListEpisodeGroupEpisodesProperties
+
+    @cached_property
+    def sort_methods(self):
+        from xbmcplugin import SORT_METHOD_UNSORTED
+        return [
+            {'sortMethod': SORT_METHOD_UNSORTED, 'labelMask': '[%P. ]%T', 'label2Mask': '%D'},
+        ]
