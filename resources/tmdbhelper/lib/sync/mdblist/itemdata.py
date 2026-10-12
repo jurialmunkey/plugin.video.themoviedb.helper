@@ -14,6 +14,16 @@ class MDbListSyncItemData(SyncItemData):  # TODO: FIXME
     reset_at = None
 
     """
+    hidden_at
+    """
+    @cached_property
+    def hidden_at(self):
+        return self.get_hidden_at()
+
+    def get_hidden_at(self):
+        return self.item.get('dropped_at')
+
+    """
     season_number
     """
     @cached_property

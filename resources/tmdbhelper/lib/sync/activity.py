@@ -94,6 +94,8 @@ class SyncLastActivities(SyncDataParentProperties):
                 activity_key = keys.get('default')
                 activity_utc = mdblist_data.get(keys.get(item_type) or activity_key)
                 data.setdefault(item_type, {})[activity_key] = activity_utc
+        if get_setting('sync_source_watched', 'str') == 'MDbList':
+            data.setdefault('shows', {})['dropped_at'] = mdblist_data.get('dropped_at')
         return data
 
     def is_expired(self, timestamp, keys=None):

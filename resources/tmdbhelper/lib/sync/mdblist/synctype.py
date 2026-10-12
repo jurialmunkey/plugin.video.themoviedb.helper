@@ -1,4 +1,10 @@
-from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodesInShows, MDbListDataTypeEpisodesToShows, MDbListDataTypeNull
+from tmdbhelper.lib.sync.mdblist.datatype import (
+    MDbListDataType,
+    MDbListDataTypeEpisodesInShows,
+    MDbListDataTypeEpisodesToShows,
+    MDbListDataTypeNull,
+    MDbListDataTypeOffset,
+)
 from tmdbhelper.lib.sync.mdblist.dataconf import configure_episode_list
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
 from tmdbhelper.lib.sync.datatype import timerlock
@@ -124,3 +130,17 @@ class SyncHiddenCalendar(MDbListDataTypeNull):
     last_activities_key = 'hidden_at'
     method = 'hidden/calendar'
     key_prefix = 'calendar'
+
+
+class SyncHiddenDropped(MDbListDataTypeOffset):
+    keys = ('hidden_at', )
+    last_activities_key = 'dropped_at'
+    method = 'sync/dropped'
+    key_prefix = 'dropped'
+
+    def get_response_sync(self, *args, **kwargs):
+        if self.item_type != 'show':  # MDbList only supports dropping shows
+            return []
+        if not self.mdblist_api:
+            return
+        return super().get_response_sync(*args, **kwargs)

@@ -3,9 +3,9 @@ from tmdbhelper.lib.script.sync.trakt.basic import (
     ItemUnwatched,
     ItemWatchlist,
     ItemCollection,
-    ItemFavorites,
-    ItemDropped
+    ItemFavorites
 )
+from tmdbhelper.lib.script.sync.dropped import ItemDropped
 from tmdbhelper.lib.script.sync.trakt.rating import ItemRating
 from tmdbhelper.lib.script.sync.trakt.comments import ItemComments
 from tmdbhelper.lib.script.sync.trakt.userlist import (
