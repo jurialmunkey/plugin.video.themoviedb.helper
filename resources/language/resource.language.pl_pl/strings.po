@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-10-12 06:00+0200\n"
+"PO-Revision-Date: 2026-10-12 12:00+0200\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -2756,6 +2756,21 @@ msgstr "Grupy"
 msgctxt "#32542"
 msgid "Additional season: Groups"
 msgstr "Dodatkowy sezon: Grupy"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32543"
+msgid "Curated Lists"
+msgstr "Listy autorskie"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32544"
+msgid "Official Lists"
+msgstr "Listy oficjalne"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
+msgctxt "#32545"
+msgid "Streaming Charts"
+msgstr "Trendy streamingu"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
