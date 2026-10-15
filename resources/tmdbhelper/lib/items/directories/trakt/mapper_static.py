@@ -42,6 +42,8 @@ class StaticItemMapper(ItemMapper):
     @cached_property
     def list_slug(self):
         with suppress(KeyError):
+            if self.list_type == 'official':  # Trakt only serves official list items by numeric id
+                return str(self.meta['list']['ids']['trakt'])
             return self.meta['list']['ids']['slug']
 
     @cached_property
