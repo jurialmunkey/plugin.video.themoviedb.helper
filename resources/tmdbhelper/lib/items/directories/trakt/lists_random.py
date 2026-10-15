@@ -86,8 +86,10 @@ class ListTraktStaticTrendingRandomised(ListTraktCustom):
     sample_class = ListTraktStaticTrending
 
     def get_items(self, *args, tmdb_type=None, **kwargs):
-        item = random.choice(self.sample_class(-1, 'nextpage=false').get_items(tmdb_type='both'))
-        return super().get_items(**item['params'])
+        items = [i for i in self.sample_class(-1, 'nextpage=false').get_items(tmdb_type='both') or () if i and i.get('params')]
+        if not items:
+            return []
+        return super().get_items(**random.choice(items)['params'])
 
 
 class ListTraktStaticPopularRandomised(ListTraktStaticTrendingRandomised):
