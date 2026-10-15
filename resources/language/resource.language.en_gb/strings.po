@@ -2763,6 +2763,11 @@ msgctxt "#32546"
 msgid "Trakt / MDbList options"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32547"
+msgid "Subgenres"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
