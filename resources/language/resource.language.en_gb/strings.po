@@ -2757,6 +2757,11 @@ msgctxt "#32545"
 msgid "Streaming Charts"
 msgstr ""
 
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32546"
+msgid "Subgenres"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
