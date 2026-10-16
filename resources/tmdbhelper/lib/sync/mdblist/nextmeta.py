@@ -30,13 +30,7 @@ class MDbListSyncNextEpisodeItem(SyncNextEpisodeItem):
     reset_at = None  # MDbList doesnt track this rewatch data ?
 
     def is_next_episode(self, season, episode):
-        if self.main.instance_syncdata.get_episode_playcount(  # TODO Maybe a faster way than this due to timerlock e.g. check next episode ID and then all episodes later
-            self.tmdb_id,
-            season=season['number'],
-            episode=episode['number']
-        ):
-            return False
-        return True
+        return self.get_next_episode_id(season['number'], episode['number']) not in self.watched_episode_ids
 
     @cached_property
     def response(self):
@@ -51,3 +45,16 @@ class MDbListSyncAllNextEpisodesMetaItem(SyncAllNextEpisodesMetaItem):
 
 class MDbListSyncAllNextEpisodesMeta(SyncAllNextEpisodesMeta):
     meta_item_getter = MDbListSyncAllNextEpisodesMetaItem
+
+    def get_watched_episode_ids(self):
+        sd = self.main.instance_syncdata.get_all_episode_playcounts_getter()
+        return frozenset(i['id'] for i in sd.items if i['plays'])
+
+    def get_item_queue(self):
+        self.watched_episode_ids = self.get_watched_episode_ids()
+        return super().get_item_queue()
+
+    def get_items(self, item):
+        meta_item = self.meta_item_getter(self.main, item)
+        meta_item.sync.watched_episode_ids = self.watched_episode_ids
+        return meta_item.data

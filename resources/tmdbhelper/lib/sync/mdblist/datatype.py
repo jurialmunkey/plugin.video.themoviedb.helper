@@ -66,5 +66,8 @@ class MDbListDataTypeNull(MDbListDataType):  # NullType for when no correspondin
 
     keys = tuple()
 
+    def clear_columns(self, keys):
+        pass
+
     def get_response_sync(self, *args, **kwargs):
         return []

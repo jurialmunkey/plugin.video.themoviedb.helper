@@ -156,6 +156,12 @@ class SyncDataGetterAllUnHiddenEpisodesUpNext(SyncDataGetterDroppedWatchedUnHidd
     clause_keys = ('upnext_episode_id', )
 
 
+class SyncDataGetterAllEpisodePlaycounts(SyncDataGetterAll):
+    query_values = ('episode', )
+    clause_keys = ('plays', )
+    base_keys = ('id', )
+
+
 class SyncDataGetterAllItems(SyncDataGetterAll):
     @property
     def query_values(self):
@@ -302,6 +308,9 @@ class SyncDataGetters:
 
     def get_all_unhidden_episodes_upnext_getter(self):
         return SyncDataGetterAllUnHiddenEpisodesUpNext(self)
+
+    def get_all_episode_playcounts_getter(self):
+        return SyncDataGetterAllEpisodePlaycounts(self)
 
     def get_all_unhidden_shows_inprogress_getter(self):
         return SyncDataGetterAllUnHiddenShowsInProgress(self)
