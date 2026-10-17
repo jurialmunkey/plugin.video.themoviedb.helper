@@ -142,6 +142,32 @@ class ConfigureEpisodeDataItem:
         return {'number': number, 'plays': plays, 'last_watched_at': last_watched_at}
 
 
+def configure_episode_snapshot(episode_list, show_list):
+    """ Restore the existing episode format with metadata fetched once per show. """
+    try:
+        shows = {
+            item['show']['ids']['tmdb']: {k: item['show'][k] for k in ('title', 'year', 'ids')}
+            for item in show_list
+        }
+        data = []
+        for item in episode_list:
+            if not item['show'] or not item['last_watched_at']:
+                return
+            if not isinstance(item['season'], int) or not isinstance(item['episode'], int):
+                return
+            data.append({
+                'last_watched_at': item['last_watched_at'],
+                'episode': {
+                    'season': item['season'],
+                    'number': item['episode'],
+                    'show': shows[item['show']],
+                },
+            })
+        return data
+    except (AttributeError, KeyError, TypeError):
+        return
+
+
 def configure_episode_list(episode_list):
     meta = {}
     data = [ConfigureEpisodeDataItem(item, meta) for item in episode_list]

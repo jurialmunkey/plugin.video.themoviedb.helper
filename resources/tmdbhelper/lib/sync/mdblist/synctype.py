@@ -1,7 +1,15 @@
-from tmdbhelper.lib.sync.mdblist.datatype import MDbListDataType, MDbListDataTypeEpisodesInShows, MDbListDataTypeEpisodesToShows, MDbListDataTypeNull
-from tmdbhelper.lib.sync.mdblist.dataconf import configure_episode_list
+from tmdbhelper.lib.sync.mdblist.datatype import (
+    MDbListDataType,
+    MDbListDataTypeEpisodesInShows,
+    MDbListDataTypeNull,
+    MDbListDataTypeOffset,
+)
+from tmdbhelper.lib.sync.mdblist.watched import SyncWatchedFactory
 from tmdbhelper.lib.addon.consts import HALFDAY_EXPIRY
 from tmdbhelper.lib.sync.datatype import timerlock
+
+
+SyncWatched = SyncWatchedFactory
 
 
 class SyncWatchlist(MDbListDataType):
@@ -53,41 +61,6 @@ class SyncNextEpisodes(MDbListDataType):
             pass
 
 
-class SyncWatched(MDbListDataTypeEpisodesToShows):
-    keys = ('plays', 'last_watched_at', )  # 'last_updated_at', 'aired_episodes', 'watched_episodes', 'reset_at',
-    last_activities_key = 'watched_at'
-    method = 'sync/watched'
-
-    def get_data_list_by_type(self, data):
-        try:
-            return data[f'{self.sync_kwgs_mediatype}s']
-        except KeyError:
-            return
-
-    def get_response_sync(self, *args, **kwargs):
-        data = super().get_response_sync(*args, **kwargs)
-        return configure_episode_list(data) if data and self.sync_kwgs_mediatype == 'episode' else data
-
-    def clear_columns(self, *args, **kwargs):
-        if self.timestamp:  # Skip clearing columns if we just update
-            return
-        super().clear_columns(*args, **kwargs)
-
-    @property
-    def sync_kwgs_mediatype(self):
-        if self.item_type in ('show', 'season', 'episode'):
-            return 'episode'
-        return self.item_type
-
-    @property
-    def sync_kwgs(self):
-        sync_kwgs = (
-            ('mediatype', self.sync_kwgs_mediatype),
-            ('since', self.timestamp),  # TODO: DO THIS WITH JOURNAL INSTEAD AND REMOVE ITEMS too
-        )
-        return {k: v for k, v in sync_kwgs if v}
-
-
 class SyncAllNextEpisodes(MDbListDataTypeEpisodesInShows):
     keys = ('upnext_episode_id', )
     last_activities_key = 'watched_at'
@@ -124,3 +97,17 @@ class SyncHiddenCalendar(MDbListDataTypeNull):
     last_activities_key = 'hidden_at'
     method = 'hidden/calendar'
     key_prefix = 'calendar'
+
+
+class SyncHiddenDropped(MDbListDataTypeOffset):
+    keys = ('hidden_at', )
+    last_activities_key = 'dropped_at'
+    method = 'sync/dropped'
+    key_prefix = 'dropped'
+
+    def get_response_sync(self, *args, **kwargs):
+        if self.item_type != 'show':  # MDbList only supports dropping shows
+            return []
+        if not self.mdblist_api:
+            return
+        return super().get_response_sync(*args, **kwargs)

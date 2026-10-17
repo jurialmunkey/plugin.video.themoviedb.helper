@@ -645,17 +645,6 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="sync_source_playback" type="string" label="14086" help="32417">
-                    <level>0</level>
-                    <default>Trakt</default>
-                    <constraints>
-                        <options>
-                            <option>Trakt</option>
-                            <option>MDbList</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
             </group>
         </category>
         <category id="players" label="32014" help="">
@@ -831,7 +820,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="contextmenu_sync_trakt" type="boolean" label="32295" help="">
+                <setting id="contextmenu_sync_trakt" type="boolean" label="32546" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
