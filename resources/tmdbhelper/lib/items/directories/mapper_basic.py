@@ -2,6 +2,9 @@ from jurialmunkey.ftools import cached_property
 
 
 class NullItemMapper:
+    def __init__(self, *args, **kwargs):
+        pass
+
     @cached_property
     def item(self):
         return {}

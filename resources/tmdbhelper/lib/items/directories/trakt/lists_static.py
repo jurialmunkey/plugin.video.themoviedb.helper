@@ -3,10 +3,10 @@ from tmdbhelper.lib.items.directories.trakt.lists_standard import (
     ListTraktStandardProperties
 )
 from tmdbhelper.lib.items.directories.trakt.mapper_static import (
-    StaticItemMapper,
-    StaticUnLikedItemMapper,
-    StaticLikedItemMapper,
-    StaticOwnedItemMapper,
+    StaticItemMapperFactory,
+    StaticUnLikedItemMapperFactory,
+    StaticLikedItemMapperFactory,
+    StaticOwnedItemMapperFactory,
     StaticGenresItemMapper
 )
 from jurialmunkey.ftools import cached_property
@@ -17,7 +17,7 @@ from contextlib import suppress
 class ListTraktStaticProperties(ListTraktStandardProperties):
 
     container_content = ''
-    item_mapper_class = StaticItemMapper
+    item_mapper_class = StaticItemMapperFactory
     query = None
 
     @property
@@ -110,7 +110,7 @@ class ListTraktStaticOwnedNoCache(ListTraktStatic):
 class ListTraktStaticTrending(ListTraktStatic):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.item_mapper_class = StaticUnLikedItemMapper
+        list_properties.item_mapper_class = StaticUnLikedItemMapperFactory
         list_properties.request_url = 'lists/trending'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32208
@@ -120,7 +120,7 @@ class ListTraktStaticTrending(ListTraktStatic):
 class ListTraktStaticPopular(ListTraktStatic):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.item_mapper_class = StaticUnLikedItemMapper
+        list_properties.item_mapper_class = StaticUnLikedItemMapperFactory
         list_properties.request_url = 'lists/popular'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32209
@@ -130,7 +130,7 @@ class ListTraktStaticPopular(ListTraktStatic):
 class ListTraktStaticUsers(ListTraktStaticOwnedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.item_mapper_class = StaticOwnedItemMapper
+        list_properties.item_mapper_class = StaticOwnedItemMapperFactory
         list_properties.request_url = 'users/{user_slug}/lists'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32524
@@ -145,7 +145,7 @@ class ListTraktStaticUsers(ListTraktStaticOwnedNoCache):
 class ListTraktStaticLiked(ListTraktStaticNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.item_mapper_class = StaticLikedItemMapper
+        list_properties.item_mapper_class = StaticLikedItemMapperFactory
         list_properties.trakt_authorization = True
         list_properties.request_url = 'users/likes/lists'
         list_properties.plugin_name = '{localized}'
@@ -156,7 +156,7 @@ class ListTraktStaticLiked(ListTraktStaticNoCache):
 class ListTraktStaticOwned(ListTraktStaticOwnedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.item_mapper_class = StaticOwnedItemMapper
+        list_properties.item_mapper_class = StaticOwnedItemMapperFactory
         list_properties.trakt_authorization = True
         list_properties.request_url = 'users/me/lists'
         list_properties.plugin_name = '{localized}'
@@ -167,7 +167,7 @@ class ListTraktStaticOwned(ListTraktStaticOwnedNoCache):
 class ListTraktStaticSearch(ListTraktStaticNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.item_mapper_class = StaticUnLikedItemMapper
+        list_properties.item_mapper_class = StaticUnLikedItemMapperFactory
         list_properties.trakt_authorization = True
         list_properties.request_url = 'search/list?query={query}&fields=name'
         list_properties.plugin_name = '{localized} ({query})'
@@ -187,7 +187,7 @@ class ListTraktStaticListed(ListTraktStatic):
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
-        list_properties.item_mapper_class = StaticUnLikedItemMapper
+        list_properties.item_mapper_class = StaticUnLikedItemMapperFactory
         list_properties.request_url = '{trakt_type}s/{trakt_slug}/lists/personal/{trakt_sort}'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32232
