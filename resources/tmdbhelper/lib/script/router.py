@@ -65,17 +65,17 @@ class Script(object):
         'rename_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'rename_list')(**kwargs),
         'sync_trakt':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sync_trakt')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'sync_item')(**kwargs),
         'sort_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sort_list')(**kwargs),
         'sort_mdblist':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sort_mdblist')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.mdblist', 'sort_mdblist')(**kwargs),
         'invalidate_sync':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'invalidate_sync')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'invalidate_sync')(**kwargs),
         'invalidate_trakt_sync':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'invalidate_sync')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'invalidate_sync')(**kwargs),
         'get_trakt_stats':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'get_stats')(**kwargs),
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'get_stats')(**kwargs),
         'authenticate_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'authenticate_trakt')(**kwargs),
         'revoke_trakt':

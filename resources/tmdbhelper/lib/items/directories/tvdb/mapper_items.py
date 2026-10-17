@@ -1,5 +1,5 @@
 from tmdbhelper.lib.addon.plugin import ADDONPATH
-from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
+from tmdbhelper.lib.items.directories.mapper_basic import ItemMapper
 from jurialmunkey.ftools import cached_property
 
 

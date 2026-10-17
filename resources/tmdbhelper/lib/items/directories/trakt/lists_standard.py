@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.directories.lists_default import UncachedItemsPage
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
-from tmdbhelper.lib.items.directories.trakt.mapper_standard import FactoryItemMapper
+from tmdbhelper.lib.items.directories.mapper_standard import FactoryItemMapper
 from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int

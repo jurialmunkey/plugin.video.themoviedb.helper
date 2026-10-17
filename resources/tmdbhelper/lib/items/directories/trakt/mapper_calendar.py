@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_standard import EpisodeItemMapper, MovieItemMapper
+from tmdbhelper.lib.items.directories.mapper_standard import EpisodeItemMapper, MovieItemMapper
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_region_date
 from jurialmunkey.ftools import cached_property
 

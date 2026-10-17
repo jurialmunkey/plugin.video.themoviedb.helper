@@ -67,7 +67,7 @@ class CronJobMonitor(SafeThread):
         self.update_monitor.waitForAbort(1)
         if not get_property('TraktIsAuth', is_type=float):
             return
-        from tmdbhelper.lib.script.method.trakt import get_stats
+        from tmdbhelper.lib.script.method.sync import get_stats
         get_stats()
 
     def _do_library_update(self):

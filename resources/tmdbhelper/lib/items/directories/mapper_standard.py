@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper, NullItemMapper
+from tmdbhelper.lib.items.directories.mapper_basic import ItemMapper, NullItemMapper
 from jurialmunkey.ftools import cached_property
 
 
