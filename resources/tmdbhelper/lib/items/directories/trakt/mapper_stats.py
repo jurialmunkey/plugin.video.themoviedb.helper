@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
+from tmdbhelper.lib.items.directories.mapper_basic import ItemMapper
 from tmdbhelper.lib.addon.plugin import get_infolabel
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, format_date_obj
 from jurialmunkey.ftools import cached_property

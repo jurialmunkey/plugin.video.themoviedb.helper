@@ -1,15 +1,9 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
-from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
-
-
-@is_in_kwargs({'tmdb_type': ['movie', 'tv']})
-@get_tmdb_id
-def sync_trakt(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync_type=None, **kwargs):
-    """ Open sync trakt menu for item """
-    from tmdbhelper.lib.script.sync.trakt.menu import sync_item
-    sync_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, sync_type=sync_type)
+from tmdbhelper.lib.script.method.decorators import is_in_kwargs
+from tmdbhelper.lib.script.method.sync import invalidate_sync
+from tmdbhelper.lib.script.method.lists import select_sort_list
 
 
 @is_in_kwargs({'like_list': True})
@@ -56,30 +50,6 @@ def sort_list(**kwargs):
     from tmdbhelper.lib.items.directories.trakt.lists_sorting import get_sort_methods
     sort_methods = get_sort_methods(kwargs['info'])
     return select_sort_list(sort_methods, **kwargs)
-
-
-def sort_mdblist(**kwargs):
-    from tmdbhelper.lib.items.directories.mdblist.lists_sorting import get_sort_methods
-    sort_methods = get_sort_methods(kwargs['info'])
-    return select_sort_list(sort_methods, **kwargs)
-
-
-def select_sort_list(sort_methods, **kwargs):
-    from xbmcgui import Dialog
-    from tmdbhelper.lib.addon.plugin import executebuiltin, format_folderpath, encode_url
-    x = Dialog().contextmenu([i['name'] for i in sort_methods])
-    if x == -1:
-        return
-    for k, v in sort_methods[x]['params'].items():
-        kwargs[k] = v
-    executebuiltin(format_folderpath(encode_url(**kwargs)))
-
-
-def invalidate_sync(invalidate_sync, notification=True, sync=True, **kwargs):
-    from tmdbhelper.lib.sync.invalidator import SyncInvalidator
-    sync_invalidator = SyncInvalidator(invalidate_sync)
-    sync_invalidator.notification = notification
-    sync_invalidator.run(sync=sync)
 
 
 def authenticate_trakt(**kwargs):

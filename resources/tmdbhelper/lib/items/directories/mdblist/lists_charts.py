@@ -2,7 +2,7 @@ from tmdbhelper.lib.items.directories.lists_default import ListProperties, ListD
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard
 from tmdbhelper.lib.items.directories.mdblist.lists_local import ListMDbListLocalProperties
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
-from tmdbhelper.lib.items.directories.trakt.mapper_standard import FactoryItemMapper
+from tmdbhelper.lib.items.directories.mapper_standard import FactoryItemMapper
 from tmdbhelper.lib.items.directories.mdblist.mapper_charts import StreamingChartsItemMapper
 from tmdbhelper.lib.addon.plugin import convert_type
 from jurialmunkey.parser import try_int

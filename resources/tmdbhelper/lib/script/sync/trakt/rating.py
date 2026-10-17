@@ -8,7 +8,7 @@ class ItemRating(ItemSync):
     allow_episodes = True
     localized_name_add = 32485
     localized_name_rem = 32489
-    trakt_sync_key = 'rating'
+    sync_key = 'rating'
 
     def get_name_remove(self):
         return f'{get_localized(self.localized_name_rem)} ({self.sync_value})'

@@ -820,7 +820,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="contextmenu_sync_trakt" type="boolean" label="32295" help="">
+                <setting id="contextmenu_sync_trakt" type="boolean" label="32546" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>

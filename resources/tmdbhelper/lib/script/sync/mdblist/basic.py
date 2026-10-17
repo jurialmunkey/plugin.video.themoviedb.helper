@@ -1,60 +1,59 @@
-from jurialmunkey.ftools import cached_property
-from jurialmunkey.parser import try_int
-from tmdbhelper.lib.addon.dialog import busy_decorator
-from tmdbhelper.lib.script.sync.trakt.basic import ItemDropped as TraktItemDropped
+from tmdbhelper.lib.script.sync.mdblist.item import ItemSync
+from tmdbhelper.lib.script.sync.actions import (
+    ItemWatched as BasicItemWatched,
+    ItemUnwatched as BasicItemUnwatched,
+    ItemWatchlist as BasicItemWatchlist,
+    ItemCollection as BasicItemCollection,
+    ItemDropped as BasicItemDropped,
+)
 
 
-class ItemDropped(TraktItemDropped):
-    trakt_sync_url = 'sync/dropped'
+class ItemWatched(ItemSync, BasicItemWatched):
+    sync_url = 'sync/watched'
+    activity_methods = ('sync/watched', 'upnext', 'all_next_episodes', 'sync/playback', )
 
-    @cached_property
-    def mdblist_api(self):
-        from tmdbhelper.lib.api.mdblist.api import MDbListAPI
-        return MDbListAPI()
 
-    @cached_property
-    def is_available(self):
-        return bool(self.mdblist_api)
+class ItemUnwatched(ItemWatched, BasicItemUnwatched):
+    pass
+
+
+class ItemWatchlist(ItemSync, BasicItemWatchlist):
+    sync_url = 'watchlist/items'
+    activity_methods = ('watchlist/items', )
+
+    def get_method(self):
+        return f'{self.sync_url}/{"remove" if self.remove else "add"}'
 
     def get_sync_item(self):
-        return {'ids': {'tmdb': try_int(self.tmdb_id)}}
+        return super().get_sync_item()['ids']
 
-    def get_post_response_args(self):
-        return (self.method, )
 
-    @busy_decorator
-    def get_sync_response(self):
-        if not self.mdblist_api:
-            return
-        path = self.mdblist_api.get_request_url(*self.post_response_args)
-        return self.mdblist_api.get_api_request(
-            path,
-            postdata=self.post_response_data,
-            headers=self.mdblist_api.headers,
-            method='json'
+class ItemCollection(ItemSync, BasicItemCollection):
+    sync_url = 'sync/collection'
+    activity_methods = ('sync/collection', )
+
+    def get_sync_value(self):
+        """ Episode collection status is synced separately from the parent show. """
+        return self.syncdata.get_value(
+            self.tmdb_type,
+            self.tmdb_id,
+            self.season,
+            self.episode,
+            key=self.sync_key,
+            item_type=self.trakt_type
         )
 
-    def get_is_successful_sync(self):
-        if not super().get_is_successful_sync():
-            return False
-        try:
-            return not self.sync_response.json()['not_found']['shows']
-        except (AttributeError, KeyError, TypeError, ValueError):
-            return False
+    def reset_lastactivities(self):
+        super().reset_lastactivities()
+        if self.is_successful_sync and self.tmdb_type == 'tv':
+            self.invalidate_activity('sync/collection', 'episode')
 
-    def get_status_code_message(self):
-        try:
-            if self.sync_response.json()['not_found']['shows']:
-                return 'MDbList: not_found'
-        except (AttributeError, KeyError, TypeError, ValueError):
-            pass
-        return super().get_status_code_message()
+
+class ItemDropped(ItemSync, BasicItemDropped):
+    sync_url = 'sync/dropped'
+    activity_methods = ('sync/dropped', 'upnext', 'all_next_episodes', 'sync/watched', )
 
     def reset_lastactivities(self):
-        if not self.is_successful_sync:
-            return
-        for method in ('sync/dropped', 'upnext', 'all_next_episodes', 'sync/watched'):
-            self.syncdata.cache.del_item(table='lactivities', item_id=f'show.{method}')
-            self.syncdata.window.get_property(f'syncdecorators.timerlock.sync_data.show.{method}', clear_property=True)
-        self.syncdata.reset_lastactivities()
-        self.delete_listdata()
+        super().reset_lastactivities()
+        if self.is_successful_sync:
+            self.delete_listdata()

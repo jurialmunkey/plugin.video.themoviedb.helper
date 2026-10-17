@@ -433,12 +433,12 @@ class SyncData(SyncDataGetters):
         return name
 
     @has_arg_value(0, ('tv', 'movie', ))
-    def get_values(self, tmdb_type, tmdb_id, season=None, episode=None, keys=None):
-        self.sync('show' if tmdb_type == 'tv' else 'movie', keys)
+    def get_values(self, tmdb_type, tmdb_id, season=None, episode=None, keys=None, item_type=None):
+        self.sync(item_type or ('show' if tmdb_type == 'tv' else 'movie'), keys)
         return self.cache.get_values(item_id=self.get_name(tmdb_type, tmdb_id, season, episode), keys=keys)
 
-    def get_value(self, tmdb_type, tmdb_id, season=None, episode=None, key=None):
-        data = self.get_values(tmdb_type, tmdb_id, season, episode, keys=(key,))
+    def get_value(self, tmdb_type, tmdb_id, season=None, episode=None, key=None, item_type=None):
+        data = self.get_values(tmdb_type, tmdb_id, season, episode, keys=(key,), item_type=item_type)
         return data[0] if data else None
 
     def sync(self, item_type, keys, forced=False):
