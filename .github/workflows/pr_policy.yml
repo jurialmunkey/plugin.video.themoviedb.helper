@@ -9,7 +9,7 @@ on:
 # Only inspect API metadata. Never check out or execute pull request code here.
 permissions:
   issues: read
-  pull-requests: read
+  pull-requests: write
   statuses: write
 
 concurrency:
@@ -35,6 +35,37 @@ jobs:
               owner, repo, sha: pr.head.sha, context: 'PR policy', state, description,
               target_url: `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
             });
+            const updatePolicyComment = async (failures) => {
+              const marker = '<!-- tmdbhelper-pr-policy -->';
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner, repo, issue_number: pr.number, per_page: 100
+              });
+              const existing = comments.find(comment =>
+                comment.user.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
+              );
+              if (!failures.length && !existing) return;
+
+              const docs = `${context.serverUrl}/${owner}/${repo}/blob/`
+                + encodeURIComponent(context.payload.repository.default_branch);
+              const message = failures.length
+                ? 'This PR does not currently meet the contribution requirements. '
+                  + '**It may be closed if the following items are not addressed:**\n\n'
+                  + failures.map(failure => `- ${failure}`).join('\n')
+                  + '\n\nUpdate the PR description using the PR template and link a relevant issue '
+                  + 'created with the bug report or feature request template. '
+                  + 'Editing the description or pushing new commits will rerun this check.'
+                : 'The previously reported PR policy requirements have been addressed. '
+                  + 'The automated check now passes; maintainer review is still required.';
+              const body = `${marker}\n## PR policy\n\n${message}\n\n`
+                + `See the [contributing guide](${docs}/CONTRIBUTING.md) `
+                + `and [AI usage policy](${docs}/AI_USAGE.md).`;
+              if (existing) {
+                if (existing.body === body) return;
+                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+              }
+            };
             await setStatus('pending', 'Checking PR description and linked issue.');
 
             try {
@@ -98,8 +129,14 @@ jobs:
                 }
               }
 
-              if (failures.length) throw new Error(failures.join('\n'));
+              if (failures.length) {
+                await setStatus('failure', 'PR policy failed. See the policy comment for required changes.');
+                await updatePolicyComment(failures);
+                core.setFailed(failures.join('\n'));
+                return;
+              }
               await setStatus('success', 'PR description and linked issue meet the policy.');
+              await updatePolicyComment([]);
               await core.summary.addHeading('PR policy').addRaw(
                 'Passed: required sections are filled in and a bug report or feature request is linked. '
                 + 'Maintainer review still determines relevance, suitability, and correctness.'
