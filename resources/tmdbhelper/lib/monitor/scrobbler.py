@@ -220,7 +220,7 @@ class PlayerScrobbler():
     @is_scrobbling
     def update_stats(self):
         if self.is_trakt_authorized:
-            from tmdbhelper.lib.script.method.sync import get_stats
+            from tmdbhelper.lib.script.method.trakt import get_stats
             from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
             get_property(LASTACTIVITIES_DATA, clear_property=True)
             get_stats()
