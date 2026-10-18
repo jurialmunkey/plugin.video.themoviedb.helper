@@ -68,6 +68,25 @@ class TraktDiscoverGenres(DiscoverMulti):
         return tuple((DiscoverItem(i['name'], i['slug']) for i in self.routes_items if i))
 
 
+class TraktDiscoverSubgenres(TraktDiscoverGenres):
+    idx = None
+    key = 'subgenres'
+    label_prefix_localized = 32547
+
+    @staticmethod
+    def get_subgenres(genres):
+        subgenres = {j['slug']: j['name'] for i in genres or () if i for j in i.get('subgenres') or () if j}
+        return [{'slug': k, 'name': v} for k, v in sorted(subgenres.items(), key=lambda x: x[1].lower())]
+
+    @cached_property
+    def routes_items_movies(self):
+        return self.get_subgenres(self.main.trakt_api.get_response_json('genres/movies', extended='subgenres'))
+
+    @cached_property
+    def routes_items_shows(self):
+        return self.get_subgenres(self.main.trakt_api.get_response_json('genres/shows', extended='subgenres'))
+
+
 class TraktDiscoverCertifications(TraktDiscoverGenres):
     idx = None
     key = 'certifications'
@@ -209,6 +228,7 @@ class TraktDiscoverMain(DiscoverMain):
             'query': TraktDiscoverQuery(self),
             'years': TraktDiscoverYears(self),
             'genres': TraktDiscoverGenres(self),
+            'subgenres': TraktDiscoverSubgenres(self),
             'certifications': TraktDiscoverCertifications(self),
             'watchnow': TraktDiscoverAvailability(self),
             'runtimes': TraktDiscoverRuntimes(self),

@@ -44,5 +44,5 @@ body:
       required: true
     - label: I have updated TMDbHelper to the most recent version.
       required: true
-    - label: I have read the note on AI usage in reports in https://github.com/jurialmunkey/plugin.video.themoviedb.helper/issues/1856
+    - label: I have read the [AI usage policy](https://github.com/jurialmunkey/plugin.video.themoviedb.helper/blob/nexus/AI_USAGE.md).
       required: true

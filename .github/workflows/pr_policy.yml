@@ -1,0 +1,147 @@
+name: PR policy
+
+# After publishing, require the "PR policy" status from GitHub Actions in the
+# target branch's ruleset. The workflow alone does not prevent merging.
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+
+# Only inspect API metadata. Never check out or execute pull request code here.
+permissions:
+  issues: read
+  pull-requests: write
+  statuses: write
+
+concurrency:
+  group: pr-policy-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate PR policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check description and linked issue
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const { data: pr } = await github.rest.pulls.get({
+              owner, repo, pull_number: context.payload.pull_request.number
+            });
+            // Attach the required status to this PR's head, not the target branch.
+            const setStatus = (state, description) => github.rest.repos.createCommitStatus({
+              owner, repo, sha: pr.head.sha, context: 'PR policy', state, description,
+              target_url: `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
+            });
+            const updatePolicyComment = async (failures) => {
+              const marker = '<!-- tmdbhelper-pr-policy -->';
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner, repo, issue_number: pr.number, per_page: 100
+              });
+              const existing = comments.find(comment =>
+                comment.user.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
+              );
+              if (!failures.length && !existing) return;
+
+              const docs = `${context.serverUrl}/${owner}/${repo}/blob/`
+                + encodeURIComponent(context.payload.repository.default_branch);
+              const message = failures.length
+                ? 'This PR does not currently meet the contribution requirements. '
+                  + '**It may be closed if the following items are not addressed:**\n\n'
+                  + failures.map(failure => `- ${failure}`).join('\n')
+                  + '\n\nUpdate the PR description using the PR template and link a relevant issue '
+                  + 'created with the bug report or feature request template. '
+                  + 'Editing the description or pushing new commits will rerun this check.'
+                : 'The previously reported PR policy requirements have been addressed. '
+                  + 'The automated check now passes; maintainer review is still required.';
+              const body = `${marker}\n## PR policy\n\n${message}\n\n`
+                + `See the [contributing guide](${docs}/CONTRIBUTING.md) `
+                + `and [AI usage policy](${docs}/AI_USAGE.md).`;
+              if (existing) {
+                if (existing.body === body) return;
+                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+              }
+            };
+            await setStatus('pending', 'Checking PR description and linked issue.');
+
+            try {
+              const body = (pr.body || '').replace(/<!--[\s\S]*?(?:-->|$)/g, '');
+              const sections = new Map();
+              let section;
+              for (const line of body.split(/\r?\n/)) {
+                const heading = line.match(/^##\s+(.+?)\s*#*\s*$/);
+                if (heading) {
+                  section = heading[1].trim().toLowerCase();
+                  sections.set(section, []);
+                } else if (section) {
+                  sections.get(section).push(line);
+                }
+              }
+
+              const failures = [];
+              for (const title of ['Related issue or discussion', 'Problem and change', 'Verification']) {
+                if (!sections.get(title.toLowerCase())?.join('\n').trim()) {
+                  failures.push(`Fill in the "${title}" section from the PR template.`);
+                }
+              }
+
+              const references = sections.get('related issue or discussion')?.join('\n') || '';
+              const issueNumbers = new Set();
+              const urlPattern = /https:\/\/github\.com\/([^/\s]+)\/([^/\s]+)\/issues\/([1-9]\d*)\b/gi;
+              for (const match of references.matchAll(urlPattern)) {
+                if (`${match[1]}/${match[2]}`.toLowerCase() === `${owner}/${repo}`.toLowerCase()) {
+                  issueNumbers.add(Number(match[3]));
+                }
+              }
+              // Remove external URLs and qualified references before matching local #123 links.
+              const localReferences = references.replace(/https?:\/\/\S+/gi, '')
+                .replace(/[\w.-]+\/[\w.-]+#[1-9]\d*/g, '');
+              for (const match of localReferences.matchAll(/(?<![\w/])#([1-9]\d*)\b/g)) {
+                issueNumbers.add(Number(match[1]));
+              }
+
+              if (!issueNumbers.size) {
+                failures.push('Link a bug report or feature request in this repository using #123 or its full issue URL.');
+              } else if (issueNumbers.size > 20) {
+                failures.push('Link at most 20 issues; keep the PR focused on one problem or feature.');
+              } else {
+                let validIssue = false;
+                for (const issue_number of issueNumbers) {
+                  let issue;
+                  try {
+                    ({ data: issue } = await github.rest.issues.get({ owner, repo, issue_number }));
+                  } catch (error) {
+                    if (error.status !== 404 && error.status !== 410) throw error;
+                    continue;
+                  }
+                  const labels = issue.labels.map(label => typeof label === 'string' ? label : label.name);
+                  if (!issue.pull_request && labels.some(label => ['bug', 'enhancement'].includes(label))) {
+                    validIssue = true;
+                    break;
+                  }
+                }
+                if (!validIssue) {
+                  failures.push('Link an existing issue labelled "bug" or "enhancement". Another PR does not qualify.');
+                }
+              }
+
+              if (failures.length) {
+                await setStatus('failure', 'PR policy failed. See the policy comment for required changes.');
+                await updatePolicyComment(failures);
+                core.setFailed(failures.join('\n'));
+                return;
+              }
+              await setStatus('success', 'PR description and linked issue meet the policy.');
+              await updatePolicyComment([]);
+              await core.summary.addHeading('PR policy').addRaw(
+                'Passed: required sections are filled in and a bug report or feature request is linked. '
+                + 'Maintainer review still determines relevance, suitability, and correctness.'
+              ).write();
+            } catch (error) {
+              await setStatus('failure', 'PR policy failed. Open the workflow run for details.');
+              core.setFailed(error.message);
+            }
