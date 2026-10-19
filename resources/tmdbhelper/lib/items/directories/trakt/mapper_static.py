@@ -193,7 +193,7 @@ class StaticItemMapperFactory:
             return cls.official_item_mapper_class(meta, add_infoproperties)
         if helper.is_available:
             return cls.item_mapper_class(meta, add_infoproperties)
-        return NullItemMapper(meta, add_infoproperties)
+        return NullItemMapper()
 
 
 class StaticLikedItemMapperFactory(StaticItemMapperFactory):
