@@ -2931,7 +2931,7 @@ msgstr "Croato (Croazia)"
 #: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
-msgstr "API key OMDb"
+msgstr "Chiave API OMDb"
 
 #: /resources/settings.xml
 msgctxt "#32002"
