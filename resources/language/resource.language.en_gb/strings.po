@@ -2331,6 +2331,16 @@ msgid "Stop before attempting playback"
 msgstr ""
 
 #: /resources/settings.xml
+msgctxt "#32464"
+msgid "Region → Language"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32465"
+msgid "Region → English"
+msgstr ""
+
+#: /resources/settings.xml
 msgctxt "#32449"
 msgid "Ignore region release filter"
 msgstr ""
@@ -2388,6 +2398,11 @@ msgstr ""
 #: /resources/lib/api/tvdb/lists.py
 msgctxt "#32461"
 msgid "Winner of"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32478"
+msgid "Artwork preference"
 msgstr ""
 
 #: /resources/lib/api/tvdb/lists.py
@@ -2730,9 +2745,7 @@ msgctxt "#32540"
 msgid "All digital releases"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_details.py
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_episode_groups.py
-#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/groupsseason.py
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_details.py /resources/tmdbhelper/lib/items/directories/tmdb/lists_episode_groups.py /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/groupsseason.py
 msgctxt "#32541"
 msgid "Groups"
 msgstr ""
@@ -2757,8 +2770,7 @@ msgctxt "#32545"
 msgid "Streaming Charts"
 msgstr ""
 
-#: /resources/settings.xml
-#: /resources/tmdbhelper/lib/items/context.py
+#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
 msgctxt "#32546"
 msgid "Trakt / MDbList options"
 msgstr ""
