@@ -2275,6 +2275,11 @@ msgctxt "#32437"
 msgid "Configure provider data allowlist"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32450"
+msgid "Prefer fallbacks in English"
+msgstr ""
+
 #: /resources/lib/script/method.py
 msgctxt "#32438"
 msgid "Provider allowlist updated"
@@ -2413,6 +2418,11 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache items in custom lists you own for 24 hours"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32479"
+msgid "Determines what artwork to use when artwork from your region is unavailable. Enable to prefer English artwork. Disable to prefer artwork in your language from other regions."
 msgstr ""
 
 #: /resources/settings.xml

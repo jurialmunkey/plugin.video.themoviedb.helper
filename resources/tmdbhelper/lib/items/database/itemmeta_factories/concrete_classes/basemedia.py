@@ -218,7 +218,7 @@ class MediaItemArtworkRoutes:
     @property
     def base_configured_routes(self):
         if not get_setting('fanarttv_lookup'):
-            if get_setting('art_preferences') == 1:
+            if get_setting('regional_prefer'):
                 return self.get_art_list_country_preferred()
             return self.get_art_list(allow_tmdb=True)
         if not get_setting('language_lookup'):
@@ -226,7 +226,7 @@ class MediaItemArtworkRoutes:
                 return self.get_art_list_ftv_preferred()
             return self.get_art_list_tmdb_preferred()
         if not get_setting('fanarttv_prefer'):
-            if get_setting('art_preferences') == 1:  # Fanart TV does not have country so dont apply it when fanarttv is preferred
+            if get_setting('regional_prefer'):  # Fanart TV does not have country so dont apply it when fanarttv is preferred
                 return self.get_art_list_country_preferred(allow_ftv=True)
             return self.get_art_list_tmdb_language()
         return self.get_art_list_ftv_language()
