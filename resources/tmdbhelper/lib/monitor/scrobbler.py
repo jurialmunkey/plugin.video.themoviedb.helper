@@ -7,9 +7,10 @@ from tmdbhelper.lib.addon.tmdate import set_timestamp
 
 
 class PlayerScrobbler():
-    def __init__(self, total_time, trakt_api=None, mdblist_api=None):
+    def __init__(self, total_time, trakt_api=None, mdblist_api=None, floppy_api=None):
         self.trakt_api = trakt_api
         self.mdblist_api = mdblist_api
+        self.floppy_api = floppy_api
         self.start_time = 0
         self.total_time = total_time
         self.tvdb_id = self.playerstring.get('tvdb_id')
@@ -56,6 +57,29 @@ class PlayerScrobbler():
         if not self.trakt_scrobbler_item:
             return False
         return True
+
+    @property
+    def is_floppy_authorized(self):
+        """ to check that floppy is authorized  """
+
+        if not self.floppy_api:
+            return False
+        if not get_setting('floppy_scrobbling'):
+            return False
+        if self.is_floppy_plugin_scrobbling:
+            return False
+        if not self.floppy_scrobbler_item:
+            return False
+        return True
+
+    @cached_property
+    def is_floppy_plugin_scrobbling(self):
+        """ plugin.video.floppy scrobbles all playback itself so defer to it rather than log plays twice """
+        from xbmcaddon import Addon
+        try:
+            return Addon('plugin.video.floppy').getSetting('scrobble') == 'true'
+        except RuntimeError:  # Not installed or disabled
+            return False
 
     def is_scrobbling(func):
         """ decorator to check if available item should be scrobbled """
@@ -149,6 +173,38 @@ class PlayerScrobbler():
                 'progress': try_int(self.progress)
             }
 
+    @cached_property
+    def floppy_scrobbler_item(self):
+        return self.get_floppy_scrobbler_item() or {}
+
+    @is_scrobbling
+    def get_floppy_scrobbler_item(self):
+        if self.tmdb_type == 'tv':
+            if not self.season or not self.episode:
+                return
+            return {
+                'media_type': 'episode',
+                'ids': {'tmdb': f'{self.tmdb_id}'},
+                'season_number': self.season,
+                'episode_number': self.episode,
+            }
+
+        if self.tmdb_type == 'movie':
+            return {
+                'media_type': 'movie',
+                'ids': {'tmdb': f'{self.tmdb_id}'},
+            }
+
+    def get_floppy_scrobbler_data(self, method):
+        """ Floppy only marks complete near the end so send completion explicitly to match the 80% Trakt rule """
+        return {
+            **self.floppy_scrobbler_item,
+            'action': method,
+            'position_seconds': int(self.current_time),
+            'duration_seconds': int(self.total_time),
+            'completed': self.progress >= 80 if method == 'stop' else None,
+        }
+
     @is_scrobbling
     def scrobble(self, method):
         if method not in ('start', 'stop'):
@@ -173,6 +229,19 @@ class PlayerScrobbler():
                 method='json'
             )
             kodi_log(f'SCROBBLER: [MDBLIST] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.mdblist_scrobbler_item}\n{data}', 2)
+        if self.is_floppy_authorized:
+            postdata = self.get_floppy_scrobbler_data(method)
+            path = self.floppy_api.get_request_url('scrobble')
+            data = self.floppy_api.get_simple_api_request(
+                path,
+                postdata=postdata,
+                headers=self.floppy_api.headers,
+                method='json'
+            )
+            kodi_log(f'SCROBBLER: [FLOPPY] [{method}] {self.content_id} -- {self.progress:.2f}%\n{postdata}\n{data}', 2)
+            if method == 'stop' and data:
+                from tmdbhelper.lib.api.floppy.api import set_floppy_reload
+                set_floppy_reload()
 
     @is_scrobbling
     def start(self, tmdb_type, tmdb_id):

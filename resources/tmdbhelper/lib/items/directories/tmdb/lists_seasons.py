@@ -8,11 +8,17 @@ from jurialmunkey.parser import try_int
 class ListSeasons(ContainerDirectory):
     hide_unaired = True
 
+    @property
+    def is_upnext_authorized(self):
+        if get_setting('sync_source_watched', 'str') == 'Floppy':
+            return bool(get_setting('floppy_apikey', 'str'))
+        return bool(get_property('TraktIsAuth', is_type=float))
+
     def get_special_seasons(self, tmdb_id):
         items = []
 
         # Up Next
-        if get_setting('seasons_upnext') and get_property('TraktIsAuth', is_type=float):
+        if get_setting('seasons_upnext') and self.is_upnext_authorized:
             sync = BaseViewFactory('upnextseason', 'tv', tmdb_id)
 
             try:

@@ -40,6 +40,11 @@ class CommonContainerAPIs():
         return MDbListAPI()
 
     @cached_property
+    def floppy_api(self):
+        from tmdbhelper.lib.api.floppy.api import FloppyAPI
+        return FloppyAPI()
+
+    @cached_property
     def omdb_api(self):
         from tmdbhelper.lib.api.omdb.api import OMDb
         from tmdbhelper.lib.addon.plugin import get_setting

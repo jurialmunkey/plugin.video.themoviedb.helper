@@ -284,7 +284,7 @@ class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHid
 
 def SyncDataGetterAllUnHiddenShowsInProgress(instance_syncdata):
     from tmdbhelper.lib.addon.plugin import get_setting
-    if get_setting('sync_source_watched', 'str') == 'MDbList':
+    if get_setting('sync_source_watched', 'str') in ('MDbList', 'Floppy'):  # Both report aired episodes remaining
         from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterAllUnHiddenShowsInProgress
         return MDbListSyncDataGetterAllUnHiddenShowsInProgress(instance_syncdata)
     from tmdbhelper.lib.sync.trakt.datasync import TraktSyncDataGetterAllUnHiddenShowsInProgress
@@ -392,9 +392,10 @@ class SyncDataGetters:
 
 class SyncData(SyncDataGetters):
 
-    def __init__(self, trakt_api=None, mdblist_api=None):
+    def __init__(self, trakt_api=None, mdblist_api=None, floppy_api=None):
         self.trakt_api = trakt_api
         self.mdblist_api = mdblist_api
+        self.floppy_api = floppy_api
 
     @cached_property
     def routes(self):
@@ -461,9 +462,15 @@ def SyncDataFactory(parent=None):
         from tmdbhelper.lib.api.mdblist.api import MDbListAPI
         mdblist_api = MDbListAPI()
 
-    if not trakt_api and not mdblist_api:
+    try:
+        floppy_api = parent.floppy_api
+    except AttributeError:
+        from tmdbhelper.lib.api.floppy.api import FloppyAPI
+        floppy_api = FloppyAPI()
+
+    if not trakt_api and not mdblist_api and not floppy_api:
         return
     # if not trakt_api.is_authorized:  # TODO: Allow MDBLIST ONLY  # AUTHORIZED CHECK MDBLIST
     #     return
 
-    return SyncData(trakt_api=trakt_api, mdblist_api=mdblist_api)
+    return SyncData(trakt_api=trakt_api, mdblist_api=mdblist_api, floppy_api=floppy_api)

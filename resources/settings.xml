@@ -414,6 +414,35 @@
                     <enable>false</enable>
                 </setting>
             </group>
+            <group id="9" label="32548">
+                <setting id="floppy_url" type="string" label="32549" help="">
+                    <level>0</level>
+                    <default>http://localhost:8000</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32549</heading>
+                    </control>
+                </setting>
+                <setting id="floppy_apikey" type="string" label="32550" help="">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32550</heading>
+                    </control>
+                </setting>
+                <setting id="floppy_apikey_access" type="boolean" label="32483" help="" parent="floppy_apikey">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
+            </group>
             <group id="3" label="32124">
                 <setting id="ratingposterdb_apikey" type="string" label="32127" help="">
                     <level>0</level>
@@ -619,6 +648,7 @@
                         <options>
                             <option>Trakt</option>
                             <option>MDbList</option>
+                            <option>Floppy</option>
                         </options>
                     </constraints>
                     <control type="spinner" format="string"/>
@@ -630,6 +660,7 @@
                         <options>
                             <option>Trakt</option>
                             <option>MDbList</option>
+                            <option>Floppy</option>
                         </options>
                     </constraints>
                     <control type="spinner" format="string"/>
@@ -641,6 +672,7 @@
                         <options>
                             <option>Trakt</option>
                             <option>MDbList</option>
+                            <option>Floppy</option>
                         </options>
                     </constraints>
                     <control type="spinner" format="string"/>
@@ -737,6 +769,14 @@
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" operator="!is" setting="mdblist_apikey"></dependency>
+                    </dependencies>
+                </setting>
+                <setting id="floppy_scrobbling" type="boolean" label="32551" help="32553">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="floppy_apikey"></dependency>
                     </dependencies>
                 </setting>
             </group>

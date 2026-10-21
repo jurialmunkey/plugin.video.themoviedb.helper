@@ -2768,6 +2768,36 @@ msgctxt "#32547"
 msgid "Subgenres"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32548"
+msgid "Floppy API"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32549"
+msgid "Floppy server URL"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32550"
+msgid "Floppy API token"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32551"
+msgid "Scrobble items on Floppy while watching"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32552"
+msgid "Sync options"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32553"
+msgid "Skipped while the Floppy add-on (plugin.video.floppy) has its own scrobbling turned on, so plays are not logged twice"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""

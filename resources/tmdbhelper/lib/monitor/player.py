@@ -208,25 +208,29 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
     def onPlayBackEnded(self):
         self.scrobbler_stop()
-        self.refresh_mdblist_watched()
+        self.refresh_sync_source_watched()
         self.reset_properties()
 
     def onPlayBackStopped(self):
         self.scrobbler_stop()
-        self.refresh_mdblist_watched()
+        self.refresh_sync_source_watched()
         self.reset_properties()
 
-    def refresh_mdblist_watched(self):
-        if get_setting('sync_source_watched', 'str') != 'MDbList':
+    def refresh_sync_source_watched(self):
+        scrobbling_settings = {'MDbList': 'mdblist_scrobbling', 'Floppy': None}  # Floppy may be scrobbled by plugin.video.floppy
+        sync_source = get_setting('sync_source_watched', 'str')
+        try:
+            scrobbling_setting = scrobbling_settings[sync_source]
+        except KeyError:  # Trakt refreshes from its own scrobbler sync
             return
-        if not get_setting('mdblist_scrobbling'):
+        if scrobbling_setting and not get_setting(scrobbling_setting):
             return
         from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
         from tmdbhelper.lib.addon.logger import kodi_log
         from tmdbhelper.lib.addon.tmdate import set_timestamp
         self.get_property(LASTACTIVITIES_DATA, clear_property=True)
         self.get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
-        kodi_log('Sync: invalidated MDbList watched activities after playback', 2)
+        kodi_log(f'Sync: invalidated {sync_source} watched activities after playback', 2)
 
     def onPlayBackPaused(self):
         self.scrobbler_pause()
@@ -447,7 +451,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
         # Update scrobbler
         self.scrobbler_stop()
-        self.scrobbler = PlayerScrobbler(total_time=self.getTotalTime(), trakt_api=self.trakt_api, mdblist_api=self.mdblist_api)
+        self.scrobbler = PlayerScrobbler(total_time=self.getTotalTime(), trakt_api=self.trakt_api, mdblist_api=self.mdblist_api, floppy_api=self.floppy_api)
 
         # Clear properties and store the last cleared item
         self.previous_item = self.current_item

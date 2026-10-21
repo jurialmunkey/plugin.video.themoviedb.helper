@@ -2,8 +2,18 @@ from jurialmunkey.modimp import importmodule
 from tmdbhelper.lib.addon.plugin import get_setting
 
 
+SYNC_SOURCE_PROVIDERS = {
+    'MDbList': 'mdblist',
+    'Floppy': 'floppy',
+}
+
+
+def get_sync_provider(source):
+    return SYNC_SOURCE_PROVIDERS.get(get_setting(f'sync_source_{source}', 'str'), 'trakt')
+
+
 def get_sync_item(item_class, source, *args, module='basic', **kwargs):
-    provider = 'mdblist' if get_setting(f'sync_source_{source}', 'str') == 'MDbList' else 'trakt'
+    provider = get_sync_provider(source)
     item_class = importmodule(f'tmdbhelper.lib.script.sync.{provider}.{module}', item_class)
     return item_class(*args, **kwargs)
 

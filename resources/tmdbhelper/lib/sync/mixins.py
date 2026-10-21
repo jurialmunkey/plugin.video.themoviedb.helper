@@ -17,3 +17,7 @@ class SyncDataParentProperties:
     @property
     def mdblist_api(self):
         return self.instance_syncdata.mdblist_api
+
+    @property
+    def floppy_api(self):
+        return self.instance_syncdata.floppy_api

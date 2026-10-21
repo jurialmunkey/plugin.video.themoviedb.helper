@@ -7,8 +7,16 @@ class TraktPlayData():
         self._watchedindicators = watchedindicators  # Set watched status and playcount
 
     @property
+    def is_authorized(self):
+        from tmdbhelper.lib.addon.plugin import get_setting
+        if get_setting('sync_source_watched', 'str') == 'Floppy':
+            from tmdbhelper.lib.api.floppy.api import FloppyAPI
+            return bool(FloppyAPI())
+        return self.trakt_api.authenticator.is_authorized
+
+    @property
     def is_enabled(self):
-        if self.trakt_api.authenticator.is_authorized:
+        if self.is_authorized:
             if self._watchedindicators:
                 return bool(self.syncdata)
             if self._pauseplayprogress:

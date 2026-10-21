@@ -85,7 +85,10 @@ class ContextMenu():
     def get_item_name(name, mediatypes):
         if mediatypes['setting'] != 'contextmenu_sync_trakt':
             return name
-        if any(get_setting(f'sync_source_{source}', 'str') == 'MDbList' for source in ('watched', 'watchlist', 'collection')):
+        sync_sources = [get_setting(f'sync_source_{source}', 'str') for source in ('watched', 'watchlist', 'collection')]
+        if 'Floppy' in sync_sources:
+            return '$ADDON[plugin.video.themoviedb.helper 32552]'
+        if 'MDbList' in sync_sources:
             return '$ADDON[plugin.video.themoviedb.helper 32546]'
         return name
 

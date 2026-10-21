@@ -71,4 +71,7 @@ class BaseDirItemAuthorised(BaseDirItem):
         if self.authorisation_type == 'MDbList':
             from tmdbhelper.lib.addon.plugin import get_setting
             return bool(get_setting('mdblist_apikey', 'str'))
+        if self.authorisation_type == 'Floppy':
+            from tmdbhelper.lib.addon.plugin import get_setting
+            return bool(get_setting('floppy_apikey', 'str'))
         return False

@@ -1,9 +1,5 @@
-from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.script.sync.basic import get_sync_item
 
 
 def ItemDropped(*args, **kwargs):
-    if get_setting('sync_source_watched', 'str') == 'MDbList':
-        from tmdbhelper.lib.script.sync.mdblist.basic import ItemDropped
-    else:
-        from tmdbhelper.lib.script.sync.trakt.basic import ItemDropped
-    return ItemDropped(*args, **kwargs)
+    return get_sync_item('ItemDropped', 'watched', *args, **kwargs)

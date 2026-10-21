@@ -51,10 +51,12 @@ class PermissionHandler:
         'tmdb': 2 ** 4,
         'trakt': 2 ** 5,
         'tvdb': 2 ** 6,
+        'floppy': 2 ** 7,
     }
 
     _PERMISSION_TYPES = {
         'fanarttv': 'fanarttv_clientkey_access',
+        'floppy': 'floppy_apikey_access',
         'mdblist': 'mdblist_apikey_access',
         'omdb': 'omdb_apikey_access',
         'trakt': 'trakt_token_access',
