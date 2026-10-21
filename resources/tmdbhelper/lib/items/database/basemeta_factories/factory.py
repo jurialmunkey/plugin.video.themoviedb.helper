@@ -322,6 +322,11 @@ def import_art_poster():
     return ArtPoster
 
 
+def import_art_poster_country():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterCountry
+    return ArtPosterCountry
+
+
 def import_art_poster_language():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterLanguage
     return ArtPosterLanguage
@@ -352,6 +357,11 @@ def import_art_landscape():
     return ArtLandscape
 
 
+def import_art_landscape_country():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeCountry
+    return ArtLandscapeCountry
+
+
 def import_art_landscape_language():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeLanguage
     return ArtLandscapeLanguage
@@ -370,6 +380,11 @@ def import_art_thumbs():
 def import_art_clearlogo():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogo
     return ArtClearlogo
+
+
+def import_art_clearlogo_country():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoCountry
+    return ArtClearlogoCountry
 
 
 def import_art_clearlogo_language():
@@ -551,16 +566,19 @@ FACTORY_ROUTES = {
     'art': import_art,
     'art_profile': import_art_profile,
     'art_poster': import_art_poster,
+    'art_poster_country': import_art_poster_country,
     'art_poster_language': import_art_poster_language,
     'art_poster_english': import_art_poster_english,
     'art_poster_null': import_art_poster_null,
     'art_fanart': import_art_fanart,
     'art_extrafanart': import_art_extrafanart,
     'art_landscape': import_art_landscape,
+    'art_landscape_country': import_art_landscape_country,
     'art_landscape_language': import_art_landscape_language,
     'art_landscape_english': import_art_landscape_english,
     'art_thumbs': import_art_thumbs,
     'art_clearlogo': import_art_clearlogo,
+    'art_clearlogo_country': import_art_clearlogo_country,
     'art_clearlogo_language': import_art_clearlogo_language,
     'art_clearlogo_english': import_art_clearlogo_english,
     'art_clearlogo_null': import_art_clearlogo_null,
