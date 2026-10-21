@@ -1,5 +1,6 @@
 from tmdbhelper.lib.items.directories.base.item_builder import BaseDirItemBuilder
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_localized
+from tmdbhelper.lib.sync.auth import SyncAuthorisation
 from jurialmunkey.ftools import cached_property
 
 
@@ -58,17 +59,8 @@ class BaseDirItemAuthorised(BaseDirItem):
 
     @property
     def authorisation_type(self):
-        if not self.authorisation_setting:
-            return 'Trakt'
-        from tmdbhelper.lib.addon.plugin import get_setting
-        return get_setting(self.authorisation_setting, 'str')
+        return SyncAuthorisation(self.authorisation_setting).authorisation_type
 
     @property
     def enabled(self):
-        if self.authorisation_type == 'Trakt':
-            from jurialmunkey.window import get_property
-            return bool(get_property('TraktIsAuth'))
-        if self.authorisation_type == 'MDbList':
-            from tmdbhelper.lib.addon.plugin import get_setting
-            return bool(get_setting('mdblist_apikey', 'str'))
-        return False
+        return SyncAuthorisation(self.authorisation_setting).is_authorized
