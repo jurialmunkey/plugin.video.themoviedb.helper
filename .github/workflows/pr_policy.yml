@@ -112,7 +112,7 @@ jobs:
                   issueNumbers.add(Number(match[3]));
                 }
               }
-              // Remove external URLs and qualified references before matching local #123 links.
+              // Remove external URLs and qualified references before matching local issue references.
               const localReferences = references.replace(/https?:\/\/\S+/gi, '')
                 .replace(/[\w.-]+\/[\w.-]+#[1-9]\d*/g, '');
               for (const match of localReferences.matchAll(/(?<![\w/])#([1-9]\d*)\b/g)) {
@@ -120,7 +120,7 @@ jobs:
               }
 
               if (!issueNumbers.size) {
-                failures.push('Link a bug report or feature request in this repository using #123 or its full issue URL.');
+                failures.push('Link a bug report or feature request in this repository using its issue number or full issue URL.');
               } else if (issueNumbers.size > 20) {
                 failures.push('Link at most 20 issues; keep the PR focused on one problem or feature.');
               } else {
