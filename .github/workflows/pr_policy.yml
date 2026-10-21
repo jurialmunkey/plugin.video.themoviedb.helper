@@ -69,6 +69,21 @@ jobs:
             await setStatus('pending', 'Checking PR description and linked issue.');
 
             try {
+              // Translation-only PRs are exempt from the issue/template requirements.
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                owner, repo, pull_number: pr.number, per_page: 100
+              });
+              const translationPath = /^resources\/language\/resource\.language\.[a-z0-9_@-]+\/strings\.po$/i;
+              const translationOnly = files.length > 0 && files.every(file =>
+                translationPath.test(file.filename)
+              );
+
+              if (translationOnly) {
+                await setStatus('success', 'Translation-only PR; policy not applicable.');
+                await updatePolicyComment([]);
+                return;
+              }
+
               const body = (pr.body || '').replace(/<!--[\s\S]*?(?:-->|$)/g, '');
               const sections = new Map();
               let section;
