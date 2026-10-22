@@ -52,7 +52,7 @@ class PlayerResolverBase:
 
     def execute_seturl(self):
         from xbmcplugin import setResolvedUrl
-        kodi_log(['lib.player - resolving path to url\n', self.path, f'\nPlaylist {bool(self.playlist)}'], 1)  # Print self.playlist to log to make sure property initialises
+        kodi_log(['lib.player - resolving path to url\n', self.is_content, f'\nPlaylist {bool(self.playlist)}'], 1)  # Print self.playlist to log to make sure property initialises
         setResolvedUrl(self.handle, True, self.listitem)
         self.update_playerstring()
 
@@ -157,14 +157,14 @@ class PlayerResolverNone(PlayerResolverBase):
         if self.is_folder:
             return format_folderpath(self.path)
         if not self.player.is_resolvable:
-            return self.path
+            return self.is_content
         if self.handle is None:
-            return self.path
+            return self.is_content
 
     @cached_property
     def listitem(self):
         self.player.item.details.params = {}
-        self.player.item.details.path = self.path
+        self.player.item.details.path = self.is_content
         self.player.item.details.infoproperties['isPlayable'] = 'false' if self.is_folder else 'true'
         self.player.item.details.infoproperties['is_folder'] = 'true' if self.is_folder else 'false'
         return self.player.item.details.get_listitem()
@@ -178,6 +178,16 @@ class PlayerResolverNone(PlayerResolverBase):
             episode=self.player.item.episode,
             player=self.player.file
         )
+
+    @cached_property
+    def is_content(self):
+        if self.is_strm and self.path:
+            from tmdbhelper.lib.files.futils import read_file
+            content = read_file(self.path)
+            if content and not content.startswith('plugin://plugin.video.themoviedb.helper'):
+                kodi_log(f'lib.player - reading strm file:\n{self.path} -> {content}', 1)
+                return content
+        return self.path
 
 
 class PlayerResolverList(PlayerResolverNone):
