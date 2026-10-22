@@ -1,7 +1,6 @@
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.container import ContainerDirectory, ContainerCacheOnlyDirectory
-from tmdbhelper.lib.sync.auth import SyncAuthorisation
 from jurialmunkey.parser import try_int
 
 
@@ -12,7 +11,7 @@ class ListSeasons(ContainerDirectory):
         items = []
 
         # Up Next
-        if get_setting('seasons_upnext') and SyncAuthorisation('sync_source_watched').is_authorized:
+        if get_setting('seasons_upnext') and self.sync_playdata.is_authorized:
             sync = BaseViewFactory('upnextseason', 'tv', tmdb_id)
 
             try:

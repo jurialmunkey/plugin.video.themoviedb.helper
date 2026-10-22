@@ -1,18 +1,21 @@
 from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.sync.auth import SyncAuthorisation
 
 
-class TraktPlayData():
-    def __init__(self, pauseplayprogress=False, watchedindicators=False):
+class SyncPlayData(SyncAuthorisation):
+    def __init__(self, pauseplayprogress=False, watchedindicators=False, **kwargs):
+        super().__init__('sync_source_watched', **kwargs)
         self._pauseplayprogress = pauseplayprogress  # Set play progress using paused at position
         self._watchedindicators = watchedindicators  # Set watched status and playcount
 
     @property
     def is_enabled(self):
-        if self.trakt_api.authenticator.is_authorized:
-            if self._watchedindicators:
-                return bool(self.syncdata)
-            if self._pauseplayprogress:
-                return bool(self.syncdata)
+        if not self.is_authorized:
+            return False
+        if self._watchedindicators:
+            return bool(self.syncdata)
+        if self._pauseplayprogress:
+            return bool(self.syncdata)
         return False
 
     def is_sync(func):
@@ -21,11 +24,6 @@ class TraktPlayData():
                 return
             return func(self, *args, **kwargs)
         return wrapper
-
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
 
     @cached_property
     def syncdata(self):
