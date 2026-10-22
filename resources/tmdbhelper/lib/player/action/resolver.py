@@ -185,6 +185,8 @@ class PlayerResolverNone(PlayerResolverBase):
             from tmdbhelper.lib.files.futils import read_file
             content = read_file(self.path)
             if content and not content.startswith('plugin://plugin.video.themoviedb.helper'):
+                while content.endswith('.strm') and read_file(content):
+                    content = read_file(content)
                 kodi_log(f'lib.player - reading strm file:\n{self.path} -> {content}', 1)
                 return content
         return self.path
