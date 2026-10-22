@@ -87,6 +87,17 @@ class BaseDirItemOnDeckUnWatchedMovie(BaseDirItemOnDeckMovies):
         return get_localized(16101)
 
 
+class BaseDirItemToWatch(BaseDirItemAuthorised):
+    priority = 210
+    label_type = 'reversed'
+    label_localized = 32078
+    types = ('movie', 'tv', )
+    authorisation_setting = 'sync_source_watched'
+    params = {'info': 'trakt_towatch'}
+    art_icon = 'resources/icons/sync/watchlist.png'
+    group = 32196
+
+
 class BaseDirItemNextEpisodes(BaseDirItemOnDeckMovies):
     priority = 220
     label_type = 'localize'

@@ -23,16 +23,6 @@ class BaseDirItemTraktMostWatched(BaseDirItemAuthorised):
     group = 32195
 
 
-class BaseDirItemTraktToWatch(BaseDirItemAuthorised):
-    priority = 210
-    label_type = 'reversed'
-    label_localized = 32078
-    types = ('movie', 'tv', )
-    params = {'info': 'trakt_towatch'}
-    art_icon = 'resources/icons/trakt/watchlist.png'
-    group = 32196
-
-
 class BaseDirItemTraktDropped(BaseDirItemAuthorised):
     priority = 230
     label_type = 'localize'

@@ -1,6 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.sync.datasync import (
+    SyncDataGetterAllMoviesToWatch,
+    SyncDataGetterAllShowsToWatch,
+)
+
+
+class TraktSyncDataGetterAllUnHiddenMoviesToWatch(SyncDataGetterAllMoviesToWatch):
+    query_clauses = ('item_type=?', 'progress_watched_hidden_at IS NULL', )
+    filter_keys = ('progress_watched_hidden_at', )
+
+
+class TraktSyncDataGetterAllUnHiddenShowsToWatch(SyncDataGetterAllShowsToWatch):
+    query_clauses = ('item_type=?', 'dropped_hidden_at IS NULL AND progress_watched_hidden_at IS NULL', )
+    filter_keys = ('dropped_hidden_at', 'progress_watched_hidden_at', )
 
 
 class TraktSyncDataGetterAllUnHiddenShowsInProgress:

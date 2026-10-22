@@ -131,14 +131,22 @@ class SyncDataGetterDroppedCalendarUnHidden(SyncDataGetterAll):
     query_clauses = ('item_type=?', 'dropped_hidden_at IS NULL AND calendar_hidden_at IS NULL', )
 
 
-class SyncDataGetterAllUnHiddenMoviesToWatch(SyncDataGetterProgressWatchedUnHidden):
+class SyncDataGetterAllMoviesToWatch(SyncDataGetterAll):
     query_values = ('movie', )
     clause_keys = ('playback_progress', 'watchlist_listed_at', )
+    filter_keys = ()
+
+    def get_keys(self):
+        return (*super().get_keys(), *self.filter_keys, )
 
 
-class SyncDataGetterAllUnHiddenShowsToWatch(SyncDataGetterDroppedWatchedUnHidden):
+class SyncDataGetterAllShowsToWatch(SyncDataGetterAll):
     query_values = ('show', )
     clause_keys = ('next_episode_id', 'watchlist_listed_at', )
+    filter_keys = ()
+
+    def get_keys(self):
+        return (*super().get_keys(), *self.filter_keys, )
 
 
 class SyncDataGetterAllUnHiddenShowsStarted(SyncDataGetterDroppedWatchedUnHidden):
@@ -280,6 +288,24 @@ class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHid
     @property
     def query_values(self):
         return ('episode', self.tmdb_id, )
+
+
+def SyncDataGetterAllUnHiddenMoviesToWatch(instance_syncdata):
+    from tmdbhelper.lib.addon.plugin import get_setting
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterAllUnHiddenMoviesToWatch
+        return MDbListSyncDataGetterAllUnHiddenMoviesToWatch(instance_syncdata)
+    from tmdbhelper.lib.sync.trakt.datasync import TraktSyncDataGetterAllUnHiddenMoviesToWatch
+    return TraktSyncDataGetterAllUnHiddenMoviesToWatch(instance_syncdata)
+
+
+def SyncDataGetterAllUnHiddenShowsToWatch(instance_syncdata):
+    from tmdbhelper.lib.addon.plugin import get_setting
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterAllUnHiddenShowsToWatch
+        return MDbListSyncDataGetterAllUnHiddenShowsToWatch(instance_syncdata)
+    from tmdbhelper.lib.sync.trakt.datasync import TraktSyncDataGetterAllUnHiddenShowsToWatch
+    return TraktSyncDataGetterAllUnHiddenShowsToWatch(instance_syncdata)
 
 
 def SyncDataGetterAllUnHiddenShowsInProgress(instance_syncdata):

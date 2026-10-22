@@ -241,7 +241,7 @@ class ItemListSyncDataToWatch(ItemListSyncData):
         return sd
 
     def get_presorted_items(self):
-        return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x[self.presorted_fallback_key], reverse=True)
+        return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x[self.presorted_fallback_key] or '', reverse=True)
 
     def get_items(self):
         data = [self.namedtuple_basic(i, self.item_type, ) for i in self.presorted_items]
