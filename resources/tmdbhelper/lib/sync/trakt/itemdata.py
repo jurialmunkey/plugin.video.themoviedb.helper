@@ -212,6 +212,8 @@ class TraktSyncItemData(SyncItemData):
 
     def get_premiered(self):
         try:
+            if self.parent_item_type == 'movie':
+                return self.item[self.parent_item_type]['released'][:10]
             return self.item[self.parent_item_type]['first_aired'][:10]
         except (AttributeError, KeyError, TypeError):
             return
