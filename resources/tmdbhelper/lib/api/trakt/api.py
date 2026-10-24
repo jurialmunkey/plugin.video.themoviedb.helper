@@ -1,6 +1,6 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.api.request import NoCacheRequestAPI
-from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, CLIENT_SECRET, USER_TOKEN
+from tmdbhelper.lib.api.api_keys.trakt import CLIENT_ID, USER_TOKEN
 from tmdbhelper.lib.api.trakt.authenticator import TraktAuthenticator
 from tmdbhelper.lib.api.trakt.profile import TraktProfile
 
@@ -15,20 +15,17 @@ OAUTH_TOKEN_URL = 'https://auth.trakt.tv/oauth/token'
 class TraktAPI(NoCacheRequestAPI):
 
     client_id = CLIENT_ID
-    client_secret = CLIENT_SECRET
     user_token = USER_TOKEN
 
     def __init__(
             self,
             client_id=None,
-            client_secret=None,
             user_token=None,
             login_if_required=False,
             force=False):
         super(TraktAPI, self).__init__(req_api_url=API_URL, req_api_name='TraktAPI', timeout=20)
 
         TraktAPI.client_id = client_id or self.client_id
-        TraktAPI.client_secret = client_secret or self.client_secret
         TraktAPI.user_token = user_token or self.user_token
         self.login_if_required = login_if_required
         self.login() if force else self.authorize()
@@ -79,22 +76,19 @@ class TraktAPI(NoCacheRequestAPI):
     def get_authorisation_token(self, device_code):
         return self.get_api_request_json(OAUTH_DEVICE_TOKEN_URL, postdata={
             'code': device_code,
-            'client_id': self.client_id,
-            'client_secret': self.client_secret
+            'client_id': self.client_id
         })
 
     def del_authorisation_token(self, access_token):
         return self.get_api_request(OAUTH_REVOKE_URL, postdata={
             'token': access_token,
-            'client_id': self.client_id,
-            'client_secret': self.client_secret
+            'client_id': self.client_id
         })
 
     def set_authorisation_token(self, refresh_token):
         return self.get_api_request_json(OAUTH_TOKEN_URL, postdata={
             'refresh_token': refresh_token,
             'client_id': self.client_id,
-            'client_secret': self.client_secret,
             'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob',
             'grant_type': 'refresh_token'
         })
