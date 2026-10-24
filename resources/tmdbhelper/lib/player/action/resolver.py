@@ -30,6 +30,19 @@ class PlayerResolverBase:
 
     @cached_property
     def playlist(self):
+        return self.get_playlist() or self.get_strm_playlist()
+
+    def get_strm_playlist(self):
+        if not self.is_strm_file:
+            return
+        from xbmc import PlayList, PLAYLIST_VIDEO
+        # Kodi expands STRM entries and their properties before starting playback.
+        playlist = PlayList(PLAYLIST_VIDEO)
+        playlist.clear()
+        playlist.add(self.path, self.listitem)
+        return playlist
+
+    def get_playlist(self):
 
         if not self.allow_playlist:
             kodi_log(f'lib.player - Playlist: Skipping', 1)
@@ -136,7 +149,11 @@ class PlayerResolverNone(PlayerResolverBase):
     def is_strm(self):
         if self.player.is_strm:
             return True
-        return bool(self.path.endswith('.strm'))
+        return self.is_strm_file
+
+    @cached_property
+    def is_strm_file(self):
+        return self.path.lower().endswith('.strm') and not self.is_folder
 
     @cached_property
     def is_folder(self):
@@ -156,6 +173,9 @@ class PlayerResolverNone(PlayerResolverBase):
             return self.path.replace('executebuiltin://', '')
         if self.is_folder:
             return format_folderpath(self.path)
+        if self.is_strm_file:
+            # Resolving to a STRM bypasses Kodi's playlist expansion.
+            return self.path
         if not self.player.is_resolvable:
             return self.path
         if self.handle is None:
