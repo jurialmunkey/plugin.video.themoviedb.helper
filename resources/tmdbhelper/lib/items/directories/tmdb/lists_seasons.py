@@ -1,7 +1,6 @@
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_setting
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
 from tmdbhelper.lib.items.container import ContainerDirectory, ContainerCacheOnlyDirectory
-from jurialmunkey.window import get_property
 from jurialmunkey.parser import try_int
 
 
@@ -12,7 +11,7 @@ class ListSeasons(ContainerDirectory):
         items = []
 
         # Up Next
-        if get_setting('seasons_upnext') and get_property('TraktIsAuth', is_type=float):
+        if get_setting('seasons_upnext') and self.sync_playdata.is_authorized:
             sync = BaseViewFactory('upnextseason', 'tv', tmdb_id)
 
             try:
@@ -30,6 +29,11 @@ class ListSeasons(ContainerDirectory):
                     items.append(sync.data[0])
             except (KeyError, TypeError, AttributeError):
                 pass
+
+        # Groups
+        if get_setting('seasons_groups'):
+            sync = BaseViewFactory('groupsseason', 'tv', tmdb_id)
+            items.extend(sync.data or [])
 
         return items
 

@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_basic import ItemMapper
+from tmdbhelper.lib.items.directories.mapper_basic import ItemMapper, NullItemMapper
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized, get_setting, ADDONPATH
 from tmdbhelper.lib.addon.consts import RUNSCRIPT
@@ -11,43 +11,12 @@ class StaticItemMapper(ItemMapper):
         return self.list_name
 
     @cached_property
-    def user_profile_slug(self):
-        with suppress(KeyError):
-            return self.meta['user_profile_slug']
-
-    @cached_property
-    def list_owned(self):
-        if not self.user_profile_slug:
-            return False
-        return bool(self.user_profile_slug == self.user_slug)
-
-    @cached_property
-    def list_privacy(self):
-        with suppress(KeyError):
-            return self.meta['list']['privacy']
-
-    @cached_property
-    def list_privated(self):
-        if self.list_privacy == 'public':
-            return False
-        if self.list_privacy == 'private' and self.list_owned:
-            return False
-        return True
-
-    @cached_property
-    def list_type(self):
-        with suppress(KeyError):
-            return self.meta['list']['type']
-
-    @cached_property
     def list_slug(self):
         with suppress(KeyError):
             return self.meta['list']['ids']['slug']
 
     @cached_property
     def user_slug(self):
-        if self.list_type == 'official':
-            return 'official'
         with suppress(KeyError):
             return self.meta['list']['user']['ids']['slug']
 
@@ -99,27 +68,34 @@ class StaticItemMapper(ItemMapper):
         }
         return unique_ids
 
-    def get_context_menu(self):
+    def get_sort_context_menu(self):
         return [
             (
                 get_localized(32309),
                 RUNSCRIPT.format('sort_list,{}'.format(','.join(f'{k}={v}' for k, v in self.params.items())))
             ),
+        ]
+
+    def get_context_menu(self):
+        return self.get_sort_context_menu() + [
             (
                 get_localized(20444),
                 RUNSCRIPT.format('user_list={list_slug},user_slug={user_slug}'.format(**self.params))
             ),
         ]
 
+
+class StaticOfficialItemMapper(StaticItemMapper):
+    user_slug = 'official'
+    user_name = 'Trakt'
+
     @cached_property
-    def item(self):
-        if self.list_privated:  # Workaround to hide private entries for private lists in results
-            return {}
-        if not self.user_slug:  # Workaround to hide invalid entries for banned users still showing in results
-            return {}
-        if not self.list_slug:  # Workaround to hide invalid entries for banned lists still showing in results
-            return {}
-        return super().item
+    def list_slug(self):
+        with suppress(KeyError):
+            return self.meta['list']['ids']['trakt']
+
+    def get_context_menu(self):
+        return self.get_sort_context_menu()
 
 
 class StaticLikedItemMapper(StaticItemMapper):
@@ -160,6 +136,79 @@ class StaticOwnedItemMapper(StaticItemMapper):
             )
         ]
         return context_menu
+
+
+class StaticOfficialLikedItemMapper(StaticLikedItemMapper, StaticOfficialItemMapper):
+    pass
+
+
+class StaticOfficialUnLikedItemMapper(StaticUnLikedItemMapper, StaticOfficialItemMapper):
+    pass
+
+
+class StaticOfficialOwnedItemMapper(StaticOwnedItemMapper, StaticOfficialItemMapper):
+    pass
+
+
+class StaticItemMapperFactoryHelper:
+    def __init__(self, meta):
+        self.meta = meta
+
+    @cached_property
+    def user_slug(self):
+        return self.meta['list'].get('user', {}).get('ids', {}).get('slug')
+
+    @cached_property
+    def list_slug(self):
+        return self.meta['list'].get('ids', {}).get('slug')
+
+    @cached_property
+    def privacy(self):
+        return self.meta['list'].get('privacy')
+
+    @cached_property
+    def is_official(self):
+        return self.meta['list']['type'] == 'official'
+
+    @cached_property
+    def is_available(self):
+        if not self.user_slug:
+            return False
+        if not self.list_slug:
+            return False
+        if self.privacy == 'public':
+            return True
+        if self.privacy == 'private':
+            return self.meta.get('user_profile_slug') == self.user_slug
+        return True
+
+
+class StaticItemMapperFactory:
+    item_mapper_class = StaticItemMapper
+    official_item_mapper_class = StaticOfficialItemMapper
+
+    def __new__(cls, meta, add_infoproperties=None):
+        helper = StaticItemMapperFactoryHelper(meta)
+        if helper.is_official:
+            return cls.official_item_mapper_class(meta, add_infoproperties)
+        if helper.is_available:
+            return cls.item_mapper_class(meta, add_infoproperties)
+        return NullItemMapper()
+
+
+class StaticLikedItemMapperFactory(StaticItemMapperFactory):
+    item_mapper_class = StaticLikedItemMapper
+    official_item_mapper_class = StaticOfficialLikedItemMapper
+
+
+class StaticUnLikedItemMapperFactory(StaticItemMapperFactory):
+    item_mapper_class = StaticUnLikedItemMapper
+    official_item_mapper_class = StaticOfficialUnLikedItemMapper
+
+
+class StaticOwnedItemMapperFactory(StaticItemMapperFactory):
+    item_mapper_class = StaticOwnedItemMapper
+    official_item_mapper_class = StaticOfficialOwnedItemMapper
 
 
 class StaticGenresItemMapper(ItemMapper):

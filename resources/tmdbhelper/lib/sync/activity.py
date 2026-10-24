@@ -9,10 +9,23 @@ from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.sync.mixins import SyncDataParentProperties
 
 
-MDBLIST_SETTINGS = (
-    ('sync_source_watchlist', 'watchlisted_at'),
-    ('sync_source_collection', 'collected_at'),
-)
+MDBLIST_ACTIVITIES = {
+    'watchlisted_at': {
+        'setting': 'sync_source_watchlist'
+    },
+    'collected_at': {
+        'setting': 'sync_source_collection'
+    },
+    'paused_at': {
+        'setting': 'sync_source_watched',
+        'episodes': 'episode_paused_at'
+    },
+    'watched_at': {
+        'setting': 'sync_source_watched',
+        'shows': 'episode_watched_at',
+        'episodes': 'episode_watched_at'
+    },
+}
 
 
 class SyncLastActivities(SyncDataParentProperties):
@@ -74,12 +87,14 @@ class SyncLastActivities(SyncDataParentProperties):
 
     @staticmethod
     def update_data_with_mdblist_activities(data, mdblist_data):
-        for setting, activity_key in MDBLIST_SETTINGS:
-            if get_setting(setting, 'str') != 'MDbList':
+        for activity_key, keys in MDBLIST_ACTIVITIES.items():
+            if get_setting(keys['setting'], 'str') != 'MDbList':
                 continue
-            activity_mdblist = mdblist_data.get(activity_key)
             for item_type in ('movies', 'shows', 'seasons', 'episodes'):
-                data.setdefault(item_type, {})[activity_key] = activity_mdblist
+                activity_utc = mdblist_data.get(keys.get(item_type) or activity_key)
+                data.setdefault(item_type, {})[activity_key] = activity_utc
+        if get_setting('sync_source_watched', 'str') == 'MDbList':
+            data.setdefault('shows', {})['dropped_at'] = mdblist_data.get('dropped_at')
         return data
 
     def is_expired(self, timestamp, keys=None):
@@ -88,7 +103,7 @@ class SyncLastActivities(SyncDataParentProperties):
 
         last_activity = self.get_last_activity(keys)
 
-        if not last_activity or last_activity > timestamp:
+        if last_activity and last_activity > timestamp:
             return True
 
         return False

@@ -8,8 +8,7 @@ from tmdbhelper.lib.items.directories.trakt.mapper_calendar import (
     FactoryCalendarEpisodeItemMapper,
     FactoryCalendarMovieItemMapper,
 )
-from tmdbhelper.lib.items.directories.mdblist.lists_local import UncachedMDbListItemsPage
-from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
+from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData, UncachedListLocalItemsPage
 from tmdbhelper.lib.items.directories.lists_default import ItemCache
 
 
@@ -184,7 +183,7 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
     For episode type calendars
     """
 
-    class_pages = UncachedMDbListItemsPage
+    class_pages = UncachedListLocalItemsPage
     trakt_path = ''
     trakt_user = 'my'
     trakt_authorization = True

@@ -1,18 +1,16 @@
-from tmdbhelper.lib.script.sync.trakt.basic import (
+from tmdbhelper.lib.script.sync.basic import (
     ItemWatched,
     ItemUnwatched,
     ItemWatchlist,
     ItemCollection,
-    ItemFavorites,
-    ItemDropped
+    ItemProgress,
 )
+from tmdbhelper.lib.script.sync.trakt.basic import ItemFavorites
+from tmdbhelper.lib.script.sync.dropped import ItemDropped
 from tmdbhelper.lib.script.sync.trakt.rating import ItemRating
 from tmdbhelper.lib.script.sync.trakt.comments import ItemComments
-from tmdbhelper.lib.script.sync.trakt.userlist import (
-    ItemUserList,
-    ItemMDbList
-)
-from tmdbhelper.lib.script.sync.trakt.progress import ItemProgress
+from tmdbhelper.lib.script.sync.trakt.userlist import ItemUserList
+from tmdbhelper.lib.script.sync.mdblist.userlist import ItemUserList as ItemMDbList
 from tmdbhelper.lib.script.sync.menu import Menu as BasicMenu
 
 

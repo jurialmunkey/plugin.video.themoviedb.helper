@@ -1,26 +1,10 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.logger import kodi_try_except, kodi_log
-from tmdbhelper.lib.files.futils import validate_join
-from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from tmdbhelper.lib.addon.logger import kodi_try_except
+from tmdbhelper.lib.api.contains import CommonContainerAPIs, CommonRatingsAPIs
 from jurialmunkey.window import WindowPropertySetter
-import xbmcvfs
-import json
-
-
-TVDB_AWARDS_KEYS = {
-    'Academy Awards': 'academy',
-    'Golden Globe Awards': 'goldenglobe',
-    'MTV Movie & TV Awards': 'mtv',
-    'Critics\' Choice Awards': 'criticschoice',
-    'Primetime Emmy Awards': 'emmy',
-    'Screen Actors Guild Awards': 'sag',
-    'BAFTA Awards': 'bafta'}
 
 
 class CommonMonitorDetails(CommonContainerAPIs):
-    def __init__(self):
-        self.imdb_top250 = {}
-
     @cached_property
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
@@ -30,15 +14,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
         lidc.extendedinfo = True
         lidc.parent_params = {}
         return lidc
-
-    def get_awards_data(self):
-        try:
-            filepath = validate_join('special://home/addons/plugin.video.themoviedb.helper/resources/jsondata/', 'awards.json')
-            with xbmcvfs.File(filepath, 'r') as file:
-                return json.load(file)
-        except (IOError, json.JSONDecodeError):
-            kodi_log('ERROR: Failed to load awards data!')
-            return {'movie': {}, 'tv': {}}
 
     @kodi_try_except('lib.monitor.common get_tmdb_id')
     def get_tmdb_id(self, tmdb_type, imdb_id=None, query=None, year=None, episode_year=None):
@@ -84,65 +59,33 @@ class CommonMonitorDetails(CommonContainerAPIs):
     def del_identifier_details(self, identifier):
         return self.query_database.del_identifier(identifier)
 
-    def get_tvdb_awards(self, tmdb_type, tmdb_id):
-        info = {}
-        try:
-            awards = self.all_awards[tmdb_type][str(tmdb_id)]
-        except(KeyError, TypeError, AttributeError):
-            return info
-        for t in ['awards_won', 'awards_nominated']:
-            item_awards = awards.get(t)
-            if not item_awards:
-                continue
-            all_awards, all_awards_cr = [], []
-            for cat, lst in item_awards.items():
-                all_awards_cr.append(f'[CR]{cat}' if all_awards else cat)
-                all_awards_cr += lst
-                all_awards += [(f'{cat} {i}') for i in lst]
-                try:
-                    info[f'{TVDB_AWARDS_KEYS[cat]}_{t}'] = len(lst)
-                except(KeyError, TypeError, AttributeError):
-                    continue
-            if all_awards:
-                info[f'total_{t}'] = len(all_awards)
-                info[t] = ' / '.join(all_awards)
-                info[f'{t}_cr'] = '[CR]'.join(all_awards_cr)
-        return info
-
-    def get_imdb_top250_list(self, tmdb_type):
-        return self.query_database.get_imdb_top250_list_cached(tmdb_type)
-
     @cached_property
-    def imdb_top250_list_movie(self):
-        return self.get_imdb_top250_list('movie')
-
-    @cached_property
-    def imdb_top250_list_tv(self):
-        return self.get_imdb_top250_list('tv')
-
-    def return_imdb_top250_list(self, tmdb_type):
-        if tmdb_type == 'movie':
-            return self.imdb_top250_list_movie
-        if tmdb_type == 'tv':
-            return self.imdb_top250_list_tv
-
-    def get_detailed_ratings(self, tmdb_type, tmdb_id):
-        from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import RatingsDict
-        sync = RatingsDict()
-        sync.common_apis.mdblist_api = self.mdblist_api
-        sync.common_apis.trakt_api = self.trakt_api
-        sync.common_apis.tmdb_api = self.tmdb_api
-        sync.common_apis.omdb_api = self.omdb_api
-        sync.imdb_top250_list = self.return_imdb_top250_list(tmdb_type)
-        sync.tmdb_type = tmdb_type
-        sync.tmdb_id = tmdb_id
-        return sync.data or {}
+    def all_awards(self):
+        return CommonRatingsAPIs.get_awards_data()
 
     def get_all_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
-        info = {}
-        info.update(self.get_detailed_ratings(tmdb_type, tmdb_id))
-        info.update(self.get_tvdb_awards(tmdb_type, tmdb_id))
-        return info
+        ratings_api = CommonRatingsAPIs()
+
+        # Reuse awards to avoid rescraping
+        ratings_api.all_awards = self.all_awards
+
+        # Set defaults
+        ratings_api.tmdb_type = tmdb_type
+        ratings_api.tmdb_id = tmdb_id
+        ratings_api.season = season
+        ratings_api.episode = episode
+
+        # Reuse some APIs to avoid reinit
+        ratings_api.tmdb_api = self.tmdb_api
+        ratings_api.tmdb_imagepath = self.tmdb_imagepath
+        ratings_api.trakt_api = self.trakt_api
+        ratings_api.ftv_api = self.ftv_api
+        ratings_api.tvdb_api = self.tvdb_api
+        ratings_api.mdblist_api = self.mdblist_api
+        ratings_api.omdb_api = self.omdb_api
+        ratings_api.query_database = self.query_database
+
+        return ratings_api.all_ratings
 
 
 class CommonMonitorItem:

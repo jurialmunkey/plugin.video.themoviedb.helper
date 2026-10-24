@@ -50,7 +50,7 @@
                             <option label="30029">29</option>
                             <option label="30030">30</option>
                             <option label="30031">31</option>
-                            <option label="30030">32</option>
+                            <option label="30032">32</option>
                             <option label="30033">33</option>
                             <option label="30034">34</option>
                             <option label="30035">35</option>
@@ -98,8 +98,13 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="force_english_plot_fallback" type="boolean" label="32349" help="32350">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
-            <group id="2" label="32401">
+            <group id="2" label="39123">
                 <setting id="artwork_quality" type="integer" label="32420" help="">
                     <level>0</level>
                     <default>0</default>
@@ -114,7 +119,7 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="force_english_plot_fallback" type="boolean" label="32349" help="32350">
+                <setting id="regional_prefer" type="boolean" label="32450" help="32479" parent="artwork_quality">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
@@ -154,6 +159,11 @@
                     <control type="toggle"/>
                 </setting>
                 <setting id="seasons_anticipated" type="boolean" label="32018" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="seasons_groups" type="boolean" label="32542" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -589,31 +599,6 @@
             </group>
         </category>
         <category id="accounts" label="32403" help="">
-
-            <group id="1" label="39031">
-                <setting id="sync_source_watchlist" type="string" label="32193" help="">
-                    <level>0</level>
-                    <default>Trakt</default>
-                    <constraints>
-                        <options>
-                            <option>Trakt</option>
-                            <option>MDbList</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
-                <setting id="sync_source_collection" type="string" label="32192" help="">
-                    <level>0</level>
-                    <default>Trakt</default>
-                    <constraints>
-                        <options>
-                            <option>Trakt</option>
-                            <option>MDbList</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
-            </group>
             <group id="2" label="5">
                 <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
                     <level>0</level>
@@ -628,6 +613,42 @@
                     <control type="button" format="action">
                         <data>RunScript(plugin.video.themoviedb.helper, invalidate_sync)</data>
                     </control>
+                </setting>
+            </group>
+
+            <group id="1" label="39031">
+                <setting id="sync_source_watched" type="string" label="32408" help="32417">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="sync_source_watchlist" type="string" label="32193" help="32417">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="sync_source_collection" type="string" label="32192" help="32417">
+                    <level>0</level>
+                    <default>Trakt</default>
+                    <constraints>
+                        <options>
+                            <option>Trakt</option>
+                            <option>MDbList</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
                 </setting>
             </group>
         </category>
@@ -804,7 +825,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="contextmenu_sync_trakt" type="boolean" label="32295" help="">
+                <setting id="contextmenu_sync_trakt" type="boolean" label="32546" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>

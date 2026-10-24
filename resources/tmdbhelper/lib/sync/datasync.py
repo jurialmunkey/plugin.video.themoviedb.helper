@@ -131,14 +131,22 @@ class SyncDataGetterDroppedCalendarUnHidden(SyncDataGetterAll):
     query_clauses = ('item_type=?', 'dropped_hidden_at IS NULL AND calendar_hidden_at IS NULL', )
 
 
-class SyncDataGetterAllUnHiddenMoviesToWatch(SyncDataGetterProgressWatchedUnHidden):
+class SyncDataGetterAllMoviesToWatch(SyncDataGetterAll):
     query_values = ('movie', )
     clause_keys = ('playback_progress', 'watchlist_listed_at', )
+    filter_keys = ()
+
+    def get_keys(self):
+        return (*super().get_keys(), *self.filter_keys, )
 
 
-class SyncDataGetterAllUnHiddenShowsToWatch(SyncDataGetterDroppedWatchedUnHidden):
+class SyncDataGetterAllShowsToWatch(SyncDataGetterAll):
     query_values = ('show', )
     clause_keys = ('next_episode_id', 'watchlist_listed_at', )
+    filter_keys = ()
+
+    def get_keys(self):
+        return (*super().get_keys(), *self.filter_keys, )
 
 
 class SyncDataGetterAllUnHiddenShowsStarted(SyncDataGetterDroppedWatchedUnHidden):
@@ -154,6 +162,12 @@ class SyncDataGetterAllUnHiddenShowsNextEpisode(SyncDataGetterDroppedWatchedUnHi
 class SyncDataGetterAllUnHiddenEpisodesUpNext(SyncDataGetterDroppedWatchedUnHidden):  # TODO: UNSURE ABOUT THIS ONE
     query_values = ('episode', )
     clause_keys = ('upnext_episode_id', )
+
+
+class SyncDataGetterAllEpisodePlaycounts(SyncDataGetterAll):
+    query_values = ('episode', )
+    clause_keys = ('plays', )
+    base_keys = ('id', )
 
 
 class SyncDataGetterAllItems(SyncDataGetterAll):
@@ -214,6 +228,51 @@ class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
     clause_keys = ('last_watched_at', )
 
 
+class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
+    days = 30
+    query_clauses = (
+        'item_type=?',
+        "DATE(last_watched_at, 'localtime') >= DATE('now', 'localtime', ?)",
+        "DATE(last_watched_at, 'localtime') <= DATE('now', 'localtime')",
+    )
+
+    @property
+    def query_values(self):
+        return (self.item_type, f'-{self.days - 1} days', )
+
+    def get_keys(self):
+        return (
+            "DATE(last_watched_at, 'localtime') AS watched_date",
+            'COUNT(*) AS watched_count',
+        )
+
+    def get_clause(self):
+        return f'{super().get_clause()} GROUP BY watched_date ORDER BY watched_date DESC'
+
+    def get_items(self):
+        self.instance_syncdata.sync(self.item_type, self.clause_keys)
+        return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
+
+
+class SyncDataGetterWatchedMonthlyHistoryStats(SyncDataGetterWatchedHistoryStats):
+    months = 12
+    query_clauses = (
+        'item_type=?',
+        "DATE(last_watched_at, 'localtime') >= DATE('now', 'localtime', 'start of month', ?)",
+        "DATE(last_watched_at, 'localtime') <= DATE('now', 'localtime')",
+    )
+
+    @property
+    def query_values(self):
+        return (self.item_type, f'-{self.months - 1} months', )
+
+    def get_keys(self):
+        return (
+            "DATE(last_watched_at, 'localtime', 'start of month') AS watched_date",
+            'COUNT(*) AS watched_count',
+        )
+
+
 class SyncDataGetterAllItemsPlayback(SyncDataGetterAllItems):
     clause_keys = ('playback_progress', )
 
@@ -231,129 +290,31 @@ class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHid
         return ('episode', self.tmdb_id, )
 
 
-class SyncDataGetterAllUnHiddenShowsInProgress:
-    calendar_startdate = -14
-    calendar_days = 15
-    additional_keys = ()
+def SyncDataGetterAllUnHiddenMoviesToWatch(instance_syncdata):
+    from tmdbhelper.lib.addon.plugin import get_setting
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterAllUnHiddenMoviesToWatch
+        return MDbListSyncDataGetterAllUnHiddenMoviesToWatch(instance_syncdata)
+    from tmdbhelper.lib.sync.trakt.datasync import TraktSyncDataGetterAllUnHiddenMoviesToWatch
+    return TraktSyncDataGetterAllUnHiddenMoviesToWatch(instance_syncdata)
 
-    def __init__(self, instance_syncdata):
-        self.instance_syncdata = instance_syncdata
 
-    @property
-    def get_episode_watchedcount(self):
-        return self.instance_syncdata.get_episode_watchedcount
+def SyncDataGetterAllUnHiddenShowsToWatch(instance_syncdata):
+    from tmdbhelper.lib.addon.plugin import get_setting
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterAllUnHiddenShowsToWatch
+        return MDbListSyncDataGetterAllUnHiddenShowsToWatch(instance_syncdata)
+    from tmdbhelper.lib.sync.trakt.datasync import TraktSyncDataGetterAllUnHiddenShowsToWatch
+    return TraktSyncDataGetterAllUnHiddenShowsToWatch(instance_syncdata)
 
-    @property
-    def get_episode_playcount(self):
-        return self.instance_syncdata.get_episode_playcount
 
-    @cached_property
-    def calendar_data(self):
-        return self.get_calendar_data()
-
-    def get_calendar_data(self):
-        from tmdbhelper.lib.items.directories.trakt.lists_calendar import ListTraktCalendarProperties
-        list_properties = ListTraktCalendarProperties()
-        list_properties.trakt_api = self.instance_syncdata.trakt_api
-        list_properties.trakt_date = self.calendar_startdate
-        list_properties.trakt_days = self.calendar_days
-        list_properties.trakt_type = 'episode'
-        return list_properties.api_response_json
-
-    @cached_property
-    def calendar_episodes(self):
-        return self.get_calendar_episodes()
-
-    def get_calendar_episodes(self):
-        from tmdbhelper.lib.addon.tmdate import date_in_range
-        from tmdbhelper.lib.addon.plugin import get_setting
-
-        if not get_setting('nextepisodes_usecalendar'):
-            return
-
-        if not self.calendar_data:
-            return
-
-        calendar = {}
-
-        for i in self.calendar_data:
-            try:
-                # Check that date is still in range once utc_converted
-                if not date_in_range(
-                    i['first_aired'],
-                    utc_convert=True,
-                    start_date=self.calendar_startdate,
-                    days=self.calendar_days
-                ):
-                    continue
-
-                # Ignore specials
-                if i['episode']['season'] == 0:
-                    continue
-
-                show = calendar.setdefault(i['show']['ids']['tmdb'], {})
-                show.setdefault(i['episode']['season'], []).append(i['episode']['number'])
-
-            except KeyError:
-                continue
-
-        return calendar
-
-    def is_calendar_watched(self, tmdb_id):
-        if not self.calendar_episodes:
-            return True
-        if tmdb_id not in self.calendar_episodes:
-            return True
-        for season in self.calendar_episodes[tmdb_id]:
-            # Check for a new season airing
-            if not self.get_episode_watchedcount(tmdb_id, season):
-                return False
-            # Check for a new episode airing
-            for episode in self.calendar_episodes[tmdb_id][season]:
-                if not self.get_episode_playcount(tmdb_id, season, episode):
-                    return False
-        return True
-
-    def is_inprogress_show(self, tmdb_id, aired_episodes, watched_episodes):
-        if aired_episodes <= watched_episodes:
-            if self.is_calendar_watched(tmdb_id):
-                return False
-        return True
-
-    @cached_property
-    def parent_getter(self):
-        return self.get_parent_getter()
-
-    def get_parent_getter(self):
-        sd = self.instance_syncdata.get_all_unhidden_shows_started_getter()
-        sd.additional_keys = self.parent_additional_keys
-        return sd
-
-    @cached_property
-    def keys(self):
-        return self.get_keys()
-
-    def get_keys(self):
-        return self.parent_getter.keys
-
-    @property
-    def parent_additional_keys(self):
-        return ('aired_episodes', 'watched_episodes', 'dropped_hidden_at', 'last_watched_at', *(self.additional_keys or ()))
-
-    @cached_property
-    def items(self):
-        return self.get_items()
-
-    def get_items(self):
-        sd = self.parent_getter
-        return [
-            i for i in sd.items
-            if self.is_inprogress_show(
-                i['tmdb_id'],
-                i['aired_episodes'],
-                i['watched_episodes']
-            )
-        ]
+def SyncDataGetterAllUnHiddenShowsInProgress(instance_syncdata):
+    from tmdbhelper.lib.addon.plugin import get_setting
+    if get_setting('sync_source_watched', 'str') == 'MDbList':
+        from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterAllUnHiddenShowsInProgress
+        return MDbListSyncDataGetterAllUnHiddenShowsInProgress(instance_syncdata)
+    from tmdbhelper.lib.sync.trakt.datasync import TraktSyncDataGetterAllUnHiddenShowsInProgress
+    return TraktSyncDataGetterAllUnHiddenShowsInProgress(instance_syncdata)
 
 
 class SyncDataGetters:
@@ -373,6 +334,9 @@ class SyncDataGetters:
 
     def get_all_unhidden_episodes_upnext_getter(self):
         return SyncDataGetterAllUnHiddenEpisodesUpNext(self)
+
+    def get_all_episode_playcounts_getter(self):
+        return SyncDataGetterAllEpisodePlaycounts(self)
 
     def get_all_unhidden_shows_inprogress_getter(self):
         return SyncDataGetterAllUnHiddenShowsInProgress(self)
@@ -402,6 +366,16 @@ class SyncDataGetters:
 
     def get_all_watched_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllItemsWatched, item_type)
+
+    def get_watched_history_stats_getter(self, item_type, days):
+        sd = self.get_item_type_getter(SyncDataGetterWatchedHistoryStats, item_type)
+        sd.days = days
+        return sd
+
+    def get_watched_monthly_history_stats_getter(self, item_type, months):
+        sd = self.get_item_type_getter(SyncDataGetterWatchedMonthlyHistoryStats, item_type)
+        sd.months = months
+        return sd
 
     def get_all_playback_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllItemsPlayback, item_type)
@@ -485,18 +459,19 @@ class SyncData(SyncDataGetters):
         return name
 
     @has_arg_value(0, ('tv', 'movie', ))
-    def get_values(self, tmdb_type, tmdb_id, season=None, episode=None, keys=None):
-        self.sync('show' if tmdb_type == 'tv' else 'movie', keys)
+    def get_values(self, tmdb_type, tmdb_id, season=None, episode=None, keys=None, item_type=None):
+        self.sync(item_type or ('show' if tmdb_type == 'tv' else 'movie'), keys)
         return self.cache.get_values(item_id=self.get_name(tmdb_type, tmdb_id, season, episode), keys=keys)
 
-    def get_value(self, tmdb_type, tmdb_id, season=None, episode=None, key=None):
-        data = self.get_values(tmdb_type, tmdb_id, season, episode, keys=(key,))
+    def get_value(self, tmdb_type, tmdb_id, season=None, episode=None, key=None, item_type=None):
+        data = self.get_values(tmdb_type, tmdb_id, season, episode, keys=(key,), item_type=item_type)
         return data[0] if data else None
 
     def sync(self, item_type, keys, forced=False):
         from jurialmunkey.modimp import importmodule
         for route in set([j for j in (self.routes.get(k) for k in keys) if j]):
-            importmodule(*route)(self, item_type).sync(forced=forced)
+            factory = importmodule(*route)
+            factory()(self, item_type).sync(forced=forced)
 
 
 def SyncDataFactory(parent=None):
@@ -514,7 +489,7 @@ def SyncDataFactory(parent=None):
 
     if not trakt_api and not mdblist_api:
         return
-    if not trakt_api.is_authorized:  # TODO: Allow MDBLIST ONLY
-        return
+    # if not trakt_api.is_authorized:  # TODO: Allow MDBLIST ONLY  # AUTHORIZED CHECK MDBLIST
+    #     return
 
     return SyncData(trakt_api=trakt_api, mdblist_api=mdblist_api)

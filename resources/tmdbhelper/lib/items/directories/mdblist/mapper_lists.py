@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.trakt.mapper_standard import MediaItemMapper
+from tmdbhelper.lib.items.directories.mapper_standard import MediaItemMapper
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized, ADDONPATH
 from tmdbhelper.lib.addon.consts import RUNSCRIPT
@@ -58,4 +58,18 @@ class ListsMDbListItemMapper(MediaItemMapper):
             'list_name': self.label,
             'plugin_category': self.label,
         }
+        return params
+
+
+class OfficialListsMDbListItemMapper(ListsMDbListItemMapper):
+
+    def __init__(self, *args, tmdb_type, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tmdb_type = tmdb_type
+
+    def get_params(self):
+        params = super().get_params()
+        params['info'] = 'mdblist_officiallist'
+        params['list_id'] = self.meta['slug']
+        params['tmdb_type'] = self.tmdb_type
         return params

@@ -20,6 +20,7 @@ class ListTraktFiltered(ListTraktStandard):
     def get_items(
         self, *args,
         genres=None,
+        subgenres=None,
         query=None,
         years=None,
         languages=None,
@@ -27,6 +28,7 @@ class ListTraktFiltered(ListTraktStandard):
         runtimes=None,
         studio_ids=None,
         certifications=None,
+        watchnow=None,
         network_ids=None,
         status=None,
         ratings=None,
@@ -44,6 +46,7 @@ class ListTraktFiltered(ListTraktStandard):
         self.list_properties.trakt_filters = {
             k: v for k, v in (
                 ('genres', genres),
+                ('subgenres', subgenres),
                 ('query', query),
                 ('years', years),
                 ('languages', languages),
@@ -51,6 +54,7 @@ class ListTraktFiltered(ListTraktStandard):
                 ('runtimes', runtimes),
                 ('studio_ids', studio_ids),
                 ('certifications', certifications),
+                ('watchnow', watchnow),
                 ('network_ids', network_ids),
                 ('status', status),
                 ('ratings', ratings),

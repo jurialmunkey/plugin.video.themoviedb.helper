@@ -17,7 +17,6 @@ class FanartTVType(ArtworkDetailsMixin, FanartTV):
 
     def get_cached_data_by_language(self):
         # Override country lookup as fanart tv only has language
-        # return self.get_cached_data_by_iso_country() or self.get_cached_data_by_iso_language()
         return self.get_cached_data_by_iso_language()
 
     @staticmethod

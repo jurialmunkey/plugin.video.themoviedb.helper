@@ -88,7 +88,7 @@ class SyncInvalidatorAll:
     def name(self):
         return get_localized(self.localized_id)
 
-    data = (
+    factories = (
         SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes,
         SyncCollection, SyncWatchlist, SyncFavorites, SyncRatings,
         SyncHiddenProgressWatched, SyncHiddenProgressCollected,
@@ -136,7 +136,7 @@ class SyncInvalidatorAll:
 
     @cached_property
     def database_keys(self):
-        database_keys = tuple((self.data_build_keys(i) for i in self.data))
+        database_keys = tuple((self.data_build_keys(factory()) for factory in self.factories))
         database_keys = tuple(itertools.chain.from_iterable(database_keys))
         return database_keys
 
@@ -150,7 +150,7 @@ class SyncInvalidatorAll:
 
     @cached_property
     def database_lactivities_ids(self):
-        database_lactivities_ids = tuple((self.data_build_lactivities_ids(i) for i in self.data))
+        database_lactivities_ids = tuple((self.data_build_lactivities_ids(factory()) for factory in self.factories))
         database_lactivities_ids = tuple(itertools.chain.from_iterable(database_lactivities_ids))
         return database_lactivities_ids
 
@@ -183,32 +183,32 @@ class SyncInvalidatorAll:
 
 
 class SyncInvalidatorWatchedProgress(SyncInvalidatorAll):
-    data = (SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes)
+    factories = (SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes)
     localized_id = 32035
 
 
 class SyncInvalidatorCollection(SyncInvalidatorAll):
-    data = (SyncCollection, )
+    factories = (SyncCollection, )
     localized_id = 32192
 
 
 class SyncInvalidatorWatchlist(SyncInvalidatorAll):
-    data = (SyncWatchlist, )
+    factories = (SyncWatchlist, )
     localized_id = 32193
 
 
 class SyncInvalidatorFavorites(SyncInvalidatorAll):
-    data = (SyncFavorites, )
+    factories = (SyncFavorites, )
     localized_id = 1036
 
 
 class SyncInvalidatorRatings(SyncInvalidatorAll):
-    data = (SyncRatings, )
+    factories = (SyncRatings, )
     localized_id = 32028
 
 
 class SyncInvalidatorHidden(SyncInvalidatorAll):
-    data = (
+    factories = (
         SyncHiddenProgressWatched, SyncHiddenProgressCollected,
         SyncHiddenCalendar, SyncHiddenDropped,
     )

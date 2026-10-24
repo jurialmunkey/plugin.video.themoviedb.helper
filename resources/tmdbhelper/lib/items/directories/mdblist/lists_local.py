@@ -1,32 +1,13 @@
-from tmdbhelper.lib.items.directories.lists_default import UncachedItemsPage
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
 from tmdbhelper.lib.items.directories.mdblist.mapper_standard import FactoryMDbListItemMapper
-from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData
+from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData, UncachedListLocalItemsPage
 from tmdbhelper.lib.addon.plugin import get_setting
 from jurialmunkey.ftools import cached_property
-from jurialmunkey.parser import try_int
-
-
-class UncachedMDbListItemsPage(UncachedItemsPage):
-    @cached_property
-    def response_results(self):
-        try:
-            return self.response['json']
-        except (TypeError, KeyError):
-            return
-
-    @cached_property
-    def response_total_pages(self):
-        return try_int(self.response['headers'].get('x-pagination-page-count', 0))
-
-    @cached_property
-    def response_total_items(self):
-        return try_int(self.response['headers'].get('x-pagination-item-count', 0))
 
 
 class ListMDbListLocalProperties(ListStandardProperties):
 
-    class_pages = UncachedMDbListItemsPage
+    class_pages = UncachedListLocalItemsPage
 
     def get_mediatype_items(self, mediatype):
         return [i for i in self.items if i['infolabels']['mediatype'] == mediatype]
@@ -55,7 +36,7 @@ class ListMDbListLocalProperties(ListStandardProperties):
             ('seasons', len(self.seasons)),
             ('episodes', len(self.episodes)),
         ]
-        container_content = sorted(container_content, key=lambda x: x[1])
+        container_content = sorted(container_content, key=lambda x: x[1], reverse=True)
         return container_content[0][0]
 
     @property

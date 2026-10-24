@@ -61,7 +61,7 @@ class BaseDirItemMainTMDbv4(BaseDirItemMainMovie):
 
 class BaseDirItemMainSync(BaseDirItemMainMovie):
     priority = 175
-    label = 'List Services'
+    label_localized = 32403
     params = {'info': 'dir_sync'}
     art_icon = 'resources/icons/sync/default.png'
 

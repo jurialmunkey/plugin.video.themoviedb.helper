@@ -47,6 +47,10 @@ class Tvshow(MediaItem):
         )])
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('next_aired'))
         cached_data_keys.extend(Tvshow.cached_data_keys_episode_to_air('last_aired'))
+        cached_data_keys.append((
+            '(SELECT COUNT(*) FROM episode_groups '
+            'WHERE episode_groups.tvshow_id=tvshow.id) AS episode_groups'
+        ))
         return tuple(cached_data_keys)
 
     def config_basemeta_db_tvshow(self, database_obj):
@@ -92,26 +96,32 @@ class Tvshow(MediaItem):
             'basemeta_db_fanart_tv_banner_season': self.config_basemeta_db_season,
 
             'basemeta_db_art_poster_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_art_poster_country_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_poster_language_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_poster_english_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_poster_null_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_fanart_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_landscape_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_art_landscape_country_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_landscape_language_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_landscape_english_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_clearlogo_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_art_clearlogo_country_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_clearlogo_language_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_clearlogo_english_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_clearlogo_null_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_poster_season': self.config_basemeta_db_season,
+            'basemeta_db_art_poster_country_season': self.config_basemeta_db_season,
             'basemeta_db_art_poster_language_season': self.config_basemeta_db_season,
             'basemeta_db_art_poster_english_season': self.config_basemeta_db_season,
             'basemeta_db_art_poster_null_season': self.config_basemeta_db_season,
             'basemeta_db_art_fanart_season': self.config_basemeta_db_season,
             'basemeta_db_art_landscape_season': self.config_basemeta_db_season,
+            'basemeta_db_art_landscape_country_season': self.config_basemeta_db_season,
             'basemeta_db_art_landscape_language_season': self.config_basemeta_db_season,
             'basemeta_db_art_landscape_english_season': self.config_basemeta_db_season,
             'basemeta_db_art_clearlogo_season': self.config_basemeta_db_season,
+            'basemeta_db_art_clearlogo_country_season': self.config_basemeta_db_season,
             'basemeta_db_art_clearlogo_language_season': self.config_basemeta_db_season,
             'basemeta_db_art_clearlogo_english_season': self.config_basemeta_db_season,
             'basemeta_db_art_clearlogo_null_season': self.config_basemeta_db_season,
@@ -146,6 +156,7 @@ class Tvshow(MediaItem):
         return (
             self.return_basemeta_db('base'),
             self.return_basemeta_db('belongs'),
+            self.return_basemeta_db('episode_groups'),
             self.return_basemeta_db('season'),
             self.return_basemeta_db('episode'),
             self.return_basemeta_db('genre'),

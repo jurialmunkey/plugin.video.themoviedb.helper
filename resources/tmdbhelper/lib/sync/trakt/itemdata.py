@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.sync.itemdata import SyncItemData, SyncItem
+from tmdbhelper.lib.sync.itemconf import SyncItemConstructor
 
 
 class TraktSyncItemData(SyncItemData):
@@ -42,7 +43,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_tmdb_id()
 
     def get_tmdb_id(self):
-        return self.item[self.parent_item_type]['ids']['tmdb']
+        try:
+            return self.item[self.parent_item_type]['ids']['tmdb']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     trakt_slug
@@ -52,9 +56,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_trakt_slug()
 
     def get_trakt_slug(self):
-        if self.parent_item_type not in self.item:
+        try:
+            return self.item[self.parent_item_type]['ids']['slug']
+        except (AttributeError, KeyError, TypeError):
             return
-        return self.item[self.parent_item_type]['ids']['slug']
 
     """
     plays
@@ -77,26 +82,6 @@ class TraktSyncItemData(SyncItemData):
         return self.item.get('last_watched_at') or self.item.get('watched_at')
 
     """
-    last_updated_at
-    """
-    @cached_property
-    def last_updated_at(self):
-        return self.get_last_updated_at()
-
-    def get_last_updated_at(self):
-        return self.item.get('last_updated_at') or self.item.get('updated_at')
-
-    """
-    last_collected_at
-    """
-    @cached_property
-    def last_collected_at(self):
-        return self.get_last_collected_at()
-
-    def get_last_collected_at(self):
-        return self.item.get('last_collected_at') or self.item.get('collected_at')
-
-    """
     aired_episodes
     """
     @cached_property
@@ -104,10 +89,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_aired_episodes()
 
     def get_aired_episodes(self):
-        if 'show' not in self.item.keys():
+        try:
+            return self.item['show']['aired_episodes']
+        except (AttributeError, KeyError, TypeError):
             return
-        return self.item['show'].get('aired_episodes')
-
     """
     reset_at
     """
@@ -169,36 +154,6 @@ class TraktSyncItemData(SyncItemData):
         return self.item.get('notes')
 
     """
-    id
-    """
-    @cached_property
-    def id(self):
-        return self.get_id()
-
-    def get_id(self):
-        return self.item.get('id')
-
-    """
-    paused_at
-    """
-    @cached_property
-    def paused_at(self):
-        return self.get_paused_at()
-
-    def get_paused_at(self):
-        return self.item.get('paused_at')
-
-    """
-    progress
-    """
-    @cached_property
-    def progress(self):
-        return self.get_progress()
-
-    def get_progress(self):
-        return self.item.get('progress')
-
-    """
     watched_episodes
     """
     @cached_property
@@ -257,10 +212,9 @@ class TraktSyncItemData(SyncItemData):
 
     def get_premiered(self):
         try:
-            if 'show' in self.item.keys():
-                return self.item['show']['first_aired'][:10]
-            if 'movie' in self.item.keys():
-                return self.item['movie']['released'][:10]
+            if self.parent_item_type == 'movie':
+                return self.item[self.parent_item_type]['released'][:10]
+            return self.item[self.parent_item_type]['first_aired'][:10]
         except (AttributeError, KeyError, TypeError):
             return
 
@@ -272,10 +226,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_year()
 
     def get_year(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('year')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('year')
+        try:
+            return self.item[self.parent_item_type]['year']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     title
@@ -285,10 +239,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_title()
 
     def get_title(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('title')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('title')
+        try:
+            return self.item[self.parent_item_type]['title']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     status
@@ -298,10 +252,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_status()
 
     def get_status(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('status')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('status')
+        try:
+            return self.item[self.parent_item_type]['status']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     country
@@ -311,10 +265,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_country()
 
     def get_country(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('country')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('country')
+        try:
+            return self.item[self.parent_item_type]['country']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     language
@@ -324,10 +278,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_language()
 
     def get_language(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('language')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('language')
+        try:
+            return self.item[self.parent_item_type]['language']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     certification
@@ -337,10 +291,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_certification()
 
     def get_certification(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('certification')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('certification')
+        try:
+            return self.item[self.parent_item_type]['certification']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     runtime
@@ -350,10 +304,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_runtime()
 
     def get_runtime(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('runtime')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('runtime')
+        try:
+            return self.item[self.parent_item_type]['runtime']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     trakt_rating
@@ -363,10 +317,10 @@ class TraktSyncItemData(SyncItemData):
         return self.get_trakt_rating()
 
     def get_trakt_rating(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('rating')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('rating')
+        try:
+            return self.item[self.parent_item_type]['rating']
+        except (AttributeError, KeyError, TypeError):
+            return
 
     """
     trakt_votes
@@ -376,10 +330,14 @@ class TraktSyncItemData(SyncItemData):
         return self.get_trakt_votes()
 
     def get_trakt_votes(self):
-        if 'show' in self.item.keys():
-            return self.item['show'].get('votes')
-        if 'movie' in self.item.keys():
-            return self.item['movie'].get('votes')
+        try:
+            return self.item[self.parent_item_type]['votes']
+        except (AttributeError, KeyError, TypeError):
+            return
+
+
+class TraktSyncItemConstructor(SyncItemConstructor):
+    item_data_class = TraktSyncItemData
 
 
 class TraktSyncItem(SyncItem):
@@ -391,59 +349,7 @@ class TraktSyncItem(SyncItem):
     )
 
     def get_data(self):
-        data = {}
-
-        def sync_episodes(season_data, season, item_data, item):
-            episodes = season.get('episodes')
-            if not episodes:
-                return
-
-            season_data.watched_episodes = 0
-            for episode in episodes:
-                episode_data = TraktSyncItemData(episode, 'episode')
-                episode_data.tmdb_id = season_data.tmdb_id
-                episode_data.season_number = season_data.season_number
-                episode_data.episode_number = episode["number"]
-
-                # Count watched_episodes
-                if episode_data.last_watched_at:
-                    if not item_data.reset_at or episode_data.last_watched_at > item_data.reset_at:  # Only count episodes watched since we (re)started watching
-                        season_data.watched_episodes += 1
-
-                # Set values to back to keys for database storage
-                data[episode_data.item_id] = [getattr(episode_data, k) for k in self.keys]
-
-        def sync_seasons(item_data, item):
-            if item_data.item_type != 'show':
-                return
-            seasons = item.get('seasons')
-            if not seasons:
-                return
-
-            item_data.watched_episodes = 0
-            for season in seasons:
-                season_data = TraktSyncItemData(season, 'season')
-                season_data.tmdb_id = item_data.tmdb_id
-                season_data.season_number = season["number"]
-
-                # Iterate through episodes data
-                sync_episodes(season_data, season, item_data, item)
-
-                # Sum watched_episodes
-                if season_data.watched_episodes:
-                    if season_data.season_number and season_data.season_number != 0:  # Exclude special seasons
-                        item_data.watched_episodes += season_data.watched_episodes
-
-                # Set values to back to keys for database storage
-                data[season_data.item_id] = [getattr(season_data, k) for k in self.keys]
-
-        for item in self.meta:
-            item_data = TraktSyncItemData(item, item.get('type') or self.item_type)
-
-            # Iterate through seasons data for watched type syncs where seasons/episodes presented as list
-            sync_seasons(item_data, item)
-
-            # Set values to back to keys for database storage
-            data[item_data.item_id] = [getattr(item_data, k) for k in self.keys]
-
+        data = TraktSyncItemConstructor(self.meta, self.keys, self.item_type).data
+        # from tmdbhelper.lib.addon.logger import dump_log
+        # dump_log({'keys': self.keys, 'meta': self.meta, 'data': data}, f'TraktSyncItem_{self.item_type}_{"_".join(self.keys)}')
         return data
