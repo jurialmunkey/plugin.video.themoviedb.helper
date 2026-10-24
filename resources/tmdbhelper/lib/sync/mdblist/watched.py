@@ -114,6 +114,21 @@ class SyncWatchedMovies(SyncWatched):
 class SyncWatchedEpisodes(MDbListDataTypeEpisodesToShows, SyncWatched):
     sync_kwgs_mediatype = 'episode'
 
+    def get_season_watched_counts(self):
+        from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterSeasonWatchedCounts
+        sd = MDbListSyncDataGetterSeasonWatchedCounts(self.instance_syncdata)
+        return {i['id']: (i['watched_episodes'], ) for i in sd.items}
+
+    def sync_season_watched_counts(self):
+        self.cache.set_many_values(keys=('watched_episodes', ), data=self.get_season_watched_counts())
+
+    def sync_data(self, **kwargs):
+        if not super().sync_data(**kwargs):
+            return False
+        # Incremental responses contain only changed episodes, so count the stored history.
+        self.sync_season_watched_counts()
+        return True
+
 
 class SyncWatchedFactory(SyncWatched):
 

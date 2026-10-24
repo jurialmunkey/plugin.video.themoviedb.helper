@@ -2,9 +2,37 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.sync.datasync import (
+    SyncDataGetterAll,
     SyncDataGetterAllMoviesToWatch,
     SyncDataGetterAllShowsToWatch,
 )
+
+
+class MDbListSyncDataGetterSeasonWatchedCounts(SyncDataGetterAll):
+    item_type = 'season'
+    query_clauses = ('item_type=?', )
+    clause_keys = ('id', )
+
+    @property
+    def query_values(self):
+        return ('episode', self.item_type, )
+
+    def get_keys(self):
+        return (
+            'id',
+            '('
+            'SELECT COUNT(*) FROM simplecache episode '
+            'WHERE episode.item_type=? AND episode.plays>0 '
+            'AND episode.tmdb_type=simplecache.tmdb_type '
+            'AND episode.tmdb_id=simplecache.tmdb_id '
+            'AND episode.season_number=simplecache.season_number '
+            'AND simplecache.season_number>0'
+            ') AS watched_episodes',
+        )
+
+    def get_items(self):
+        # Called after watched sync; read stored data without recursively syncing it.
+        return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
 
 
 class MDbListSyncDataGetterAllUnHiddenMoviesToWatch(SyncDataGetterAllMoviesToWatch):
