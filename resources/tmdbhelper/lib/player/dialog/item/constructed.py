@@ -10,10 +10,24 @@ class PlayerItemConstructed(PlayerItemBasic):
     play_modes = ('play_movie', 'play_episode')
 
     def __init__(self, item, mode, meta, file):
-        self.item = item  # Item details
+        self._item = item  # Item details
         self.mode = mode  # Player mode e.g. play_movie
         self.meta = meta  # Player details
         self.file = file  # Player filename
+
+    @cached_property
+    def item(self):
+        return self.get_item()
+
+    def get_item(self):
+        if self._item is None or not self.substitute:
+            return self._item
+        from tmdbhelper.lib.player.dialog.substitute import PlayerSubstitute
+        return PlayerSubstitute(self._item, self.substitute).dictionary
+
+    @cached_property
+    def substitute(self):
+        return self.meta_get('substitute') or {}
 
     @cached_property
     def meta_getter(self):
