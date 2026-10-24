@@ -315,8 +315,8 @@ msgstr "Ange koden"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "Gå till [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "Gå till [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"

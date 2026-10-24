@@ -436,8 +436,8 @@ msgstr "Введите код"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "Перейдите на [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "Перейдите на [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"

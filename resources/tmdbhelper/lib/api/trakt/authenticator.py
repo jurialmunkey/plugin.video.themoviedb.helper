@@ -74,6 +74,10 @@ class TraktAuthenticator:
         return self.get_key(self.code, 'device_code')
 
     @cached_property
+    def verification_url(self):
+        return self.get_key(self.code, 'verification_url')
+
+    @cached_property
     def expires_in(self):
         return self.get_key(self.code, 'expires_in') or 0
 
@@ -87,7 +91,7 @@ class TraktAuthenticator:
 
     @cached_property
     def auth_dialog_text(self):
-        return f'{get_localized(32096)}\n{get_localized(32095)}: [B]{self.user_code}[/B]'
+        return f'{get_localized(32096).format(self.verification_url)}\n{get_localized(32095)}: [B]{self.user_code}[/B]'
 
     @cached_property
     def auth_dialog(self):

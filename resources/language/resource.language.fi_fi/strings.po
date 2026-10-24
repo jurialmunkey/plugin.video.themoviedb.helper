@@ -304,8 +304,8 @@ msgstr "Syötä koodi"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "Avaa [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "Avaa [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"

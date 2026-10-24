@@ -529,8 +529,8 @@ msgstr "أدخل الرمز"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "اذهب إلى [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "اذهب إلى [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"

@@ -6,10 +6,10 @@ from tmdbhelper.lib.api.trakt.profile import TraktProfile
 
 
 API_URL = 'https://api.trakt.tv'
-OAUTH_DEVICE_CODE_URL = 'https://api.trakt.tv/oauth/device/code'
-OAUTH_DEVICE_TOKEN_URL = 'https://api.trakt.tv/oauth/device/token'
-OAUTH_REVOKE_URL = 'https://api.trakt.tv/oauth/revoke'
-OAUTH_TOKEN_URL = 'https://api.trakt.tv/oauth/token'
+OAUTH_DEVICE_CODE_URL = 'https://auth.trakt.tv/oauth/device/code'
+OAUTH_DEVICE_TOKEN_URL = 'https://auth.trakt.tv/oauth/device/token'
+OAUTH_REVOKE_URL = 'https://auth.trakt.tv/oauth/revoke'
+OAUTH_TOKEN_URL = 'https://auth.trakt.tv/oauth/token'
 
 
 class TraktAPI(NoCacheRequestAPI):

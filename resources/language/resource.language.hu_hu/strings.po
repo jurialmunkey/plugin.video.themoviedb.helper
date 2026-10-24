@@ -324,8 +324,8 @@ msgstr "Kód megadása"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "Menj a [B]https://trakt.tv/activate[/B] helyre"
+msgid "Go to [B]{}[/B]"
+msgstr "Menj a [B]{}[/B] helyre"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"

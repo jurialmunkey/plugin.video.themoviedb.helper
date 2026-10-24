@@ -303,8 +303,8 @@ msgstr "Введіть код"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "Перейдіть на [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "Перейдіть на [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"

@@ -303,8 +303,8 @@ msgstr "voer de code in"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "Ga naar [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "Ga naar [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"

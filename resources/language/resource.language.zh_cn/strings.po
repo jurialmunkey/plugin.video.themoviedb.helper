@@ -510,8 +510,8 @@ msgstr "输入代码"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "转到 [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "转到 [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"
