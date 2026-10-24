@@ -36,7 +36,12 @@ class PlayerResolverBase:
         if not self.is_strm_file:
             return
         from xbmc import PlayList, PLAYLIST_VIDEO
-        # Kodi expands STRM entries and their properties before starting playback.
+        # Workaround: Kodi expands STRM entries and their properties before playback
+        # when started through its playlist player, but not after plugin resolution.
+        # WARNING: This clears the existing video queue, even with allow_playlist=False,
+        # breaking playlist continuation (including queued next episodes).
+        # TODO: An upstream Kodi fix is needed to expand resolved STRM files within
+        # the current playlist without this dummy-resolution and playlist workaround.
         playlist = PlayList(PLAYLIST_VIDEO)
         playlist.clear()
         playlist.add(self.path, self.listitem)
