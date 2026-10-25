@@ -21,7 +21,6 @@ class ListSyncProperties(ListProperties):
     def sync_data(self):
         return ItemListSyncDataFactory(
             self.sync_type,
-            self.trakt_api,
             sort_by=self.sort_by,
             sort_how=self.sort_how,
             item_type=self.item_type,
@@ -61,7 +60,6 @@ class ListStandardSync(ListDefault):
     def configure_list_properties(self, list_properties):
         list_properties.limit = 20 * max(get_setting('pagemulti_sync', 'int'), 1)
         list_properties.plugin_name = '{plural} {localized}'
-        list_properties.trakt_api = self.trakt_api
         return list_properties
 
     def get_items(self, tmdb_type, page=1, sort_by=None, sort_how=None, tmdb_id=None, **kwargs):

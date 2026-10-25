@@ -35,7 +35,7 @@ class ListHistoryStatsProperties(ListProperties):
         return [self.get_sync_data_getter(item_type) for item_type in self.item_types]
 
     def get_sync_data_getter(self, item_type):
-        return SyncDataFactory(self).get_watched_history_stats_getter(item_type, self.days)
+        return SyncDataFactory().get_watched_history_stats_getter(item_type, self.days)
 
     @cached_property
     def total(self):
@@ -129,7 +129,7 @@ class ListMonthlyHistoryStatsProperties(ListHistoryStatsProperties):
     months = 12
 
     def get_sync_data_getter(self, item_type):
-        return SyncDataFactory(self).get_watched_monthly_history_stats_getter(item_type, self.months)
+        return SyncDataFactory().get_watched_monthly_history_stats_getter(item_type, self.months)
 
     @cached_property
     def watched_dates(self):

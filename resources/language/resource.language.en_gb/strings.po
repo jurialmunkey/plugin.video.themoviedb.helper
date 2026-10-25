@@ -2417,6 +2417,11 @@ msgctxt "#32547"
 msgid "Subgenres"
 msgstr ""
 
+#: /resources/settings.xml
+msgctxt "#32548"
+msgid "Choose an installed provider for this feature, or None to disable it."
+msgstr ""
+
 msgctxt "#30030"
 msgid "Hindi (India)"
 msgstr ""
@@ -2474,7 +2479,7 @@ msgid "Malay (Singapore)"
 msgstr ""
 
 msgctxt "#30044"
-msgid "Norwegian Bokmål (Norway)"
+msgid "Norwegian BokmÃ¥l (Norway)"
 msgstr ""
 
 msgctxt "#30045"
@@ -2641,4 +2646,9 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32025"
 msgid "Default player for episodes"
+msgstr ""
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32549"
+msgid "Sync Options"
 msgstr ""

@@ -54,13 +54,17 @@ class BaseDirItem:
 
 
 class BaseDirItemAuthorised(BaseDirItem):
+    @cached_property
+    def authorisation(self):
+        return self.get_authorisation()
 
-    authorisation_setting = None
+    def get_authorisation(self):
+        return SyncAuthorisation()
 
     @property
     def authorisation_type(self):
-        return SyncAuthorisation(self.authorisation_setting).authorisation_type
+        return self.authorisation.authorisation_type
 
     @property
     def enabled(self):
-        return SyncAuthorisation(self.authorisation_setting).is_authorized
+        return self.authorisation.is_authorized

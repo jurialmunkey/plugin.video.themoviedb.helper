@@ -91,8 +91,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def sync_playdata(self):
         from tmdbhelper.lib.items.sync import SyncPlayData
         return SyncPlayData(
-            trakt_api=self.trakt_api,
-            mdblist_api=self.mdblist_api,
             watchedindicators=get_setting('trakt_watchedindicators'),
             pauseplayprogress=get_setting('trakt_watchedindicators'))
 

@@ -1,9 +1,11 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem, BaseDirItemAuthorised
+from tmdbhelper.lib.items.directories.base.basedir_sync import BaseDirItemSync
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class BaseDirItemTraktFavorites(BaseDirItemAuthorised):
+class BaseDirItemTraktFavorites(BaseDirItemSync):
+    sync_capability = 'favorites'
     priority = 110
     label_type = 'reversed'
     label_localized = 1036
@@ -14,7 +16,8 @@ class BaseDirItemTraktFavorites(BaseDirItemAuthorised):
     group = 1036
 
 
-class BaseDirItemTraktMostWatched(BaseDirItemAuthorised):
+class BaseDirItemTraktMostWatched(BaseDirItemSync):
+    sync_capability = 'watched'
     priority = 160
     label_localized = 32195
     types = ('movie', 'tv', 'episode', )
@@ -23,7 +26,8 @@ class BaseDirItemTraktMostWatched(BaseDirItemAuthorised):
     group = 32195
 
 
-class BaseDirItemTraktDropped(BaseDirItemAuthorised):
+class BaseDirItemTraktDropped(BaseDirItemSync):
+    sync_capability = 'watched'
     priority = 230
     label_type = 'localize'
     label_localized = 32048

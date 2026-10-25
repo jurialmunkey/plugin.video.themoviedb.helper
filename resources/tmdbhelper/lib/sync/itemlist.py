@@ -39,10 +39,13 @@ class ItemListSyncDataProperties:
     def reverse(self):
         return self.get_reverse()
 
-    @property
+    @cached_property
     def syncdata(self):
+        return self.get_syncdata()
+
+    def get_syncdata(self):
         from tmdbhelper.lib.sync.datasync import SyncDataFactory
-        return SyncDataFactory(self)
+        return SyncDataFactory()
 
     @cached_property
     def namedtuple_basic(self):
@@ -116,8 +119,7 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         'lastweek': ('last_watched_at', True, '', ),
     }
 
-    def __init__(self, trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
-        self.trakt_api = trakt_api
+    def __init__(self, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
         self.sort_by, self.sort_how = sort_by, sort_how
         self.item_keys = item_keys or ()
         self.item_type = item_type

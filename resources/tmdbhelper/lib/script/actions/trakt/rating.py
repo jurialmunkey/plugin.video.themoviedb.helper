@@ -1,17 +1,32 @@
-from tmdbhelper.lib.script.sync.trakt.item import ItemSync
+from .item import ItemAction
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from xbmcgui import Dialog
 
 
-class ItemRating(ItemSync):
+class ItemRating(ItemAction):
     allow_episodes = True
     localized_name_add = 32485
     localized_name_rem = 32489
-    sync_key = 'rating'
 
     def get_name_remove(self):
         return f'{get_localized(self.localized_name_rem)} ({self.sync_value})'
+
+    def get_sync_value(self):
+        return self.trakt_api.get_user_rating(self.trakt_type, self.sync_item['ids']['trakt'])
+
+    def reset_lastactivities(self):
+        if not self.is_successful_sync:
+            return
+        from tmdbhelper.lib.sync.invalidator import SyncInvalidatorRatings
+        invalidator = SyncInvalidatorRatings()
+        provider = invalidator.syncdata.registry.get_selected_provider('ratings')
+        if provider is not None and provider.provider_id == 'trakt':
+            invalidator.invalidate()
+
+    def sync(self):
+        self.reset_lastactivities()
+        super().sync()
 
     @staticmethod
     def refresh_containers():

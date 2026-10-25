@@ -4,8 +4,8 @@ from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.script.sync.request import ItemSync as BasicItemSync
 
 
-class ItemSync(BasicItemSync):
-    activity_methods = ()
+class ItemAction(BasicItemSync):
+    service_name = 'MDbList'
 
     @cached_property
     def mdblist_api(self):
@@ -21,9 +21,6 @@ class ItemSync(BasicItemSync):
 
     def get_is_available(self):
         return bool(self.mdblist_api)
-
-    def get_name(self):
-        return f'{super().get_name()} (MDbList)'
 
     def get_self(self):
         if not self.is_available:
@@ -88,15 +85,3 @@ class ItemSync(BasicItemSync):
         if any(self.response_data.get('not_found', {}).values()):
             return 'MDbList: not_found'
         return super().get_status_code_message()
-
-    def invalidate_activity(self, method, item_type=None):
-        item_id = f'{item_type or self.base_trakt_type}.{method}'
-        self.syncdata.cache.del_item(table='lactivities', item_id=item_id)
-        self.syncdata.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
-
-    def reset_lastactivities(self):
-        if not self.is_successful_sync:
-            return
-        for method in self.activity_methods:
-            self.invalidate_activity(method)
-        self.syncdata.reset_lastactivities()

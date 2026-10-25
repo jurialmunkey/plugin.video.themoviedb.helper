@@ -1,11 +1,11 @@
-from tmdbhelper.lib.script.sync.trakt.item import ItemSync
+from .item import ItemAction
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from jurialmunkey.ftools import cached_property
 from xbmcgui import Dialog
 
 
-class ItemComments(ItemSync):
+class ItemComments(ItemAction):
     localized_name = 32304
     preconfigured = True
 

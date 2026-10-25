@@ -3,7 +3,9 @@ from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.script.sync.request import ItemSync as BasicItemSync
 
 
-class ItemSync(BasicItemSync):
+class ItemAction(BasicItemSync):
+    service_name = 'Trakt'
+
     @cached_property
     def trakt_api(self):
         return self.get_trakt_api()
@@ -11,6 +13,11 @@ class ItemSync(BasicItemSync):
     def get_trakt_api(self):
         from tmdbhelper.lib.api.trakt.api import TraktAPI
         return TraktAPI()
+
+    def get_query_database(self):
+        query_database = super().get_query_database()
+        query_database.trakt_api = self.trakt_api
+        return query_database
 
     @cached_property
     def trakt_slug(self):

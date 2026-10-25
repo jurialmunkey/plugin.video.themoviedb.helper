@@ -3,7 +3,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, get_setting
-from tmdbhelper.lib.monitor.scrobbler import PlayerScrobbler
+from tmdbhelper.lib.monitor.scrobbler import PlayerScrobblerFactory
 
 
 class PlayerItem():
@@ -208,25 +208,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
     def onPlayBackEnded(self):
         self.scrobbler_stop()
-        self.refresh_mdblist_watched()
         self.reset_properties()
 
     def onPlayBackStopped(self):
         self.scrobbler_stop()
-        self.refresh_mdblist_watched()
         self.reset_properties()
-
-    def refresh_mdblist_watched(self):
-        if get_setting('sync_source_watched', 'str') != 'MDbList':
-            return
-        if not get_setting('mdblist_scrobbling'):
-            return
-        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
-        from tmdbhelper.lib.addon.logger import kodi_log
-        from tmdbhelper.lib.addon.tmdate import set_timestamp
-        self.get_property(LASTACTIVITIES_DATA, clear_property=True)
-        self.get_property('Widgets.Reload', set_property=f'{set_timestamp(0, True)}')
-        kodi_log('Sync: invalidated MDbList watched activities after playback', 2)
 
     def onPlayBackPaused(self):
         self.scrobbler_pause()
@@ -447,7 +433,7 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
         # Update scrobbler
         self.scrobbler_stop()
-        self.scrobbler = PlayerScrobbler(total_time=self.getTotalTime(), trakt_api=self.trakt_api, mdblist_api=self.mdblist_api)
+        self.scrobbler = PlayerScrobblerFactory(total_time=self.getTotalTime())
 
         # Clear properties and store the last cleared item
         self.previous_item = self.current_item
@@ -467,6 +453,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         # Update our properties
         self.set_properties(self.details)
 
-        # Start Trakt trakt_scrobbling. Wait for seek in case of resuming.
+        # Start the selected scrobbler after any resume seek.
         self.wait_for_seek(10)
         self.scrobbler_start()

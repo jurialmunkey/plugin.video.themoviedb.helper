@@ -5,6 +5,12 @@ class SimpleCache(ItemDetailsList):
     table = 'simplecache'
     conditions = 'id=? LIMIT 1'
 
+    def get_cached_data(self):
+        from tmdbhelper.lib.sync.datasync import SyncDataFactory
+        syncdata = SyncDataFactory()
+        if any(syncdata.is_column_enabled(key) for key in self.keys):
+            return super().get_cached_data()
+
     @property
     def values(self):  # WHERE conditions values for ?
         return (self.item_id, )

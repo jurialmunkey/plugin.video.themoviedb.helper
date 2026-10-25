@@ -1,12 +1,15 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.sync.auth import SyncAuthorisation
+from tmdbhelper.lib.sync.auth import SyncProviderAuthorisation
 
 
-class SyncPlayData(SyncAuthorisation):
-    def __init__(self, pauseplayprogress=False, watchedindicators=False, **kwargs):
-        super().__init__('sync_source_watched', **kwargs)
+class SyncPlayData(SyncProviderAuthorisation):
+    def __init__(self, pauseplayprogress=False, watchedindicators=False):
+        super().__init__('watched')
         self._pauseplayprogress = pauseplayprogress  # Set play progress using paused at position
         self._watchedindicators = watchedindicators  # Set watched status and playcount
+
+    def get_provider(self):
+        return self.syncdata.registry.get_selected_provider(self.capability)
 
     @property
     def is_enabled(self):
@@ -28,7 +31,7 @@ class SyncPlayData(SyncAuthorisation):
     @cached_property
     def syncdata(self):
         from tmdbhelper.lib.sync.datasync import SyncDataFactory
-        return SyncDataFactory(self)
+        return SyncDataFactory()
 
     @is_sync
     def pre_sync(self, info=None, tmdb_type=None, **kwargs):

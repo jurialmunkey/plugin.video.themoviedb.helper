@@ -3,23 +3,31 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class BaseDirItemCollection(BaseDirItemAuthorised):
+class BaseDirItemSync(BaseDirItemAuthorised):
+    sync_capability = 'watched'
+
+    def get_authorisation(self):
+        from tmdbhelper.lib.sync.auth import SyncProviderAuthorisation
+        return SyncProviderAuthorisation(self.sync_capability)
+
+
+class BaseDirItemCollection(BaseDirItemSync):
     priority = 100
     label_localized = 32192
     label_type = 'reversed'
     params = {'info': 'trakt_collection'}
     art_icon = '/resources/icons/sync/collection.png'
-    authorisation_setting = 'sync_source_collection'
+    sync_capability = 'collection'
     sorting = True
     types = ('movie', 'tv', 'both')
     group = 32192
 
 
-class BaseDirItemWatchlist(BaseDirItemAuthorised):
+class BaseDirItemWatchlist(BaseDirItemSync):
+    sync_capability = 'watchlist'
     priority = 120
     label_type = 'reversed'
     label_localized = 32193
-    authorisation_setting = 'sync_source_watchlist'
     types = ('movie', 'tv', 'season', 'episode', 'both', )
     params = {'info': 'trakt_watchlist'}
     sorting = True
@@ -43,10 +51,10 @@ class BaseDirItemWatchListAnticipated(BaseDirItemWatchlist):
     group = 32193
 
 
-class BaseDirItemHistory(BaseDirItemAuthorised):
+class BaseDirItemHistory(BaseDirItemSync):
     priority = 150
     label_localized = 32194
-    authorisation_setting = 'sync_source_watched'
+    sync_capability = 'watched'
     sorting = True
     types = ('movie', 'tv', 'episode', 'both', )
     params = {'info': 'trakt_history'}
@@ -54,11 +62,11 @@ class BaseDirItemHistory(BaseDirItemAuthorised):
     group = 32194
 
 
-class BaseDirItemOnDeckMovies(BaseDirItemAuthorised):
+class BaseDirItemOnDeckMovies(BaseDirItemSync):
     priority = 170
     label_localized = 32196
     types = ('movie', 'tv', )
-    authorisation_setting = 'sync_source_watched'
+    sync_capability = 'watched'
     params = {'info': 'trakt_inprogress'}
     sorting = True
     art_icon = 'resources/icons/sync/inprogress.png'
@@ -87,15 +95,20 @@ class BaseDirItemOnDeckUnWatchedMovie(BaseDirItemOnDeckMovies):
         return get_localized(16101)
 
 
-class BaseDirItemToWatch(BaseDirItemAuthorised):
+class BaseDirItemToWatch(BaseDirItemSync):
     priority = 210
     label_type = 'reversed'
     label_localized = 32078
     types = ('movie', 'tv', )
-    authorisation_setting = 'sync_source_watched'
+    sync_capability = 'watched'
     params = {'info': 'trakt_towatch'}
     art_icon = 'resources/icons/sync/watchlist.png'
     group = 32196
+
+    @property
+    def enabled(self):
+        from tmdbhelper.lib.sync.auth import SyncProviderAuthorisation
+        return any(SyncProviderAuthorisation(feature).is_authorized for feature in ('watched', 'watchlist'))
 
 
 class BaseDirItemNextEpisodes(BaseDirItemOnDeckMovies):
@@ -123,4 +136,4 @@ class BaseDirItemOnDeckUnWatchedEpisodes(BaseDirItemOnDeckMovies):
 
 def get_all_sync_class_instances():
     from tmdbhelper.lib.addon.module import get_all_module_class_objects_by_priority
-    return [clobj() for clobj in get_all_module_class_objects_by_priority(__name__)]
+    return [clobj() for clobj in get_all_module_class_objects_by_priority(__name__) if clobj is not BaseDirItemSync]
