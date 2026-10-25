@@ -247,6 +247,9 @@ SEASON_COLUMNS = {
     'season': {
         'data': 'INTEGER',
     },
+    'episode_count': {
+        'data': 'INTEGER',
+    },
     'year': {
         'data': 'INTEGER',
         'indexed': True
