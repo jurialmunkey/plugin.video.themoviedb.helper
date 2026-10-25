@@ -48,7 +48,7 @@ class SyncPlayback(MDbListDataTypeEpisodesInShows):
 
 
 class SyncNextEpisodes(MDbListDataType):
-    keys = ('next_episode_id', 'next_episode_aired_at', 'last_watched_at', 'aired_episodes', 'watched_episodes', )  # AIRED AND WATCHED DATA IN THIS ENDPOINT FOR MDBLIST
+    keys = ('next_episode_id', 'next_episode_aired_at', 'last_watched_at', 'aired_episodes', )
     last_activities_key = 'watched_at'
     method = 'upnext'
     sync_kwgs = {}

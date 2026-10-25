@@ -8,10 +8,11 @@ from tmdbhelper.lib.sync.datasync import (
 )
 
 
-class MDbListSyncDataGetterSeasonWatchedCounts(SyncDataGetterAll):
-    item_type = 'season'
+class MDbListSyncDataGetterShowWatchedCounts(SyncDataGetterAll):
+    item_type = 'show'
     query_clauses = ('item_type=?', )
     clause_keys = ('id', )
+    episode_conditions = 'episode.season_number>0'
 
     @property
     def query_values(self):
@@ -25,14 +26,18 @@ class MDbListSyncDataGetterSeasonWatchedCounts(SyncDataGetterAll):
             'WHERE episode.item_type=? AND episode.plays>0 '
             'AND episode.tmdb_type=simplecache.tmdb_type '
             'AND episode.tmdb_id=simplecache.tmdb_id '
-            'AND episode.season_number=simplecache.season_number '
-            'AND simplecache.season_number>0'
+            f'AND {self.episode_conditions}'
             ') AS watched_episodes',
         )
 
     def get_items(self):
         # Called after watched sync; read stored data without recursively syncing it.
         return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
+
+
+class MDbListSyncDataGetterSeasonWatchedCounts(MDbListSyncDataGetterShowWatchedCounts):
+    item_type = 'season'
+    episode_conditions = 'episode.season_number>0 AND episode.season_number=simplecache.season_number'
 
 
 class MDbListSyncDataGetterAllUnHiddenMoviesToWatch(SyncDataGetterAllMoviesToWatch):

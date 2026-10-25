@@ -1077,7 +1077,7 @@ SIMPLECACHE_COLUMNS = {
     },
     'watched_episodes': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAiredEpisodes', ),
+        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
         'indexed': True
     },
     'reset_at': {

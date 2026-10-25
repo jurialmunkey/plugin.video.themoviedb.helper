@@ -112,25 +112,33 @@ class SyncWatchedMovies(SyncWatched):
 
 
 class SyncWatchedEpisodes(MDbListDataTypeEpisodesToShows, SyncWatched):
+    keys = (*SyncWatched.keys, 'watched_episodes', )
     sync_kwgs_mediatype = 'episode'
 
-    def get_season_watched_counts(self):
-        from tmdbhelper.lib.sync.mdblist.datasync import MDbListSyncDataGetterSeasonWatchedCounts
-        sd = MDbListSyncDataGetterSeasonWatchedCounts(self.instance_syncdata)
-        return {i['id']: (i['watched_episodes'], ) for i in sd.items}
+    def get_watched_counts(self):
+        from tmdbhelper.lib.sync.mdblist.datasync import (
+            MDbListSyncDataGetterShowWatchedCounts,
+            MDbListSyncDataGetterSeasonWatchedCounts,
+        )
+        return {
+            i['id']: (i['watched_episodes'], )
+            for getter in (MDbListSyncDataGetterShowWatchedCounts, MDbListSyncDataGetterSeasonWatchedCounts)
+            for i in getter(self.instance_syncdata).items
+        }
 
-    def sync_season_watched_counts(self):
-        self.cache.set_many_values(keys=('watched_episodes', ), data=self.get_season_watched_counts())
+    def sync_watched_counts(self):
+        self.cache.set_many_values(keys=('watched_episodes', ), data=self.get_watched_counts())
 
     def sync_data(self, **kwargs):
         if not super().sync_data(**kwargs):
             return False
         # Incremental responses contain only changed episodes, so count the stored history.
-        self.sync_season_watched_counts()
+        self.sync_watched_counts()
         return True
 
 
 class SyncWatchedFactory(SyncWatched):
+    keys = SyncWatchedEpisodes.keys
 
     def __new__(cls, instance_syncdata, item_type):
         routes = {

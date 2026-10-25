@@ -73,5 +73,5 @@ def SyncWatched():
 
 def SyncAiredEpisodes():
     if get_setting('sync_source_watched', 'str') == 'MDbList':
-        return SyncNextEpisodes()  # AIRED/WATCHED counts in next episodes for MDbList
+        return SyncNextEpisodes()  # Aired counts in next episodes for MDbList
     return SyncWatched()
