@@ -1,3 +1,4 @@
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes, MediaItemInfoPropertyItemRoutes
 
@@ -43,6 +44,34 @@ class Tvshow(MediaItem):
             pass
         return infolabels
 
+    def get_previous_season_episode_count(self, season):
+        return sum(
+            i['episode_count']
+            for i in self.return_basemeta_db('season_episode_counts').cached_data
+            if i['season'] < season
+        )
+
+    def get_aired_episodes(self):
+        next_aired_id = self.get_data_value('next_aired_id')
+        if not next_aired_id:
+            if self.get_data_value('status') in ('Ended', 'Canceled'):
+                return self.get_data_value('totalepisodes')
+            return
+        _, _, season, episode = next_aired_id.split('.')
+        season, episode = try_int(season), try_int(episode)
+        if season == 1:
+            return episode - 1
+        if season > 1:
+            return self.get_previous_season_episode_count(season) + episode - 1
+
+    def get_infoproperties_aired_episodes(self, infoproperties):
+        if infoproperties.get('airedepisodes') is not None:
+            return infoproperties
+        aired_episodes = self.get_aired_episodes()
+        if aired_episodes is not None:
+            infoproperties['airedepisodes'] = aired_episodes
+        return infoproperties
+
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_translation(infoproperties)
@@ -56,4 +85,5 @@ class Tvshow(MediaItem):
             pass
         infoproperties = self.get_infoproperties_ranks(infoproperties)
         infoproperties = self.get_infoproperties_next_ep(infoproperties)
+        infoproperties = self.get_infoproperties_aired_episodes(infoproperties)
         return infoproperties

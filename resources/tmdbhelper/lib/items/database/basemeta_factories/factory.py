@@ -132,6 +132,11 @@ def import_season():
     return Season
 
 
+def import_season_episode_counts():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.season_episode_counts import SeasonEpisodeCounts
+    return SeasonEpisodeCounts
+
+
 def import_episode():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Episode
     return Episode
@@ -526,6 +531,7 @@ FACTORY_ROUTES = {
     'episode_group_seasons': import_episode_group_seasons,
     'episode_group_season_episodes': import_episode_group_season_episodes,
     'season': import_season,
+    'season_episode_counts': import_season_episode_counts,
     'episode': import_episode,
     'belongs': import_belongs,
     'collection': import_collection,
