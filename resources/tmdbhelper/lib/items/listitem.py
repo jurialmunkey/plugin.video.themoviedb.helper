@@ -558,6 +558,14 @@ class _Season(_Tvshow):
     mediatype = 'season'
     trakt_type = 'season'
 
+    @property
+    def totalepisodes(self):
+        if self.infoproperties.get('specialseason'):
+            return super().totalepisodes
+        if global_setting['seasons_anticipated']:
+            return self.airedepisodes
+        return super().totalepisodes
+
     @cached_property
     def is_unaired(self):
         if not self.infolabels.get('premiered'):
