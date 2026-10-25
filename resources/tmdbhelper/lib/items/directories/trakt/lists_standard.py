@@ -66,9 +66,13 @@ class ListTraktStandardProperties(ListStandardProperties):
     def url(self):
         return self.request_url.format(trakt_type=self.trakt_type)
 
+    @cached_property
+    def final_items(self):
+        return self.class_pages(self, self.page).items
+
     def get_uncached_items(self):
         return {
-            'items': self.class_pages(self, self.page).items,
+            'items': self.final_items,
             'pages': self.total_pages,
             'count': self.total_items,
         }
@@ -82,9 +86,73 @@ class ListTraktStandardProperties(ListStandardProperties):
         return FactoryItemMapper(item, add_infoproperties, trakt_type=self.trakt_type, sub_type=self.sub_type).item
 
 
+class ListTraktStandardLocalProperties(ListTraktStandardProperties):
+    page_limit = 8
+    item_limit = 20
+
+    @cached_property
+    def cache_name_tuple(self):
+        cache_name_tuple = self.get_cache_name_list_filter()
+        cache_name_tuple = ['local_items'] + self.get_cache_name_list_prefix() + cache_name_tuple
+        cache_name_tuple = cache_name_tuple + [self.page, self.limit, self.page_limit, self.item_limit]
+        return tuple(cache_name_tuple)
+
+    @property
+    def next_page(self):
+        return self.pages + 1  # Override next page object by making next_page out of bounds
+
+    @cached_property
+    def next_page_generator(self):
+        return (x for x in range(self.page, self.page + self.page_limit))
+
+    @cached_property
+    def kodi_db(self):
+        from tmdbhelper.lib.api.kodi.rpc import get_kodi_library
+        return get_kodi_library(self.tmdb_type)
+
+    def get_dbid(self, item):
+        if not self.kodi_db:
+            return
+        try:
+            unique_ids = item['unique_ids']
+            infolabels = item['infolabels']
+        except (KeyError, TypeError):
+            return
+        return self.kodi_db.get_info(
+            info='dbid',
+            imdb_id=unique_ids.get('imdb'),
+            tmdb_id=unique_ids.get('tmdb'),
+            tvdb_id=unique_ids.get('tvdb'),
+            originaltitle=infolabels.get('originaltitle'),
+            title=infolabels.get('title'),
+            year=infolabels.get('year')
+        )
+
+    @cached_property
+    def item_generator(self):
+        return (
+            i for xpage in self.next_page_generator
+            for i in self.class_pages(self, xpage).items
+            if i and self.get_dbid(i)
+        )
+
+    @cached_property
+    def final_items(self):
+        final_items = []
+        for x, i in enumerate(self.item_generator):
+            if x >= self.item_limit:
+                break
+            final_items.append(i)
+        return final_items
+
+
 class ListTraktStandard(ListStandard):
 
-    list_properties_class = ListTraktStandardProperties
+    @property
+    def list_properties_class(self):
+        if not self.is_localonly:
+            return ListTraktStandardProperties
+        return ListTraktStandardLocalProperties
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
