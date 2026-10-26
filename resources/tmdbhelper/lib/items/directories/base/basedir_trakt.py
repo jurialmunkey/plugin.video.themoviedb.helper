@@ -16,7 +16,7 @@ class BaseDirItemTraktFavorites(BaseDirItemTraktAuthorised):
     types = ('movie', 'tv', 'both', )
     params = {'info': 'trakt_favorites'}
     sorting = True
-    art_icon = 'resources/icons/trakt/watchlist.png'
+    art_icon = 'resources/icons/trakt/favorites.png'
     group = 1036
 
 
@@ -276,7 +276,7 @@ class BaseDirItemTraktMostViewers(BaseDirItem):
     types = ('movie', 'tv', )
     params = {'info': 'trakt_mostviewers'}
     filters = True
-    art_icon = 'resources/icons/trakt/mostplayed.png'
+    art_icon = 'resources/icons/trakt/viewers.png'
     group = 32414
 
 
@@ -493,7 +493,7 @@ class BaseDirItemTraktSearchLists(BaseDirItem):
     label_localized = 32361
     types = ('both', )
     params = {'info': 'trakt_searchlists'}
-    art_icon = 'resources/icons/trakt/mylist.png'
+    art_icon = 'resources/icons/trakt/searchlists.png'
     group = 32159
 
 

@@ -1,0 +1,176 @@
+{
+  "author": "Alexander Kahlkopf / iconmonstr",
+  "license": "https://iconmonstr.com/license/",
+  "icons": [
+    {
+      "file": "iconmonstr-arrow-right-alt-filled.svg",
+      "source": "https://iconmonstr.com/arrow-right-alt-filled-svg/",
+      "sha256": "f1cc016b26209d65c4522096c9456085879bf7987050f1bb26ae0d9938a19dd2"
+    },
+    {
+      "file": "iconmonstr-award-5.svg",
+      "source": "https://iconmonstr.com/award-5-svg/",
+      "sha256": "cf9abbdf15fb20972c0f85eb5b00296956d2052e4879685d38f8402d9ef09860"
+    },
+    {
+      "file": "iconmonstr-bookmark-4.svg",
+      "source": "https://iconmonstr.com/bookmark-4-svg/",
+      "sha256": "178c658692798e5a1290620e99543c045acb3262f6de0818a120564ac35ec920"
+    },
+    {
+      "file": "iconmonstr-calendar-2.svg",
+      "source": "https://iconmonstr.com/calendar-2-svg/",
+      "sha256": "6e323c0e7dc0b99d7a66f12a8159980b2162962417e721f4c0426962c37af9a4"
+    },
+    {
+      "file": "iconmonstr-calendar-4.svg",
+      "source": "https://iconmonstr.com/calendar-4-svg/",
+      "sha256": "3080af2f8718f3652ff864fa71ed90f82a52fb37cc1815ff21ddaad09afedb59"
+    },
+    {
+      "file": "iconmonstr-chart-20.svg",
+      "source": "https://iconmonstr.com/chart-20-svg/",
+      "sha256": "036da0de003bbc83835e610771d8239aac9a237a256a67301c2e679c0e60553a"
+    },
+    {
+      "file": "iconmonstr-chart-5.svg",
+      "source": "https://iconmonstr.com/chart-5-svg/",
+      "sha256": "fdf4871fa0d45818a362d48962b52581285d86e2da51679ecde3a1d80d90ac0d"
+    },
+    {
+      "file": "iconmonstr-check-mark-4.svg",
+      "source": "https://iconmonstr.com/check-mark-4-svg/",
+      "sha256": "3c3e9990c0b3e7d93df0d75300c2bf9ccc9efa5bb4b1ad52d9946370f9dccaca"
+    },
+    {
+      "file": "iconmonstr-coin-10.svg",
+      "source": "https://iconmonstr.com/coin-10-svg/",
+      "sha256": "cfc3eeb53318dcf122fa96b9a19c4f1207f4d8a2487067c8aa45c89198fe745d"
+    },
+    {
+      "file": "iconmonstr-eye-3.svg",
+      "source": "https://iconmonstr.com/eye-3-svg/",
+      "sha256": "57db853ba495ee64008c9df4a62f9414427c1861d0f0077effd154a368cc9691"
+    },
+    {
+      "file": "iconmonstr-forbidden-1.svg",
+      "source": "https://iconmonstr.com/forbidden-1-svg/",
+      "sha256": "9a56a2a4f0b0335c45e4c8e0b1621e17bd6e509e178589557f18db1fdef05ce5"
+    },
+    {
+      "file": "iconmonstr-heart-filled.svg",
+      "source": "https://iconmonstr.com/heart-filled-svg/",
+      "sha256": "a78dd3e15345397614419c32467b92b07bd0852d536f93db4f6eae0e9d30d30d"
+    },
+    {
+      "file": "iconmonstr-layer-21.svg",
+      "source": "https://iconmonstr.com/layer-21-svg/",
+      "sha256": "e4ea2ffe5acf9028033bca3f26c6b9e8e254ba71610f28dca1d21bfcf8eab896"
+    },
+    {
+      "file": "iconmonstr-layer-multiple-filled.svg",
+      "source": "https://iconmonstr.com/layer-multiple-filled-svg/",
+      "sha256": "fd50651129cd63644a7287e3f037736d6345bbbd1c262261c027441ead98d866"
+    },
+    {
+      "file": "iconmonstr-link-1.svg",
+      "source": "https://iconmonstr.com/link-1-svg/",
+      "sha256": "6f20ce2c55b403c7ce6c6916eb8d9d7635c117066f32f4af992209d430d316af"
+    },
+    {
+      "file": "iconmonstr-magnifier-text-lined.svg",
+      "source": "https://iconmonstr.com/magnifier-text-lined-svg/",
+      "sha256": "83b857081c282298a7dd0aaa6211e239c04d398bf7dc023c9a35502abffa38d9"
+    },
+    {
+      "file": "iconmonstr-media-control-1.svg",
+      "source": "https://iconmonstr.com/media-control-1-svg/",
+      "sha256": "86792d7b8e12de9197c0902b9cfb4eb7dd7690684b7fb65b004c99c6509a1489"
+    },
+    {
+      "file": "iconmonstr-pen-16.svg",
+      "source": "https://iconmonstr.com/pen-16-svg/",
+      "sha256": "0797b2a82d91cbb200bc24aa770c3e9a77e8f857d2260b5f93f9d4c1761469df"
+    },
+    {
+      "file": "iconmonstr-radio-tower-1.svg",
+      "source": "https://iconmonstr.com/radio-tower-1-svg/",
+      "sha256": "7fc3beb9435e2c400f3049f677be533137fc899226002e68d1dea7a0aee69707"
+    },
+    {
+      "file": "iconmonstr-shield-12.svg",
+      "source": "https://iconmonstr.com/shield-12-svg/",
+      "sha256": "d10827dc530848f9ee936affdc96854e61e655d6eb7ad15d78f6b574317f754a"
+    },
+    {
+      "file": "iconmonstr-sitemap-1.svg",
+      "source": "https://iconmonstr.com/sitemap-1-svg/",
+      "sha256": "8324d320d90696cc15dea0e3d912ac4508e34c99dd06a1a061ea9664a0bf2517"
+    },
+    {
+      "file": "iconmonstr-speech-bubble-2.svg",
+      "source": "https://iconmonstr.com/speech-bubble-2-svg/",
+      "sha256": "0ab3c25b8ff84f9d10c21a1247c8340d416c5c4557c2e2c4eb8b20c256d555d0"
+    },
+    {
+      "file": "iconmonstr-star-3.svg",
+      "source": "https://iconmonstr.com/star-3-svg/",
+      "sha256": "15efc02440e0554c348d3d4a66392feba42177465370b0de8fdf8288868ca573"
+    },
+    {
+      "file": "iconmonstr-television-1.svg",
+      "source": "https://iconmonstr.com/television-1-svg/",
+      "sha256": "8d3be8ebe6bc5fc5fe10b4700818f1383ff32e870aa87b03743c9991ea4c05bf"
+    },
+    {
+      "file": "iconmonstr-text-bullet-list-lined.svg",
+      "source": "https://iconmonstr.com/text-bullet-list-lined-svg/",
+      "sha256": "a68a5379a9d19c0dae4b6d11817bcca20e733acd0e7dfd42cbed55ba7db45761"
+    },
+    {
+      "file": "iconmonstr-thumb-1.svg",
+      "source": "https://iconmonstr.com/thumb-1-svg/",
+      "sha256": "bf5797df930129d4a742c84635498bd910da59965ba395f4207d0183cf459edd"
+    },
+    {
+      "file": "iconmonstr-thumb-9.svg",
+      "source": "https://iconmonstr.com/thumb-9-svg/",
+      "sha256": "3e7a80c7683062e3bf40f71509cc990168ffd1de2efe01ffde318da8ff248645"
+    },
+    {
+      "file": "iconmonstr-time-8.svg",
+      "source": "https://iconmonstr.com/time-8-svg/",
+      "sha256": "cd07f69e657a87d84d34225aed7a5affd0b5ad12ababc26eb658531d41af91a4"
+    },
+    {
+      "file": "iconmonstr-time-9.svg",
+      "source": "https://iconmonstr.com/time-9-svg/",
+      "sha256": "3a50543ef2e1bb75fec0d95d77745963dc10582f91a4069e90d6af1202718a64"
+    },
+    {
+      "file": "iconmonstr-trophy-1.svg",
+      "source": "https://iconmonstr.com/trophy-1-svg/",
+      "sha256": "c48e403828bf6120a00e619d74e86dbf4882d0669fdaed0c048d6c4eb162756f"
+    },
+    {
+      "file": "iconmonstr-trophy-5.svg",
+      "source": "https://iconmonstr.com/trophy-5-svg/",
+      "sha256": "5b3c871b06a30c2d0402f27f599a1e06c786bec2062ed68165e7037c2f2f2080"
+    },
+    {
+      "file": "iconmonstr-user-19.svg",
+      "source": "https://iconmonstr.com/user-19-svg/",
+      "sha256": "99ca0856e65764dc7ecf645b90bea98ee57acd7471a7b6de5d809c6969277b7c"
+    },
+    {
+      "file": "iconmonstr-user-29.svg",
+      "source": "https://iconmonstr.com/user-29-svg/",
+      "sha256": "ba9e459a769d9ae0b7786bcc6b80bd28f46145fbc99524f594b62c1f0a20ec08"
+    },
+    {
+      "file": "iconmonstr-video-camera-1.svg",
+      "source": "https://iconmonstr.com/video-camera-1-svg/",
+      "sha256": "a86241e24b707174deaf7ca0dce00d22cad1d6b271bbc6e3d91a3f62cde35c83"
+    }
+  ]
+}

@@ -8,7 +8,7 @@ class BaseDirItemDetailsPlay(BaseDirItem):
     label_type = 'localize'
     label_localized = 208
     params = {'info': 'play'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/play.png'
     types = ('movie', 'episode', )
 
 
@@ -29,7 +29,7 @@ class BaseDirItemDetailsGroups(BaseDirItem):
     label_type = 'localize'
     label_localized = 32541
     params = {'info': 'episode_groups'}
-    art_icon = 'resources/icons/themoviedb/episodes.png'
+    art_icon = 'resources/icons/themoviedb/groupings.png'
     types = ('tv', )
 
 
@@ -38,7 +38,7 @@ class BaseDirItemDetailsCollection(BaseDirItem):
     label_type = 'localize'
     label_localized = 32192
     params = {'info': 'collection'}
-    art_icon = 'resources/icons/themoviedb/movies.png'
+    art_icon = 'resources/icons/themoviedb/collection.png'
     types = ('movie', )
 
 
@@ -74,7 +74,7 @@ class BaseDirItemDetailsTraktRelated(BaseDirItem):
     label_type = 'localize'
     label_localized = 32064
     params = {'info': 'trakt_related'}
-    art_icon = 'resources/icons/trakt/popular.png'
+    art_icon = 'resources/icons/trakt/related.png'
     types = ('movie', 'tv', 'episode',)
 
 
@@ -137,7 +137,7 @@ class BaseDirItemDetailsTraktComments(BaseDirItem):
     label_type = 'localize'
     label_localized = 32305
     params = {'info': 'trakt_comments'}
-    art_icon = 'resources/icons/trakt/mylists.png'
+    art_icon = 'resources/icons/trakt/comments.png'
     types = ('movie', 'tv', 'episode',)
 
 
@@ -146,7 +146,7 @@ class BaseDirItemDetailsTraktWatchers(BaseDirItem):
     label_type = 'localize'
     label_localized = 32065
     params = {'info': 'trakt_watchers'}
-    art_icon = 'resources/icons/trakt/popularlist.png'
+    art_icon = 'resources/icons/trakt/viewers.png'
     types = ('movie', 'tv', 'episode',)
 
 

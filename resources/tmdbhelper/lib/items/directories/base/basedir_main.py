@@ -56,7 +56,7 @@ class BaseDirItemMainTMDbv4(BaseDirItemMainMovie):
     priority = 170
     label_localized = 32079
     params = {'info': 'dir_tmdb_v4'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/user.png'
 
 
 class BaseDirItemMainSync(BaseDirItemMainMovie):
@@ -121,7 +121,7 @@ class BaseDirItemMain(BaseDirItemMainMovie):
     priority = 210
     label = 'Nodes'
     params = {'info': 'dir_custom_node'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/nodes.png'
 
 
 class BaseDirItemMainSettings(BaseDirItemMainMovie):
