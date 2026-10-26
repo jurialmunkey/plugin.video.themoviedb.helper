@@ -1,5 +1,5 @@
 from tmdbhelper.lib.items.directories.lists_default import ListSliceProperties, ListDefault
-from tmdbhelper.lib.items.directories.trakt.mapper_airingnext import AiringNextItemGetter
+from tmdbhelper.lib.items.directories.sync.mapper_airingnext import AiringNextItemGetter
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized
 from tmdbhelper.lib.addon.dialog import progress_bg
 from jurialmunkey.ftools import cached_property
@@ -71,7 +71,7 @@ class ListLibraryAiringNextProperties(ListAiringNextProperties):
         return self.kodi_db.database
 
 
-class ListTraktAiringNext(ListDefault):
+class ListSyncAiringNext(ListDefault):
     list_properties_class = ListAiringNextProperties
 
     def configure_list_properties(self, list_properties):
@@ -89,7 +89,7 @@ class ListTraktAiringNext(ListDefault):
         return self.get_items_finalised()
 
 
-class ListLibraryAiringNext(ListTraktAiringNext):
+class ListLibraryAiringNext(ListSyncAiringNext):
     list_properties_class = ListLibraryAiringNextProperties
 
     @cached_property

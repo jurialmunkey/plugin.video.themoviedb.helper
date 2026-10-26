@@ -1,4 +1,4 @@
-from tmdbhelper.lib.items.directories.trakt.lists_sync import ListStandardSync, ListSyncProperties
+from tmdbhelper.lib.items.directories.sync.lists_standard import ListStandardSync, ListSyncProperties
 
 
 class ListFavoritesProperties(ListSyncProperties):

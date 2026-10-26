@@ -1,6 +1,6 @@
 from tmdbhelper.lib.sync.itemlist import ItemListSyncDataFactory
 from tmdbhelper.lib.items.directories.lists_default import ListDefault, ListProperties
-from tmdbhelper.lib.items.directories.sync import SyncProviderListProperties
+from tmdbhelper.lib.items.directories.sync.lists_provider import SyncProviderListProperties
 from tmdbhelper.lib.items.itemlist import ItemListPagination
 from tmdbhelper.lib.addon.plugin import convert_type, get_setting
 from jurialmunkey.ftools import cached_property
@@ -240,7 +240,7 @@ class ListInProgress(ListOnDeck):
             self.list_properties.item_type = 'show'
             self.list_properties.params_def = {
                 'show': {
-                    'info': 'trakt_upnext',
+                    'info': 'sync_upnext',
                     'tmdb_type': 'tv',
                     'tmdb_id': '{tmdb_id}'
                 }

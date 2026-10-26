@@ -70,7 +70,7 @@ PLAYERS_BASEDIR_TEMPLATES = 'special://home/addons/plugin.video.themoviedb.helpe
 PLAYERS_PRIORITY = 1000
 PLAYERS_CHOSEN_DEFAULTS_FILENAME = 'player_defaults'
 
-NO_UNAIRED_LABEL = ('details', 'trakt_calendar', 'library_nextaired', 'videos', 'trakt_watchlist_anticipated', 'trakt_anticipated')
+NO_UNAIRED_LABEL = ('details', 'trakt_calendar', 'library_nextaired', 'videos', 'trakt_watchlist_anticipated', 'sync_watchlist_anticipated', 'trakt_anticipated')
 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
@@ -131,62 +131,62 @@ ROUTE_NOID = {
     'trakt_discover': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_discover',
         'import_attr': 'ListDiscover'}},
-    'trakt_towatch': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_towatch': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListToWatch'}},
-    'trakt_becauseyouwatched': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+    'sync_becauseyouwatched': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_random',
         'import_attr': 'ListRandomBecauseYouWatched'}},
-    'trakt_becausemostwatched': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_random',
+    'sync_becausemostwatched': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_random',
         'import_attr': 'ListRandomBecauseYouWatched'}},
     'library_nextaired': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_calendar',
         'import_attr': 'ListLocalCalendar'}},
     'library_airingnext': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_airingnext',
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_airingnext',
         'import_attr': 'ListLibraryAiringNext'}},
-    'trakt_airingnext': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_airingnext',
-        'import_attr': 'ListTraktAiringNext'}},
-    'trakt_collection': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_airingnext': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_airingnext',
+        'import_attr': 'ListSyncAiringNext'}},
+    'sync_collection': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListCollection'}},
-    'trakt_watchlist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_watchlist': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListWatchlist'}},
-    'trakt_watchlist_released': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_watchlist_released': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListWatchlistReleased'}},
-    'trakt_watchlist_anticipated': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_watchlist_anticipated': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListWatchlistAnticipated'}},
-    'trakt_history': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_history': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListHistory'}},
-    'trakt_history_stats': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_stats',
+    'sync_history_stats': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_stats',
         'import_attr': 'ListHistoryStats'}},
-    'trakt_mostwatched': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_mostwatched': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListMostWatched'}},
     'trakt_favorites': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_favorites',
         'import_attr': 'ListFavorites'}},
-    'trakt_dropped': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_dropped': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListDropped'}},
-    'trakt_inprogress': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_inprogress': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListInProgress'}},
-    'trakt_ondeck': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_ondeck': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListOnDeck'}},
-    'trakt_ondeck_unwatched': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_ondeck_unwatched': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListOnDeckUnWatched'}},
-    'trakt_nextepisodes': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_nextepisodes': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListNextEpisodes'}},
     'trakt_searchlists': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
@@ -245,9 +245,9 @@ ROUTE_NOID = {
     'trakt_userlist': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_custom',
         'import_attr': 'ListTraktCustom'}},
-    'trakt_sortby': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sorting',
-        'import_attr': 'ListTraktSortBy'}},
+    'sync_sortby': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.lists_sorting',
+        'import_attr': 'ListSortBy'}},
     'trakt_genres': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_static',
         'import_attr': 'ListTraktStaticGenres'}},
@@ -498,8 +498,8 @@ ROUTE_TMDBID = {
     'next_recommendation': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_nextup',
         'import_attr': 'ListNextRecommendation'}},
-    'trakt_upnext': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+    'sync_upnext': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListUpNext'}},
     'trakt_related': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_related',
@@ -523,6 +523,29 @@ ROUTE_TMDBID = {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_related',
         'import_attr': 'ListKeywords'}},
 }
+
+
+# Preserve saved widgets and favourites using the original Trakt entry points.
+ROUTE_NOID.update({
+    'trakt_towatch': ROUTE_NOID['sync_towatch'],
+    'trakt_becauseyouwatched': ROUTE_NOID['sync_becauseyouwatched'],
+    'trakt_becausemostwatched': ROUTE_NOID['sync_becausemostwatched'],
+    'trakt_airingnext': ROUTE_NOID['sync_airingnext'],
+    'trakt_collection': ROUTE_NOID['sync_collection'],
+    'trakt_watchlist': ROUTE_NOID['sync_watchlist'],
+    'trakt_watchlist_released': ROUTE_NOID['sync_watchlist_released'],
+    'trakt_watchlist_anticipated': ROUTE_NOID['sync_watchlist_anticipated'],
+    'trakt_history': ROUTE_NOID['sync_history'],
+    'trakt_history_stats': ROUTE_NOID['sync_history_stats'],
+    'trakt_mostwatched': ROUTE_NOID['sync_mostwatched'],
+    'trakt_dropped': ROUTE_NOID['sync_dropped'],
+    'trakt_inprogress': ROUTE_NOID['sync_inprogress'],
+    'trakt_ondeck': ROUTE_NOID['sync_ondeck'],
+    'trakt_ondeck_unwatched': ROUTE_NOID['sync_ondeck_unwatched'],
+    'trakt_nextepisodes': ROUTE_NOID['sync_nextepisodes'],
+    'trakt_sortby': ROUTE_NOID['sync_sortby'],
+})
+ROUTE_TMDBID['trakt_upnext'] = ROUTE_TMDBID['sync_upnext']
 
 
 """

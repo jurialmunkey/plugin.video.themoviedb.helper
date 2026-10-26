@@ -53,8 +53,8 @@ class BaseDirItemRandomStudios(BaseDirItemRandomGenres):
 class BaseDirItemRandomBecauseYouWatched(BaseDirItemRandomGenres):
     priority = 150
     label_prefix = 32199
-    params = {'info': 'trakt_becauseyouwatched'}
-    art_icon = 'resources/icons/trakt/recommended.png'
+    params = {'info': 'sync_becauseyouwatched'}
+    art_icon = 'resources/icons/sync/recommended.png'
     types = ('movie', 'tv', )
 
     @cached_property
@@ -67,7 +67,7 @@ class BaseDirItemRandomBecauseYouWatched(BaseDirItemRandomGenres):
 class BaseDirItemRandomBecauseMostWatched(BaseDirItemRandomBecauseYouWatched):
     priority = 160
     label_suffix = 32200
-    params = {'info': 'trakt_becausemostwatched'}
+    params = {'info': 'sync_becausemostwatched'}
 
 
 class BaseDirItemRandomTrending(BaseDirItem):

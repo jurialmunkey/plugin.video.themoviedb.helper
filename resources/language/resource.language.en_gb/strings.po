@@ -195,7 +195,7 @@ msgctxt "#32040"
 msgid "All seasons"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#: /resources/tmdbhelper/lib/items/directories/sync/lists_standard.py
 msgctxt "#32041"
 msgid "Your In-Progress TV Shows"
 msgstr ""
@@ -212,7 +212,7 @@ msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#: /resources/tmdbhelper/lib/items/directories/sync/lists_standard.py
 msgctxt "#32045"
 msgid "Your In-Progress Movies"
 msgstr ""
@@ -227,7 +227,7 @@ msgctxt "#32047"
 msgid "Undrop TV show"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#: /resources/tmdbhelper/lib/items/directories/sync/lists_standard.py
 msgctxt "#32048"
 msgid "Dropped TV Shows"
 msgstr ""
@@ -2349,7 +2349,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32534"
-msgid "Trakt sync progress notifications"
+msgid "Sync progress notifications"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py

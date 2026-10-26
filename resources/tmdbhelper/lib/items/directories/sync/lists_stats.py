@@ -1,6 +1,6 @@
 from tmdbhelper.lib.items.directories.lists_default import ListDefault
-from tmdbhelper.lib.items.directories.sync import SyncProviderListProperties
-from tmdbhelper.lib.items.directories.trakt.mapper_stats import HistoryStatsItemMapper, DailyHistoryStatsItemMapper, MonthlyHistoryStatsItemMapper
+from tmdbhelper.lib.items.directories.sync.lists_provider import SyncProviderListProperties
+from tmdbhelper.lib.items.directories.sync.mapper_stats import HistoryStatsItemMapper, DailyHistoryStatsItemMapper, MonthlyHistoryStatsItemMapper
 from tmdbhelper.lib.addon.plugin import convert_type
 from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta
 from tmdbhelper.lib.sync.datasync import SyncDataFactory

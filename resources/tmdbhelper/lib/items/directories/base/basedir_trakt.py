@@ -1,5 +1,4 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem, BaseDirItemAuthorised
-from tmdbhelper.lib.items.directories.base.basedir_sync import BaseDirItemSync
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
@@ -21,51 +20,12 @@ class BaseDirItemTraktFavorites(BaseDirItemTraktAuthorised):
     group = 1036
 
 
-class BaseDirItemTraktMostWatched(BaseDirItemSync):
-    sync_capability = 'watched'
-    priority = 160
-    label_localized = 32195
-    types = ('movie', 'tv', 'episode', )
-    params = {'info': 'trakt_mostwatched'}
-    art_icon = 'resources/icons/trakt/mostwatched.png'
-    group = 32195
-
-
-class BaseDirItemTraktDropped(BaseDirItemSync):
-    sync_capability = 'watched'
-    priority = 230
-    label_type = 'localize'
-    label_localized = 32048
-    types = ('tv', )
-    params = {'info': 'trakt_dropped'}
-    art_icon = 'resources/icons/trakt/inprogress.png'
-    group = 32196
-
-
 class BaseDirItemTraktRecommendations(BaseDirItemTraktAuthorised):
     priority = 240
     label_type = 'reversed'
     label_localized = 32198
     types = ('movie', 'tv', )
     params = {'info': 'trakt_recommendations'}
-    art_icon = 'resources/icons/trakt/recommended.png'
-    group = 32223
-
-
-class BaseDirItemTraktBecauseYouWatched(BaseDirItemTraktAuthorised):
-    priority = 250
-    label_localized = 32199
-    types = ('movie', 'tv', )
-    params = {'info': 'trakt_becauseyouwatched'}
-    art_icon = 'resources/icons/trakt/recommended.png'
-    group = 32223
-
-
-class BaseDirItemTraktBecauseMostWatched(BaseDirItemTraktAuthorised):
-    priority = 260
-    label_localized = 32200
-    types = ('movie', 'tv', )
-    params = {'info': 'trakt_becausemostwatched'}
     art_icon = 'resources/icons/trakt/recommended.png'
     group = 32223
 
@@ -92,16 +52,6 @@ class BaseDirItemTraktMyAiring(BaseDirItemTraktAuthorised):
     @cached_property
     def label_append(self):
         return get_localized(32202)
-
-
-class BaseDirItemTraktAiringNext(BaseDirItemTraktAuthorised):
-    priority = 280
-    label_type = 'localize'
-    label_localized = 32459
-    types = ('tv', )
-    params = {'info': 'trakt_airingnext'}
-    art_icon = 'resources/icons/trakt/calendar.png'
-    group = 32203
 
 
 class BaseDirItemTraktCalendarDir(BaseDirItemTraktAuthorised):

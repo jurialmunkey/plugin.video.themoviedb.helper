@@ -2,6 +2,7 @@ from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass
 
 
 class SimpleCache(ItemDetailsList):
+    """Read item metadata cached by the configured sync providers."""
     table = 'simplecache'
     conditions = 'id=? LIMIT 1'
 

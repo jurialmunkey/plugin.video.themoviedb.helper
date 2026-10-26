@@ -3,6 +3,7 @@ from tmdbhelper.lib.items.directories.lists_default import ListProperties
 
 
 class SyncProviderListProperties(ListProperties):
+    """List properties requiring a configured modular sync provider."""
     sync_capabilities = ('watched',)
 
     @cached_property

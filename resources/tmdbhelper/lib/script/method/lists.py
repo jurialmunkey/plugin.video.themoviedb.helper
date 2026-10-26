@@ -7,3 +7,9 @@ def select_sort_list(sort_methods, **kwargs):
     for k, v in sort_methods[x]['params'].items():
         kwargs[k] = v
     executebuiltin(format_folderpath(encode_url(**kwargs)))
+
+
+def sort_list(**kwargs):
+    from tmdbhelper.lib.items.directories.lists_sorting import get_sort_methods
+    sort_methods = get_sort_methods(kwargs['info'])
+    return select_sort_list(sort_methods, **kwargs)

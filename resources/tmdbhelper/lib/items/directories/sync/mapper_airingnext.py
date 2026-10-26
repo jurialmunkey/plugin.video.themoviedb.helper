@@ -4,7 +4,7 @@ from jurialmunkey.ftools import cached_property
 
 
 class AiringNextItemMapper(ItemMapper):
-
+    """Map episode metadata for sync and local-library airing-next lists."""
     prefix = 'next_aired'
 
     @cached_property

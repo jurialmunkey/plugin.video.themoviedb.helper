@@ -4,6 +4,13 @@ from tmdbhelper.lib.api.mapping import get_empty_item
 
 
 def get_sort_methods(info=None):
+    info = {
+        'trakt_collection': 'sync_collection',
+        'trakt_inprogress': 'sync_inprogress',
+        'trakt_watchlist': 'sync_watchlist',
+        'trakt_watchlist_released': 'sync_watchlist_released',
+        'trakt_watchlist_anticipated': 'sync_watchlist_anticipated',
+    }.get(info, info)
     items = [
         {
             'name': f'{get_localized(32287)}: {get_localized(571)}',
@@ -27,11 +34,11 @@ def get_sort_methods(info=None):
         {
             'name': f'{get_localized(32287)}: {get_localized(32473)} {get_localized(584)}',
             'params': {'sort_by': 'collected', 'sort_how': 'asc'},
-            'allowlist': ('trakt_collection', 'trakt_userlist')},
+            'allowlist': ('sync_collection', 'trakt_userlist')},
         {
             'name': f'{get_localized(32287)}: {get_localized(32473)} {get_localized(585)}',
             'params': {'sort_by': 'collected', 'sort_how': 'desc'},
-            'allowlist': ('trakt_collection', 'trakt_userlist')},
+            'allowlist': ('sync_collection', 'trakt_userlist')},
         {
             'name': f'{get_localized(32287)}: {get_localized(369)} (A-Z)',
             'params': {'sort_by': 'title', 'sort_how': 'asc'}},
@@ -57,35 +64,35 @@ def get_sort_methods(info=None):
         {
             'name': f'{get_localized(32287)}: {get_localized(32453).capitalize()}',
             'params': {'sort_by': 'plays', 'sort_how': 'asc'},
-            'allowlist': ('trakt_inprogress',)},
+            'allowlist': ('sync_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32205)}',
             'params': {'sort_by': 'plays', 'sort_how': 'desc'},
-            'allowlist': ('trakt_inprogress',)},
+            'allowlist': ('sync_inprogress',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32242)} {get_localized(584)}',
             'params': {'sort_by': 'released', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32242)} {get_localized(585)}',
             'params': {'sort_by': 'released', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(2050)} {get_localized(584)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(2050)} {get_localized(585)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(205)} {get_localized(584)}',
             'params': {'sort_by': 'votes', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(205)} {get_localized(585)}',
             'params': {'sort_by': 'votes', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', 'trakt_inprogress', 'trakt_watchlist', 'trakt_watchlist_released', 'trakt_watchlist_anticipated',)},
+            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32175)} {get_localized(584)}',
             'params': {'sort_by': 'popularity', 'sort_how': 'asc'},
@@ -122,7 +129,7 @@ def get_sort_directory_item(i, **params):
     return item
 
 
-class ListTraktSortBy(ContainerDirectory):
+class ListSortBy(ContainerDirectory):
     def get_items(self, info, parent_info=None, **kwargs):
         items = [get_sort_directory_item(i, info=parent_info, **kwargs) for i in get_sort_methods(parent_info)]
         return items

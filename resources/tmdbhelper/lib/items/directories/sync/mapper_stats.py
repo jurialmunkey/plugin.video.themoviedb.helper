@@ -5,6 +5,7 @@ from jurialmunkey.ftools import cached_property
 
 
 class HistoryStatsItemMapper(ItemMapper):
+    """Map watched history aggregates into skin-facing list items."""
     @cached_property
     def label(self):
         return self.meta['watched_date']

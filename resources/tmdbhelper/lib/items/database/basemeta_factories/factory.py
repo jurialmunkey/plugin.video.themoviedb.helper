@@ -453,42 +453,42 @@ def import_user_art_thumb():
 
 
 def import_playcount():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import PlayCount
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import PlayCount
     return PlayCount
 
 
 def import_watchedcount():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import WatchedCount
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import WatchedCount
     return WatchedCount
 
 
 def import_airedcount():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import AiredCount
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import AiredCount
     return AiredCount
 
 
 def import_playprogress():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import PlayProgress
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import PlayProgress
     return PlayProgress
 
 
 def import_favorites_rank():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import FavoritesRank
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import FavoritesRank
     return FavoritesRank
 
 
 def import_watchlist_rank():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import WatchlistRank
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import WatchlistRank
     return WatchlistRank
 
 
 def import_collected_date():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import CollectedDate
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import CollectedDate
     return CollectedDate
 
 
 def import_lastplayed():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import LastPlayed
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import LastPlayed
     return LastPlayed
 
 
