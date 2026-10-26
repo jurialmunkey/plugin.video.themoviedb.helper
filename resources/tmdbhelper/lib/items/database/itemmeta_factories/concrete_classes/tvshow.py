@@ -1,4 +1,5 @@
 from jurialmunkey.parser import try_int
+from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.basemedia import MediaItem
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes, MediaItemInfoPropertyItemRoutes
 
@@ -59,10 +60,12 @@ class Tvshow(MediaItem):
             return
         _, _, season, episode = next_aired_id.split('.')
         season, episode = try_int(season), try_int(episode)
+        if is_unaired_timestamp(self.get_data_value('next_aired_premiered')):
+            episode -= 1
         if season == 1:
-            return episode - 1
+            return episode
         if season > 1:
-            return self.get_previous_season_episode_count(season) + episode - 1
+            return self.get_previous_season_episode_count(season) + episode
 
     def get_infoproperties_aired_episodes(self, infoproperties):
         if infoproperties.get('airedepisodes') is not None:
