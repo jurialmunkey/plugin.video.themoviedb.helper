@@ -19,8 +19,10 @@ class ServiceActions(CommonContainerAPIs):
         from tmdbhelper.lib.script.actions.trakt.userlist import ItemUserList
         from tmdbhelper.lib.script.actions.trakt.rating import ItemRating
         from tmdbhelper.lib.script.actions.trakt.comments import ItemComments
+        from tmdbhelper.lib.script.actions.trakt.favorites import ItemFavorites
         return {name: ('trakt_api', self.trakt_api, action_class) for name, action_class in (
-            ('userlist', ItemUserList), ('rating', ItemRating), ('comments', ItemComments))}
+            ('userlist', ItemUserList), ('rating', ItemRating), ('comments', ItemComments),
+            ('favorites', ItemFavorites))}
 
     def get_mdblist_actions(self):
         from tmdbhelper.lib.script.actions.mdblist.userlist import ItemUserList

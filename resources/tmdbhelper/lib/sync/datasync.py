@@ -406,6 +406,14 @@ class SyncData(SyncDataGetters):
         self._registry = registry
 
     @cached_property
+    def core_sync(self):
+        return self.get_core_sync()
+
+    def get_core_sync(self):
+        from tmdbhelper.lib.sync.trakt.datasync import TraktSyncData
+        return TraktSyncData(self)
+
+    @cached_property
     def registry(self):
         return self.get_registry()
 
@@ -423,16 +431,22 @@ class SyncData(SyncDataGetters):
 
     def get_sync_provider(self, sync_type):
         from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES
+        if sync_type in self.core_sync.sync_classes:
+            return
         provider = self.registry.get_selected_provider(SYNC_FEATURES[sync_type])
         if provider is not None and provider.is_authorized():
             return provider
 
     def get_sync_class(self, sync_type):
+        if sync_type in self.core_sync.sync_classes:
+            return self.core_sync.get_sync_class(sync_type)
         provider = self.get_sync_provider(sync_type)
         if provider is not None:
             return provider.get_sync_class(sync_type)
 
     def create_sync(self, sync_type, item_type):
+        if sync_type in self.core_sync.sync_classes:
+            return self.core_sync.create_sync(sync_type, item_type)
         provider = self.get_sync_provider(sync_type)
         if provider is None:
             return
@@ -495,7 +509,10 @@ class SyncData(SyncDataGetters):
         from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES
         keys = tuple(key for key, key_sync_type in self.routes.items() if key_sync_type == sync_type)
         self.cache.del_column_values(keys=keys)
-        self.clear_unavailable_provider_activities(SYNC_FEATURES[sync_type])
+        if sync_type in self.core_sync.sync_classes:
+            self.core_sync.clear_activities((sync_type,))
+        else:
+            self.clear_unavailable_provider_activities(SYNC_FEATURES[sync_type])
         self.disabled_sync_types.add(sync_type)
 
     def clear_unavailable_provider_activities(self, feature):

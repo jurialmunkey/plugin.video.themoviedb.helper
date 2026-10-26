@@ -70,7 +70,7 @@ Action discovery is shared by Sync Options and context-menu availability. Each
 container configures one discovery context for its list items before finalisation.
 
 The available feature selectors are history/progress, watchlist, collection,
-rating sync, favorites, and scrobbling. Each selector offers
+and scrobbling. Each selector offers
 None, enabled providers declaring that feature, and installation/enabling options
 from `catalog.py`. The catalogue records trusted addon IDs, display names, and
 supported capabilities so missing or disabled modules are offered only for
@@ -89,15 +89,21 @@ assigned to another feature, taking the first in the displayed provider order
 when several qualify. Preselection does not save a setting until confirmed.
 Item actions use the provider selected for
 the same feature. Unsupported synced-state actions are absent from Sync Options.
-Personal-list actions for every authorized service, Trakt comments, and Trakt
-rating dialogs remain in core and are available independently of these selectors.
-Disabling rating sync does not disable submitting or removing a Trakt rating.
+Personal-list actions for every authorized service, Trakt comments, ratings, and
+favorites belong to core and are available independently of these selectors.
+Ratings and favorites sync directly through the authenticated Trakt API without
+requiring the Trakt provider addon. Their sync implementations, source-to-database
+mapping, and activity tracking live in `sync/trakt/`. `SyncData` dispatches these
+core sync types separately from provider types; provider registrations must not
+declare `SyncRatings`, `SyncFavorites`, or the `favorites` action. Favorites lists
+use Trakt authorization and never offer provider setup. Existing database columns,
+sorting, pagination, and manual ratings/favorites/all-data sync remain supported.
 Service rating lookups cache complete snapshots for at most twenty minutes,
 separately for each account token and media type. Each lookup checks that media
 type's Trakt `rated_at` activity timestamp and refreshes the snapshot when it
-changes. Successful writes invalidate that media type immediately; manual ratings
-or all-data sync clears every service rating snapshot, even without a selected
-rating-sync provider. Empty snapshots are cached; failed or incomplete responses
+changes. Successful writes invalidate that media type and its synced database
+values immediately; manual ratings or all-data sync clears every service rating
+snapshot. Empty snapshots are cached; failed or incomplete responses
 and snapshots without a valid activity timestamp are not.
 List removal targets the service owning the displayed list; other services retain
 their add-to-list action. The `sync_trakt` script route aliases `sync_options`.
@@ -135,7 +141,7 @@ Directory watched/playback pre-sync reaches this cleanup even when the selected
 provider is unavailable; cached item-details reads remain free of provider queries.
 
 There are no built-in fallback providers, old setting aliases, or automatic
-selections. Opening an unconfigured sync list or a list with an unavailable
+selections. Opening an unconfigured provider sync list or a list with an unavailable
 selected provider offers setup, including from widgets. Installation and enabling
 use Kodi's built-in
 `InstallAddon` and `EnableAddon` commands, followed by a fresh discovery check.

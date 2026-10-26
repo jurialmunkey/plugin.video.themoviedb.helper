@@ -171,7 +171,7 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
         'import_attr': 'ListMostWatched'}},
     'trakt_favorites': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',
+        'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_favorites',
         'import_attr': 'ListFavorites'}},
     'trakt_dropped': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_sync',

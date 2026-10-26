@@ -1,5 +1,5 @@
 from tmdbhelper.lib.sync.itemlist import ItemListSyncDataFactory
-from tmdbhelper.lib.items.directories.lists_default import ListDefault
+from tmdbhelper.lib.items.directories.lists_default import ListDefault, ListProperties
 from tmdbhelper.lib.items.directories.sync import SyncProviderListProperties
 from tmdbhelper.lib.items.itemlist import ItemListPagination
 from tmdbhelper.lib.addon.plugin import convert_type, get_setting
@@ -7,7 +7,7 @@ from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 
 
-class ListSyncProperties(SyncProviderListProperties):
+class ListSyncProperties(ListProperties):
 
     next_page = True
     sync_type = ''  # ItemListSyncDataFactory type
@@ -24,8 +24,6 @@ class ListSyncProperties(SyncProviderListProperties):
         return self.get_sync_data()
 
     def get_sync_data(self):
-        if not self.provider_available:
-            return
         sync_data = ItemListSyncDataFactory(
             self.sync_type,
             sort_by=self.sort_by,
@@ -62,9 +60,16 @@ class ListSyncProperties(SyncProviderListProperties):
         return self.items + self.response.next_page
 
 
+class ListProviderSyncProperties(SyncProviderListProperties, ListSyncProperties):
+    def get_sync_data(self):
+        if not self.provider_available:
+            return
+        return super().get_sync_data()
+
+
 class ListStandardSync(ListDefault):
 
-    list_properties_class = ListSyncProperties
+    list_properties_class = ListProviderSyncProperties
 
     def configure_list_properties(self, list_properties):
         list_properties.limit = 20 * max(get_setting('pagemulti_sync', 'int'), 1)
@@ -156,16 +161,6 @@ class ListPlaybackProgress(ListStandardSync):
         list_properties.sort_how = 'desc'
         list_properties.localize = 32196
         list_properties.plugin_name = '{localized} {plural}'
-        return list_properties
-
-
-class ListFavorites(ListStandardSync):
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.sync_type = 'favorites'
-        list_properties.sync_capabilities = ('favorites',)
-        list_properties.sort_by = 'unsorted'
-        list_properties.localize = 1036
         return list_properties
 
 

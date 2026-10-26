@@ -1,4 +1,5 @@
 from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.script.sync.menu import Menu as BasicMenu
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 from tmdbhelper.lib.script.actions.discovery import ActionDiscovery
@@ -39,7 +40,7 @@ class Menu(BasicMenu):
         if len(self.choices) == 1:
             return 0
         from xbmcgui import Dialog
-        return Dialog().contextmenu([self.get_choice_name(item) for item in self.choices])
+        return Dialog().select(get_localized(32549), [self.get_choice_name(item) for item in self.choices])
 
     @staticmethod
     def get_choice_name(item):

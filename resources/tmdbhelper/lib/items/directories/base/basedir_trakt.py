@@ -10,8 +10,7 @@ class BaseDirItemTraktAuthorised(BaseDirItemAuthorised):
         return TraktAuthorisation()
 
 
-class BaseDirItemTraktFavorites(BaseDirItemSync):
-    sync_capability = 'favorites'
+class BaseDirItemTraktFavorites(BaseDirItemTraktAuthorised):
     priority = 110
     label_type = 'reversed'
     label_localized = 1036

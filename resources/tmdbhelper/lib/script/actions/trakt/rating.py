@@ -21,9 +21,8 @@ class ItemRating(ItemAction):
         self.trakt_api.invalidate_user_ratings(self.item_type)
         from tmdbhelper.lib.sync.invalidator import SyncInvalidatorRatings
         invalidator = SyncInvalidatorRatings()
-        provider = invalidator.syncdata.registry.get_selected_provider('ratings')
-        if provider is not None and provider.provider_id == 'trakt':
-            invalidator.invalidate()
+        invalidator.syncdata.core_sync.api = self.trakt_api
+        invalidator.invalidate()
 
     def sync(self):
         self.reset_lastactivities()

@@ -646,22 +646,6 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=collection)</data>
                     </control>
                 </setting>
-                <setting id="sync_provider_ratings" type="string" label="563" help="32548">
-                    <level>0</level>
-                    <default></default>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=ratings)</data>
-                    </control>
-                </setting>
-                <setting id="sync_provider_favorites" type="string" label="1036" help="32548">
-                    <level>0</level>
-                    <default></default>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=favorites)</data>
-                    </control>
-                </setting>
             </group>
         </category>
         <category id="players" label="32014" help="">

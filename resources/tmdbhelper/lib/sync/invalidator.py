@@ -1,7 +1,8 @@
 from xbmcgui import Dialog
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.sync.providers.features import FEATURE_LABELS, SYNC_FEATURES
+from tmdbhelper.lib.sync.features import FEATURE_LABELS, SYNC_FEATURES
+from tmdbhelper.lib.sync.providers.features import FEATURE_LABELS as PROVIDER_FEATURE_LABELS
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 from tmdbhelper.lib.sync.activity import SyncLastActivities
 
@@ -56,6 +57,8 @@ class SyncInvalidatorAll:
         return self.get_providers()
 
     def get_providers(self):
+        if not set(self.features).intersection(PROVIDER_FEATURE_LABELS):
+            return ()
         return tuple(provider for provider in self.syncdata.registry.providers.values()
                      if set(self.features).intersection(provider.capabilities))
 
@@ -75,6 +78,7 @@ class SyncInvalidatorAll:
     def invalidate(self):
         if self.database_keys:
             self.syncdata.cache.del_column_values(keys=self.database_keys)
+        self.syncdata.core_sync.invalidate(self.features)
         for provider in self.providers:
             self.invalidate_provider(provider)
 
