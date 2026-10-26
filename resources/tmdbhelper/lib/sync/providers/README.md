@@ -71,8 +71,20 @@ container configures one discovery context for its list items before finalisatio
 
 The available feature selectors are history/progress, watchlist, collection,
 rating sync, favorites, and scrobbling. Each selector offers
-None and only installed providers declaring that feature. The chosen provider ID
-is stored as `sync_provider_<feature>`. Item actions use the provider selected for
+None, enabled providers declaring that feature, and installation/enabling options
+from `catalog.py`. The catalogue contains only supported addon IDs and display
+names; capabilities always come from the loaded provider. Missing or disabled
+modules cannot be filtered by capability until installed and enabled. Selection
+checks their declared capabilities before assigning them to a feature.
+Each `sync_provider_<feature>` setting stores an empty value for an unconfigured
+feature, `never` for an explicitly disabled feature, or the chosen provider ID.
+Empty settings keep associated directory lists visible for discovery and setup;
+`never` hides them and suppresses setup. Choosing None in a feature selector
+stores `never`; selecting a provider enables the feature again. For an
+unconfigured feature, the selector preselects an enabled, capable provider already
+assigned to another feature, taking the first in the displayed provider order
+when several qualify. Preselection does not save a setting until confirmed.
+Item actions use the provider selected for
 the same feature. Unsupported synced-state actions are absent from Sync Options.
 Personal-list actions for every authorized service, Trakt comments, and Trakt
 rating dialogs remain in core and are available independently of these selectors.
@@ -118,10 +130,42 @@ Directory watched/playback pre-sync reaches this cleanup even when the selected
 provider is unavailable; cached item-details reads remain free of provider queries.
 
 There are no built-in fallback providers, old setting aliases, or automatic
-selections. Users must install their preferred provider modules and choose their
-providers. The migration prompt is deferred. Duplicate IDs, incompatible interfaces,
-and broken entry points produce explicit errors. Discovery and provider imports
-are scoped to a Python invocation; reload after installing or updating addons.
+selections. Opening an unconfigured sync list or a list with an unavailable
+selected provider offers setup, including from widgets. Installation and enabling
+use Kodi's built-in
+`InstallAddon` and `EnableAddon` commands, followed by a fresh discovery check.
+Installations use the user's installed repositories; core does not download
+provider packages or add repositories.
+
+Skin-only history statistics never offer provider setup. Daily and monthly
+statistics return no entries when the selected watched provider is unavailable
+or unauthorized.
+
+Widget setup offers OK, Later, and Never. Later suppresses widget prompts through
+a Home window property until Kodi restarts; standard directory requests ignore
+Later. Never stores `never` for the requested feature. Users can enable that
+feature later through its existing provider selector in the addon settings.
+There is no separate global Never setting. Combined To watch lists remain visible
+while either watched/progress or watchlist is not `never`. Their setup offers only
+features not marked `never`; choosing Never disables those remaining features.
+Setup uses the shared property mutex and rechecks availability
+and prompt state after acquiring it. A prompt-generation property prevents
+already-queued widget requests from repeating the same setup attempt.
+
+`SyncProviderOnboarding(addon_id).configure()` installs or enables a catalogue
+provider and offers `SyncProviderFeatureSelection(provider)`. This provider-agnostic
+multiselect reads capabilities and current selections from the loaded provider
+and settings. Checked features select that provider; unchecked features clear only
+its own assignments. Unchecked features already marked `never` keep that state;
+explicitly checking one assigns the provider. Cancelling changes nothing. Trakt
+invokes onboarding after
+successful device authentication, never during token refresh. Confirmed Trakt
+logout clears its feature selections while retaining the installed module.
+
+Duplicate IDs, incompatible interfaces, and broken entry points produce explicit
+errors. Discovery and provider imports are scoped to a Python invocation;
+setup refreshes discovery after installation or enabling. Updating already-loaded
+provider code still requires a new invocation.
 
 Provider addons are maintained separately from the plugin. Install each provider
 in its own `script.module.tmdbhelper.sync.<service>` folder alongside

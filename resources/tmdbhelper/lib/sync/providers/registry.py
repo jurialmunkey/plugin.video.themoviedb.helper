@@ -1,7 +1,7 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.sync.providers.discovery import SyncProviderDiscovery
 from tmdbhelper.lib.sync.providers.loader import SyncProviderLoader
+from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
 
 
 class SyncProviderRegistry:
@@ -39,4 +39,4 @@ class SyncProviderRegistry:
 
     @staticmethod
     def get_selected_provider_id(capability):
-        return get_setting(f'sync_provider_{capability}', 'str')
+        return SyncProviderSetting(capability).provider_id

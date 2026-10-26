@@ -136,8 +136,11 @@ class TraktAuthenticator:
     def on_success(self):
         """Triggered when device authentication has been completed"""
         kodi_log(u'Trakt authenticated successfully!', 1)
-        from tmdbhelper.lib.files.futils import json_dumps as data_dumps
-        self.trakt_api.user_token.value = data_dumps(self.authorization)
+        self.trakt_stored_access_token.stored_authorization = self.authorization
+        self.trakt_stored_access_token.update_stored_authorization()
+        self.trakt_stored_access_token.update_traktisauth_property()
+        from tmdbhelper.lib.script.sync.provider_setup import SyncProviderOnboarding
+        SyncProviderOnboarding('script.module.tmdbhelper.sync.trakt').configure()
 
     def poller(self):
 
@@ -200,4 +203,7 @@ class TraktAuthenticator:
     def logout(self, confirmation=True):
         if confirmation and not Dialog().yesno(get_localized(32212), get_localized(32213)):
             return
-        return TraktStoredAccessToken(self.trakt_api).logout()
+        TraktStoredAccessToken(self.trakt_api).logout()
+        from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
+        SyncProviderSetting.clear_provider('trakt')
+        return True

@@ -102,7 +102,7 @@ class TraktAPI(NoCacheRequestAPI):
 
     def logout(self):
         self.refresh_authenticator()
-        self.authenticator.logout()
+        return self.authenticator.logout()
 
     def login(self):
         self.refresh_authenticator()

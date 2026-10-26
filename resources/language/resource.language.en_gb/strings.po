@@ -2419,7 +2419,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32548"
-msgid "Choose an installed provider for this feature, or None to disable it."
+msgid "Choose a provider for this feature, install or enable a supported provider, or choose None to disable it and hide its lists."
 msgstr ""
 
 msgctxt "#30030"
@@ -2651,4 +2651,39 @@ msgstr ""
 #: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
 msgctxt "#32549"
 msgid "Sync Options"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32550"
+msgid "Sync provider setup"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_install.py
+msgctxt "#32551"
+msgid "Install {0}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_install.py
+msgctxt "#32552"
+msgid "Enable {0}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_features.py
+msgctxt "#32553"
+msgid "Choose features for {0}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/sync_provider.py
+msgctxt "#32554"
+msgid "{0} does not support {1}. Choose another provider for this list."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32555"
+msgid "This list requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32556"
+msgid "Later"
 msgstr ""

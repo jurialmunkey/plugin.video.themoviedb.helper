@@ -63,7 +63,8 @@ def authenticate_trakt(**kwargs):
 
 def revoke_trakt(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
-    TraktAPI().logout()
+    if not TraktAPI().logout():
+        return
     invalidate_sync('all', notification=False, sync=False)
 
 

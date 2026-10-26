@@ -1,44 +1,92 @@
 from xbmcgui import Dialog
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_localized, get_setting, set_setting
+from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.script.sync.provider_install import SyncProviderInstall
+from tmdbhelper.lib.sync.providers.catalog import PROVIDERS
 from tmdbhelper.lib.sync.providers.features import FEATURE_LABELS
 from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
 
 
-class SyncProviderSelection:
-    def __init__(self, capability):
-        self.capability = capability
+class SyncProviderSelection(SyncProviderSetting):
+    @property
+    def capabilities(self):
+        return (self.capability,)
 
     @property
-    def setting(self):
-        return f'sync_provider_{self.capability}'
+    def heading(self):
+        return ' / '.join(get_localized(FEATURE_LABELS[feature]) for feature in self.capabilities)
 
     @cached_property
     def providers(self):
         return self.get_providers()
 
     def get_providers(self):
-        providers = SyncProviderRegistry().get_capable_providers(self.capability)
+        providers = (provider for provider in SyncProviderRegistry().providers.values()
+                     if set(self.capabilities).intersection(provider.capabilities))
         return sorted(providers, key=lambda provider: (provider.display_name.casefold(), provider.provider_id))
 
+    def get_installers(self):
+        installers = (SyncProviderInstall(addon_id) for addon_id in PROVIDERS)
+        return sorted((installer for installer in installers if not installer.is_available),
+                      key=lambda installer: installer.display_name.casefold())
+
+    def get_preselect(self, ids):
+        if not self.is_unconfigured:
+            return ids.index(self.value) if self.value in ids else 0
+        selected_ids = {SyncProviderSetting(feature).provider_id for feature in FEATURE_LABELS
+                        if feature not in self.capabilities}
+        preferred = next((provider.provider_id for provider in self.providers
+                          if provider.provider_id in selected_ids), self.never_value)
+        return ids.index(preferred)
+
     def select(self):
-        ids = ['', *(provider.provider_id for provider in self.providers)]
+        ids = [self.never_value, *(provider.provider_id for provider in self.providers)]
         labels = [get_localized(231), *(provider.display_name for provider in self.providers)]
-        current = get_setting(self.setting, 'str')
-        preselect = ids.index(current) if current in ids else 0
-        selected = Dialog().select(get_localized(FEATURE_LABELS[self.capability]), labels, preselect=preselect)
-        if selected == -1 or ids[selected] == current:
+        installers = self.get_installers()
+        labels.extend(installer.label for installer in installers)
+        selected = Dialog().select(self.heading, labels, preselect=self.get_preselect(ids))
+        if selected == -1:
             return
+        if selected >= len(ids):
+            return self.select_installer(installers[selected - len(ids)])
         self.save(ids[selected])
+        return ids[selected]
+
+    def select_installer(self, installer):
+        provider = installer.install()
+        if provider is None:
+            return
+        if not set(self.capabilities).intersection(provider.capabilities):
+            Dialog().ok(get_localized(32550), get_localized(32554).format(provider.display_name, self.heading))
+            return
+        self.save_provider(provider)
+        return provider.provider_id
+
+    def save_provider(self, provider):
+        self.save(provider.provider_id)
+
+
+class SyncProviderListSelection(SyncProviderSelection):
+    def __init__(self, capabilities):
+        super().__init__(capabilities[0])
+        self._capabilities = capabilities
+
+    @property
+    def capabilities(self):
+        return self._capabilities
 
     def save(self, provider_id):
-        if self.capability != 'scrobbling':
-            from tmdbhelper.lib.sync.invalidator import SyncInvalidatorAll
-            invalidator = SyncInvalidatorAll()
-            invalidator.features = (self.capability,)
-            invalidator.notification = False
-            invalidator.invalidate()
-        set_setting(self.setting, provider_id, 'str')
+        if provider_id == self.never_value:
+            for capability in self.capabilities:
+                SyncProviderSetting(capability).disable()
+            return
+        provider = SyncProviderRegistry().providers[provider_id]
+        self.save_provider(provider)
+
+    def save_provider(self, provider):
+        capability = next(feature for feature in self.capabilities if feature in provider.capabilities)
+        SyncProviderSetting(capability).save(provider.provider_id)
 
 
 def select_sync_provider(capability, **kwargs):

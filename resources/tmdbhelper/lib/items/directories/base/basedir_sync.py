@@ -1,10 +1,19 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItemAuthorised
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
 
 
 class BaseDirItemSync(BaseDirItemAuthorised):
     sync_capability = 'watched'
+
+    @property
+    def sync_capabilities(self):
+        return (self.sync_capability,)
+
+    @property
+    def enabled(self):
+        return any(not SyncProviderSetting(feature).is_never for feature in self.sync_capabilities)
 
     def get_authorisation(self):
         from tmdbhelper.lib.sync.auth import SyncProviderAuthorisation
@@ -100,15 +109,10 @@ class BaseDirItemToWatch(BaseDirItemSync):
     label_type = 'reversed'
     label_localized = 32078
     types = ('movie', 'tv', )
-    sync_capability = 'watched'
+    sync_capabilities = ('watched', 'watchlist')
     params = {'info': 'trakt_towatch'}
     art_icon = 'resources/icons/sync/watchlist.png'
     group = 32196
-
-    @property
-    def enabled(self):
-        from tmdbhelper.lib.sync.auth import SyncProviderAuthorisation
-        return any(SyncProviderAuthorisation(feature).is_authorized for feature in ('watched', 'watchlist'))
 
 
 class BaseDirItemNextEpisodes(BaseDirItemOnDeckMovies):
