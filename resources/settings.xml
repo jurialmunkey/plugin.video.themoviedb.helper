@@ -646,6 +646,14 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=collection)</data>
                     </control>
                 </setting>
+                <setting id="sync_provider_scrobbling" type="string" label="32138" help="32548">
+                    <level>0</level>
+                    <default></default>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="button" format="action">
+                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling)</data>
+                    </control>
+                </setting>
             </group>
         </category>
         <category id="players" label="32014" help="">
@@ -723,14 +731,6 @@
                     <dependencies>
                         <dependency type="visible" operator="!is" setting="tmdb_user_token"></dependency>
                     </dependencies>
-                </setting>
-                <setting id="sync_provider_scrobbling" type="string" label="32138" help="32548">
-                    <level>0</level>
-                    <default></default>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling)</data>
-                    </control>
                 </setting>
             </group>
         </category>
