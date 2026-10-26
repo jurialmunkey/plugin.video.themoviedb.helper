@@ -48,7 +48,8 @@ class SyncLastActivities(SyncDataParentProperties):
 
     @mutexlock
     def get_json_data(self):
-        return self.json_prop or self.json_sync or {}
+        # Re-read the shared cache after waiting for another caller to refresh it.
+        return self.get_json_prop() or self.json_sync or {}
 
     def get_json_prop(self):
         data = data_loads(self.window.get_property(self.json_property_name))
