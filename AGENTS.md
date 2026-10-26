@@ -13,13 +13,11 @@ when adding or extending functionality.
   to use, and an existing implementation that demonstrates the relevant pattern.
   Explain how the proposal follows these conventions; proximity alone does not
   make an existing implementation an appropriate reference.
-- Ask the user to approve the proposed approach and wait for their response
-  before implementation. Raise architectural questions early, with a recommended
-  option and meaningful alternatives where applicable. Read-only investigation
-  may continue while awaiting approval.
-- Once approved, keep implementation within the agreed responsibilities and
-  patterns. Routine details within that approach do not need repeated approval.
-  If new findings require changing the owning layer, shared abstraction, or
+- Raise architectural questions early, with a recommended
+  option and meaningful alternatives where applicable.
+- Keep implementation within the agreed responsibilities and
+  patterns.
+- If new findings require changing the owning layer, shared abstraction, or
   agreed pattern, explain the proposed revision and obtain approval before
   implementing that deviation.
 
@@ -56,6 +54,8 @@ several layers, each retaining its own responsibility.
 
 ## Organization and reuse
 
+- Always use explicitly named absolute imports. Relative imports and wildcard
+  (`from ... import *`) imports are not permitted.
 - Keep a distinct feature in its own appropriately named modules.
 - Update routes in `addon/consts.py` and all imports when moving or renaming
   classes or modules. Remove unused imports and obsolete references.

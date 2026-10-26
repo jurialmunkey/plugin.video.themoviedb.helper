@@ -168,25 +168,25 @@ class ItemSync:
         return self.get_is_allowed_type()
 
     def get_is_allowed_type(self):
-        if self.trakt_type == 'episode':
+        if self.item_type == 'episode':
             return bool(self.allow_episodes)
-        if self.trakt_type == 'season':
+        if self.item_type == 'season':
             return bool(self.allow_seasons)
-        if self.trakt_type == 'show':
+        if self.item_type == 'show':
             return bool(self.allow_shows)
-        if self.trakt_type == 'movie':
+        if self.item_type == 'movie':
             return bool(self.allow_movies)
         return False
 
     """
-    trakt_type
+    item_type
     """
 
     @cached_property
-    def trakt_type(self):
-        return self.get_trakt_type()
+    def item_type(self):
+        return self.get_item_type()
 
-    def get_trakt_type(self):
+    def get_item_type(self):
         if self.tmdb_type == 'movie':
             return 'movie'
         if self.tmdb_type != 'tv':
@@ -198,14 +198,14 @@ class ItemSync:
         return 'episode'
 
     """
-    base_trakt_type
+    base_item_type
     """
 
     @cached_property
-    def base_trakt_type(self):
-        return self.get_base_trakt_type()
+    def base_item_type(self):
+        return self.get_base_item_type()
 
-    def get_base_trakt_type(self):
+    def get_base_item_type(self):
         if self.tmdb_type == 'movie':
             return 'movie'
         if self.tmdb_type != 'tv':

@@ -1,9 +1,17 @@
 from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem, BaseDirItemAuthorised
+from tmdbhelper.lib.items.directories.base.basedir_sync import BaseDirItemSync
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class BaseDirItemTraktFavorites(BaseDirItemAuthorised):
+class BaseDirItemTraktAuthorised(BaseDirItemAuthorised):
+    def get_authorisation(self):
+        from tmdbhelper.lib.api.trakt.auth import TraktAuthorisation
+        return TraktAuthorisation()
+
+
+class BaseDirItemTraktFavorites(BaseDirItemSync):
+    sync_capability = 'favorites'
     priority = 110
     label_type = 'reversed'
     label_localized = 1036
@@ -14,7 +22,8 @@ class BaseDirItemTraktFavorites(BaseDirItemAuthorised):
     group = 1036
 
 
-class BaseDirItemTraktMostWatched(BaseDirItemAuthorised):
+class BaseDirItemTraktMostWatched(BaseDirItemSync):
+    sync_capability = 'watched'
     priority = 160
     label_localized = 32195
     types = ('movie', 'tv', 'episode', )
@@ -23,7 +32,8 @@ class BaseDirItemTraktMostWatched(BaseDirItemAuthorised):
     group = 32195
 
 
-class BaseDirItemTraktDropped(BaseDirItemAuthorised):
+class BaseDirItemTraktDropped(BaseDirItemSync):
+    sync_capability = 'watched'
     priority = 230
     label_type = 'localize'
     label_localized = 32048
@@ -33,7 +43,7 @@ class BaseDirItemTraktDropped(BaseDirItemAuthorised):
     group = 32196
 
 
-class BaseDirItemTraktRecommendations(BaseDirItemAuthorised):
+class BaseDirItemTraktRecommendations(BaseDirItemTraktAuthorised):
     priority = 240
     label_type = 'reversed'
     label_localized = 32198
@@ -43,7 +53,7 @@ class BaseDirItemTraktRecommendations(BaseDirItemAuthorised):
     group = 32223
 
 
-class BaseDirItemTraktBecauseYouWatched(BaseDirItemAuthorised):
+class BaseDirItemTraktBecauseYouWatched(BaseDirItemTraktAuthorised):
     priority = 250
     label_localized = 32199
     types = ('movie', 'tv', )
@@ -52,7 +62,7 @@ class BaseDirItemTraktBecauseYouWatched(BaseDirItemAuthorised):
     group = 32223
 
 
-class BaseDirItemTraktBecauseMostWatched(BaseDirItemAuthorised):
+class BaseDirItemTraktBecauseMostWatched(BaseDirItemTraktAuthorised):
     priority = 260
     label_localized = 32200
     types = ('movie', 'tv', )
@@ -61,7 +71,7 @@ class BaseDirItemTraktBecauseMostWatched(BaseDirItemAuthorised):
     group = 32223
 
 
-class BaseDirItemTraktMyAiring(BaseDirItemAuthorised):
+class BaseDirItemTraktMyAiring(BaseDirItemTraktAuthorised):
     priority = 270
     types = ('tv', )
     params = {'info': 'trakt_myairing'}
@@ -85,7 +95,7 @@ class BaseDirItemTraktMyAiring(BaseDirItemAuthorised):
         return get_localized(32202)
 
 
-class BaseDirItemTraktAiringNext(BaseDirItemAuthorised):
+class BaseDirItemTraktAiringNext(BaseDirItemTraktAuthorised):
     priority = 280
     label_type = 'localize'
     label_localized = 32459
@@ -95,7 +105,7 @@ class BaseDirItemTraktAiringNext(BaseDirItemAuthorised):
     group = 32203
 
 
-class BaseDirItemTraktCalendarDir(BaseDirItemAuthorised):
+class BaseDirItemTraktCalendarDir(BaseDirItemTraktAuthorised):
     priority = 290
     types = ('tv', )
     params = {'info': 'dir_calendar_trakt'}
@@ -508,7 +518,7 @@ class BaseDirItemTraktPopularLists(BaseDirItem):
     group = 32159
 
 
-class BaseDirItemTraktLikedLists(BaseDirItemAuthorised):
+class BaseDirItemTraktLikedLists(BaseDirItemTraktAuthorised):
     priority = 630
     label_type = 'localize'
     label_localized = 32210
@@ -518,7 +528,7 @@ class BaseDirItemTraktLikedLists(BaseDirItemAuthorised):
     group = 32159
 
 
-class BaseDirItemTraktMyLists(BaseDirItemAuthorised):
+class BaseDirItemTraktMyLists(BaseDirItemTraktAuthorised):
     priority = 640
     label_type = 'localize'
     label_localized = 32211
@@ -555,4 +565,4 @@ class BaseDirItemTraktAuthenticate(BaseDirItem):
 
 def get_all_trakt_class_instances():
     from tmdbhelper.lib.addon.module import get_all_module_class_objects_by_priority
-    return [clobj() for clobj in get_all_module_class_objects_by_priority(__name__)]
+    return [clobj() for clobj in get_all_module_class_objects_by_priority(__name__) if clobj is not BaseDirItemTraktAuthorised]

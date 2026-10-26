@@ -1,28 +1,22 @@
-from tmdbhelper.lib.addon.plugin import get_setting
-from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from jurialmunkey.ftools import cached_property
 
 
-DEFAULT_API = object()
+class SyncProviderAuthorisation:
+    def __init__(self, capability):
+        self.capability = capability
 
+    @cached_property
+    def provider(self):
+        return self.get_provider()
 
-class SyncAuthorisation(CommonContainerAPIs):
-    def __init__(self, authorisation_setting=None, trakt_api=DEFAULT_API, mdblist_api=DEFAULT_API):
-        self.authorisation_setting = authorisation_setting
-        if trakt_api is not DEFAULT_API:
-            self.trakt_api = trakt_api
-        if mdblist_api is not DEFAULT_API:
-            self.mdblist_api = mdblist_api
+    def get_provider(self):
+        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+        return SyncProviderRegistry().get_selected_provider(self.capability)
 
     @property
     def authorisation_type(self):
-        if not self.authorisation_setting:
-            return 'Trakt'
-        return get_setting(self.authorisation_setting, 'str')
+        return self.provider.display_name if self.provider else ''
 
     @property
     def is_authorized(self):
-        if self.authorisation_type == 'Trakt':
-            return self.trakt_api.authenticator.is_authorized
-        if self.authorisation_type == 'MDbList':
-            return self.mdblist_api is not None
-        return False
+        return self.provider is not None and self.provider.is_authorized()

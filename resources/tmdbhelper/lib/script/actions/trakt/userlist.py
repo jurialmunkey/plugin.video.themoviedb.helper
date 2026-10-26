@@ -1,11 +1,11 @@
-from tmdbhelper.lib.script.sync.trakt.item import ItemSync
+from tmdbhelper.lib.script.actions.trakt.item import ItemAction
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from jurialmunkey.ftools import cached_property
 from xbmcgui import Dialog
 
 
-class ItemUserList(ItemSync):
+class ItemUserList(ItemAction):
     preconfigured = True
     sync_url = 'items'
 
@@ -57,9 +57,8 @@ class ItemUserList(ItemSync):
     """
 
     def get_remove(self):
-        if get_infolabel("ListItem.Property(param.owner)") == 'true':
-            return True
-        return False
+        return (get_infolabel("ListItem.Property(param.info)") == 'trakt_userlist'
+                and get_infolabel("ListItem.Property(param.owner)") == 'true')
 
     def get_name(self):
         return get_localized(32355) if self.remove else get_localized(32298)
@@ -71,7 +70,9 @@ class ItemUserList(ItemSync):
     @busy_decorator
     def get_users_lists(self):
         from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned
-        users_lists = ListTraktStaticOwned(-1, '').get_items(tmdb_type='both') or []
+        container = ListTraktStaticOwned(-1, '')
+        container.trakt_api = self.trakt_api
+        users_lists = container.get_items(tmdb_type='both') or []
         users_lists.append({'label': get_localized(32299)})
         return users_lists
 
@@ -113,3 +114,55 @@ class ItemUserList(ItemSync):
             self.add_to_library(self.tmdb_type, self.tmdb_id, list_user_slug_tuple=(self.userlist_slug, self.userlist_user, ))
         self.display_dialog()
         self.refresh_containers()
+
+
+class ItemLikeList:
+    def __init__(self, user_slug, list_slug, confirmation=False, delete=False):
+        self.user_slug = user_slug
+        self.list_slug = list_slug
+        self.confirmation = confirmation
+        self.delete = delete
+
+    @cached_property
+    def trakt_api(self):
+        return self.get_trakt_api()
+
+    def get_trakt_api(self):
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
+
+    @cached_property
+    def response(self):
+        return self.get_response()
+
+    def get_response(self):
+        request = self.trakt_api.delete_response if self.delete else self.trakt_api.post_response
+        return request('users', self.user_slug, 'lists', self.list_slug, 'like')
+
+    @cached_property
+    def is_successful(self):
+        return self.get_is_successful()
+
+    def get_is_successful(self):
+        return self.response is not None and self.response.status_code == 204
+
+    @cached_property
+    def dialog_message(self):
+        return self.get_dialog_message()
+
+    def get_dialog_message(self):
+        affix = get_localized(32320 if self.delete else 32321)
+        body = [
+            get_localized(32316 if self.is_successful else 32317).format(affix),
+            get_localized(32168).format(self.list_slug, self.user_slug),
+        ]
+        if not self.is_successful and self.response is not None:
+            body.append(get_localized(32318).format(self.response.status_code))
+        return '\n'.join(body)
+
+    def sync(self):
+        successful = self.is_successful
+        if self.confirmation:
+            Dialog().ok(get_localized(32315), self.dialog_message)
+        if successful:
+            return self.response

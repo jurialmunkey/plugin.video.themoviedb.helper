@@ -8,13 +8,16 @@ from tmdbhelper.lib.script.method.lists import select_sort_list
 
 @is_in_kwargs({'like_list': True})
 def like_list(like_list=None, user_slug=None, delete=False, **kwargs):
-    from tmdbhelper.lib.sync.datasync import SyncDataFactory
-    SyncDataFactory().like_userlist(
+    from tmdbhelper.lib.script.actions.trakt.userlist import ItemLikeList
+    item = ItemLikeList(
         user_slug=user_slug or 'me',
         list_slug=like_list,
         confirmation=True,
         delete=delete
     )
+    if not item.trakt_api.authenticator.is_authorized:
+        return
+    item.sync()
     if not delete:
         return
     from tmdbhelper.lib.script.method.kodi_utils import container_refresh
@@ -64,11 +67,14 @@ def revoke_trakt(**kwargs):
     invalidate_sync('all', notification=False, sync=False)
 
 
-def get_stats(**kwargs):
+def get_stats(trakt_api=None, forced=False, **kwargs):
     from tmdbhelper.lib.query.database.database import FindQueriesDatabase
     from jurialmunkey.window import get_property
 
-    stats = FindQueriesDatabase().get_trakt_stats()
+    queries = FindQueriesDatabase()
+    if trakt_api is not None:
+        queries.trakt_api = trakt_api
+    stats = queries.get_trakt_stats(forced=forced)
     if not stats:
         return
 

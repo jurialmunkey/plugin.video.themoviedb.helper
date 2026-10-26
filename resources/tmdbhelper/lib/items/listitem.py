@@ -185,6 +185,14 @@ class _ListItem(object):
         self.infoproperties.update({'isPlayable': 'true'}) if self.is_resolvable else None
         return self.infoproperties
 
+    @cached_property
+    def action_discovery(self):
+        return self.get_action_discovery()
+
+    def get_action_discovery(self):
+        from tmdbhelper.lib.script.actions.discovery import ActionDiscovery
+        return ActionDiscovery()
+
     def finalise_context_menu(self):
         from tmdbhelper.lib.items.context import ContextMenu
         self.context_menu += ContextMenu(self).get()

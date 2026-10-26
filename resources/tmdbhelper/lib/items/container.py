@@ -91,8 +91,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def sync_playdata(self):
         from tmdbhelper.lib.items.sync import SyncPlayData
         return SyncPlayData(
-            trakt_api=self.trakt_api,
-            mdblist_api=self.mdblist_api,
             watchedindicators=get_setting('trakt_watchedindicators'),
             pauseplayprogress=get_setting('trakt_watchedindicators'))
 
@@ -134,7 +132,16 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         from tmdbhelper.lib.items.finaliser import ItemFinaliser
         return ItemFinaliser
 
+    @cached_property
+    def action_discovery(self):
+        return self.get_action_discovery()
+
+    def get_action_discovery(self):
+        from tmdbhelper.lib.script.actions.discovery import ActionDiscovery
+        return ActionDiscovery(self.sync_playdata.syncdata)
+
     def make_item(self, li):
+        li.action_discovery = self.action_discovery
         ci = self.item_finaliser(self, li)
         return ci.item if ci else None
 

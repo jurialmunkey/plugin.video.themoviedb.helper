@@ -18,17 +18,11 @@ class SyncNextEpisodeItem:
         return self.get_key('tmdb_id')
 
     @cached_property
-    def trakt_slug(self):
-        return self.get_key('trakt_slug')
-
-    @cached_property
     def id_data(self):
-        return {
-            k: v for k, v in (
-                ('tmdb', self.tmdb_id),
-                ('slug', self.trakt_slug),
-            ) if v
-        }
+        return self.get_id_data()
+
+    def get_id_data(self):
+        return {'tmdb': self.tmdb_id} if self.tmdb_id else {}
 
     @property
     def get_response_sync(self):
@@ -128,7 +122,7 @@ class SyncNextEpisodeItem:
 
 class SyncAllNextEpisodesMetaItem:
 
-    dialog_progress_bg_text_fstr = '{sync.tmdb_id} {sync.trakt_slug}'
+    dialog_progress_bg_text_fstr = '{sync.tmdb_id}'
     sync_item_class = SyncNextEpisodeItem
 
     def __init__(self, main, item):

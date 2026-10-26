@@ -1,4 +1,4 @@
-from tmdbhelper.lib.script.sync.request import ItemSync
+from tmdbhelper.lib.script.sync.provider import ItemSync
 
 
 class ItemWatched(ItemSync):
@@ -37,7 +37,3 @@ class ItemDropped(ItemSync):
     convert_episodes = True
     convert_seasons = True
     sync_key = 'dropped_hidden_at'
-
-    def delete_listdata(self):
-        from tmdbhelper.lib.script.method.tmdb import delete_listdata
-        delete_listdata(patterns=('ListTraktCalendar%', 'TraktData_calendars%'))

@@ -1,6 +1,5 @@
 from tmdbhelper.lib.items.directories.base.item_builder import BaseDirItemBuilder
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_localized
-from tmdbhelper.lib.sync.auth import SyncAuthorisation
 from jurialmunkey.ftools import cached_property
 
 
@@ -54,13 +53,17 @@ class BaseDirItem:
 
 
 class BaseDirItemAuthorised(BaseDirItem):
+    @cached_property
+    def authorisation(self):
+        return self.get_authorisation()
 
-    authorisation_setting = None
+    def get_authorisation(self):
+        raise NotImplementedError
 
     @property
     def authorisation_type(self):
-        return SyncAuthorisation(self.authorisation_setting).authorisation_type
+        return self.authorisation.authorisation_type
 
     @property
     def enabled(self):
-        return SyncAuthorisation(self.authorisation_setting).is_authorized
+        return self.authorisation.is_authorized

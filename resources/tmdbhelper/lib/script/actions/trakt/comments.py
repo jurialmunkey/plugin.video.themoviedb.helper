@@ -1,15 +1,15 @@
-from tmdbhelper.lib.script.sync.trakt.item import ItemSync
+from tmdbhelper.lib.script.actions.trakt.item import ItemAction
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from jurialmunkey.ftools import cached_property
 from xbmcgui import Dialog
 
 
-class ItemComments(ItemSync):
+class ItemComments(ItemAction):
     localized_name = 32304
     preconfigured = True
 
-    def get_trakt_type(self):
+    def get_item_type(self):
         if self.tmdb_type == 'movie':
             return 'movie'
         return 'show'
@@ -33,7 +33,7 @@ class ItemComments(ItemSync):
 
     @cached_property
     def comments(self):
-        return self.trakt_api.get_response_json(f'{self.trakt_type}s', self.trakt_slug, 'comments', limit=50) or []
+        return self.trakt_api.get_response_json(f'{self.item_type}s', self.trakt_slug, 'comments', limit=50) or []
 
     @cached_property
     def itemlist(self):

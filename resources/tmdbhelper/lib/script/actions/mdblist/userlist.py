@@ -1,11 +1,11 @@
-from tmdbhelper.lib.script.sync.mdblist.item import ItemSync
+from tmdbhelper.lib.script.actions.mdblist.item import ItemAction
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from jurialmunkey.ftools import cached_property
 from xbmcgui import Dialog
 
 
-class ItemUserList(ItemSync):
+class ItemUserList(ItemAction):
     preconfigured = True
 
     def get_self(self):
@@ -19,12 +19,8 @@ class ItemUserList(ItemSync):
         return self.get_lists()
 
     def get_lists(self):
-        from tmdbhelper.lib.api.mdblist.api import MDbListAPI
-        try:
-            response = MDbListAPI().get_request('lists', 'user')
-            return [i for i in response if i and not i.get('dynamic')]
-        except AttributeError:
-            return
+        response = self.mdblist_api.get_request('lists', 'user')
+        return [i for i in response if i and not i.get('dynamic')]
 
     """
     list_id
@@ -37,10 +33,10 @@ class ItemUserList(ItemSync):
         if self.remove:
             return get_infolabel("ListItem.Property(param.list_id)")
         if self.lists is None:  # No API credentials
-            Dialog().ok('MDbList', f'{get_localized(32516)}\n{get_localized(32517)}')
+            Dialog().ok(get_localized(32133), f'{get_localized(32516)}\n{get_localized(32517)}')
             return
         if not self.lists:  # No static lists
-            Dialog().ok('MDbList', get_localized(32518))
+            Dialog().ok(get_localized(32133), get_localized(32518))
             return
         names = [i.get('name', '') for i in self.lists]
         x = Dialog().select(get_localized(32133), names)
@@ -60,14 +56,13 @@ class ItemUserList(ItemSync):
         return True
 
     def get_name(self):
-        return get_localized(32519) if self.remove else get_localized(32514)
+        return get_localized(32355) if self.remove else get_localized(32298)
 
     @busy_decorator
     def modify_static_list(self):
-        from tmdbhelper.lib.api.mdblist.api import MDbList
-        return MDbList().modify_static_list(
+        return self.mdblist_api.modify_static_list(
             self.list_id,
-            media_type=self.base_trakt_type,
+            media_type=self.base_item_type,
             media_id=self.tmdb_id,
             media_provider='tmdb',
             action='remove' if self.remove else 'add'

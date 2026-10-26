@@ -10,7 +10,11 @@ def sync_item(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync_type
 
 
 def invalidate_sync(invalidate_sync, notification=True, sync=True, **kwargs):
+    from tmdbhelper.lib.script.actions.menu import ServiceActions
     from tmdbhelper.lib.sync.invalidator import SyncInvalidator
     sync_invalidator = SyncInvalidator(invalidate_sync)
+    if sync_invalidator is None:
+        return
+    ServiceActions().invalidate_caches(sync_invalidator.features)
     sync_invalidator.notification = notification
     sync_invalidator.run(sync=sync)
