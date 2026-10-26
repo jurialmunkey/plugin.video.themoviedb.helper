@@ -2717,3 +2717,8 @@ msgstr ""
 msgctxt "#32562"
 msgid "Custom"
 msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/sync_provider.py
+msgctxt "#32563"
+msgid "You are enabling {0}, a third-party sync service outside TMDbHelper's trusted list. Only continue if you trust this service and understand the risks, including sharing your viewing activity and account data."
+msgstr ""

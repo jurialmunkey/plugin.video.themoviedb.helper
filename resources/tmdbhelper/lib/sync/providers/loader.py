@@ -95,6 +95,8 @@ class SyncProviderLoader:
     def load(self):
         try:
             with self.module_lock:
-                return self.validate_provider(self.load_module().Provider())
+                provider = self.validate_provider(self.load_module().Provider())
+                provider.addon_id = self.addon['addonid']
+                return provider
         except Exception as exc:
             raise RuntimeError(f"Unable to load sync provider {self.addon['addonid']}: {exc}") from exc

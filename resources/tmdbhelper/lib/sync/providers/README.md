@@ -87,6 +87,12 @@ stores `never`; selecting a provider enables the feature again. For an
 unconfigured feature, the selector preselects an enabled, capable provider already
 assigned to another feature, taking the first in the displayed provider order
 when several qualify. Preselection does not save a setting until confirmed.
+Selecting an enabled provider outside the trusted catalogue requires confirming
+a warning about trusting the third-party service and the risks of sharing viewing
+activity and account data. Cancel is focused by default; declining or closing the
+warning preserves existing selections. The loader attaches the actual addon ID to
+each provider as `addon_id`, so trust checks use catalogue addon IDs rather than
+provider-declared IDs or display names. List setup inherits the same confirmation.
 Item actions use the provider selected for
 the same feature. Unsupported synced-state actions are absent from Sync Options.
 Personal-list actions for every authorized service, Trakt comments, ratings, and

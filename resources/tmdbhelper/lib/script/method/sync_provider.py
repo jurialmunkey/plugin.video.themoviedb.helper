@@ -1,4 +1,4 @@
-from xbmcgui import Dialog
+from xbmcgui import Dialog, DLG_YESNO_NO_BTN
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.script.sync.provider_install import SyncProviderInstall
@@ -52,8 +52,18 @@ class SyncProviderSelection(SyncProviderSetting):
             return
         if selected >= len(ids):
             return self.select_installer(installers[selected - len(ids)])
+        if selected and not self.confirm_provider(self.providers[selected - 1]):
+            return
         self.save(ids[selected])
         return ids[selected]
+
+    def confirm_provider(self, provider):
+        if provider.addon_id in PROVIDERS:
+            return True
+        return Dialog().yesno(
+            get_localized(32550), get_localized(32563).format(provider.display_name),
+            yeslabel=get_localized(186), nolabel=get_localized(222),
+            defaultbutton=DLG_YESNO_NO_BTN)
 
     def select_installer(self, installer):
         provider = installer.install()
