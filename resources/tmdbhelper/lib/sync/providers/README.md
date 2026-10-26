@@ -141,6 +141,11 @@ Skin-only history statistics never offer provider setup. Daily and monthly
 statistics return no entries when the selected watched provider is unavailable
 or unauthorized.
 
+For provider setup, requests are treated as widgets unless `MyVideoNav.xml` is
+active. This window state is captured when setup is created and remains fixed
+for that attempt. Background lists loaded while the video browser is active also
+receive standard directory behavior. The URL's `widget` parameter and container
+paths do not determine setup prompt behavior.
 Widget setup offers OK, Later, and Never. Later suppresses widget prompts through
 a Home window property until Kodi restarts; standard directory requests ignore
 Later. Never stores `never` for the requested feature. Users can enable that

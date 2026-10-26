@@ -4,7 +4,6 @@ from tmdbhelper.lib.items.directories.lists_default import ListProperties
 
 class SyncProviderListProperties(ListProperties):
     sync_capabilities = ('watched',)
-    is_widget = False
 
     @cached_property
     def provider_available(self):
@@ -12,4 +11,4 @@ class SyncProviderListProperties(ListProperties):
 
     def get_provider_available(self):
         from tmdbhelper.lib.script.sync.provider_setup import SyncProviderSetup
-        return SyncProviderSetup(self.sync_capabilities, self.is_widget).ensure_provider()
+        return SyncProviderSetup(self.sync_capabilities).ensure_provider()

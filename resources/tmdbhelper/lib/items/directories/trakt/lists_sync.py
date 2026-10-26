@@ -67,7 +67,6 @@ class ListStandardSync(ListDefault):
     list_properties_class = ListSyncProperties
 
     def configure_list_properties(self, list_properties):
-        list_properties.is_widget = self.is_widget
         list_properties.limit = 20 * max(get_setting('pagemulti_sync', 'int'), 1)
         list_properties.plugin_name = '{plural} {localized}'
         return list_properties

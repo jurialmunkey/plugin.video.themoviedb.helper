@@ -1,7 +1,7 @@
-from xbmcgui import Dialog
+from xbmcgui import Dialog, DLG_YESNO_YES_BTN
 from jurialmunkey.parser import try_int
 from jurialmunkey.window import get_property
-from tmdbhelper.lib.addon.plugin import get_localized
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized
 from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.script.method.sync_provider import SyncProviderListSelection
 from tmdbhelper.lib.script.sync.provider_features import SyncProviderFeatureSelection
@@ -15,10 +15,13 @@ class SyncProviderSetup:
     later_property = 'SyncProviderSetup.Later'
     prompt_property = 'SyncProviderSetup.Prompt'
 
-    def __init__(self, capabilities, is_widget=False):
+    def __init__(self, capabilities):
         self.capabilities = capabilities
-        self.is_widget = is_widget
+        self.is_widget = self.get_is_widget()
         self.prompt_version = get_property(self.prompt_property)
+
+    def get_is_widget(self):
+        return not get_condvisibility('Window.IsActive(MyVideoNav.xml)')
 
     @property
     def eligible_capabilities(self):
@@ -67,7 +70,8 @@ class SyncProviderSetup:
                 yeslabel=get_localized(186), nolabel=get_localized(222))
         selected = Dialog().yesnocustom(
             get_localized(32550), get_localized(32555),
-            yeslabel=get_localized(186), nolabel=get_localized(32556), customlabel=get_localized(13170))
+            yeslabel=get_localized(186), nolabel=get_localized(32556), customlabel=get_localized(13170),
+            defaultbutton=DLG_YESNO_YES_BTN)
         if selected == 1:
             return True
         if selected == 2:
