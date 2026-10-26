@@ -3,6 +3,14 @@
 These guidelines apply throughout this repository. Match the existing architecture
 when adding or extending functionality.
 
+## Commit messages
+
+- Prefix every commit subject with an appropriate emoji shortcode, matching the
+  existing history (for example, `:bug:` for fixes, `:sparkles:` for new features,
+  `:zap:` for improvements, `:bookmark:` for version bumps, and `:robot:` for
+  agent instructions).
+- Follow the shortcode with a space and a concise description of the change.
+
 ## Agree on the approach before implementation
 
 - Before implementing changes involving item data, database access, or sync,
