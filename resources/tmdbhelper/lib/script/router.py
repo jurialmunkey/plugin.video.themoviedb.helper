@@ -100,6 +100,8 @@ class Script(object):
         # User Configuration
         'select_sync_provider':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'select_sync_provider')(**kwargs),
+        'install_sync_provider':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'install_sync_provider')(**kwargs),
         'provider_allowlist':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.settings', 'configure_provider_allowlist')(),
 

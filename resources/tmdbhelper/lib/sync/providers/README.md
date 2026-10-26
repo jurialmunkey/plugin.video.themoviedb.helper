@@ -10,13 +10,13 @@ The loader imports the package directly from its installed path without changing
 no built-in service names or provider imports. Relative and wildcard imports
 are not permitted.
 
-Both provider addons follow this layout:
+Provider addons follow this layout:
 
 ```text
 addon.xml
 LICENSE.txt
 resources/
-    icon.png                # opaque 512 x 512 service icon
+    icon.png                # provider icon
     fanart.jpg
     lib/
         <package_name>/
@@ -72,10 +72,13 @@ container configures one discovery context for its list items before finalisatio
 The available feature selectors are history/progress, watchlist, collection,
 rating sync, favorites, and scrobbling. Each selector offers
 None, enabled providers declaring that feature, and installation/enabling options
-from `catalog.py`. The catalogue contains only supported addon IDs and display
-names; capabilities always come from the loaded provider. Missing or disabled
-modules cannot be filtered by capability until installed and enabled. Selection
-checks their declared capabilities before assigning them to a feature.
+from `catalog.py`. The catalogue records trusted addon IDs, display names, and
+supported capabilities so missing or disabled modules are offered only for
+features they support. Combined-list setup offers a catalogue provider when it
+supports at least one requested feature. Loaded providers determine actual
+capabilities; selection rechecks those declarations after installing/enabling
+and before assigning a provider to a feature. Keep catalogue capabilities aligned
+with the corresponding provider declarations when support changes.
 Each `sync_provider_<feature>` setting stores an empty value for an unconfigured
 feature, `never` for an explicitly disabled feature, or the chosen provider ID.
 Empty settings keep associated directory lists visible for discovery and setup;
@@ -100,9 +103,11 @@ List removal targets the service owning the displayed list; other services retai
 their add-to-list action. The `sync_trakt` script route aliases `sync_options`.
 
 Scrobbling has one independent provider selection. That provider receives playback
-start and stop requests. Shared playback timing, completion thresholds, Kodi watched
-updates, and TMDb rating prompts remain in TMDbHelper and run without a selected
-or authorized scrobbler. Provider modules own payloads, service requests,
+start and stop requests. Shared playback timing, completion thresholds, and TMDb
+rating prompts remain in TMDbHelper. Rating prompts run without a selected or
+authorized scrobbler. Watched writes belong exclusively to the selected scrobbling
+provider; core does not also increment the Kodi library playcount. Provider modules
+own payloads, service requests,
 authentication, and interpretation of scrobble results. Core coordinates sync-cache
 refreshes after successful stop requests and Trakt stats refreshes after a reported
 history change. Stats retrieval, caching, scheduling, and skin properties remain
@@ -158,14 +163,28 @@ and prompt state after acquiring it. A prompt-generation property prevents
 already-queued widget requests from repeating the same setup attempt.
 
 `SyncProviderOnboarding(addon_id).configure()` installs or enables a catalogue
-provider and offers `SyncProviderFeatureSelection(provider)`. This provider-agnostic
+provider and offers `SyncProviderDefaultSelection(provider)`. The dialog offers
+Default, Cancel, and Custom, with Default focused. Default replaces every feature's
+provider selection, including `never`, with the selected provider for supported
+features and the empty, unconfigured state for unsupported features. Cancel
+or closing the dialog preserves all current selections.
+Custom opens `SyncProviderFeatureSelection(provider)`. This provider-agnostic
 multiselect reads capabilities and current selections from the loaded provider
 and settings. Checked features select that provider; unchecked features clear only
 its own assignments. Unchecked features already marked `never` keep that state;
-explicitly checking one assigns the provider. Cancelling changes nothing. Trakt
-invokes onboarding after
+explicitly checking one assigns the provider. Cancelling the multiselect changes
+nothing. Trakt invokes onboarding after
 successful device authentication, never during token refresh. Confirmed Trakt
 logout clears its feature selections while retaining the installed module.
+
+The **Install sync provider** setting below **Clear sync** opens the complete
+trusted catalogue, including installed and enabled providers. Missing providers
+have an `(install)` suffix; disabled providers have an `(enable)` suffix. Selecting
+one runs the same onboarding flow: install/enable as needed, then choose Default,
+Cancel, or Custom. The Custom multiselect shows its supported features.
+Existing assignments to that provider are
+preselected. Unchecking one resets its setting to the empty, unconfigured state;
+unchecked features assigned to other providers retain their settings.
 
 Duplicate IDs, incompatible interfaces, and broken entry points produce explicit
 errors. Discovery and provider imports are scoped to a Python invocation;
@@ -181,3 +200,17 @@ in the standalone modules.
 Install the provider-enabled TMDbHelper build together with matching provider
 versions. The dependency version alone cannot distinguish a development checkout
 from an older checkout with the same version.
+
+The Kodi provider (`script.module.tmdbhelper.sync.kodi`) reads the active profile's
+video library through JSON-RPC. Library membership supplies collection; playcounts,
+last-played dates, and resume points supply history/progress. Next episodes are
+limited to available local library episodes. Kodi collection is read-only through
+this provider: adding/removing actual library content remains a Kodi operation.
+Watched/unwatched actions and resume removal write back to library items.
+Kodi supplies cumulative playcounts and the latest played date, not a complete
+chronological log of individual plays. The provider refreshes snapshots at most
+once per minute during normal reads, and actions invalidate/resync immediately.
+Native Kodi library playback retains Kodi's own watched/resume persistence;
+scrobbling another source writes to the matching library item only when Kodi is
+the selected scrobbler. See the standalone provider's README for identity matching,
+date limitations, and non-library tracking findings.

@@ -27,8 +27,10 @@ class SyncProviderSelection(SyncProviderSetting):
         return sorted(providers, key=lambda provider: (provider.display_name.casefold(), provider.provider_id))
 
     def get_installers(self):
+        capabilities = set(self.capabilities)
         installers = (SyncProviderInstall(addon_id) for addon_id in PROVIDERS)
-        return sorted((installer for installer in installers if not installer.is_available),
+        return sorted((installer for installer in installers
+                       if capabilities.intersection(installer.capabilities) and not installer.is_available),
                       key=lambda installer: installer.display_name.casefold())
 
     def get_preselect(self, ids):
@@ -91,3 +93,8 @@ class SyncProviderListSelection(SyncProviderSelection):
 
 def select_sync_provider(capability, **kwargs):
     SyncProviderSelection(capability).select()
+
+
+def install_sync_provider(**kwargs):
+    from tmdbhelper.lib.script.sync.provider_catalog import SyncProviderInstallSelection
+    SyncProviderInstallSelection().select()

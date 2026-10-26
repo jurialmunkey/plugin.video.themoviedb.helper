@@ -6,7 +6,11 @@ from tmdbhelper.lib.sync.providers.catalog import PROVIDERS
 class SyncProviderInstall(SyncProviderAddon):
     @property
     def display_name(self):
-        return PROVIDERS[self.addon_id]
+        return PROVIDERS[self.addon_id]['display_name']
+
+    @property
+    def capabilities(self):
+        return PROVIDERS[self.addon_id]['capabilities']
 
     @property
     def label(self):

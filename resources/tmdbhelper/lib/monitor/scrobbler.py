@@ -115,7 +115,6 @@ class PlayerScrobbler():
             return
         kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
         self.scrobble('stop') if not self.syncing else None
-        self.set_kodi_watched()
         self.set_tmdb_ratings()
         self.stopped = True
 
@@ -166,49 +165,6 @@ class PlayerScrobbler():
             episode=self.episode or None,
             sync_type='rating'
         )
-
-    @is_scrobbling
-    def set_kodi_watched(self):
-        if not self.current_time:
-            return
-        # Only update if progress is 80% or more
-        if self.progress < 80:
-            return
-
-        import tmdbhelper.lib.api.kodi.rpc as rpc
-
-        if self.tmdb_type == 'tv':
-            tvshowid = rpc.KodiLibrary('tvshow').get_info(
-                info='dbid',
-                imdb_id=self.imdb_id,
-                tmdb_id=self.tmdb_id,
-                tvdb_id=self.tvdb_id)
-            if not tvshowid:
-                kodi_log(f'SCROBBLER: [Kodi] No SHOW: {self.content_id}', 2)
-                return
-            dbid = rpc.KodiLibrary('episode', tvshowid).get_info(
-                info='dbid',
-                season=self.season,
-                episode=self.episode)
-            if not dbid:
-                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.content_id}', 2)
-                return
-            rpc.set_watched(dbid=dbid, dbtype='episode')
-            kodi_log(f'SCROBBLER: [Kodi] {self.content_id}', 2)
-            return
-
-        if self.tmdb_type == 'movie':
-            dbid = rpc.KodiLibrary('movie').get_info(
-                info='dbid',
-                imdb_id=self.imdb_id,
-                tmdb_id=self.tmdb_id,
-                tvdb_id=self.tvdb_id)
-            if not dbid:
-                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.content_id}', 2)
-                return
-            rpc.set_watched(dbid=dbid, dbtype='movie')
-            kodi_log(f'SCROBBLER: [Kodi] {self.content_id}', 2)
-            return
 
 
 def PlayerScrobblerFactory(total_time):

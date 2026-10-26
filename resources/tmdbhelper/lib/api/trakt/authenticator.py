@@ -1,4 +1,4 @@
-from xbmcgui import Dialog, DialogProgress
+from xbmcgui import Dialog, DialogProgress, DLG_YESNO_YES_BTN
 from jurialmunkey.parser import boolean
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
@@ -183,7 +183,8 @@ class TraktAuthenticator:
             self.dialog_noapikey_text,
             nolabel=get_localized(222),
             yeslabel=get_localized(186),
-            customlabel=get_localized(13170)
+            customlabel=get_localized(13170),
+            defaultbutton=DLG_YESNO_YES_BTN
         )
         routes = {
             1: self.login,  # Yes (OK)

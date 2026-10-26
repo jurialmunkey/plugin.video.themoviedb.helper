@@ -614,6 +614,11 @@
                         <data>RunScript(plugin.video.themoviedb.helper, invalidate_sync)</data>
                     </control>
                 </setting>
+                <setting id="install_sync_provider" type="action" label="32557" help="">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper,install_sync_provider)</data>
+                    <control type="button" format="action" />
+                </setting>
             </group>
 
             <group id="1" label="39031">

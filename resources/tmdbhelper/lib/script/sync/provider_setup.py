@@ -4,7 +4,7 @@ from jurialmunkey.window import get_property
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_localized
 from tmdbhelper.lib.files.locker import mutexlock
 from tmdbhelper.lib.script.method.sync_provider import SyncProviderListSelection
-from tmdbhelper.lib.script.sync.provider_features import SyncProviderFeatureSelection
+from tmdbhelper.lib.script.sync.provider_default import SyncProviderDefaultSelection
 from tmdbhelper.lib.script.sync.provider_install import SyncProviderInstall
 from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
 from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
@@ -67,7 +67,8 @@ class SyncProviderSetup:
         if not self.is_widget:
             return Dialog().yesno(
                 get_localized(32550), get_localized(32555),
-                yeslabel=get_localized(186), nolabel=get_localized(222))
+                yeslabel=get_localized(186), nolabel=get_localized(222),
+                defaultbutton=DLG_YESNO_YES_BTN)
         selected = Dialog().yesnocustom(
             get_localized(32550), get_localized(32555),
             yeslabel=get_localized(186), nolabel=get_localized(32556), customlabel=get_localized(13170),
@@ -91,4 +92,4 @@ class SyncProviderOnboarding:
     def configure(self):
         provider = SyncProviderInstall(self.addon_id).install()
         if provider is not None:
-            SyncProviderFeatureSelection(provider).select()
+            SyncProviderDefaultSelection(provider).select()
