@@ -78,7 +78,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32013"
-msgid "Get watched indicators, episode counts, and resume points"
+msgid "Sync watched and resume status"
 msgstr ""
 
 msgctxt "#30010"
@@ -2655,7 +2655,7 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync/provider_setup.py
 msgctxt "#32550"
-msgid "Sync provider setup"
+msgid "TMDbHelper Sync Provider"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync/provider_install.py
@@ -2680,7 +2680,7 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync/provider_setup.py
 msgctxt "#32555"
-msgid "This list requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
+msgid "{0} requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync/provider_setup.py
