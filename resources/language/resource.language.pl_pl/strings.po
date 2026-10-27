@@ -744,7 +744,7 @@ msgstr "Automatyczna aktualizacja biblioteki z list(y)"
 #: /resources/lib/script.py
 msgctxt "#32132"
 msgid "Do you wish to update the library from the list(s) now?"
-msgstr "Czy chcesz teraz zaktualizować bibliotekę z list(y)"
+msgstr "Czy chcesz teraz zaktualizować bibliotekę z list(y)?"
 
 #: /resources/lib/script.py
 msgctxt "#32133"
@@ -2011,7 +2011,7 @@ msgstr "Skonfiguruj listę dozwolonych dostawców"
 #: /resources/settings.xml
 msgctxt "#32450"
 msgid "Prefer fallbacks in English"
-msgstr "Preferuj treści zastępcze w języku angielskim"
+msgstr "Preferuj grafiki zastępcze w języku angielskim"
 
 #: /resources/lib/script/method.py
 msgctxt "#32438"
