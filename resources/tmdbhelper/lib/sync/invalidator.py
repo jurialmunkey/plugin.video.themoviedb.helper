@@ -75,8 +75,8 @@ class SyncInvalidatorAll:
             self.syncdata.cache.del_item(table='lactivities', item_id=item_id)
             self.syncdata.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
 
-    def invalidate(self):
-        if self.database_keys:
+    def invalidate(self, clear_data=True):
+        if clear_data and self.database_keys:
             self.syncdata.cache.del_column_values(keys=self.database_keys)
         self.syncdata.core_sync.invalidate(self.features)
         for provider in self.providers:
@@ -88,7 +88,8 @@ class SyncInvalidatorAll:
             self.syncdata.sync(item_type, keys, forced=True)
 
     def run(self, sync=False):
-        self.invalidate()
+        # Resync replaces columns after a successful response; keep them available until then.
+        self.invalidate(clear_data=not sync)
         if sync:
             self.sync()
         if self.notification:
