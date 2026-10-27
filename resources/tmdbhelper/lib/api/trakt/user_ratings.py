@@ -32,7 +32,7 @@ class TraktUserRatings:
         return self.get_cache()
 
     def get_cache(self):
-        return BasicCache()
+        return BasicCache(filename='TraktUserRatings.db')
 
     @cached_property
     def cache_name(self):
