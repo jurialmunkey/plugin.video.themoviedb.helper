@@ -2722,3 +2722,83 @@ msgstr ""
 msgctxt "#32563"
 msgid "You are enabling {0}, a third-party sync service outside TMDbHelper's trusted list. Only continue if you trust this service and understand the risks, including sharing your viewing activity and account data."
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32564"
+msgid "Image cache size"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32565"
+msgid "Size limit per folder. Unlimited disables cleanup."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32566"
+msgid "Unlimited"
+msgstr ""
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32567"
+msgid "Clean image cache"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32568"
+msgid "Scanning {0}: {1} of {2} files"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32569"
+msgid "Cleaning {0}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32570"
+msgid "Space reclaimed: {0}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32571"
+msgid "Image cache cleanup finished. Space reclaimed: {0}."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32572"
+msgid "Image cache cleanup cancelled. Space reclaimed: {0}."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32573"
+msgid "Image cache cleanup is disabled while the target size is Unlimited."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32574"
+msgid "Save settings and clean to the selected size limit."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32575"
+msgid "32 MB"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32576"
+msgid "64 MB"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32577"
+msgid "128 MB"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32578"
+msgid "256 MB"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32579"
+msgid "512 MB"
+msgstr ""

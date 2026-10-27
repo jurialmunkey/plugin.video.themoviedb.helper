@@ -154,6 +154,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.kodi_utils', 'do_wikipedia_gui')(**kwargs),
 
         # Maintenance and Logging
+        'clean_image_cache':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.image_cache', 'clean_image_cache')(**kwargs),
         'log_request':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.logging', 'log_request')(**kwargs),
         'log_sync':

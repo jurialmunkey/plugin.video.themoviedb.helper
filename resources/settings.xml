@@ -1006,6 +1006,31 @@
                         <heading>32472</heading>
                     </control>
                 </setting>
+                <setting id="image_cache_size" type="integer" label="32564" help="32565">
+                    <level>0</level>
+                    <default>128</default>
+                    <constraints>
+                        <options>
+                            <option label="32575">32</option>
+                            <option label="32576">64</option>
+                            <option label="32577">128</option>
+                            <option label="32578">256</option>
+                            <option label="32579">512</option>
+                            <option label="32566">0</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="clean_image_cache" type="action" label="32567" help="32574">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper, clean_image_cache)</data>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
             </group>
             <group id="4" label="14260">
                 <setting id="timer_reports" type="boolean" label="32395" help="">
