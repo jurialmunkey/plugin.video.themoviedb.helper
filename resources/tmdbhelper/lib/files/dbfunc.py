@@ -2,31 +2,37 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from contextlib import contextmanager
+from threading import local
 
 
 class DatabaseConnection:
-    open_connection = None
-
     def __init__(self, cache):
         self.cache = cache
+        self._local = local()
+
+    @property
+    def open_connection(self):
+        return getattr(self._local, 'open_connection', None)
 
     def close(self):
-        if not self.open_connection:
+        connection = self.open_connection
+        if not connection:
             return
-        self.open_connection.close()
-        self.open_connection = None
+        connection.close()
+        self._local.open_connection = None
 
     @contextmanager
     def open(self):
         existing_connection = bool(self.open_connection)
 
         if not existing_connection:
-            self.open_connection = self.cache.get_database().cursor()
+            self._local.open_connection = self.cache.get_database().cursor()
 
-        yield self.open_connection
-
-        if not existing_connection:
-            self.close()
+        try:
+            yield self.open_connection
+        finally:
+            if not existing_connection:
+                self.close()
 
 
 class DatabaseAccess:
