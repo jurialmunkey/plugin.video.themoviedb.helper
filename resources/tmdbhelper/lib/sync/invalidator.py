@@ -85,7 +85,7 @@ class SyncInvalidatorAll:
     def sync(self):
         for item_type in ('movie', 'show', 'season', 'episode'):
             keys = tuple(key for key in self.database_keys if item_type in self.sync_table[key])
-            self.syncdata.sync(item_type, keys, forced=True)
+            self.syncdata.sync(item_type, keys)
 
     def run(self, sync=False):
         # Resync replaces columns after a successful response; keep them available until then.
