@@ -23,6 +23,49 @@ from tmdbhelper.lib.items.directories.base.artwork import DIRECTORY_ICON_VARIANT
 SCALE = 3
 
 
+class CompositeLayout:
+    canvas_size = 512
+
+    def get_scaled(self, value):
+        return round(value * self.canvas_size / 512)
+
+    @property
+    def icon_size(self):
+        return self.get_scaled(192)
+
+    @property
+    def icon_center(self):
+        return tuple(self.get_scaled(value) for value in (256, 210))
+
+    @property
+    def text_center(self):
+        return tuple(self.get_scaled(value) for value in (256, 369))
+
+    @property
+    def badge_center(self):
+        return tuple(self.get_scaled(value) for value in (352, 275))
+
+    @property
+    def badge_diameter(self):
+        return self.get_scaled(100)
+
+    @property
+    def rim_width(self):
+        return self.get_scaled(8)
+
+    @property
+    def shadow_offset(self):
+        return self.get_scaled(6)
+
+    @property
+    def shadow_blur(self):
+        return 6.4 * self.canvas_size / 512
+
+
+class TMDbCompositeLayout(CompositeLayout):
+    canvas_size = 720
+
+
 class SourceArtwork:
     """Keep the saved artwork's geometry, colours, backgrounds and footers."""
 
@@ -50,6 +93,16 @@ class SourceArtwork:
     @cached_property
     def glyph(self):
         return self.glyph_area.crop(self.bounds)
+
+    @cached_property
+    def text(self):
+        return self.get_text()
+
+    def get_text(self):
+        area = self.image.crop((0, self.glyph_area.height, self.image.width, self.image.height))
+        background = Image.new('RGB', area.size, self.background[:3])
+        bounds = ImageChops.difference(area.convert('RGB'), background).getbbox()
+        return area.crop(bounds)
 
     @cached_property
     def mask(self):
@@ -86,6 +139,9 @@ class TypeArtwork:
         'episode': 'episodes',
     }
 
+    def __init__(self, glyphs):
+        self.glyphs = glyphs
+
     @cached_property
     def sources(self):
         return {
@@ -96,13 +152,30 @@ class TypeArtwork:
     def get(self, item_type):
         return self.sources[item_type]
 
+    @cached_property
+    def combined_mask(self):
+        return self.get_combined_mask()
+
+    def get_combined_mask(self):
+        screen = self.glyphs.get('television-1')
+        screen = screen.crop(screen.getbbox())
+        play = self.glyphs.get('media-control-1')
+        play = play.crop(play.getbbox()).resize((48, 58), Image.Resampling.LANCZOS)
+        inset = Image.new('L', screen.size)
+        position = (screen.width // 2 - play.width // 2, 64 - play.height // 2)
+        inset.paste(play, position)
+        return ImageChops.lighter(screen, inset)
+
+    def get_mask(self, item_type):
+        return self.combined_mask if item_type == 'both' else self.get(item_type).mask
+
 
 class DirectoryVariantComposer(IconComposer):
     """Concrete compositor for the approved centred type and rimmed badge style."""
 
     def __init__(self, output):
         super().__init__('', output)
-        self.types = TypeArtwork()
+        self.types = TypeArtwork(self.glyphs)
 
     @cached_property
     def sources(self):
@@ -115,6 +188,9 @@ class DirectoryVariantComposer(IconComposer):
             source = SourceArtwork(path)
             self.sources[path] = source
             return source
+
+    def get_layout(self, family):
+        return TMDbCompositeLayout() if family == 'themoviedb' else CompositeLayout()
 
     def get_fill(self, family, size):
         if family == 'themoviedb':
@@ -133,55 +209,36 @@ class DirectoryVariantComposer(IconComposer):
             draw.line((0, y, size[0], y), fill=(*color, 255))
         return fill
 
-    def get_type_glyph(self, family, item_type, width):
-        source = self.types.get(item_type)
-        size = (width * SCALE, round(source.glyph.height * width / source.glyph.width) * SCALE)
-        if family == 'themoviedb':
-            return source.glyph.resize(size, Image.Resampling.LANCZOS)
-        mask = source.mask.resize(size, Image.Resampling.LANCZOS)
+    def get_type_glyph(self, family, item_type, icon_size):
+        mask = self.types.get_mask(item_type)
+        scale = icon_size * SCALE / max(mask.size)
+        size = tuple(round(value * scale) for value in mask.size)
+        mask = mask.resize(size, Image.Resampling.LANCZOS)
         fill = self.get_fill(family, size)
         fill.putalpha(mask)
         return fill
 
+    def add_centered(self, canvas, image, center):
+        position = tuple(value * SCALE - dimension // 2 for value, dimension in zip(center, image.size))
+        canvas.alpha_composite(image, position)
+
+    def add_text(self, canvas, source, family):
+        text = source.text.resize(tuple(value * SCALE for value in source.text.size), Image.Resampling.LANCZOS)
+        self.add_centered(canvas, text, self.get_layout(family).text_center)
+
     def add_main(self, canvas, family, item_type):
-        if item_type == 'both':
-            return self.add_combined_main(canvas, family)
-        width = 240 if family == 'themoviedb' else 192
-        glyph = self.get_type_glyph(family, item_type, width)
-        # Tall symbols must also fit the normal square glyph area.
-        glyph.thumbnail((width * SCALE, width * SCALE), Image.Resampling.LANCZOS)
-        left = (canvas.width - glyph.width) // 2
-        center_y = 326 if family == 'themoviedb' else 210
-        top = center_y * SCALE - glyph.height // 2
-        if family != 'themoviedb' and item_type == 'movie':
-            top = 114 * SCALE
-        canvas.alpha_composite(glyph, (left, top))
-        return self.get_badge_center(family, left + glyph.width, top + glyph.height)
-
-    def add_combined_main(self, canvas, family):
-        width, gap = (180, 28) if family == 'themoviedb' else (144, 20)
-        glyphs = [self.get_type_glyph(family, item_type, width) for item_type in ('movie', 'tv')]
-        total_width = sum(glyph.width for glyph in glyphs) + gap * SCALE
-        left = (canvas.width - total_width) // 2
-        center_y = (326 if family == 'themoviedb' else 210) * SCALE
-        height = max(glyph.height for glyph in glyphs)
-        for glyph in glyphs:
-            canvas.alpha_composite(glyph, (left, center_y - glyph.height // 2))
-            left += glyph.width + gap * SCALE
-        return self.get_badge_center(family, left - gap * SCALE, center_y + height // 2)
-
-    def get_badge_center(self, family, right, bottom):
-        overlap = 39 if family == 'themoviedb' else 31
-        return (round(right / SCALE), round(bottom / SCALE) - overlap)
+        layout = self.get_layout(family)
+        glyph = self.get_type_glyph(family, item_type, layout.icon_size)
+        self.add_centered(canvas, glyph, layout.icon_center)
 
     def add_badge_shadow(self, canvas, family, bounds):
-        offset, blur = (8, 8) if family == 'themoviedb' else (6, 6.4)
+        layout = self.get_layout(family)
         left, top, right, bottom = bounds
         mask = Image.new('L', canvas.size)
-        shadow_bounds = (left, top + offset, right, bottom + offset)
+        shadow_bounds = (left, top + layout.shadow_offset, right, bottom + layout.shadow_offset)
         ImageDraw.Draw(mask).ellipse(tuple(value * SCALE for value in shadow_bounds), fill=110)
         shadow = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
-        shadow.putalpha(mask.filter(ImageFilter.GaussianBlur(blur * SCALE)))
+        shadow.putalpha(mask.filter(ImageFilter.GaussianBlur(layout.shadow_blur * SCALE)))
         canvas.alpha_composite(shadow)
 
     def get_badge_face(self, source, family, diameter):
@@ -192,7 +249,7 @@ class DirectoryVariantComposer(IconComposer):
         face = Image.new('RGBA', size, source.background)
         face.putalpha(circle)
         mask = Image.new('L', size)
-        ImageDraw.Draw(mask).ellipse(bounds, outline=255, width=10 if family == 'themoviedb' else 8)
+        ImageDraw.Draw(mask).ellipse(bounds, outline=255, width=self.get_layout(family).rim_width)
         rim = self.get_fill(family, size)
         rim.putalpha(mask)
         face.alpha_composite(rim)
@@ -210,7 +267,7 @@ class DirectoryVariantComposer(IconComposer):
         return fill
 
     def add_badge(self, canvas, source, family, center):
-        diameter = 124 if family == 'themoviedb' else 100
+        diameter = self.get_layout(family).badge_diameter
         left, top = (value - diameter // 2 for value in center)
         self.add_badge_shadow(canvas, family, (left, top, left + diameter, top + diameter))
         canvas.alpha_composite(self.get_badge_face(source, family, diameter), (left * SCALE, top * SCALE))
@@ -221,16 +278,12 @@ class DirectoryVariantComposer(IconComposer):
     def build_variant(self, icon, item_type):
         source = self.get_source(ICON_ROOT.parent.parent / icon)
         family = source.path.parent.name
-        canvas = source.image.copy()
-        bottom = source.glyph_area.height
-        ImageDraw.Draw(canvas).rectangle((0, 0, canvas.width - 1, bottom - 1), fill=source.background)
-        canvas = canvas.resize(tuple(value * SCALE for value in canvas.size), Image.Resampling.LANCZOS)
-        center = self.add_main(canvas, family, item_type)
-        self.add_badge(canvas, source, family, center)
+        layout = self.get_layout(family)
+        canvas = Image.new('RGBA', (layout.canvas_size * SCALE,) * 2, source.background)
+        self.add_text(canvas, source, family)
+        self.add_main(canvas, family, item_type)
+        self.add_badge(canvas, source, family, layout.badge_center)
         canvas = canvas.resize(source.image.size, Image.Resampling.LANCZOS)
-        # Keep text and provider branding byte-for-byte identical to the source.
-        footer = source.image.crop((0, bottom, canvas.width, canvas.height))
-        canvas.paste(footer, (0, bottom))
         variant = get_directory_icon_variant(icon, item_type)
         path = self.output / Path(variant).relative_to('resources/icons')
         path.parent.mkdir(parents=True, exist_ok=True)

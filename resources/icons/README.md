@@ -54,17 +54,31 @@ python resources/icons/build_directory_variants.py --output /path/to/preview
 This tool subclasses the existing compositor and reuses the saved normal PNGs
 as source artwork, including their backgrounds, provider branding and labels.
 Existing type glyphs come from `themoviedb/movies.png`, `tv.png`, `cast.png`,
-`groupings.png` (seasons) and `episodes.png`. Combined entries place the movie and
-TV glyphs side by side. The main type glyph remains horizontally centred without
-accounting for the badge. Gradients and solid fills follow each provider's palette.
+`groupings.png` (seasons) and `episodes.png`. Combined entries use one screen-with-play
+symbol composed from the existing `television-1` and `media-control-1` SVG masks.
+All main glyphs fit the same square icon box with preserved proportions and a
+fixed horizontal and vertical centre. Gradients and solid fills follow each
+provider's palette.
 
 The category glyph sits inside a background-coloured circular badge with a
 coloured rim and the approved downward soft shadow. The inset is approximately
 12.5% smaller than the initial mockup, with additional radial padding for square
-glyphs. The badge overhangs the main glyph's right and bottom edges. Glyph masks
+glyphs. The badge position is a fixed layout anchor, independent of the main
+glyph's visible bounds. Glyph masks
 are recovered from the saved artwork while retaining its antialiasing; rendering
-at three times the final dimensions smooths the circle and rim. Footer pixels
-are copied from each normal icon unchanged. This build requires Pillow and
+at three times the final dimensions smooths the circle and rim. Saved text and
+provider branding are extracted and centred at a fixed text anchor. Compositing
+always follows background, text, main icon, then badge (including its shadow);
+no footer is pasted over the completed badge. `CompositeLayout` defines one
+proportional grid; `TMDbCompositeLayout` scales it to 720px. Coordinates are
+rounded only for rasterization:
+
+| Output | Icon box / centre | Text centre | Badge centre / diameter |
+| --- | --- | --- | --- |
+| 512px | 192px / (256, 210) | (256, 369) | (352, 275) / 100px |
+| 720px | 270px / (360, 295) | (360, 519) | (495, 387) / 141px |
+
+This build requires Pillow and
 ImageMagick 7, but no font file, network access or new icon downloads.
 
 The manifest is shared with the menu artwork selector so every selectable
