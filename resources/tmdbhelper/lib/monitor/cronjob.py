@@ -37,6 +37,7 @@ class CronJobMonitor(SafeThread):
 
     def _do_database_maintenance(self):
         self.database_maintenance.vacuum()
+        self.database_maintenance.prune_image_cache()
 
     def _do_delete_old_databases(self):
         self.database_maintenance.delete_legacy_folders()
