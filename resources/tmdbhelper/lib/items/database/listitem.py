@@ -6,8 +6,7 @@ from tmdbhelper.lib.addon.plugin import convert_type
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.files.dbfunc import DatabaseConnection
 from tmdbhelper.lib.addon.logger import TimerList
-from tmdbhelper.lib.addon.thread import ParallelThread
-import itertools
+from tmdbhelper.lib.items.database.listitem_writer import ListItemWriter
 
 
 class ListItemConfig:
@@ -131,6 +130,9 @@ class ListItemConfig:
             return
         return self.listitem_cacher.try_queued_data()
 
+    def set_queued_data(self, connection, func_queue):
+        return self.listitem_cacher.set_queued_data(connection, func_queue)
+
 
 class ListItemCacher:
     def __init__(self, parent, tmdb_type, tmdb_id, season=None, episode=None, listitem_config=None):
@@ -210,13 +212,24 @@ class ListItemCacher:
     def try_queued_data(self):
         if not self.baseitem_db_cache:
             return
-        # self.baseitem_db_cache.connection = connection
         self.baseitem_db_cache.cache_refresh = (
             self.parent.cache_refresh if self.parent.cache_refresh == 'basic'
             else None
         )
         self.baseitem_db_cache.cache_translations = self.parent.cache_translations
-        return self.baseitem_db_cache.try_cached_data(return_queue=True)
+        connection = DatabaseConnection(self.cache)
+        self.baseitem_db_cache.connection = connection
+        try:
+            return self.baseitem_db_cache.try_cached_data(return_queue=True)
+        finally:
+            connection.close()
+
+    def set_queued_data(self, connection, func_queue):
+        self.baseitem_db_cache.connection = connection
+        for db_cache in self.baseitem_db_cache.db_table_caches:
+            db_cache.connection = connection
+        for func, args, kwgs in func_queue:
+            func(*args, **kwgs)
 
 
 class ListItemThread:
@@ -265,28 +278,15 @@ class ListItemThread:
         ]
 
     @cached_property
-    def func_queue(self):
-        with TimerList(self.timer_lists, ' - online', log_threshold=0.001, logging=self.log_timers):
-            return self.get_func_queue()
+    def item_writer(self):
+        return ListItemWriter(self.uncached_items, self.connection, self.timer_lists, self.log_timers)
 
-    def get_func_queue(self):
-
-        def _queued_data(listitem_config):
-            return listitem_config.try_queued_data()
-
-        with ParallelThread(self.uncached_items, _queued_data) as pt:
-            item_queue = pt.queue
-
-        return list(itertools.chain.from_iterable((i for i in item_queue if i)))
-
-    def set_func_queue(self):
-        self.connection.open_connection.execute('BEGIN')
-        with TimerList(self.timer_lists, ' - writer', log_threshold=0.001, logging=self.log_timers):
-            for func, args, kwgs in self.func_queue:
-                func(*args, **kwgs)
-        with TimerList(self.timer_lists, ' - commit', log_threshold=0.001, logging=self.log_timers):
-            self.connection.open_connection.execute('COMMIT')
-        self.cached_data = self.get_cached_data()
+    def write_uncached_items(self):
+        with TimerList(self.timer_lists, ' - pipeline', log_threshold=0.001, logging=self.log_timers):
+            self.item_writer.write_items()
+        if self.item_writer.has_written_data:
+            with self.connection.open():
+                self.cached_data = self.get_cached_data()
 
     @cached_property
     def configured_items(self):
@@ -294,10 +294,9 @@ class ListItemThread:
             return self.configured_list
         if not self.uncached_items:
             return self.configured_list
-        if not self.func_queue:
-            return self.configured_list
-        with self.connection.open():
-            self.set_func_queue()
+        self.write_uncached_items()
+        if self.item_writer.aborted:
+            return []
         return self.configured_list
 
 
