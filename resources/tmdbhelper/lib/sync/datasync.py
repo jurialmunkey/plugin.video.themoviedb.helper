@@ -4,6 +4,7 @@ from jurialmunkey.ftools import cached_property
 from jurialmunkey.checks import has_arg_value
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.files.dbdata import DatabaseStatements
+from tmdbhelper.lib.files.sqlite_mutex import SQLiteMutex
 
 
 class SyncItemDetailsDatabase(ItemDetailsDatabase):
@@ -515,6 +516,14 @@ class SyncData(SyncDataGetters):
             self.clear_unavailable_provider_activities(SYNC_FEATURES[sync_type])
         self.disabled_sync_types.add(sync_type)
 
+    def invalidate_activity(self, item_id):
+        lockname = f'{self.cache._db_file}.datasync.{item_id}.lockfile'
+        with SQLiteMutex(lockname, timeout=300, kodi_log=self.cache.kodi_log) as mutex_lock:
+            if mutex_lock.lockstate == -1:  # Abort or Timeout
+                return
+            self.cache.del_item(table='lactivities', item_id=item_id)
+            self.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
+
     def clear_unavailable_provider_activities(self, feature):
         provider_id = self.registry.get_selected_provider_id(feature)
         if not provider_id or provider_id in self.unavailable_providers:
@@ -524,8 +533,7 @@ class SyncData(SyncDataGetters):
             return  # An unsupported sync type must not invalidate the provider's supported data.
         from tmdbhelper.lib.sync.activity import SyncLastActivities
         for item_id in self.cache.get_provider_activity_ids(provider_id):
-            self.cache.del_item(table='lactivities', item_id=item_id)
-            self.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
+            self.invalidate_activity(item_id)
         SyncLastActivities.clear_provider(self.window, provider_id)
         self.unavailable_providers.add(provider_id)
 
