@@ -4,6 +4,7 @@ from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized
 from tmdbhelper.lib.api.contains import CommonContainerAPIs, CommonRatingsAPIs
 from tmdbhelper.lib.addon.logger import TimerList
+from threading import Lock
 
 
 class ContainerDirectoryCommon(CommonContainerAPIs):
@@ -23,6 +24,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         self.paramstring = paramstring  # plugin://plugin.video.themoviedb.helper?paramstring
         self.params = kwargs  # paramstring dictionary
         self.parent_params = kwargs.copy()  # TODO: CLEANUP
+        self._sync_lock = Lock()
 
     @cached_property
     def log_timers(self):
@@ -95,6 +97,19 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             pauseplayprogress=get_setting('trakt_watchedindicators'))
 
     @cached_property
+    def sync_ready(self):
+        return self.get_sync_ready()
+
+    def get_sync_ready(self):
+        with TimerList(self.timer_lists, '--sync', log_threshold=0.001, logging=self.log_timers):
+            self.sync_playdata.pre_sync_join()
+        return True
+
+    def wait_for_sync(self):
+        with self._sync_lock:
+            return self.sync_ready
+
+    @cached_property
     def pagination(self):
         if not boolean(self.params.get('nextpage', True)):
             return False
@@ -163,6 +178,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         """ Build items in threads """
 
         items = self.build_detailed_items(items)
+        self.wait_for_sync()
 
         # Finalise listitems in parallel threads
         with TimerList(self.timer_lists, '--make', log_threshold=0.001, logging=self.log_timers):
@@ -266,9 +282,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             self.property_params.update(self.set_params_to_container())
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
 
-            with TimerList(self.timer_lists, '--sync', log_threshold=0.001, logging=self.log_timers):
-                self.sync_playdata.pre_sync_join()
-
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
                 items = self.build_items(items)
                 if items_only:
@@ -311,6 +324,7 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.extendedinfo = self.is_detailed
         lidc.timer_lists = self.timer_lists
         lidc.log_timers = self.log_timers
+        lidc.before_get_item_meta = self.wait_for_sync
         return lidc
 
     def build_ratings_item(self, li):

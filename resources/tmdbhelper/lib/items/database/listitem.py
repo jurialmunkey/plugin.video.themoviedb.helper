@@ -116,6 +116,16 @@ class ListItemConfig:
             return
         return self.listitem_cacher.get_cached_item(connection)
 
+    def get_cached_item_data(self, connection):
+        if not self.listitem_cacher:
+            return
+        return self.listitem_cacher.get_cached_item_data(connection)
+
+    def get_cached_item_meta(self, data):
+        if data is None:
+            return
+        return self.listitem_cacher.get_cached_item_meta(data)
+
     def try_queued_data(self):
         if not self.listitem_cacher:
             return
@@ -150,6 +160,7 @@ class ListItemCacher:
             baseitem_db_cache.common_apis = self.common_apis
             baseitem_db_cache.extendedinfo = self.extendedinfo
             baseitem_db_cache.cache = self.cache
+            baseitem_db_cache.before_get_item_meta = self.parent.wait_for_sync
         except(AttributeError, TypeError, KeyError):
             return
 
@@ -174,12 +185,27 @@ class ListItemCacher:
         return self.add_item_details(self.baseitem_db_cache.data)
 
     def get_cached_item(self, connection):
+        baseitem_db_cache = self.get_configured_baseitem_db_cache(connection)
+        if not baseitem_db_cache:
+            return
+        return self.add_item_details(baseitem_db_cache.get_cached_data())
+
+    def get_cached_item_data(self, connection):
+        baseitem_db_cache = self.get_configured_baseitem_db_cache(connection)
+        if not baseitem_db_cache:
+            return
+        return baseitem_db_cache.get_cached_item_data()
+
+    def get_cached_item_meta(self, data):
+        return self.add_item_details(self.baseitem_db_cache.get_item_meta(data))
+
+    def get_configured_baseitem_db_cache(self, connection):
         if not self.baseitem_db_cache:
             return
         self.baseitem_db_cache.connection = connection
         self.baseitem_db_cache.cache_refresh = self.parent.cache_refresh
         self.baseitem_db_cache.cache_translations = self.parent.cache_translations
-        return self.add_item_details(self.baseitem_db_cache.get_cached_data())
+        return self.baseitem_db_cache
 
     def try_queued_data(self):
         if not self.baseitem_db_cache:
@@ -211,7 +237,7 @@ class ListItemThread:
 
     def get_cached_data(self):
         return [
-            listitem_config.get_cached_item(self.connection)
+            listitem_config.get_cached_item_data(self.connection)
             for listitem_config in self.items
         ]
 
@@ -227,11 +253,14 @@ class ListItemThread:
 
     @cached_property
     def configured_list(self):
-        return self.get_configured_list()
+        self.parent.wait_for_sync()
+        with TimerList(self.timer_lists, ' - return', log_threshold=0.001, logging=self.log_timers):
+            with self.connection.open():
+                return self.get_configured_list()
 
     def get_configured_list(self):
         return [
-            listitem_config.get_configured_listitem(self.cached_data[x])
+            listitem_config.get_configured_listitem(listitem_config.get_cached_item_meta(self.cached_data[x]))
             for x, listitem_config in enumerate(self.items)
         ]
 
@@ -257,8 +286,7 @@ class ListItemThread:
                 func(*args, **kwgs)
         with TimerList(self.timer_lists, ' - commit', log_threshold=0.001, logging=self.log_timers):
             self.connection.open_connection.execute('COMMIT')
-        with TimerList(self.timer_lists, ' - return', log_threshold=0.001, logging=self.log_timers):
-            self.cached_data = self.get_cached_data()
+        self.cached_data = self.get_cached_data()
 
     @cached_property
     def configured_items(self):
@@ -281,6 +309,7 @@ class ListItemDetails:
     parent_params = {}
     timer_lists = {}
     log_timers = False
+    before_get_item_meta = None
 
     def __init__(self, common_apis=None):
         self.common_apis = common_apis or CommonContainerAPIs()
@@ -296,3 +325,7 @@ class ListItemDetails:
 
     def configure_listitems_threaded(self, items):
         return ListItemThread(self, [ListItemConfig(self, i) for i in items]).configured_items
+
+    def wait_for_sync(self):
+        if self.before_get_item_meta is not None:
+            return self.before_get_item_meta()

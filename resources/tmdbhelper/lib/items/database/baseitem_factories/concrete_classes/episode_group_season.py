@@ -23,6 +23,7 @@ class EpisodeGroupSeason(EpisodeGroup):
         database_obj.cache = self.cache
         database_obj.connection = self.connection
         database_obj.cache_refresh = self.cache_refresh
+        database_obj.before_get_item_meta = self.before_get_item_meta
         return database_obj.data
 
     @property

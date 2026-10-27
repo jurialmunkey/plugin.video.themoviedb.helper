@@ -49,6 +49,7 @@ class Season(Tvshow):
             base_dbc.cache = self.cache
             base_dbc.cache_refresh = self.cache_refresh
             base_dbc.cache_translations = self.cache_translations
+            base_dbc.before_get_item_meta = self.before_get_item_meta
         except (TypeError, KeyError, IndexError, ValueError):
             return
         return base_dbc.data

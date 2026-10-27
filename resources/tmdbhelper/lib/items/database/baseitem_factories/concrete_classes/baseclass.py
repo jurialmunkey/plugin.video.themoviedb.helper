@@ -17,6 +17,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
     expiry_time = DEFAULT_EXPIRY
     cached_data_check_key = 'tmdb_id'
     extendedinfo = False
+    before_get_item_meta = None
     routes_basemeta_db = {}
     allowlist_infolabel_keys = _ListItemInfoTagVideo._tag_attr
     append_to_response_tmdbtype = 'movie'
@@ -156,6 +157,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     def get_item_meta(self, data):
         """ configurator class to transform db cache data into a format usable for Kodi ListItem """
+        if self.before_get_item_meta is not None:
+            self.before_get_item_meta()
         imc = ItemMetaFactory(self, data)
         imc.extendedinfo = self.extendedinfo
         return imc.item
@@ -182,10 +185,17 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     def get_cached_data(self):
         with self.connection.open():
+            data = self.get_cached_item_data()
+            if data is None:
+                return
+            return self.get_item_meta(data)
+
+    def get_cached_item_data(self):
+        with self.connection.open():
             data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
             if not data or not data[0] or not data[0][self.cached_data_check_key]:
                 return
-            return self.get_item_meta(data)
+            return data
 
     def set_cached_data(self, item_id, mediatype, expiry, datalevel, fanart_tv, translation, language, table, keys, mapped_data, delete_cascade=False):
         baseitem_keys = ('mediatype', 'expiry', 'datalevel', 'fanart_tv', 'language')
