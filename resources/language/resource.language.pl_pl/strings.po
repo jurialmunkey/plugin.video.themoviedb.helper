@@ -459,7 +459,7 @@ msgstr "Inne"
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "Pokaż 'Następna strona' w widżetach"
+msgstr "Pokaż 'Następna strona'"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32098"
@@ -519,17 +519,17 @@ msgstr "Autoryzacja konta w serwisie Trakt"
 #: /resources/lib/container.py
 msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
-msgstr "Czy chcesz wyczyścić istniejące pozycje lub dodać więcej?"
+msgstr "Chcesz wyczyścić istniejące pozycje, czy dodać więcej?"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32115"
 msgid "Reset {} artwork to default?"
-msgstr "Zresetować {} do domyślnego?"
+msgstr "Przywrócić grafikę {} do domyślnej?"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32116"
 msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
-msgstr "Usuwa grafikę przypisaną przez użytkownika i resetuje ją do domyślnego wyboru zdefiniowanego w ustawieniach."
+msgstr "Usuwa grafikę przypisaną przez użytkownika i przywraca ją do domyślnego wyboru zdefiniowanego w ustawieniach."
 
 #: /resources/lib/container.py
 msgctxt "#32101"
