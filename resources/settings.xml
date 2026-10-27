@@ -616,8 +616,10 @@
                 </setting>
                 <setting id="install_sync_provider" type="action" label="32557" help="">
                     <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper,install_sync_provider)</data>
-                    <control type="button" format="action" />
+                    <data>RunScript(plugin.video.themoviedb.helper,install_sync_provider,return_settings=true)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
                 </setting>
             </group>
 
@@ -627,7 +629,8 @@
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
                     <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=watched)</data>
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=watched,return_settings=true)</data>
                     </control>
                 </setting>
                 <setting id="sync_provider_watchlist" type="string" label="32193" help="32548">
@@ -635,7 +638,8 @@
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
                     <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=watchlist)</data>
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=watchlist,return_settings=true)</data>
                     </control>
                 </setting>
                 <setting id="sync_provider_collection" type="string" label="32192" help="32548">
@@ -643,7 +647,8 @@
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
                     <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=collection)</data>
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=collection,return_settings=true)</data>
                     </control>
                 </setting>
                 <setting id="sync_provider_scrobbling" type="string" label="32138" help="32548">
@@ -651,7 +656,8 @@
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
                     <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling)</data>
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling,return_settings=true)</data>
                     </control>
                 </setting>
             </group>

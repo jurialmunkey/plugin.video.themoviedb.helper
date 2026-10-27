@@ -62,6 +62,12 @@ several layers, each retaining its own responsibility.
 
 ## Organization and reuse
 
+- Prefer hanging indents for continuation lines over vertical alignment with
+  the opening delimiter. Follow PEP 8's hanging-indent guidance:
+  put no arguments on the first line and indent continuation lines to clearly
+  distinguish them from the surrounding code. Use an extra indentation level
+  where needed to distinguish continued function parameters from the body;
+  PEP 8 does not require continuation indentation to be exactly four spaces.
 - Always use explicitly named absolute imports. Relative imports and wildcard
   (`from ... import *`) imports are not permitted.
 - Keep a distinct feature in its own appropriately named modules.

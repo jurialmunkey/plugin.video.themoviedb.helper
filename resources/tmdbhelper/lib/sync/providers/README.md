@@ -198,6 +198,13 @@ Existing assignments to that provider are
 preselected. Unchecking one resets its setting to the empty, unconfigured state;
 unchecked features assigned to other providers retain their settings.
 
+Provider selectors and **Install sync provider** save and close the addon settings
+dialog before opening their selection dialogs. This ensures selectors read the
+saved values and provider changes are persisted directly, avoiding Kodi's deferred
+setting writes while the addon settings dialog is open. Settings reopen at the
+original provider control afterward, including when selection is cancelled.
+Provider setup launched from lists or other scripts does not reopen settings.
+
 Duplicate IDs, incompatible interfaces, and broken entry points produce explicit
 errors. Discovery and provider imports are scoped to a Python invocation;
 setup refreshes discovery after installation or enabling. Updating already-loaded
