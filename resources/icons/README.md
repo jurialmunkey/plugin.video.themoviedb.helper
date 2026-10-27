@@ -37,9 +37,43 @@ palette and TMDb footer. MDbList and TVDb category icons retain their respective
 backgrounds and provider footers. Shared calendar period selectors use the
 neutral `common/calendar.png` because both library and Trakt routes use them.
 
-Each icon has one iconmonstr glyph in the standard centred position and size.
-There are no companion symbols, inset badges or overlays added by the compositor.
-Trakt Discover uses the existing `trakt/trakt.png` provider logo directly.
+The normal icons retain their single centred glyph. Trakt Discover uses the
+existing `trakt/trakt.png` provider logo directly.
+
+## Type variants in mixed menus
+
+`build_directory_variants.py` builds the separately named `-movie`, `-tv`,
+`-person`, `-season`, `-episode` and `-both` PNGs registered in
+`resources/tmdbhelper/lib/items/directories/base/artwork.py`:
+
+```sh
+python resources/icons/build_directory_variants.py
+python resources/icons/build_directory_variants.py --output /path/to/preview
+```
+
+This tool subclasses the existing compositor and reuses the saved normal PNGs
+as source artwork, including their backgrounds, provider branding and labels.
+Existing type glyphs come from `themoviedb/movies.png`, `tv.png`, `cast.png`,
+`groupings.png` (seasons) and `episodes.png`. Combined entries place the movie and
+TV glyphs side by side. The main type glyph remains horizontally centred without
+accounting for the badge. Gradients and solid fills follow each provider's palette.
+
+The category glyph sits inside a background-coloured circular badge with a
+coloured rim and the approved downward soft shadow. The inset is approximately
+12.5% smaller than the initial mockup, with additional radial padding for square
+glyphs. The badge overhangs the main glyph's right and bottom edges. Glyph masks
+are recovered from the saved artwork while retaining its antialiasing; rendering
+at three times the final dimensions smooths the circle and rim. Footer pixels
+are copied from each normal icon unchanged. This build requires Pillow and
+ImageMagick 7, but no font file, network access or new icon downloads.
+
+The manifest is shared with the menu artwork selector so every selectable
+variant has an exported file. `BaseDirList` requests these variants only when a
+menu displays multiple content types. Group headers, groups containing a single
+type, and Movies/TV/People directories retain their normal icons. Artwork
+selection does not change item labels, route parameters, sorting or sync queries.
+MDbList's mixed lists use its existing white palette and blue background;
+single-type TVDb menus retain their normal artwork.
 
 Existing `sync/up-next.png`, `trakt/up-next.png` and `trakt/groupings.png` paths
 are preserved with rebuilt artwork. In particular, `UpNextSeason.map_item_art()`

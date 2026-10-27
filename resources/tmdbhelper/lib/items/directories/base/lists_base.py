@@ -60,10 +60,14 @@ class BaseDirList:
         ]
 
     def get_basedir_ungrouped(self, item_type=None, group=None):
+        basedir = [
+            i for i in self.get_basedir(item_type)
+            if not group or int(group) == i.item.group
+        ]
+        type_art = not item_type and len({i.type for i in basedir}) > 1
         return [
-            i.item.get_item(i.type, mixed_dir=bool(not item_type))
-            for i in self.get_basedir(item_type)
-            if not group or int(group) == i.item.group  # Convert paramstring value to int for comparison
+            i.item.get_item(i.type, mixed_dir=bool(not item_type), type_art=type_art)
+            for i in basedir
         ]
 
     def get_basedir(self, item_type=None):

@@ -48,8 +48,8 @@ class BaseDirItem:
             'icon': f'{ADDONPATH}/{self.art_icon}'
         }
 
-    def get_item(self, item_type, mixed_dir=False):
-        return self.item_builder(self, item_type, mixed_dir).item
+    def get_item(self, item_type, mixed_dir=False, type_art=False):
+        return self.item_builder(self, item_type, mixed_dir, type_art=type_art).item
 
 
 class BaseDirItemAuthorised(BaseDirItem):
