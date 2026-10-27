@@ -39,10 +39,13 @@ class ItemListSyncDataProperties:
     def reverse(self):
         return self.get_reverse()
 
-    @property
+    @cached_property
     def syncdata(self):
+        return self.get_syncdata()
+
+    def get_syncdata(self):
         from tmdbhelper.lib.sync.datasync import SyncDataFactory
-        return SyncDataFactory(self)
+        return SyncDataFactory()
 
     @cached_property
     def namedtuple_basic(self):
@@ -107,7 +110,6 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         'title': ('title', True, '', ),
         'watched': ('last_watched_at', True, '', ),
         'paused': ('playback_paused_at', True, '', ),
-        'votes': ('trakt_votes', True, 0, ),
         'plays': ('plays', True, 0, ),
         'runtime': ('runtime', True, 0, ),
         'collected': ('collection_last_collected_at', True, '', ),
@@ -116,8 +118,7 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         'lastweek': ('last_watched_at', True, '', ),
     }
 
-    def __init__(self, trakt_api, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
-        self.trakt_api = trakt_api
+    def __init__(self, item_type=None, sort_by=None, sort_how=None, item_keys=None, tmdb_id=None):
         self.sort_by, self.sort_how = sort_by, sort_how
         self.item_keys = item_keys or ()
         self.item_type = item_type
@@ -241,7 +242,7 @@ class ItemListSyncDataToWatch(ItemListSyncData):
         return sd
 
     def get_presorted_items(self):
-        return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x[self.presorted_fallback_key], reverse=True)
+        return sorted(self.syncdata_getter.items, key=lambda x: x['watchlist_listed_at'] or x[self.presorted_fallback_key] or '', reverse=True)
 
     def get_items(self):
         data = [self.namedtuple_basic(i, self.item_type, ) for i in self.presorted_items]

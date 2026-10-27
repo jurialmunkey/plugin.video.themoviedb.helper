@@ -247,6 +247,9 @@ SEASON_COLUMNS = {
     'season': {
         'data': 'INTEGER',
     },
+    'episode_count': {
+        'data': 'INTEGER',
+    },
     'year': {
         'data': 'INTEGER',
         'indexed': True
@@ -1064,124 +1067,124 @@ SIMPLECACHE_COLUMNS = {
     },
     'plays': {
         'data': 'INTEGER DEFAULT 0',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
+        'sync': 'SyncWatched',
         'indexed': True
     },
     'aired_episodes': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAiredEpisodes', ),
+        'sync': 'SyncAiredEpisodes',
         'indexed': True
     },
     'watched_episodes': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAiredEpisodes', ),
+        'sync': 'SyncWatched',
         'indexed': True
     },
     'reset_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', )
+        'sync': 'SyncWatched'
     },
     'last_watched_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
+        'sync': 'SyncWatched',
         'indexed': True
     },
     'last_updated_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatched', ),
+        'sync': 'SyncWatched',
         'indexed': True
     },
     'rating': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncRatings', )
+        'sync': 'SyncRatings'
     },
     'rated_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncRatings', )
+        'sync': 'SyncRatings'
     },
     'favorites_rank': {
         'data': 'INTEGER DEFAULT 0',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncFavorites', )
+        'sync': 'SyncFavorites'
     },
     'favorites_listed_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncFavorites', )
+        'sync': 'SyncFavorites'
     },
     'favorites_notes': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncFavorites', )
+        'sync': 'SyncFavorites'
     },
     'watchlist_rank': {
         'data': 'INTEGER DEFAULT 0',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatchlist', ),
+        'sync': 'SyncWatchlist',
         'indexed': True
     },
     'watchlist_listed_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatchlist', ),
+        'sync': 'SyncWatchlist',
         'indexed': True
     },
     'watchlist_notes': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncWatchlist', )
+        'sync': 'SyncWatchlist'
     },
     'collection_last_collected_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncCollection', ),
+        'sync': 'SyncCollection',
         'indexed': True
     },
     'collection_last_updated_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncCollection', )
+        'sync': 'SyncCollection'
     },
     'playback_progress': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncPlayback', ),
+        'sync': 'SyncPlayback',
         'indexed': True
     },
     'playback_paused_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncPlayback', ),
+        'sync': 'SyncPlayback',
         'indexed': True
     },
     'playback_id': {
         'data': 'INTEGER',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncPlayback', ),
+        'sync': 'SyncPlayback',
         'indexed': True
     },
     'progress_watched_hidden_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncHiddenProgressWatched', ),
+        'sync': 'SyncHiddenProgressWatched',
         'indexed': True
     },
     'progress_collected_hidden_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncHiddenProgressCollected', ),
+        'sync': 'SyncHiddenProgressCollected',
         'indexed': True
     },
     'calendar_hidden_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncHiddenCalendar', ),
+        'sync': 'SyncHiddenCalendar',
         'indexed': True
     },
     'dropped_hidden_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncHiddenDropped', ),
+        'sync': 'SyncHiddenDropped',
         'indexed': True
     },
     'next_episode_id': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncNextEpisodes', ),
+        'sync': 'SyncNextEpisodes',
         'indexed': True
     },
     'next_episode_aired_at': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncNextEpisodes', ),
+        'sync': 'SyncNextEpisodes',
         'indexed': True
     },
     'upnext_episode_id': {
         'data': 'TEXT',
-        'sync': ('tmdbhelper.lib.sync.synctype', 'SyncAllNextEpisodes', ),
+        'sync': 'SyncAllNextEpisodes',
         'indexed': True
     },
 }

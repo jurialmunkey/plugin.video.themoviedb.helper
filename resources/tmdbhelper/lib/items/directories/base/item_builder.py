@@ -1,12 +1,13 @@
-from tmdbhelper.lib.addon.plugin import convert_type, get_localized
+from tmdbhelper.lib.addon.plugin import ADDONPATH, convert_type, get_localized
 from jurialmunkey.ftools import cached_property
 
 
 class BaseDirItemBuilder:
-    def __init__(self, base_item, item_type, mixed_dir=False):
+    def __init__(self, base_item, item_type, mixed_dir=False, type_art=False):
         self.base_item = base_item  # BaseDirItem
         self.mixed_dir = mixed_dir
         self.item_type = item_type
+        self.type_art = type_art
 
     @cached_property
     def context_menu(self):
@@ -34,8 +35,16 @@ class BaseDirItemBuilder:
 
     @cached_property
     def art(self):
-        art = {}
-        art.update(self.base_item.art)
+        return self.get_art()
+
+    def get_art(self):
+        art = self.base_item.art.copy()
+        if not self.type_art:
+            return art
+        from tmdbhelper.lib.items.directories.base.artwork import get_directory_icon_variant
+        icon = get_directory_icon_variant(self.base_item.art_icon, self.item_type)
+        if icon:
+            art['icon'] = f'{ADDONPATH}/{icon}'
         return art
 
     @cached_property

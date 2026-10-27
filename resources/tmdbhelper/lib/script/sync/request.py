@@ -7,14 +7,6 @@ class ItemSync(BasicItemSync):
     sync_url = None
 
     @cached_property
-    def syncdata(self):
-        return self.get_syncdata()
-
-    def get_syncdata(self):
-        from tmdbhelper.lib.sync.datasync import SyncDataFactory
-        return SyncDataFactory(self)
-
-    @cached_property
     def method(self):
         return self.get_method()
 
@@ -59,21 +51,3 @@ class ItemSync(BasicItemSync):
 
     def get_sync_item(self):
         raise NotImplementedError
-
-    def reset_lastactivities(self):
-        if not self.is_successful_sync:
-            return
-        self.syncdata.reset_lastactivities()
-
-    def get_sync_value(self):
-        return self.syncdata.get_value(
-            self.tmdb_type,
-            self.tmdb_id,
-            self.season,
-            self.episode,
-            self.sync_key
-        )
-
-    def sync(self):
-        self.reset_lastactivities()
-        super().sync()

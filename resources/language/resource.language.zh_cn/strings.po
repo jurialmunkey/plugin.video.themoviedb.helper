@@ -25,11 +25,6 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "阿拉伯语（沙特阿拉伯）"
 
-#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
-msgctxt "#32000"
-msgid "Unaired"
-msgstr "未播出"
-
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr "白俄罗斯语（白俄罗斯）"
@@ -138,11 +133,6 @@ msgstr "英语（爱尔兰）"
 msgctxt "#30017"
 msgid "English (New Zealand)"
 msgstr "英语（新西兰）"
-
-#: /resources/tmdbhelper/lib/script/method/trakt.py
-msgctxt "#32026"
-msgid "Invalidate Sync Data"
-msgstr "同步数据失效"
 
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32027"
@@ -283,11 +273,6 @@ msgid "Fanart.tv API"
 msgstr "Fanart.tv API"
 
 #: /resources/settings.xml
-msgctxt "#32031"
-msgid "Trakt API"
-msgstr "Trakt API"
-
-#: /resources/settings.xml
 msgctxt "#32032"
 msgid "Download Players"
 msgstr "下载播放器"
@@ -296,11 +281,6 @@ msgstr "下载播放器"
 msgctxt "#32033"
 msgid "Default Players"
 msgstr "默认播放器"
-
-#: /resources/settings.xml
-msgctxt "#32034"
-msgid "Get watched indicators and episode counts"
-msgstr "获取观看指南和分集"
 
 #: /resources/settings.xml
 msgctxt "#32037"
@@ -443,11 +423,6 @@ msgid "Female"
 msgstr "女"
 
 #: /resources/settings.xml
-msgctxt "#32073"
-msgid "Hide unaired movies"
-msgstr "隐藏未匹配电影"
-
-#: /resources/settings.xml
 msgctxt "#32074"
 msgid "Library Integration"
 msgstr "媒体库整合"
@@ -492,11 +467,6 @@ msgctxt "#32098"
 msgid "Updated"
 msgstr "已更新"
 
-#: /resources/settings.xml
-msgctxt "#32084"
-msgid "Hide unaired episodes"
-msgstr "隐藏未匹配剧集"
-
 # "Flatten" 指将多季合并为单层列表，原翻译未体现“合并”逻辑，易误解为“全部展开”。
 #: /resources/settings.xml
 msgctxt "#32085"
@@ -507,16 +477,6 @@ msgstr "合并季数显示"
 msgctxt "#32086"
 msgid "Auto-update library and add new/missing episodes"
 msgstr "自动更新库并添加新的/缺失的剧集"
-
-#: /resources/settings.xml
-msgctxt "#32088"
-msgid "Navigation"
-msgstr "导航"
-
-#: /resources/settings.xml
-msgctxt "#32089"
-msgid "Select Action"
-msgstr "选择操作"
 
 #: /resources/settings.xml
 msgctxt "#32090"
@@ -532,11 +492,6 @@ msgstr "留空即删除"
 msgctxt "#32106"
 msgid "Enter {} URL"
 msgstr "输入 {} 网址"
-
-#: /resources/settings.xml
-msgctxt "#32091"
-msgid "Special season folders"
-msgstr "剧集特别篇文件夹"
 
 #: /resources/settings.xml
 msgctxt "#32092"
@@ -555,18 +510,13 @@ msgstr "输入代码"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "转到 [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "转到 [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"
 msgid "Trakt Authentication"
 msgstr "Trakt 身份验证"
-
-#: /resources/lib/container.py
-msgctxt "#32099"
-msgid "A value has already been set for this parameter"
-msgstr "已为此参数设置值"
 
 #: /resources/lib/container.py
 msgctxt "#32100"
@@ -599,28 +549,9 @@ msgid "Add Items"
 msgstr "增加项目"
 
 #: /resources/lib/container.py
-msgctxt "#32103"
-msgid "No Value Added"
-msgstr "未添加值"
-
-#: /resources/lib/container.py
-msgctxt "#32104"
-msgid ""
-"TMDb ID for {} not found or none selected.\n"
-"Do you want to add another value?"
-msgstr ""
-"{} 的 TMDb ID 未找到或未选择。\n"
-"是否要添加其他值？"
-
-#: /resources/lib/container.py
 msgctxt "#32107"
 msgid "Set Match Method"
 msgstr "匹配方式"
-
-#: /resources/lib/container.py
-msgctxt "#32108"
-msgid "Choose matching method for parameters with multiple values."
-msgstr "为具有多个值的参数选择匹配方法。"
 
 #: /resources/settings.xml
 msgctxt "#32124"
@@ -651,16 +582,6 @@ msgstr "顶"
 msgctxt "#32129"
 msgid "Override player monitor clearlogo with artwork from TMDbHelper"
 msgstr "用 TMDbHelper 媒体资源覆盖播放器监视器的透明徽标"
-
-#: /resources/lib/container.py
-msgctxt "#32111"
-msgid "Select Items"
-msgstr "选择项目"
-
-#: /resources/lib/container.py
-msgctxt "#32112"
-msgid "Select Genres"
-msgstr "选择类型"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
@@ -718,11 +639,6 @@ msgid "Keyword"
 msgstr "关键词"
 
 #: /resources/tmdbhelper/lib/player/players.py
-msgctxt "#32143"
-msgid "Recaching Kodi library"
-msgstr "正在重新缓存 Kodi 媒体库"
-
-#: /resources/tmdbhelper/lib/player/players.py
 msgctxt "#32144"
 msgid "Retrieving player files"
 msgstr "正在检索播放文件"
@@ -771,21 +687,6 @@ msgstr "移除节点"
 msgctxt "#32153"
 msgid "Query"
 msgstr "查询"
-
-#: /resources/lib/container.py
-msgctxt "#32119"
-msgid "Select Release Types"
-msgstr "类型"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
-msgctxt "#32155"
-msgid "Airing"
-msgstr "正在播出"
-
-#: /resources/lib/container.py
-msgctxt "#32120"
-msgid "Select Region for Release"
-msgstr "选择发布区域"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_trakt.py
 msgctxt "#32157"
@@ -852,11 +753,6 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "选择列表"
 
-#: /resources/settings.xml
-msgctxt "#32142"
-msgid "Hide watched items"
-msgstr "隐藏观看项目"
-
 #: /resources/lib/context.py
 msgctxt "#32154"
 msgid "Update library now"
@@ -866,26 +762,6 @@ msgstr "更新媒体库"
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr "媒体库播出节目表关联当地剧集"
-
-#: /resources/lib/context.py
-msgctxt "#32160"
-msgid "Adding {} - {} to library..."
-msgstr "添加 {} - {} 到媒体库。"
-
-#: /resources/lib/traktapi.py
-msgctxt "#32161"
-msgid "Do you wish to update the library with this list now?"
-msgstr "是否立即使用此列表更新媒体库？"
-
-#: /resources/settings.xml
-msgctxt "#32162"
-msgid "Automatically play local files"
-msgstr "自动播放本地文件"
-
-#: /resources/settings.xml
-msgctxt "#32163"
-msgid "Use fanart.tv for service monitor artwork"
-msgstr "使用 fanart.tv 获取艺术图"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -1181,11 +1057,6 @@ msgctxt "#32234"
 msgid "Reality"
 msgstr "真人秀"
 
-#: /resources/lib/script.py
-msgctxt "#32222"
-msgid "Manage artwork"
-msgstr "管理艺术图"
-
 #: /resources/lib/plugin.py
 msgctxt "#32223"
 msgid "Recommended"
@@ -1260,11 +1131,6 @@ msgstr "选择项目"
 msgctxt "#32237"
 msgid "Clear Discover History"
 msgstr "清除探索历史"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32239"
-msgid "Match"
-msgstr "匹配"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32240"
@@ -1397,11 +1263,6 @@ msgid "With Companies"
 msgstr "含公司"
 
 #: /resources/lib/userdiscover.py
-msgctxt "#32266"
-msgid "Without"
-msgstr "除了"
-
-#: /resources/lib/userdiscover.py
 msgctxt "#32267"
 msgid "Without Keywords"
 msgstr "无关键字"
@@ -1427,39 +1288,9 @@ msgid "Vote Count ( < or = )"
 msgstr "投票数小于等于"
 
 #: /resources/lib/userdiscover.py
-msgctxt "#32272"
-msgid "Vote Average ( > or = )"
-msgstr "平均投票大于等于"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32273"
-msgid "Vote Average ( < or = )"
-msgstr "平均投票小于等于"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32274"
-msgid "Runtime (Minutes) ( > or = )"
-msgstr "时长大于等于（分钟）"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32275"
-msgid "Runtime (Minutes) ( < or = )"
-msgstr "时长小于等于（分钟）"
-
-#: /resources/lib/userdiscover.py
 msgctxt "#32276"
 msgid "Search for"
 msgstr "搜索"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32277"
-msgid "Add Rule"
-msgstr "添加规则"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32278"
-msgid "Enter Network IDs separated with \" / \""
-msgstr "网络 ID 使用 \" / \"分隔"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32279"
@@ -1490,11 +1321,6 @@ msgstr "近一周"
 msgctxt "#32282"
 msgid "Yesterday"
 msgstr "去年"
-
-#: /resources/lib/basedir.py
-msgctxt "#32283"
-msgid "Next Week"
-msgstr "下周"
 
 #: /resources/lib/basedir.py
 msgctxt "#32284"
@@ -1738,16 +1564,6 @@ msgctxt "#32331"
 msgid "Enter New Name for {}"
 msgstr "输入新名字为 {}"
 
-#: /resources/lib/player/configure.py
-msgctxt "#32332"
-msgid "Choose resolve method for player"
-msgstr "为播放器选择解决方式"
-
-#: /resources/lib/player/configure.py
-msgctxt "#32333"
-msgid "User Choice"
-msgstr "用户选择"
-
 #: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
 msgctxt "#32346"
 msgid "Timezone"
@@ -1788,27 +1604,6 @@ msgstr ""
 "如果不保存，设置将会丢失。"
 
 #: /resources/lib/player/configure.py
-msgctxt "#32338"
-msgid "Close without Saving"
-msgstr "关闭而不保存"
-
-#: /resources/lib/player/configure.py
-msgctxt "#32339"
-msgid "{} playback URL resolve method"
-msgstr "{} 播放网址解析方式"
-
-#: /resources/lib/player/configure.py
-msgctxt "#32340"
-msgid ""
-"Please note that setResolvedUrl is Kodi's preferred method for resolving playback URLs. The PlayMedia method should only be used if you experience difficulties using setResolvedUrl with this particular player.\n"
-"\n"
-"Are you sure you want to set this player's resolve method to PlayMedia?"
-msgstr ""
-"请注意，setResolvedUrl 是 Kodi 解析播放网址的首选方法。只有当你在此特定播放器中使用 setResolvedUrl 时遇到困难时，才应使用 PlayMedia 方法。\n"
-"\n"
-"你确定要将此播放器的解析方法设置为 PlayMedia 吗？"
-
-#: /resources/lib/player/configure.py
 msgctxt "#32341"
 msgid "Choose fallback player method"
 msgstr "选择备用播放方式"
@@ -1819,19 +1614,9 @@ msgid "Fallbacks for {}"
 msgstr "备用播放"
 
 #: /resources/lib/player/configure.py
-msgctxt "#32343"
-msgid "Choose fallback for {} {}"
-msgstr "选择备用播放"
-
-#: /resources/lib/player/configure.py
 msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "输入 {} 的新优先级"
-
-#: /resources/lib/tmdb/api.py
-msgctxt "#32345"
-msgid "Episode groups"
-msgstr "分集组"
 
 #: /resources/settings.xml
 msgctxt "#32347"
@@ -1862,22 +1647,6 @@ msgstr "虚拟解析网址"
 msgctxt "#32352"
 msgid "Dummy video duration (seconds)"
 msgstr "占位视频时长（秒）"
-
-#: /resources/lib/player/players.py
-msgctxt "#32353"
-msgid "Missing \"is_resolvable\" Flag"
-msgstr "缺少 “is_resolutible” 标志"
-
-#: /resources/lib/player/players.py
-msgctxt "#32354"
-msgid ""
-"Does this player resolve directly to a single playable file?\n"
-"\n"
-"Select \"Yes\" for any player that plays directly from single source. Select \"No\" for players that scrape multiple sources or otherwise do not work with the setResolvedURL method."
-msgstr ""
-"该播放器是否直接解析为单个可播放文件?\n"
-"\n"
-"对于任何直接从单一来源播放的播放器，请选择“是”。对于抓取多个来源或不使用 setResolvedURL 方法的玩家，请选择“否”."
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1931,11 +1700,6 @@ msgid "Delay after resolving (seconds)"
 msgstr "解析完成后延迟（秒）"
 
 #: /resources/settings.xml
-msgctxt "#32364"
-msgid "Reroute PlayMedia to xbmc.Player()"
-msgstr "将 PlayMedia 请求重定向到 xbmc.Player() 方法"
-
-#: /resources/settings.xml
 msgctxt "#32377"
 msgid "Use online artwork in image monitor"
 msgstr "图像监视器中启用在线媒体封面"
@@ -1944,11 +1708,6 @@ msgstr "图像监视器中启用在线媒体封面"
 msgctxt "#32365"
 msgid "Combined"
 msgstr "组合"
-
-#: /resources/settings.xml
-msgctxt "#32366"
-msgid "Hide items without airdates"
-msgstr "隐藏没有播出日期节目"
 
 #: /resources/settings.xml
 msgctxt "#32367"
@@ -2015,50 +1774,15 @@ msgctxt "#32376"
 msgid "Building players dialog"
 msgstr "构建播放器对话框"
 
-#: /resources/lib/trakt/api.py
-msgctxt "#32378"
-msgid "Show All"
-msgstr "显示所有"
-
-#: /resources/settings.xml
-msgctxt "#32379"
-msgid "Hide Specials"
-msgstr "隐藏特殊"
-
-#: /resources/settings.xml
-msgctxt "#32380"
-msgid "Hide Up Next"
-msgstr "隐藏“下个播放”"
-
 #: /resources/settings.xml
 msgctxt "#32396"
 msgid "Delete TMDb cached list details"
 msgstr "删除 TMDb 缓存的列表详情"
 
-#: /resources/settings.xml
-msgctxt "#32381"
-msgid "Hide Up Next and Specials"
-msgstr "隐藏“下个播放”和特别节目"
-
-#: /resources/settings.xml
-msgctxt "#32382"
-msgid "Hide Episode Groups"
-msgstr "隐藏剧集分组"
-
 #: /resources/tmdbhelper/lib/script/method/image_functions.py
 msgctxt "#32399"
 msgid "Retrieving Artwork"
 msgstr "正在获取艺术图"
-
-#: /resources/settings.xml
-msgctxt "#32383"
-msgid "Hide Episode Groups and Specials"
-msgstr "隐藏剧集分组与特别节目"
-
-#: /resources/settings.xml
-msgctxt "#32384"
-msgid "Hide Episode Groups and Up Next"
-msgstr "隐藏剧集分组和下个播放"
 
 #: /resources/settings.xml
 msgctxt "#32402"
@@ -2069,11 +1793,6 @@ msgstr "观看时向 MDbList 同步播放记录"
 msgctxt "#32403"
 msgid "Sync"
 msgstr "同步"
-
-#: /resources/settings.xml
-msgctxt "#32385"
-msgid "Hide All"
-msgstr "隐藏所有"
 
 #: /resources/settings.xml
 msgctxt "#32387"
@@ -2132,29 +1851,14 @@ msgid "Play local Kodi library files"
 msgstr "播放本地 Kodi 媒体库文件"
 
 #: /resources/settings.xml
-msgctxt "#32401"
-msgid "TMDb detailed information"
-msgstr "TMDb 详细信息"
-
-#: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
 msgstr "播放最多剧集"
-
-#: /resources/lib/addon/constants.py
-msgctxt "#32405"
-msgid "Your TV Shows Airing This Week"
-msgstr "本周观看的剧集"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr "你正在观看的剧集"
-
-#: /resources/settings.xml
-msgctxt "#32407"
-msgid "Get resume points (experimental) (slower)"
-msgstr "获取续播点（实验性功能，速度较慢）"
 
 #: /resources/settings.xml
 msgctxt "#32409"
@@ -2341,16 +2045,6 @@ msgctxt "#32446"
 msgid "plugin:// search URL for {}"
 msgstr "plugin:// search URL for {}"
 
-#: /resources/lib/player/configure.py
-msgctxt "#32447"
-msgid "Up Next Only"
-msgstr "仅“下个播放”"
-
-#: /resources/settings.xml
-msgctxt "#32448"
-msgid "Stop before attempting playback"
-msgstr "尝试播放前停止"
-
 #: /resources/settings.xml
 msgctxt "#32449"
 msgid "Ignore region release filter"
@@ -2370,16 +2064,6 @@ msgstr "最高"
 msgctxt "#32453"
 msgid "Least played"
 msgstr "最少播放"
-
-#: /resources/lib/api/trakt/api.py
-msgctxt "#32454"
-msgid "Shortest"
-msgstr "最短时长"
-
-#: /resources/lib/api/trakt/api.py
-msgctxt "#32455"
-msgid "Longest"
-msgstr "最久时长"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32456"
@@ -2406,16 +2090,6 @@ msgctxt "#32460"
 msgid "Awards"
 msgstr "奖项"
 
-#: /resources/lib/api/tvdb/lists.py
-msgctxt "#32461"
-msgid "Winner of"
-msgstr "获奖"
-
-#: /resources/lib/api/tvdb/lists.py
-msgctxt "#32462"
-msgid "Nominated for"
-msgstr "提名"
-
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache items in custom lists you own for 24 hours"
@@ -2435,11 +2109,6 @@ msgstr "刷新缓存的 Kodi 媒体库详细信息"
 msgctxt "#32468"
 msgid "Authorisation and sync notifications on startup"
 msgstr "启动时的授权和同步通知"
-
-#: /resources/settings.xml
-msgctxt "#32469"
-msgid "Ignore articles when sorting alphabetically"
-msgstr "按字母顺序排序时忽略冠词"
 
 #: /resources/settings.xml
 msgctxt "#32470"
@@ -2582,21 +2251,6 @@ msgctxt "#32500"
 msgid "Page multiplier (TMDb basic lists)"
 msgstr "分页乘数（TMDb 基本列表）"
 
-#: /resources/settings.xml
-msgctxt "#32501"
-msgid "Page multiplier (Trakt basic lists)"
-msgstr "分页乘数（Trakt 基本列表）"
-
-#: /resources/settings.xml
-msgctxt "#32502"
-msgid "Page multiplier (Trakt sync lists)"
-msgstr "分页乘数（Trakt 同步列表）"
-
-#: /resources/settings.xml
-msgctxt "#32503"
-msgid "Page multiplier (Library windows)"
-msgstr "分页乘数（媒体库列表视图）"
-
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
 msgid "Add {} to node"
@@ -2667,25 +2321,10 @@ msgctxt "#32522"
 msgid "TMDb user options"
 msgstr "TMDb 用户选项"
 
-#: /resources/tmdbhelper/lib/script/method/tmdb.py
-msgctxt "#32523"
-msgid "Add/Remove from TMDb user list"
-msgstr "从 TMDb 用户列表中添加/删除"
-
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32524"
 msgid "User lists"
 msgstr "用户列表"
-
-#: /resources/tmdbhelper/lib/script/method/tmdb.py
-msgctxt "#32525"
-msgid "Add/Remove from TMDb favourites"
-msgstr "从 TMDb 收藏夹添加/删除"
-
-#: /resources/tmdbhelper/lib/script/method/tmdb.py
-msgctxt "#32526"
-msgid "Add/Remove from TMDb watchlist"
-msgstr "从 TMDB 观看列表添加/删除"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32527"
@@ -2711,11 +2350,6 @@ msgstr "删除评分"
 msgctxt "#32531"
 msgid "Method only available for VIP accounts."
 msgstr "该方法仅适用于 VIP 账户。"
-
-#: /resources/tmdbhelper/lib/script/sync/basic.py
-msgctxt "#32532"
-msgid "Force resync"
-msgstr "强制重新同步"
 
 #: /resources/settings.xml
 msgctxt "#32534"
@@ -2913,11 +2547,6 @@ msgctxt "#32001"
 msgid "OMDb API key"
 msgstr "OMDb API 密钥"
 
-#: /resources/settings.xml
-msgctxt "#32002"
-msgid "Days to cache details"
-msgstr "缓存详细信息的天数"
-
 # "MPAA rating prefix" 通常指美国电影协会分级前缀（例如 Rated: PG-13 中的 Rated: 部分）
 #: /resources/settings.xml
 msgctxt "#32004"
@@ -2973,11 +2602,6 @@ msgstr "Fanart.tv client 密钥"
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
 msgstr "将 fanart.tv 用于艺术图（较慢）"
-
-#: /resources/settings.xml
-msgctxt "#32023"
-msgid "Default select action in addon"
-msgstr "默认选择操作"
 
 #: /resources/settings.xml
 msgctxt "#32024"

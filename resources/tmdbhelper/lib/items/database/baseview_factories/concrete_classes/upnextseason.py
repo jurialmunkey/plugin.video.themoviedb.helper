@@ -12,7 +12,7 @@ class UpNextSeason(AnticipatedSeasonMediaList):
 
     def map_item_art(self, i):
         map_item_art = self.parent_item_data['art']
-        map_item_art['thumb'] = f'{ADDONPATH}/resources/icons/trakt/up-next.png'
+        map_item_art['thumb'] = f'{ADDONPATH}/resources/icons/sync/up-next.png'
         map_item_art['poster'] = map_item_art['thumb']
         return map_item_art
 
@@ -39,7 +39,7 @@ class UpNextSeason(AnticipatedSeasonMediaList):
 
     def map_item_params(self, i):
         return {
-            'info': 'trakt_upnext',
+            'info': 'sync_upnext',
             'tmdb_type': 'tv',
             'tmdb_id': self.tmdb_id,
             'hide_unaired': 'true'

@@ -437,6 +437,7 @@ class ItemMapperMethods:
         return data
 
     def get_episodes(self, items, **kwargs):
+        self.item['item']['episode_count'] = len(items)
         data = []
 
         for i in items:
@@ -487,6 +488,7 @@ class ItemMapperMethods:
 
             season_item = ItemMapperMethods.get_configured_item(i, **{
                 'season': 'season_number',
+                'episode_count': 'episode_count',
                 'year': lambda i: int(i['air_date'][0:4]),
                 'premiered': 'air_date',
                 'title': 'name',

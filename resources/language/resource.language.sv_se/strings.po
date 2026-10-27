@@ -25,11 +25,6 @@ msgctxt "#30001"
 msgid "Arabic (Saudi Arabia)"
 msgstr "Arabiska (Saudiarabien)"
 
-#: /resources/tmdbhelper/lib/api/tmdb/methods/lists.py
-msgctxt "#32000"
-msgid "Unaired"
-msgstr "Icke-sända"
-
 msgctxt "#30002"
 msgid "Belarusian (Belarus)"
 msgstr "Vitryska (Vitryssland)"
@@ -163,11 +158,6 @@ msgid "Fanart.tv API"
 msgstr "Fanart.tv API"
 
 #: /resources/settings.xml
-msgctxt "#32031"
-msgid "Trakt API"
-msgstr "Trakt API"
-
-#: /resources/settings.xml
 msgctxt "#32032"
 msgid "Download Players"
 msgstr "Hämta ner spelare"
@@ -176,11 +166,6 @@ msgstr "Hämta ner spelare"
 msgctxt "#32033"
 msgid "Default Players"
 msgstr "Standardspelare"
-
-#: /resources/settings.xml
-msgctxt "#32034"
-msgid "Get watched indicators and episode counts"
-msgstr "Få indikatorer på sedda och antal avsnitt"
 
 #: /resources/settings.xml
 msgctxt "#32037"
@@ -264,11 +249,6 @@ msgid "Female"
 msgstr "Kvinna"
 
 #: /resources/settings.xml
-msgctxt "#32073"
-msgid "Hide unaired movies"
-msgstr "Dölj icke-sända filmer"
-
-#: /resources/settings.xml
 msgctxt "#32074"
 msgid "Library Integration"
 msgstr "Integration av bibliotek"
@@ -304,11 +284,6 @@ msgid "Next page item"
 msgstr "Nästa sidpost"
 
 #: /resources/settings.xml
-msgctxt "#32084"
-msgid "Hide unaired episodes"
-msgstr "Dölj icke-sända avsnitt"
-
-#: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr "Platta ut säsonger"
@@ -319,24 +294,9 @@ msgid "Auto-update library and add new/missing episodes"
 msgstr "Uppdatera biblioteket automatiskt och lägg till nya/saknade avsnitt"
 
 #: /resources/settings.xml
-msgctxt "#32088"
-msgid "Navigation"
-msgstr "Navigering"
-
-#: /resources/settings.xml
-msgctxt "#32089"
-msgid "Select Action"
-msgstr "Välj åtgärd"
-
-#: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
 msgstr "Innehåll"
-
-#: /resources/settings.xml
-msgctxt "#32091"
-msgid "Special season folders"
-msgstr "Speciella säsongsmappar"
 
 #: /resources/settings.xml
 msgctxt "#32092"
@@ -355,18 +315,13 @@ msgstr "Ange koden"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32096"
-msgid "Go to [B]https://trakt.tv/activate[/B]"
-msgstr "Gå till [B]https://trakt.tv/activate[/B]"
+msgid "Go to [B]{}[/B]"
+msgstr "Gå till [B]{}[/B]"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32097"
 msgid "Trakt Authentication"
 msgstr "Trakt-autentisering"
-
-#: /resources/lib/container.py
-msgctxt "#32099"
-msgid "A value has already been set for this parameter"
-msgstr "Ett värde har redan ställts in för denna parameter"
 
 #: /resources/lib/container.py
 msgctxt "#32100"
@@ -384,28 +339,9 @@ msgid "Add Items"
 msgstr "Lägg till poster"
 
 #: /resources/lib/container.py
-msgctxt "#32103"
-msgid "No Value Added"
-msgstr "Inget värde lades till"
-
-#: /resources/lib/container.py
-msgctxt "#32104"
-msgid ""
-"TMDb ID for {} not found or none selected.\n"
-"Do you want to add another value?"
-msgstr ""
-"TMDb ID för {} hittades inte eller ingen vald.\n"
-"Vill du lägga till ett annat värde?"
-
-#: /resources/lib/container.py
 msgctxt "#32107"
 msgid "Set Match Method"
 msgstr "Ställ in matchningsmetod"
-
-#: /resources/lib/container.py
-msgctxt "#32108"
-msgid "Choose matching method for parameters with multiple values."
-msgstr "Välj matchningsmetod för parametrar med flera värden."
 
 #: /resources/lib/container.py
 msgctxt "#32109"
@@ -416,16 +352,6 @@ msgstr "Matcha NÅGOT värde"
 msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "Matcha ALLA värden"
-
-#: /resources/lib/container.py
-msgctxt "#32111"
-msgid "Select Items"
-msgstr "Välj poster"
-
-#: /resources/lib/container.py
-msgctxt "#32112"
-msgid "Select Genres"
-msgstr "Välj genrer"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
@@ -445,16 +371,6 @@ msgstr "Enter"
 msgctxt "#32117"
 msgid "Keyword"
 msgstr "Nyckelord"
-
-#: /resources/lib/container.py
-msgctxt "#32119"
-msgid "Select Release Types"
-msgstr "Välj utgivningstyp"
-
-#: /resources/lib/container.py
-msgctxt "#32120"
-msgid "Select Region for Release"
-msgstr "Välj region för utgivning"
 
 #: /resources/lib/container.py
 msgctxt "#32121"
@@ -507,11 +423,6 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "Välj lista(or)"
 
-#: /resources/settings.xml
-msgctxt "#32142"
-msgid "Hide watched items"
-msgstr "Dölj bevakade poster"
-
 #: /resources/lib/context.py
 msgctxt "#32154"
 msgid "Update library now"
@@ -521,26 +432,6 @@ msgstr "Uppdatera biblioteket nu"
 msgctxt "#32156"
 msgid "Next aired library calendar links to local tvshow"
 msgstr "Nästa sändning som bibliotekskalendern länkar till lokal tv-serie"
-
-#: /resources/lib/context.py
-msgctxt "#32160"
-msgid "Adding {} - {} to library..."
-msgstr "Lägger till {} - {} i biblioteket..."
-
-#: /resources/lib/traktapi.py
-msgctxt "#32161"
-msgid "Do you wish to update the library with this list now?"
-msgstr "Vill du uppdatera biblioteket med den här listan nu?"
-
-#: /resources/settings.xml
-msgctxt "#32162"
-msgid "Automatically play local files"
-msgstr "Spela upp lokala filer automatiskt"
-
-#: /resources/settings.xml
-msgctxt "#32163"
-msgid "Use fanart.tv for service monitor artwork"
-msgstr "Använd fanart.tv för bakgrund för tjänsteövervakning"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -814,11 +705,6 @@ msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
 msgstr "Lyckades logga ut från Trakts användarkonto"
 
-#: /resources/lib/script.py
-msgctxt "#32222"
-msgid "Manage artwork"
-msgstr "Hantera bakgrund"
-
 #: /resources/lib/plugin.py
 msgctxt "#32223"
 msgid "Recommended"
@@ -888,11 +774,6 @@ msgstr "Välj post"
 msgctxt "#32237"
 msgid "Clear Discover History"
 msgstr "Töm upptäcktshistorik"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32239"
-msgid "Match"
-msgstr "Match"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32240"
@@ -1025,11 +906,6 @@ msgid "With Companies"
 msgstr "Med företag"
 
 #: /resources/lib/userdiscover.py
-msgctxt "#32266"
-msgid "Without"
-msgstr "Utan"
-
-#: /resources/lib/userdiscover.py
 msgctxt "#32267"
 msgid "Without Keywords"
 msgstr "Utan nyckelord"
@@ -1055,39 +931,9 @@ msgid "Vote Count ( < or = )"
 msgstr "Antal röster ( < eller = )"
 
 #: /resources/lib/userdiscover.py
-msgctxt "#32272"
-msgid "Vote Average ( > or = )"
-msgstr "Röster i genomsnitt ( > eller = )"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32273"
-msgid "Vote Average ( < or = )"
-msgstr "Röster i genomsnitt ( < eller = )"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32274"
-msgid "Runtime (Minutes) ( > or = )"
-msgstr "Speltid (minuter) ( > eller = )"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32275"
-msgid "Runtime (Minutes) ( < or = )"
-msgstr "Speltid (minuter) ( < eller = )"
-
-#: /resources/lib/userdiscover.py
 msgctxt "#32276"
 msgid "Search for"
 msgstr "Sök efter"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32277"
-msgid "Add Rule"
-msgstr "Lägg till regel"
-
-#: /resources/lib/userdiscover.py
-msgctxt "#32278"
-msgid "Enter Network IDs separated with \" / \""
-msgstr "Ange nätverks-ID åtskilda med \" / \""
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32279"
@@ -1108,11 +954,6 @@ msgstr "Förra veckan"
 msgctxt "#32282"
 msgid "Yesterday"
 msgstr "Igår"
-
-#: /resources/lib/basedir.py
-msgctxt "#32283"
-msgid "Next Week"
-msgstr "Nästa vecka"
 
 #: /resources/lib/basedir.py
 msgctxt "#32284"
@@ -1332,16 +1173,6 @@ msgid "Enter New Name for {}"
 msgstr "Ange nytt namn för {}"
 
 #: /resources/lib/player/configure.py
-msgctxt "#32332"
-msgid "Choose resolve method for player"
-msgstr "Välj uppslagsmetod för spelaren"
-
-#: /resources/lib/player/configure.py
-msgctxt "#32333"
-msgid "User Choice"
-msgstr "Användarens val"
-
-#: /resources/lib/player/configure.py
 msgctxt "#32334"
 msgid "Reset player to defaults?"
 msgstr "Återställ spelaren till standardvärden?"
@@ -1378,33 +1209,6 @@ msgstr ""
 "Om du stänger utan att spara kommer dina ändringar att gå förlorade."
 
 #: /resources/lib/player/configure.py
-msgctxt "#32338"
-msgid "Close without Saving"
-msgstr "Stäng utan att spara"
-
-#: /resources/lib/player/configure.py
-msgctxt "#32339"
-msgid "{} playback URL resolve method"
-msgstr "{} uppslagsmetod för uppspelning av URL"
-
-#: /resources/lib/player/configure.py
-msgctxt "#32340"
-msgid ""
-"Please note that setResolvedUrl is Kodi's preferred method for resolving "
-"playback URLs. The PlayMedia method should only be used if you experience "
-"difficulties using setResolvedUrl with this particular player.\n"
-"\n"
-"Are you sure you want to set this player's resolve method to PlayMedia?"
-msgstr ""
-"Observera att setResolvedUrl är Kodis föredragna metod för att lösa "
-"uppspelningswebbadresser. PlayMedia-metoden bör endast användas om du "
-"upplever svårigheter med att använda setResolvedUrl med just den här "
-"spelaren.\n"
-"\n"
-"Är du säker på att du vill ställa in den här spelarens resolve-metod till "
-"PlayMedia?"
-
-#: /resources/lib/player/configure.py
 msgctxt "#32341"
 msgid "Choose fallback player method"
 msgstr "Välj reservmetod för spelare"
@@ -1415,19 +1219,9 @@ msgid "Fallbacks for {}"
 msgstr "Reserver för {}"
 
 #: /resources/lib/player/configure.py
-msgctxt "#32343"
-msgid "Choose fallback for {} {}"
-msgstr "Välj reservlösning för {} {}"
-
-#: /resources/lib/player/configure.py
 msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "Ange ny prioritet för {}"
-
-#: /resources/lib/tmdb/api.py
-msgctxt "#32345"
-msgid "Episode groups"
-msgstr "Avsnittsgrupper"
 
 #: /resources/settings.xml
 msgctxt "#32347"
@@ -1448,26 +1242,6 @@ msgstr "Dummy ResolvedURL"
 msgctxt "#32352"
 msgid "Dummy video duration (seconds)"
 msgstr "Dummy-videons varaktighet (sekunder)"
-
-#: /resources/lib/player/players.py
-msgctxt "#32353"
-msgid "Missing \"is_resolvable\" Flag"
-msgstr "Saknar flaggan \"is_resolvable\""
-
-#: /resources/lib/player/players.py
-msgctxt "#32354"
-msgid ""
-"Does this player resolve directly to a single playable file?\n"
-"\n"
-"Select \"Yes\" for any player that plays directly from single source. Select "
-"\"No\" for players that scrape multiple sources or otherwise do not work "
-"with the setResolvedURL method."
-msgstr ""
-"Slår den här spelaren upp direkt till en enda spelbar fil?\n"
-"\n"
-"Välj \"Ja\" för alla spelare som spelar direkt från en enda källa. Välj "
-"\"Nej\" för spelare som skrapar flera källor eller på annat sätt inte "
-"fungerar med setResolvedURL-metoden."
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1520,20 +1294,10 @@ msgctxt "#32363"
 msgid "Delay after resolving (seconds)"
 msgstr "Fördröjning efter uppslag (sekunder)"
 
-#: /resources/settings.xml
-msgctxt "#32364"
-msgid "Reroute PlayMedia to xbmc.Player()"
-msgstr "Omdirigera PlayMedia till xbmc.Player()"
-
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
 msgid "Combined"
 msgstr "Kombinerad"
-
-#: /resources/settings.xml
-msgctxt "#32366"
-msgid "Hide items without airdates"
-msgstr "Dölj poster utan sändningsdatum"
 
 #: /resources/settings.xml
 msgctxt "#32367"
@@ -1584,46 +1348,6 @@ msgstr "Hämta postdetaljer"
 msgctxt "#32376"
 msgid "Building Player Dialog"
 msgstr "Bygger spelardialog"
-
-#: /resources/lib/trakt/api.py
-msgctxt "#32378"
-msgid "Show All"
-msgstr "Visa alla"
-
-#: /resources/settings.xml
-msgctxt "#32379"
-msgid "Hide Specials"
-msgstr "Dölj specialmaterial"
-
-#: /resources/settings.xml
-msgctxt "#32380"
-msgid "Hide Up Next"
-msgstr "Dölj Up Next"
-
-#: /resources/settings.xml
-msgctxt "#32381"
-msgid "Hide Up Next and Specials"
-msgstr "Dölj Up Next och specialmaterial"
-
-#: /resources/settings.xml
-msgctxt "#32382"
-msgid "Hide Episode Groups"
-msgstr "Dölj avsnittsgrupper"
-
-#: /resources/settings.xml
-msgctxt "#32383"
-msgid "Hide Episode Groups and Specials"
-msgstr "Dölj avsnittsgrupper och specialmaterial"
-
-#: /resources/settings.xml
-msgctxt "#32384"
-msgid "Hide Episode Groups and Up Next"
-msgstr "Dölj avsnittsgrupper och Up Next"
-
-#: /resources/settings.xml
-msgctxt "#32385"
-msgid "Hide All"
-msgstr "Dölj alla"
 
 #: /resources/settings.xml
 msgctxt "#32387"
@@ -1687,29 +1411,14 @@ msgid "Play local Kodi library files"
 msgstr "Spela upp lokala Kodi-biblioteksfiler"
 
 #: /resources/settings.xml
-msgctxt "#32401"
-msgid "TMDb detailed information"
-msgstr "TMDb detaljerad information"
-
-#: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
 msgstr "Platta ut tv-serier med flera avsnitt som sänds samma dag"
-
-#: /resources/lib/addon/constants.py
-msgctxt "#32405"
-msgid "Your TV Shows Airing This Week"
-msgstr "Dina TV-serier som sänds den här veckan"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr "Dina pågående avsnitt"
-
-#: /resources/settings.xml
-msgctxt "#32407"
-msgid "Get resume points (experimental) (slower)"
-msgstr "Få återupptagningspunkter (experimentell) (långsammare)"
 
 #: /resources/settings.xml
 msgctxt "#32409"
@@ -1910,16 +1619,6 @@ msgctxt "#32446"
 msgid "plugin:// search URL for {}"
 msgstr "plugin:// sök-URL för {}"
 
-#: /resources/lib/player/configure.py
-msgctxt "#32447"
-msgid "Up Next Only"
-msgstr "Endast Up Next"
-
-#: /resources/settings.xml
-msgctxt "#32448"
-msgid "Stop before attempting playback"
-msgstr "Stoppa innan du försöker spela upp"
-
 #: /resources/settings.xml
 msgctxt "#32449"
 msgid "Ignore region release filter"
@@ -1939,16 +1638,6 @@ msgstr "Högsta"
 msgctxt "#32453"
 msgid "Least played"
 msgstr "Minst spelade"
-
-#: /resources/lib/api/trakt/api.py
-msgctxt "#32454"
-msgid "Shortest"
-msgstr "Kortaste"
-
-#: /resources/lib/api/trakt/api.py
-msgctxt "#32455"
-msgid "Longest"
-msgstr "Längsta"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32456"
@@ -1975,16 +1664,6 @@ msgctxt "#32460"
 msgid "Awards"
 msgstr "Utmärkelser"
 
-#: /resources/lib/api/tvdb/lists.py
-msgctxt "#32461"
-msgid "Winner of"
-msgstr "Vinnare av"
-
-#: /resources/lib/api/tvdb/lists.py
-msgctxt "#32462"
-msgid "Nominated for"
-msgstr "Nominerad för"
-
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache items in custom lists you own for 24 hours"
@@ -2004,11 +1683,6 @@ msgstr "Uppdatera cachad information för Kodi-biblioteket"
 msgctxt "#32468"
 msgid "Authorisation and sync notifications on startup"
 msgstr "Behörighets- och synkroniseringsmeddelanden vid start"
-
-#: /resources/settings.xml
-msgctxt "#32469"
-msgid "Ignore articles when sorting alphabetically"
-msgstr "Ignorera artiklar vid sortering i alfabetisk ordning"
 
 #: /resources/settings.xml
 msgctxt "#32470"
@@ -2167,21 +1841,6 @@ msgctxt "#32500"
 msgid "Page multiplier (TMDb basic lists)"
 msgstr "Sidmultiplikator (TMDb grundlistor)"
 
-#: /resources/settings.xml
-msgctxt "#32501"
-msgid "Page multiplier (Trakt basic lists)"
-msgstr "Sidmultiplikator (Traktens baslistor)"
-
-#: /resources/settings.xml
-msgctxt "#32502"
-msgid "Page multiplier (Trakt sync lists)"
-msgstr "Sidmultiplikator (Trakt synklistor)"
-
-#: /resources/settings.xml
-msgctxt "#32503"
-msgid "Page multiplier (Library windows)"
-msgstr "Sidmultiplikator (biblioteksfönster)"
-
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
 msgid "Add {} to node"
@@ -2253,25 +1912,10 @@ msgctxt "#32522"
 msgid "TMDb user options"
 msgstr "TMDb användaralternativ"
 
-#: /resources/tmdbhelper/lib/script/method/tmdb.py
-msgctxt "#32523"
-msgid "Add/Remove from TMDb user list"
-msgstr "Lägg till/ta bort från TMDb-användarlista"
-
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32524"
 msgid "User lists"
 msgstr "Användarlistor"
-
-#: /resources/tmdbhelper/lib/script/method/tmdb.py
-msgctxt "#32525"
-msgid "Add/Remove from TMDb favourites"
-msgstr "Lägg till/ta bort från TMDb-favoriter"
-
-#: /resources/tmdbhelper/lib/script/method/tmdb.py
-msgctxt "#32526"
-msgid "Add/Remove from TMDb watchlist"
-msgstr "Lägg till/ta bort från TMDb:s bevakningslista"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32527"
@@ -2297,11 +1941,6 @@ msgstr "Ta bort betyget"
 msgctxt "#32531"
 msgid "Method only available for VIP accounts."
 msgstr "Metoden är endast tillgänglig för VIP-konton."
-
-#: /resources/tmdbhelper/lib/script/sync/basic.py
-msgctxt "#32532"
-msgid "Force resync"
-msgstr "Tvinga en ny synkronisering"
 
 #: /resources/settings.xml
 msgctxt "#32534"
@@ -2476,11 +2115,6 @@ msgid "OMDb API key"
 msgstr "OMDb API-nyckel"
 
 #: /resources/settings.xml
-msgctxt "#32002"
-msgid "Days to cache details"
-msgstr "Dagar att mellanlagra detaljer"
-
-#: /resources/settings.xml
 msgctxt "#32004"
 msgid "MPAA rating prefix"
 msgstr "Prefix för MPAA-klassificering"
@@ -2536,11 +2170,6 @@ msgstr "Fanart.tv klientnyckel"
 msgctxt "#32021"
 msgid "Use fanart.tv for plugin artwork (slower)"
 msgstr "Använd fanart.tv för insticksbakgrund (långsammare)"
-
-#: /resources/settings.xml
-msgctxt "#32023"
-msgid "Default select action in addon"
-msgstr "Välj standardåtgärd i tillägg"
 
 #: /resources/settings.xml
 msgctxt "#32024"

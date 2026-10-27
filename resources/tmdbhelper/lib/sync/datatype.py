@@ -10,7 +10,7 @@ def timerlock(func):
     def wrapper(self, *args, **kwargs):
         interval = 3
         propname = f'syncdecorators.timerlock.sync_data'
-        propname = f'{propname}.{self.item_type}.{self.method}'
+        propname = f'{propname}.{self.item_type}.{self.cache_method}'
         if get_timestamp(self.window.get_property(propname) or 0, set_int=True):
             return
         self.window.get_property(propname, set_timestamp(interval, set_int=True))
@@ -37,13 +37,18 @@ class DataType(SyncDataParentProperties):
     key_prefix = None
     expiry_time = DEFAULT_EXPIRY
 
-    def __init__(self, instance_syncdata, item_type):
+    def __init__(self, instance_syncdata, item_type, provider):
         self.instance_syncdata = instance_syncdata
         self._item_type = item_type
+        self.provider = provider
+
+    @property
+    def cache_method(self):
+        return f'{self.provider.provider_id}.{self.method}'
 
     @property
     def mutex_lockname(self):
-        return f'{self.cache._db_file}.{self.lock_name}.{self.item_type}.{self.method}.lockfile'
+        return f'{self.cache._db_file}.{self.lock_name}.{self.item_type}.{self.cache_method}.lockfile'
 
     @cached_property
     def item_type(self):
@@ -62,12 +67,12 @@ class DataType(SyncDataParentProperties):
         return self.get_last_activities()
 
     def get_last_activities(self):
-        return SyncLastActivities(self.instance_syncdata)
+        return SyncLastActivities(self.instance_syncdata, self.provider)
 
     def store_last_activity(self):
         self.cache.set_activity(
             self.item_type,
-            self.method,
+            self.cache_method,
             get_timestring_zulu_now(),
             set_timestamp(self.expiry_time, set_int=True)
         )
@@ -97,7 +102,7 @@ class DataType(SyncDataParentProperties):
 
     @cached_property
     def timestamp(self):
-        return self.cache.get_activity(self.item_type, self.method, set_timestamp(0, set_int=True))
+        return self.cache.get_activity(self.item_type, self.cache_method, set_timestamp(0, set_int=True))
 
     @property
     def sync_args(self):

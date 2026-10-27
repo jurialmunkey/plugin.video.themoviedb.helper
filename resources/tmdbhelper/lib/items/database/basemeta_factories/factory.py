@@ -132,6 +132,11 @@ def import_season():
     return Season
 
 
+def import_season_episode_counts():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.season_episode_counts import SeasonEpisodeCounts
+    return SeasonEpisodeCounts
+
+
 def import_episode():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import Episode
     return Episode
@@ -322,6 +327,11 @@ def import_art_poster():
     return ArtPoster
 
 
+def import_art_poster_country():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterCountry
+    return ArtPosterCountry
+
+
 def import_art_poster_language():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtPosterLanguage
     return ArtPosterLanguage
@@ -352,6 +362,11 @@ def import_art_landscape():
     return ArtLandscape
 
 
+def import_art_landscape_country():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeCountry
+    return ArtLandscapeCountry
+
+
 def import_art_landscape_language():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtLandscapeLanguage
     return ArtLandscapeLanguage
@@ -370,6 +385,11 @@ def import_art_thumbs():
 def import_art_clearlogo():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogo
     return ArtClearlogo
+
+
+def import_art_clearlogo_country():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.art import ArtClearlogoCountry
+    return ArtClearlogoCountry
 
 
 def import_art_clearlogo_language():
@@ -433,42 +453,42 @@ def import_user_art_thumb():
 
 
 def import_playcount():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import PlayCount
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import PlayCount
     return PlayCount
 
 
 def import_watchedcount():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import WatchedCount
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import WatchedCount
     return WatchedCount
 
 
 def import_airedcount():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import AiredCount
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import AiredCount
     return AiredCount
 
 
 def import_playprogress():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import PlayProgress
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import PlayProgress
     return PlayProgress
 
 
 def import_favorites_rank():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import FavoritesRank
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import FavoritesRank
     return FavoritesRank
 
 
 def import_watchlist_rank():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import WatchlistRank
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import WatchlistRank
     return WatchlistRank
 
 
 def import_collected_date():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import CollectedDate
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import CollectedDate
     return CollectedDate
 
 
 def import_lastplayed():
-    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.trakt import LastPlayed
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import LastPlayed
     return LastPlayed
 
 
@@ -511,6 +531,7 @@ FACTORY_ROUTES = {
     'episode_group_seasons': import_episode_group_seasons,
     'episode_group_season_episodes': import_episode_group_season_episodes,
     'season': import_season,
+    'season_episode_counts': import_season_episode_counts,
     'episode': import_episode,
     'belongs': import_belongs,
     'collection': import_collection,
@@ -551,16 +572,19 @@ FACTORY_ROUTES = {
     'art': import_art,
     'art_profile': import_art_profile,
     'art_poster': import_art_poster,
+    'art_poster_country': import_art_poster_country,
     'art_poster_language': import_art_poster_language,
     'art_poster_english': import_art_poster_english,
     'art_poster_null': import_art_poster_null,
     'art_fanart': import_art_fanart,
     'art_extrafanart': import_art_extrafanart,
     'art_landscape': import_art_landscape,
+    'art_landscape_country': import_art_landscape_country,
     'art_landscape_language': import_art_landscape_language,
     'art_landscape_english': import_art_landscape_english,
     'art_thumbs': import_art_thumbs,
     'art_clearlogo': import_art_clearlogo,
+    'art_clearlogo_country': import_art_clearlogo_country,
     'art_clearlogo_language': import_art_clearlogo_language,
     'art_clearlogo_english': import_art_clearlogo_english,
     'art_clearlogo_null': import_art_clearlogo_null,

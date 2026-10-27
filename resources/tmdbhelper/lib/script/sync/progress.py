@@ -12,7 +12,7 @@ class ItemProgress(ItemSync):
         return self.get_playback_id()
 
     def get_playback_id(self):
-        if self.trakt_type == 'movie':
+        if self.item_type == 'movie':
             return self.syncdata.get_movie_playprogress_id(self.tmdb_id)
         if self.season is None or self.episode is None:
             return

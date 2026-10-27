@@ -1,15 +1,14 @@
 from jurialmunkey.window import get_property
 from jurialmunkey.ftools import cached_property
-from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 
 
 class PlayerScrobbler():
-    def __init__(self, total_time, trakt_api=None, mdblist_api=None):
-        self.trakt_api = trakt_api
-        self.mdblist_api = mdblist_api
+    def __init__(self, total_time, provider, syncdata):
+        self.provider = provider
+        self.syncdata = syncdata
         self.start_time = 0
         self.total_time = total_time
         self.tvdb_id = self.playerstring.get('tvdb_id')
@@ -30,32 +29,21 @@ class PlayerScrobbler():
             return 'tv'
         return ''
 
-    @property
-    def is_trakt_authorized(self):
-        """ to check that trakt is authorized  """
-        if not self.trakt_api:
-            return False
-        if not get_property('TraktIsAuth', is_type=float):
-            return False
-        if not get_setting('trakt_scrobbling'):
-            return False
-        if not self.trakt_api.is_authorized:
-            return False
-        if not self.trakt_scrobbler_item:
-            return False
-        return True
+    @cached_property
+    def request(self):
+        return self.get_request()
 
-    @property
-    def is_mdblist_authorized(self):
-        """ to check that mdblist is authorized  """
+    def get_request(self):
+        if self.provider is not None and self.provider.is_authorized():
+            return self.provider.scrobbler_class(self, self.provider)
 
-        if not self.mdblist_api:
-            return False
-        if not get_setting('mdblist_scrobbling'):
-            return False
-        if not self.trakt_scrobbler_item:
-            return False
-        return True
+    @cached_property
+    def playback_refresh(self):
+        return self.get_playback_refresh()
+
+    def get_playback_refresh(self):
+        from tmdbhelper.lib.monitor.playback_refresh import PlaybackRefreshFactory
+        return PlaybackRefreshFactory(self.provider, self.syncdata)
 
     def is_scrobbling(func):
         """ decorator to check if available item should be scrobbled """
@@ -108,72 +96,6 @@ class PlayerScrobbler():
         self.current_time = current_time
         # kodi_log(f'SCROBBLER: [UPDATE] {self.content_id} -- {self.progress:.2f}%', 2)
 
-    @cached_property
-    def trakt_scrobbler_item(self):
-        return self.get_trakt_scrobbler_item() or {}
-
-    @is_scrobbling
-    def get_trakt_scrobbler_item(self):
-        if self.tmdb_type == 'tv':
-            if not self.season or not self.episode:
-                return
-            return {
-                'show': {'ids': {'tmdb': self.tmdb_id}},
-                'episode': {'season': self.season, 'number': self.episode},
-                'progress': self.progress
-            }
-
-        if self.tmdb_type == 'movie':
-            return {
-                'movie': {'ids': {'tmdb': self.tmdb_id}},
-                'progress': self.progress
-            }
-
-    @cached_property
-    def mdblist_scrobbler_item(self):
-        return self.get_mdblist_scrobbler_item() or {}
-
-    @is_scrobbling
-    def get_mdblist_scrobbler_item(self):
-        if self.tmdb_type == 'tv':
-            if not self.season or not self.episode:
-                return
-            return {
-                'show': {'ids': {'tmdb': try_int(self.tmdb_id)}, 'season': self.season, 'episode': self.episode},
-                'progress': try_int(self.progress)
-            }
-
-        if self.tmdb_type == 'movie':
-            return {
-                'movie': {'ids': {'tmdb': try_int(self.tmdb_id)}},
-                'progress': try_int(self.progress)
-            }
-
-    @is_scrobbling
-    def scrobble(self, method):
-        if method not in ('start', 'stop'):
-            return
-        if self.is_trakt_authorized:
-            self.trakt_scrobbler_item['progress'] = self.progress
-            path = f'https://api.trakt.tv/scrobble/{method}'
-            data = self.trakt_api.get_api_request(
-                path,
-                postdata=self.trakt_scrobbler_item,
-                headers=self.trakt_api.headers,
-                method='json'
-            )
-            kodi_log(f'SCROBBLER: [TRAKT] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.trakt_scrobbler_item}\n{data}', 2)
-        if self.is_mdblist_authorized:
-            self.mdblist_scrobbler_item['progress'] = try_int(self.progress)
-            path = self.mdblist_api.get_request_url('scrobble', method)
-            data = self.mdblist_api.get_simple_api_request(
-                path,
-                postdata=self.mdblist_scrobbler_item,
-                headers=self.mdblist_api.headers,
-                method='json'
-            )
-            kodi_log(f'SCROBBLER: [MDBLIST] [{method}] {self.content_id} -- {self.progress:.2f}%\n{self.mdblist_scrobbler_item}\n{data}', 2)
-
     @is_scrobbling
     def start(self, tmdb_type, tmdb_id):
         if self.started or self.stopped:
@@ -185,7 +107,7 @@ class PlayerScrobbler():
 
     @is_scrobbling
     def pause(self, tmdb_type, tmdb_id):
-        return self.sync(tmdb_type, tmdb_id)  # Trakt no longer supports a pause method so just return after checking sync
+        return self.sync(tmdb_type, tmdb_id)  # Pauses still check the completion threshold.
 
     @is_scrobbling
     def stop(self, tmdb_type, tmdb_id):
@@ -193,9 +115,7 @@ class PlayerScrobbler():
             return
         kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
         self.scrobble('stop') if not self.syncing else None
-        self.set_kodi_watched()
         self.set_tmdb_ratings()
-        self.update_stats()
         self.stopped = True
 
     @is_scrobbling
@@ -208,22 +128,19 @@ class PlayerScrobbler():
             return
         if not self.is_match(tmdb_type, tmdb_id):
             return
-        self.syncing = True  # We don't ever unset this flag as we only want to sync once after reaching 80%
-        self.scrobble('stop')
-        if self.is_trakt_authorized:
-            kodi_log(f'SCROBBLER: [TRAKT] [Sync]', 2)
-            from tmdbhelper.lib.sync.invalidator import SyncInvalidator
-            sync_invalidator = SyncInvalidator('watchedprogress')
-            sync_invalidator.notification = False
-            sync_invalidator.run(sync=True)
+        result = self.scrobble('stop')
+        self.syncing = result is None or result.successful
 
     @is_scrobbling
-    def update_stats(self):
-        if self.is_trakt_authorized:
-            from tmdbhelper.lib.script.method.trakt import get_stats
-            from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
-            get_property(LASTACTIVITIES_DATA, clear_property=True)
-            get_stats()
+    def scrobble(self, method):
+        if method not in ('start', 'stop') or self.request is None:
+            return
+        if not self.provider.is_authorized():
+            return
+        result = self.request.scrobble(method)
+        if result.successful and method == 'stop':
+            self.playback_refresh.refresh(result.history_changed, sync=self.progress >= 80)
+        return result
 
     @is_scrobbling
     def set_tmdb_ratings(self):
@@ -249,45 +166,9 @@ class PlayerScrobbler():
             sync_type='rating'
         )
 
-    @is_scrobbling
-    def set_kodi_watched(self):
-        if not self.current_time:
-            return
-        # Only update if progress is 80% or more
-        if self.progress < 80:
-            return
 
-        import tmdbhelper.lib.api.kodi.rpc as rpc
-
-        if self.tmdb_type == 'tv':
-            tvshowid = rpc.KodiLibrary('tvshow').get_info(
-                info='dbid',
-                imdb_id=self.imdb_id,
-                tmdb_id=self.tmdb_id,
-                tvdb_id=self.tvdb_id)
-            if not tvshowid:
-                kodi_log(f'SCROBBLER: [Kodi] No SHOW: {self.content_id}', 2)
-                return
-            dbid = rpc.KodiLibrary('episode', tvshowid).get_info(
-                info='dbid',
-                season=self.season,
-                episode=self.episode)
-            if not dbid:
-                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.content_id}', 2)
-                return
-            rpc.set_watched(dbid=dbid, dbtype='episode')
-            kodi_log(f'SCROBBLER: [Kodi] {self.content_id}', 2)
-            return
-
-        if self.tmdb_type == 'movie':
-            dbid = rpc.KodiLibrary('movie').get_info(
-                info='dbid',
-                imdb_id=self.imdb_id,
-                tmdb_id=self.tmdb_id,
-                tvdb_id=self.tvdb_id)
-            if not dbid:
-                kodi_log(f'SCROBBLER: [Kodi] No DBID: {self.content_id}', 2)
-                return
-            rpc.set_watched(dbid=dbid, dbtype='movie')
-            kodi_log(f'SCROBBLER: [Kodi] {self.content_id}', 2)
-            return
+def PlayerScrobblerFactory(total_time):
+    from tmdbhelper.lib.sync.datasync import SyncDataFactory
+    syncdata = SyncDataFactory()
+    provider = syncdata.registry.get_selected_provider('scrobbling')
+    return PlayerScrobbler(total_time, provider, syncdata)

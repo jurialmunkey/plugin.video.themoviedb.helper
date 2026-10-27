@@ -51,6 +51,11 @@ class ArtProfile(ArtPoster):
         return self.get_cached_data_by_null()
 
 
+class ArtPosterCountry(ArtPoster):
+    def get_cached_data(self):
+        return self.get_cached_data_by_iso_country()
+
+
 class ArtPosterLanguage(ArtPoster):
     def get_cached_data(self):
         return self.get_cached_data_by_language()
@@ -107,6 +112,11 @@ class ArtLandscape(ArtFanart):
         return self.get_cached_data_by_language() or self.get_cached_data_by_english()
 
 
+class ArtLandscapeCountry(ArtLandscape):
+    def get_cached_data(self):
+        return self.get_cached_data_by_iso_country()
+
+
 class ArtLandscapeLanguage(ArtLandscape):
     def get_cached_data(self):
         return self.get_cached_data_by_language()
@@ -126,6 +136,11 @@ class ArtClearlogo(ArtType):
 
     def image_path_func(self, v):
         return self.common_apis.tmdb_imagepath.get_imagepath_clogos(v)
+
+
+class ArtClearlogoCountry(ArtClearlogo):
+    def get_cached_data(self):
+        return self.get_cached_data_by_iso_country()
 
 
 class ArtClearlogoLanguage(ArtClearlogo):

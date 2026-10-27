@@ -88,9 +88,9 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return get_setting('contextmenu_make_node') if not self.is_widget else False
 
     @cached_property
-    def trakt_playdata(self):
-        from tmdbhelper.lib.items.trakt import TraktPlayData
-        return TraktPlayData(
+    def sync_playdata(self):
+        from tmdbhelper.lib.items.sync import SyncPlayData
+        return SyncPlayData(
             watchedindicators=get_setting('trakt_watchedindicators'),
             pauseplayprogress=get_setting('trakt_watchedindicators'))
 
@@ -132,7 +132,16 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         from tmdbhelper.lib.items.finaliser import ItemFinaliser
         return ItemFinaliser
 
+    @cached_property
+    def action_discovery(self):
+        return self.get_action_discovery()
+
+    def get_action_discovery(self):
+        from tmdbhelper.lib.script.actions.discovery import ActionDiscovery
+        return ActionDiscovery(self.sync_playdata.syncdata)
+
     def make_item(self, li):
+        li.action_discovery = self.action_discovery
         ci = self.item_finaliser(self, li)
         return ci.item if ci else None
 
@@ -244,7 +253,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def get_directory(self, items_only=False, build_items=True):
 
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
-            self.trakt_playdata.pre_sync_start(**self.params)
+            self.sync_playdata.pre_sync_start(**self.params)
 
             items = self.get_directory_items()
 
@@ -258,7 +267,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
 
             with TimerList(self.timer_lists, '--sync', log_threshold=0.001, logging=self.log_timers):
-                self.trakt_playdata.pre_sync_join()
+                self.sync_playdata.pre_sync_join()
 
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
                 items = self.build_items(items)

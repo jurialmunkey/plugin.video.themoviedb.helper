@@ -185,6 +185,14 @@ class _ListItem(object):
         self.infoproperties.update({'isPlayable': 'true'}) if self.is_resolvable else None
         return self.infoproperties
 
+    @cached_property
+    def action_discovery(self):
+        return self.get_action_discovery()
+
+    def get_action_discovery(self):
+        from tmdbhelper.lib.script.actions.discovery import ActionDiscovery
+        return ActionDiscovery()
+
     def finalise_context_menu(self):
         from tmdbhelper.lib.items.context import ContextMenu
         self.context_menu += ContextMenu(self).get()
@@ -226,7 +234,10 @@ class _ListItem(object):
 
         if self.infoproperties.get('is_sortable'):
             self.params['parent_info'] = self.params['info']
-            self.params['info'] = 'mdblist_sortby' if self.infoproperties['is_sortable'] == 'mdblist' else 'trakt_sortby'  # Reroute sortable lists to display options in skinshortcuts
+            self.params['info'] = {
+                'mdblist': 'mdblist_sortby',
+                'sync': 'sync_sortby',
+            }.get(self.infoproperties['is_sortable'], 'trakt_sortby')  # Display sorting options in skinshortcuts
 
         if self.params.get('info') == 'search' and not self.params.get('query'):
             self.params['reload'] = 'forced'  # Add param to empty search to ensure reloads
@@ -557,6 +568,14 @@ class _Season(_Tvshow):
 
     mediatype = 'season'
     trakt_type = 'season'
+
+    @property
+    def totalepisodes(self):
+        if self.infoproperties.get('specialseason'):
+            return super().totalepisodes
+        if global_setting['seasons_anticipated']:
+            return self.airedepisodes
+        return super().totalepisodes
 
     @cached_property
     def is_unaired(self):

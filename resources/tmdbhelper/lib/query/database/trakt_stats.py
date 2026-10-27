@@ -23,7 +23,7 @@ class FindQueriesDatabaseTraktStats:
     trakt_stats
     """
 
-    def get_trakt_stats(self):
+    def get_trakt_stats(self, forced=False):
         table = 'trakt_stats'
 
         def mapping_function(data):
@@ -44,7 +44,7 @@ class FindQueriesDatabaseTraktStats:
             self.set_cached_values(table, sync.keys, sync.values, expiry=1200)  # Cache for 20 minutes
             return get_cached()
 
-        return get_cached() or set_cached()
+        return (None if forced else get_cached()) or set_cached()
 
 
 class GetTraktStatsRequest:

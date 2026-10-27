@@ -13,9 +13,9 @@ CONTEXT_MENU_ITEMS = {
         'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
     },
     # Sync Options
-    '$ADDON[plugin.video.themoviedb.helper 32295]': {
-        'command': 'RunScript(plugin.video.themoviedb.helper,sync_trakt,{})',
-        'setting': 'contextmenu_sync_trakt',
+    '$ADDON[plugin.video.themoviedb.helper 32549]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,sync_options,{})',
+        'setting': 'contextmenu_sync_options',
         'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
         'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
         'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
@@ -78,16 +78,12 @@ class ContextMenu():
     def get(self, context=None):
         context = context or CONTEXT_MENU_ITEMS
         return [(name, str(item)) for name, item in (
-            (self.get_item_name(name, mediatypes), self._build_item(mediatypes))
+            (name, self._build_item(mediatypes))
             for name, mediatypes in context.items()) if item]
 
-    @staticmethod
-    def get_item_name(name, mediatypes):
-        if mediatypes['setting'] != 'contextmenu_sync_trakt':
-            return name
-        if any(get_setting(f'sync_source_{source}', 'str') == 'MDbList' for source in ('watched', 'watchlist', 'collection')):
-            return '$ADDON[plugin.video.themoviedb.helper 32546]'
-        return name
+    @property
+    def has_sync_actions(self):
+        return self._li.action_discovery.is_available
 
     def _build_item(self, mediatypes):
         params_def = mediatypes.get(self.mediatype, mediatypes.get('other'))
@@ -96,6 +92,8 @@ class ContextMenu():
             return
 
         if not get_setting(mediatypes['setting']):
+            return
+        if mediatypes['setting'] == 'contextmenu_sync_options' and not self.has_sync_actions:
             return
 
         item = {}

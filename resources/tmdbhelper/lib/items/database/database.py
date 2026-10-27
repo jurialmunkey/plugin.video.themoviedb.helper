@@ -52,7 +52,7 @@ class ItemDetailsDatabase(Database):
             return super().create_database_execute(connection)
 
     # DB version must be max of table_version
-    database_version = 48
+    database_version = 49
 
     database_changes = {
         21: (),
@@ -134,6 +134,10 @@ class ItemDetailsDatabase(Database):
             'DROP TABLE IF EXISTS episode_group_season_episodes',
             'DROP TABLE IF EXISTS episode_group_seasons',
             'DROP TABLE IF EXISTS episode_groups',
+            'UPDATE baseitem SET expiry=0 WHERE mediatype="tvshow"',
+        ),
+        49: (
+            'ALTER TABLE season ADD episode_count INTEGER',
             'UPDATE baseitem SET expiry=0 WHERE mediatype="tvshow"',
         ),
     }

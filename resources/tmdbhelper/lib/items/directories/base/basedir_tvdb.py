@@ -8,7 +8,7 @@ class BaseDirItemTVDbAwards(BaseDirItem):
     label_type = 'localize'
     params = {'info': 'dir_tvdb_awards'}
     infolabels = {'plot': TVDB_DISCLAIMER}
-    art_icon = 'resources/icons/tvdb/tvdb.png'
+    art_icon = 'resources/icons/tvdb/awards.png'
     types = ('both', )
 
 
@@ -18,7 +18,7 @@ class BaseDirItemTVDbGenres(BaseDirItem):
     label_type = 'reversed'
     params = {'info': 'dir_tvdb_genres'}
     infolabels = {'plot': TVDB_DISCLAIMER}
-    art_icon = 'resources/icons/tvdb/tvdb.png'
+    art_icon = 'resources/icons/tvdb/genres.png'
     types = ('both', )
 
 

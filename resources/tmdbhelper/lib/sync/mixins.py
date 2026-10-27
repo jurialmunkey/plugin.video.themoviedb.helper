@@ -9,11 +9,3 @@ class SyncDataParentProperties:
     @property
     def window(self):
         return self.instance_syncdata.window
-
-    @property
-    def trakt_api(self):
-        return self.instance_syncdata.trakt_api
-
-    @property
-    def mdblist_api(self):
-        return self.instance_syncdata.mdblist_api

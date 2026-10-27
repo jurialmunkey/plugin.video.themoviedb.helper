@@ -1,66 +1,44 @@
+from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.consts import TRAKT_MAX_ITEMS_PER_PAGE
-from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.sync.datatype import DataType, DataTypeEpisodesInShows, DataTypeShowsToEpisodes
+from tmdbhelper.lib.sync.datatype import DataType
+from tmdbhelper.lib.sync.trakt.activity import TraktLastActivities
+from tmdbhelper.lib.sync.trakt.itemdata import TraktSyncItem
 
 
 class TraktDataType(DataType):
+    def __init__(self, instance_syncdata, item_type):
+        super().__init__(instance_syncdata, item_type, None)
+
+    @property
+    def trakt_api(self):
+        return self.instance_syncdata.core_sync.api
+
+    @property
+    def cache_method(self):
+        return f'trakt.{self.method}'
 
     @property
     def sync_args(self):
-        return ('sync', self.method, f'{self.item_type}s',)
+        return ('sync', self.method, f'{self.item_type}s')
+
+    def get_last_activities(self):
+        return TraktLastActivities(self.instance_syncdata)
 
     def get_syncitem(self, meta):
-        from tmdbhelper.lib.sync.trakt.itemdata import TraktSyncItem
         return TraktSyncItem(self.item_type, meta, self.keys, key_prefix=self.key_prefix)
 
-    def get_response_sync_data(self, *args, **kwargs):
-        kwargs['limit'] = TRAKT_MAX_ITEMS_PER_PAGE
-        path = self.trakt_api.get_request_url(*args, **kwargs)
-        data = self.trakt_api.get_api_request(path, headers=self.trakt_api.headers)
-        return data
-
     def get_response_sync(self, *args, **kwargs):
-        response = self.get_response_sync_data(*args, **kwargs)
-
-        # Check we actually get a response
-        if response is None:
-            return
-        try:
-            this_data = response.json()
-        except (ValueError, AttributeError):
-            return
-
-        # Dumb hack to deal with weird Trakt decision to paginate sync endpoints without
-        # Unclear why trakt would do this when unable to determine how deep to go from last activity
-        # TODO: future method could check if sorting by activity then check item stamps to test depth?
-        try:
-            page_count = int(response.headers['x-pagination-page-count']) + 1
-            page_start = int(response.headers['x-pagination-page']) + 1
-        except (KeyError, ValueError):
-            page_count = 0
-            page_start = 0
-
-        def get_next_item(x):
-            # TODO: Might need some better validation here to check for timeouts autherror etc.
-            try:
-                return self.get_response_sync_data(*args, **kwargs, page=x).json()
-            except (TypeError, ValueError, AttributeError):
+        items = []
+        page = 1
+        while True:
+            response = self.trakt_api.get_response(*args, page=page, limit=TRAKT_MAX_ITEMS_PER_PAGE, **kwargs)
+            if response is None or response.status_code != 200:
                 return
-
-        with ParallelThread(range(page_start, page_count), get_next_item) as pt:
-            next_data = pt.queue
-
-        for i in next_data:
-            if i is None:
-                continue
-            this_data.extend(i)
-
-        return this_data
-
-
-class TraktDataTypeEpisodesInShows(DataTypeEpisodesInShows, TraktDataType):
-    pass
-
-
-class TraktDataTypeShowsToEpisodes(DataTypeShowsToEpisodes, TraktDataType):
-    pass
+            try:
+                data = response.json()
+            except ValueError:
+                return
+            items.extend(data)
+            if page >= try_int(response.headers.get('x-pagination-page-count'), fallback=1):
+                return items
+            page += 1

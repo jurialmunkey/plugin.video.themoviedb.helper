@@ -41,7 +41,7 @@ class BaseDirItemTMDbTrendingDay(BaseDirItem):
     priority = 140
     label_localized = 32178
     params = {'info': 'trending_day'}
-    art_icon = 'resources/icons/themoviedb/upcoming.png'
+    art_icon = 'resources/icons/themoviedb/trending-day.png'
     types = ('movie', 'tv', 'person')
     group = 32204
 
@@ -50,7 +50,7 @@ class BaseDirItemTMDbTrendingWeek(BaseDirItem):
     priority = 150
     label_localized = 32179
     params = {'info': 'trending_week'}
-    art_icon = 'resources/icons/themoviedb/upcoming.png'
+    art_icon = 'resources/icons/themoviedb/trending-week.png'
     types = ('movie', 'tv', 'person')
     group = 32204
 
@@ -90,7 +90,7 @@ class BaseDirItemTMDbCalendarLibraryDir(BaseDirItem):
     label_localized = 32183
     types = ('tv',)
     params = {'info': 'dir_calendar_library'}
-    art_icon = 'resources/icons/themoviedb/airing.png'
+    art_icon = 'resources/icons/themoviedb/calendar.png'
     group = 14022
 
 
@@ -100,7 +100,7 @@ class BaseDirItemTMDbLibraryAiringNext(BaseDirItem):
     label_localized = 32458
     types = ('tv',)
     params = {'info': 'library_airingnext'}
-    art_icon = 'resources/icons/themoviedb/airing.png'
+    art_icon = 'resources/icons/themoviedb/airingnext.png'
     group = 14022
 
 
@@ -120,7 +120,7 @@ class BaseDirItemTMDbWatchProviders(BaseDirItem):
     label_localized = 32411
     types = ('movie', 'tv',)
     params = {'info': 'watch_providers'}
-    art_icon = 'resources/icons/themoviedb/airing.png'
+    art_icon = 'resources/icons/themoviedb/providers.png'
     group = 32411
 
 
@@ -129,7 +129,7 @@ class BaseDirItemTMDbRevenueMovies(BaseDirItem):
     label_localized = 32184
     types = ('movie',)
     params = {'info': 'revenue_movies'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/revenue.png'
     group = 32184
 
 
@@ -138,7 +138,7 @@ class BaseDirItemTMDbMostVoted(BaseDirItem):
     label_localized = 32185
     types = ('movie', 'tv',)
     params = {'info': 'most_voted'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/mostvoted.png'
     group = 32185
 
 
@@ -148,7 +148,7 @@ class BaseDirItemTMDbAllStudios(BaseDirItem):
     label_localized = 20388
     types = ('movie',)
     params = {'info': 'all_studios'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/studios.png'
     group = 20388
 
 
@@ -157,6 +157,7 @@ class BaseDirItemTMDbAllNetworks(BaseDirItemTMDbAllStudios):
     label_localized = 32062
     types = ('tv',)
     params = {'info': 'all_networks'}
+    art_icon = 'resources/icons/themoviedb/networks.png'
     group = 20388
 
 
@@ -165,6 +166,7 @@ class BaseDirItemTMDbAllCollections(BaseDirItemTMDbAllStudios):
     label_localized = 32187
     types = ('movie',)
     params = {'info': 'all_collections'}
+    art_icon = 'resources/icons/themoviedb/collection.png'
     group = 32187
 
 
@@ -173,6 +175,7 @@ class BaseDirItemTMDbAllKeywords(BaseDirItemTMDbAllStudios):
     label_localized = 21861
     types = ('movie',)
     params = {'info': 'all_keywords'}
+    art_icon = 'resources/icons/themoviedb/tags.png'
     group = 21861
 
 

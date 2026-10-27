@@ -1,239 +1,135 @@
-import itertools
 from xbmcgui import Dialog
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.dialog import ProgressDialog
-from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.sync.synctype import (
-    SyncWatched,
-    SyncPlayback,
-    SyncNextEpisodes,
-    SyncAllNextEpisodes,
-    SyncCollection,
-    SyncWatchlist,
-    SyncFavorites,
-    SyncRatings,
-    SyncHiddenProgressWatched,
-    SyncHiddenProgressCollected,
-    SyncHiddenCalendar,
-    SyncHiddenDropped,
-)
+from tmdbhelper.lib.sync.features import FEATURE_LABELS, SYNC_FEATURES
+from tmdbhelper.lib.sync.providers.features import FEATURE_LABELS as PROVIDER_FEATURE_LABELS
+from tmdbhelper.lib.sync.datasync import SyncDataFactory
+from tmdbhelper.lib.sync.activity import SyncLastActivities
 
 
 class SyncInvalidatorAll:
-
     notification = True
+    features = tuple(FEATURE_LABELS)
     localized_id = 593
-
     sync_table = {
-        'plays': ('movie', 'show', ),
-        'aired_episodes': ('show', ),
-        'watched_episodes': ('show', ),
-        'reset_at': ('movie', 'show', ),
-        'last_watched_at': ('movie', 'show', ),
-        'last_updated_at': ('movie', 'show', ),
-        'rating': ('movie', 'show', ),
-        'rated_at': ('movie', 'show', ),
-        'favorites_rank': ('movie', 'show', ),
-        'favorites_listed_at': ('movie', 'show', ),
-        'favorites_notes': ('movie', 'show', ),
-        'watchlist_rank': ('movie', 'show', 'season', 'episode', ),
-        'watchlist_listed_at': ('movie', 'show', 'season', 'episode', ),
-        'watchlist_notes': ('movie', 'show', 'season', 'episode', ),
-        'collection_last_collected_at': ('movie', 'show', ),
-        'collection_last_updated_at': ('movie', 'show', ),
-        'playback_progress': ('movie', 'show', ),
-        'playback_paused_at': ('movie', 'show', ),
-        'playback_id': ('movie', 'show', ),
-        'progress_watched_hidden_at': ('movie', 'show', ),
-        'progress_collected_hidden_at': ('movie', 'show', ),
-        'calendar_hidden_at': ('movie', 'show', ),
-        'dropped_hidden_at': ('movie', 'show', ),
-        'next_episode_id': ('show', ),
-        'next_episode_aired_at': ('show', ),
-        'upnext_episode_id': ('show', ),
+        'plays': ('movie', 'show'),
+        'aired_episodes': ('show',),
+        'watched_episodes': ('show',),
+        'reset_at': ('movie', 'show'),
+        'last_watched_at': ('movie', 'show'),
+        'last_updated_at': ('movie', 'show'),
+        'rating': ('movie', 'show'),
+        'rated_at': ('movie', 'show'),
+        'favorites_rank': ('movie', 'show'),
+        'favorites_listed_at': ('movie', 'show'),
+        'favorites_notes': ('movie', 'show'),
+        'watchlist_rank': ('movie', 'show', 'season', 'episode'),
+        'watchlist_listed_at': ('movie', 'show', 'season', 'episode'),
+        'watchlist_notes': ('movie', 'show', 'season', 'episode'),
+        'collection_last_collected_at': ('movie', 'show', 'episode'),
+        'collection_last_updated_at': ('movie', 'show', 'episode'),
+        'playback_progress': ('movie', 'show'),
+        'playback_paused_at': ('movie', 'show'),
+        'playback_id': ('movie', 'show'),
+        'progress_watched_hidden_at': ('movie', 'show'),
+        'progress_collected_hidden_at': ('movie', 'show'),
+        'calendar_hidden_at': ('movie', 'show'),
+        'dropped_hidden_at': ('movie', 'show'),
+        'next_episode_id': ('show',),
+        'next_episode_aired_at': ('show',),
+        'upnext_episode_id': ('show',),
     }
-
-    # Define keys to resync
-    sync_modes = (
-        'plays',
-        'aired_episodes',
-        'watched_episodes',
-        'reset_at',
-        'last_watched_at',
-        'last_updated_at',
-        'rating',
-        'rated_at',
-        'favorites_rank',
-        'favorites_listed_at',
-        'favorites_notes',
-        'watchlist_rank',
-        'watchlist_listed_at',
-        'watchlist_notes',
-        'collection_last_collected_at',
-        'collection_last_updated_at',
-        'playback_progress',
-        'playback_paused_at',
-        'playback_id',
-        'progress_watched_hidden_at',
-        'progress_collected_hidden_at',
-        'calendar_hidden_at',
-        'dropped_hidden_at',
-        'next_episode_id',
-        'next_episode_aired_at',
-        'upnext_episode_id',
-    )
-
-    @cached_property
-    def name(self):
-        return get_localized(self.localized_id)
-
-    factories = (
-        SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes,
-        SyncCollection, SyncWatchlist, SyncFavorites, SyncRatings,
-        SyncHiddenProgressWatched, SyncHiddenProgressCollected,
-        SyncHiddenCalendar, SyncHiddenDropped,
-    )
-
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
 
     @cached_property
     def syncdata(self):
-        from tmdbhelper.lib.sync.datasync import SyncDataFactory
-        return SyncDataFactory(self)
-
-    @cached_property
-    def progress_dialog(self):
-        if not self.notification:
-            return
-        return ProgressDialog(title=get_localized(32022), total=len(self.database_lactivities_ids) + 3)
-
-    def progress_dialog_update(self, message):
-        if not self.progress_dialog:
-            return
-        self.progress_dialog.update(message)
-
-    def progress_dialog_close(self):
-        if not self.progress_dialog:
-            return
-        self.progress_dialog.close()
-        self.progress_dialog = None
-
-    @cached_property
-    def database(self):
-        self.progress_dialog_update('Initialise database')
-        return ItemDetailsDatabase()
-
-    @staticmethod
-    def data_build_keys(datatype):
-        return tuple((
-            f'{datatype.key_prefix}_{k}' if datatype.key_prefix else k
-            for k in datatype.keys
-        ))
+        return SyncDataFactory()
 
     @cached_property
     def database_keys(self):
-        database_keys = tuple((self.data_build_keys(factory()) for factory in self.factories))
-        database_keys = tuple(itertools.chain.from_iterable(database_keys))
-        return database_keys
+        return self.get_database_keys()
 
-    def database_del_column_data(self):
-        self.progress_dialog_update(f'Deleting simplecache keys: {self.database_keys}')
-        self.database.del_column_values(table='simplecache', keys=self.database_keys)
-
-    @staticmethod
-    def data_build_lactivities_ids(datatype, item_types=('movie', 'show', 'season', 'episode')):
-        return tuple((f'{item_type}.{datatype.method}' for item_type in item_types))
+    def get_database_keys(self):
+        return tuple(key for key, sync_type in self.syncdata.routes.items()
+                     if sync_type and SYNC_FEATURES[sync_type] in self.features)
 
     @cached_property
-    def database_lactivities_ids(self):
-        database_lactivities_ids = tuple((self.data_build_lactivities_ids(factory()) for factory in self.factories))
-        database_lactivities_ids = tuple(itertools.chain.from_iterable(database_lactivities_ids))
-        return database_lactivities_ids
+    def providers(self):
+        return self.get_providers()
 
-    def database_del_lactivities(self):
-        for item_id in self.database_lactivities_ids:
-            self.progress_dialog_update(f'Deleting last activities keys: {item_id}')
-            self.database.del_item(table='lactivities', item_id=item_id)
+    def get_providers(self):
+        if not set(self.features).intersection(PROVIDER_FEATURE_LABELS):
+            return ()
+        return tuple(provider for provider in self.syncdata.registry.providers.values()
+                     if set(self.features).intersection(provider.capabilities))
+
+    def invalidate_provider(self, provider):
+        methods = {sync_class.method for name, sync_class in provider.sync_classes.items()
+                   if SYNC_FEATURES[name] in self.features}
+        for method in methods:
+            self.invalidate_method(provider.provider_id, method)
+        SyncLastActivities(self.syncdata, provider).clear()
+
+    def invalidate_method(self, provider_id, method):
+        for item_type in ('movie', 'show', 'season', 'episode'):
+            item_id = f'{item_type}.{provider_id}.{method}'
+            self.syncdata.cache.del_item(table='lactivities', item_id=item_id)
+            self.syncdata.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
 
     def invalidate(self):
-        self.database_del_column_data()
-        self.database_del_lactivities()
-
-    def sync_type(self, sync_type):
-        sync_list = tuple((k for k, v in self.sync_table.items() if k in self.sync_modes and sync_type in v))
-        self.syncdata.sync(sync_type, sync_list)
+        if self.database_keys:
+            self.syncdata.cache.del_column_values(keys=self.database_keys)
+        self.syncdata.core_sync.invalidate(self.features)
+        for provider in self.providers:
+            self.invalidate_provider(provider)
 
     def sync(self):
-        self.sync_type('movie')
-        self.sync_type('show')
-        self.sync_type('season')
-        self.sync_type('episode')
+        for item_type in ('movie', 'show', 'season', 'episode'):
+            keys = tuple(key for key in self.database_keys if item_type in self.sync_table[key])
+            self.syncdata.sync(item_type, keys, forced=True)
 
     def run(self, sync=False):
         self.invalidate()
-        self.progress_dialog_close()
-        self.sync() if sync else None
-        if not self.notification:
-            return
-        Dialog().ok('Trakt', get_localized(32146 if sync else 32027).format(self.name.lower()))
+        if sync:
+            self.sync()
+        if self.notification:
+            Dialog().ok(get_localized(32549), get_localized(32146 if sync else 32027).format(get_localized(self.localized_id).lower()))
 
 
 class SyncInvalidatorWatchedProgress(SyncInvalidatorAll):
-    factories = (SyncWatched, SyncPlayback, SyncNextEpisodes, SyncAllNextEpisodes)
-    localized_id = 32035
+    features = ('watched',)
+    localized_id = 32408
 
 
 class SyncInvalidatorCollection(SyncInvalidatorAll):
-    factories = (SyncCollection, )
+    features = ('collection',)
     localized_id = 32192
 
 
 class SyncInvalidatorWatchlist(SyncInvalidatorAll):
-    factories = (SyncWatchlist, )
+    features = ('watchlist',)
     localized_id = 32193
 
 
 class SyncInvalidatorFavorites(SyncInvalidatorAll):
-    factories = (SyncFavorites, )
+    features = ('favorites',)
     localized_id = 1036
 
 
 class SyncInvalidatorRatings(SyncInvalidatorAll):
-    factories = (SyncRatings, )
-    localized_id = 32028
-
-
-class SyncInvalidatorHidden(SyncInvalidatorAll):
-    factories = (
-        SyncHiddenProgressWatched, SyncHiddenProgressCollected,
-        SyncHiddenCalendar, SyncHiddenDropped,
-    )
-    localized_id = 32036
+    features = ('ratings',)
+    localized_id = 563
 
 
 def SyncInvalidator(datatype):
-    routes = {
-        'watchedprogress': SyncInvalidatorWatchedProgress,
-        'collection': SyncInvalidatorCollection,
-        'watchlist': SyncInvalidatorWatchlist,
-        'favorites': SyncInvalidatorFavorites,
-        'ratings': SyncInvalidatorRatings,
-        'hidden': SyncInvalidatorHidden,
-        'all': SyncInvalidatorAll,
-    }
-
+    routes = {'watched': SyncInvalidatorWatchedProgress, 'collection': SyncInvalidatorCollection,
+              'watchlist': SyncInvalidatorWatchlist, 'favorites': SyncInvalidatorFavorites,
+              'ratings': SyncInvalidatorRatings, 'all': SyncInvalidatorAll}
     try:
-        route = routes[datatype]
+        selected = routes[datatype]
     except KeyError:
-        routes_list = [v for v in routes.values()]
-        x = Dialog().select('Sync', [get_localized(i.localized_id) for i in routes_list])
-        if x == -1:
+        choices = tuple(routes.values())
+        index = Dialog().select(get_localized(32549), [get_localized(choice.localized_id) for choice in choices])
+        if index == -1:
             return
-        route = routes_list[x]
-
-    sync_invalidator = route()
-    return sync_invalidator
+        selected = choices[index]
+    return selected()

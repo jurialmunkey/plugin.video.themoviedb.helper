@@ -23,14 +23,14 @@ class BaseDirItemRandomProviders(BaseDirItemRandomGenres):
     priority = 110
     label_suffix = 32411
     params = {'info': 'random_providers'}
-    art_icon = 'resources/icons/themoviedb/airing.png'
+    art_icon = 'resources/icons/themoviedb/providers.png'
 
 
 class BaseDirItemRandomKeywords(BaseDirItemRandomGenres):
     priority = 120
     label_suffix = 32117
     params = {'info': 'random_keywords'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/tags.png'
     types = ('movie', )
 
 
@@ -38,7 +38,7 @@ class BaseDirItemRandomNetworks(BaseDirItemRandomGenres):
     priority = 130
     label_suffix = 705
     params = {'info': 'random_networks'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/networks.png'
     types = ('tv', )
 
 
@@ -46,15 +46,15 @@ class BaseDirItemRandomStudios(BaseDirItemRandomGenres):
     priority = 140
     label_suffix = 572
     params = {'info': 'random_studios'}
-    art_icon = 'resources/icons/themoviedb/default.png'
+    art_icon = 'resources/icons/themoviedb/studios.png'
     types = ('movie', )
 
 
 class BaseDirItemRandomBecauseYouWatched(BaseDirItemRandomGenres):
     priority = 150
     label_prefix = 32199
-    params = {'info': 'trakt_becauseyouwatched'}
-    art_icon = 'resources/icons/trakt/recommended.png'
+    params = {'info': 'sync_becauseyouwatched'}
+    art_icon = 'resources/icons/sync/recommended.png'
     types = ('movie', 'tv', )
 
     @cached_property
@@ -67,7 +67,8 @@ class BaseDirItemRandomBecauseYouWatched(BaseDirItemRandomGenres):
 class BaseDirItemRandomBecauseMostWatched(BaseDirItemRandomBecauseYouWatched):
     priority = 160
     label_suffix = 32200
-    params = {'info': 'trakt_becausemostwatched'}
+    params = {'info': 'sync_becausemostwatched'}
+    art_icon = 'resources/icons/sync/recommended-mostwatched.png'
 
 
 class BaseDirItemRandomTrending(BaseDirItem):
@@ -104,7 +105,7 @@ class BaseDirItemRandomMostViewers(BaseDirItemRandomTrending):
     priority = 200
     label_prefix = 32414
     params = {'info': 'random_mostviewers'}
-    art_icon = 'resources/icons/trakt/mostplayed.png'
+    art_icon = 'resources/icons/trakt/viewers.png'
 
 
 class BaseDirItemRandomAnticipated(BaseDirItemRandomTrending):

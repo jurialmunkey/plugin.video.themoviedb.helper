@@ -3,18 +3,20 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from tmdbhelper.lib.script.method.decorators import is_in_kwargs
 from tmdbhelper.lib.script.method.sync import invalidate_sync
-from tmdbhelper.lib.script.method.lists import select_sort_list
 
 
 @is_in_kwargs({'like_list': True})
 def like_list(like_list=None, user_slug=None, delete=False, **kwargs):
-    from tmdbhelper.lib.sync.datasync import SyncDataFactory
-    SyncDataFactory().like_userlist(
+    from tmdbhelper.lib.script.actions.trakt.userlist import ItemLikeList
+    item = ItemLikeList(
         user_slug=user_slug or 'me',
         list_slug=like_list,
         confirmation=True,
         delete=delete
     )
+    if not item.trakt_api.authenticator.is_authorized:
+        return
+    item.sync()
     if not delete:
         return
     from tmdbhelper.lib.script.method.kodi_utils import container_refresh
@@ -46,12 +48,6 @@ def rename_list(rename_list=None, **kwargs):
     container_refresh()
 
 
-def sort_list(**kwargs):
-    from tmdbhelper.lib.items.directories.trakt.lists_sorting import get_sort_methods
-    sort_methods = get_sort_methods(kwargs['info'])
-    return select_sort_list(sort_methods, **kwargs)
-
-
 def authenticate_trakt(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     TraktAPI(force=True)
@@ -60,15 +56,19 @@ def authenticate_trakt(**kwargs):
 
 def revoke_trakt(**kwargs):
     from tmdbhelper.lib.api.trakt.api import TraktAPI
-    TraktAPI().logout()
+    if not TraktAPI().logout():
+        return
     invalidate_sync('all', notification=False, sync=False)
 
 
-def get_stats(**kwargs):
+def get_stats(trakt_api=None, forced=False, **kwargs):
     from tmdbhelper.lib.query.database.database import FindQueriesDatabase
     from jurialmunkey.window import get_property
 
-    stats = FindQueriesDatabase().get_trakt_stats()
+    queries = FindQueriesDatabase()
+    if trakt_api is not None:
+        queries.trakt_api = trakt_api
+    stats = queries.get_trakt_stats(forced=forced)
     if not stats:
         return
 
