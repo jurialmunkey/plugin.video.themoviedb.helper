@@ -399,7 +399,7 @@ msgstr "Mnożnik strony (listy synchronizacji bazy danych)"
 #: /resources/lib/player.py
 msgctxt "#32061"
 msgid "Play with"
-msgstr "Odtwórz w"
+msgstr "Odtwórz za pomocą"
 
 #: /resources/lib/context.py
 msgctxt "#32066"
@@ -479,7 +479,7 @@ msgstr "Automatycznie aktualizuj bibliotekę i dodawaj brakujące odcinki"
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
-msgstr "Zawartość"
+msgstr "Typ zawartości"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32105"
@@ -768,7 +768,7 @@ msgid ""
 "This limit is set to ensure that the APIs providing data for free are respected."
 msgstr ""
 "Dodawanie listy serwisu Trakt do biblioteki jest ograniczone do [B]{}[/B] seriali i [B]{}[/B] filmów na listę.\n"
-"Ten limit ma na celu zapewnienie przestrzegania regulaminów w serwisach udostępniających dane API bezpłatnie."
+"Ten limit ma na celu zapewnienie poszanowania dla bezpłatnych interfejsów API udostępniających te dane."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -1395,7 +1395,7 @@ msgid ""
 "{} was successful for {}!\n"
 "{} ID {}"
 msgstr ""
-"{} powiodło się {}!\n"
+"{} powiodło się dla {}!\n"
 "{} ID {}"
 
 #: /resources/lib/syncitem.py
@@ -2021,7 +2021,7 @@ msgstr "Zaktualizowano listę dozwolonych dostawców"
 #: /resources/lib/script/method.py
 msgctxt "#32439"
 msgid "The provider allowlist has been updated."
-msgstr "Lista dozwolonych dostawców została zaktualizowana. Pamiętaj, że aktualizacja danych dostawcy wymaga odświeżenia pamięci podręcznej pozycji. Pamięć podręczną można usunąć w sekcji ustawień eksperckich."
+msgstr "Lista dozwolonych dostawców została zaktualizowana."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32440"
@@ -2792,7 +2792,7 @@ msgstr "Czyszczenie pamięci podręcznej obrazów anulowane. Odzyskane miejsce: 
 #: /resources/tmdbhelper/lib/script/method/image_cache.py
 msgctxt "#32573"
 msgid "Image cache cleanup is disabled while the target size is Unlimited."
-msgstr "Czyszczenie pamięci podręcznej obrazów jest wyłączone, gdy docelowy rozmiar to 'Nieograniczony."
+msgstr "Czyszczenie pamięci podręcznej obrazów jest wyłączone, gdy docelowy rozmiar to 'Nieograniczony'."
 
 #: /resources/settings.xml
 msgctxt "#32574"
