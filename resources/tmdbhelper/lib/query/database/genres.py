@@ -36,8 +36,8 @@ class FindQueriesDatabaseGenres:
         table = 'genres'
         keys = ('id', 'name', 'type')
 
-        def get_genres(tmdb_type):
-            genres = self.tmdb_api.get_response_json('genre', tmdb_type, 'list') or {}
+        def get_genres(tmdb_type, get_response_json):
+            genres = get_response_json('genre', tmdb_type, 'list') or {}
             genres = genres.get('genres')
             return {i['id']: i['name'] for i in genres if i} if genres else {}
 
@@ -49,8 +49,10 @@ class FindQueriesDatabaseGenres:
             return self.get_cached_values(table, keys, configure_genre_dict, **kwgs)
 
         def set_cached():
-            genres_tv = get_genres('tv')
-            genres_movies = get_genres('movie')
+            from tmdbhelper.lib.addon.thread import ParallelThread
+            with ParallelThread(('tv', 'movie'), get_genres, self.tmdb_api.get_response_json) as pt:
+                genres = pt.queue
+            genres_tv, genres_movies = genres
             genres_both = set(genres_tv).intersection(genres_movies)
             values = [
                 (
