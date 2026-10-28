@@ -41,6 +41,9 @@ Providers declare:
 - `getter_classes`: `movies_to_watch`, `shows_to_watch`, and `shows_in_progress`
   getters for watched/progress list behaviour. All three are required when the
   provider declares the watched capability; every getter must be callable.
+- `ratings_classes`: optional media-type names (`movie`, `tvshow`, `season`,
+  `episode`) mapped to RatingsSupplier subclasses. Each implements
+  `get_ratings()`; registering any supplies the independent `ratings` capability.
 - `scrobbler_class`: an optional ScrobbleRequest subclass for the scrobbling feature.
 - `directory_item_class`: an optional BaseDirItem subclass contributing a root
   folder. Its `params['info']` must name one of the provider's `list_routes`.
@@ -271,5 +274,40 @@ error is raised. Concurrent requests recheck provider availability and prompt
 generation under a mutex.
 Declining returns no directory items. The sorting script resolves the module's
 sorting container; library-monitor list discovery uses the same provider route
-interface with prompts disabled. Shared MDbList API clients, ratings, and
-library-building requests remain in core.
+interface with prompts disabled. The shared MDbList API client, rating-response
+mappings, and library-building requests remain in core.
+
+## Ratings suppliers
+
+The Ratings providers control in Details settings enables/disables installed
+suppliers and sets their priority using Move up/Move down. Save applies the
+changes; Cancel leaves the saved configuration unchanged. Enabled Kodi modules
+with the ratings capability appear independently of sync-provider selections.
+New suppliers default to enabled and follow saved entries in alphabetical order;
+unavailable providers' saved order and disabled state are retained.
+
+The hidden `ratings_provider_configuration` setting stores a JSON object with
+`order` and `disabled` lists of provider IDs. It is separate from the
+single-provider sync selectors and does not invalidate any caches. Existing
+cached results remain until their normal
+expiry or manual deletion.
+
+Subclasses of `tmdbhelper.lib.sync.providers.ratings.RatingsSupplier` receive
+`provider`, `tmdb_type`, `tmdb_id`, `imdb_id`, `season`, and `episode` before the
+cached `.ratings` property is accessed. They return a dictionary using existing
+ratings-table fields and their existing raw formats (for example, integer
+ratings on a 0-100 scale). The supplier owns authorization, API calls, and source
+mapping; it must return `{}` for an unavailable API. It must not read or write
+the item-details database. No new table fields or migrations are required.
+
+RatingsDict and its season/episode subclasses instantiate only enabled suppliers
+registered for their media type. Retrieval runs in parallel, while merging uses
+the configured order, with the first provider winning overlapping non-missing
+fields. `None` and empty strings are missing; zero ratings and vote counts are
+valid. Lower providers fill missing fields.
+
+Provider results occupy the former MDbList position in `rating_attribs`: after
+OMDb and before direct Trakt/TMDb sources. Existing built-in precedence and IMDb
+Top 250 behavior remain unchanged. MDbList's module supplies all four media
+types using the shared API client's rating methods; no MDbList-specific branch
+remains in the ratings dictionaries.

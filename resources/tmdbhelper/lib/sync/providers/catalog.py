@@ -7,7 +7,7 @@ PROVIDERS = {
     'script.module.tmdbhelper.sync.mdblist': {
         'provider_id': 'mdblist',
         'display_name': 'MDbList',
-        'capabilities': ('watched', 'watchlist', 'collection', 'scrobbling', 'lists'),
+        'capabilities': ('watched', 'watchlist', 'collection', 'scrobbling', 'lists', 'ratings'),
     },
     'script.module.tmdbhelper.sync.kodi': {
         'provider_id': 'kodi',

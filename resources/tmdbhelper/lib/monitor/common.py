@@ -81,7 +81,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
         ratings_api.trakt_api = self.trakt_api
         ratings_api.ftv_api = self.ftv_api
         ratings_api.tvdb_api = self.tvdb_api
-        ratings_api.mdblist_api = self.mdblist_api
         ratings_api.omdb_api = self.omdb_api
         ratings_api.query_database = self.query_database
 

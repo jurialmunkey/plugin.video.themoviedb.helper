@@ -5,6 +5,7 @@ from threading import RLock
 from xbmcvfs import translatePath
 from tmdbhelper.lib.sync.providers.base import SyncProvider
 from tmdbhelper.lib.sync.providers.features import ACTION_FEATURES, SYNC_FEATURES, WATCHED_GETTERS
+from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
 
 
@@ -71,6 +72,16 @@ class SyncProviderLoader:
                 raise TypeError(f'Getter factory {name} must be callable')
 
     @staticmethod
+    def validate_ratings_classes(provider):
+        for mediatype, supplier_class in provider.ratings_classes.items():
+            if mediatype not in RATINGS_MEDIATYPES:
+                raise ValueError(f'Unknown ratings media type: {mediatype}')
+            if not isinstance(supplier_class, type) or not issubclass(supplier_class, RatingsSupplier):
+                raise TypeError(f'Ratings supplier for {mediatype} must inherit RatingsSupplier')
+            if not callable(supplier_class.get_ratings) or supplier_class.get_ratings is RatingsSupplier.get_ratings:
+                raise TypeError(f'Ratings supplier for {mediatype} must implement get_ratings()')
+
+    @staticmethod
     def validate_directory(provider):
         if provider.directory_item_class is not None:
             from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
@@ -103,6 +114,7 @@ class SyncProviderLoader:
         self.validate_sync_classes(provider)
         self.validate_action_classes(provider)
         self.validate_getter_classes(provider)
+        self.validate_ratings_classes(provider)
         self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')

@@ -8,6 +8,7 @@ class SyncProvider:
     sync_classes = {}
     action_classes = {}
     getter_classes = {}
+    ratings_classes = {}
     scrobbler_class = None
     directory_item_class = None
     list_routes = {}
@@ -20,6 +21,8 @@ class SyncProvider:
             features.add('scrobbling')
         if self.list_routes:
             features.add('lists')
+        if self.ratings_classes:
+            features.add('ratings')
         return tuple(sorted(features))
 
     def get_sync_class(self, sync_type):

@@ -761,6 +761,21 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="ratings_providers" type="action" label="32581" help="32582">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper,configure_ratings_providers,return_settings=true)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="ratings_provider_configuration" type="string" label="32581" help="">
+                    <level>0</level>
+                    <default></default>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
                 <setting id="service_container_content_fallback" type="boolean" label="32497" help="32498">
                     <level>0</level>
                     <default>False</default>
