@@ -77,6 +77,7 @@ PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
 
 LASTACTIVITIES_DATA = 'TraktNewSyncLastActivities'
 LASTACTIVITIES_EXPIRY = 600
+KODI_LIBRARY_LAST_UPDATED = 'KodiLibrary.LastUpdated'
 
 UPNEXT_EPISODE_ART = {
     'thumb': lambda li: li.art.get('thumb') or '',
