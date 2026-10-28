@@ -2815,7 +2815,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32582"
-msgid "Enable or disable installed ratings providers and set their priority. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
+msgid "Select the installed providers to use for ratings. Cached ratings are retained."
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/ratings/providers.py
@@ -2848,12 +2848,12 @@ msgctxt "#32588"
 msgid "No ratings providers are installed."
 msgstr ""
 
-#: /resources/tmdbhelper/lib/script/ratings/providers.py
-msgctxt "#32589"
-msgid "Enable"
+#: /resources/settings.xml
+msgctxt "#32591"
+msgid "Priority"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/script/ratings/providers.py
-msgctxt "#32590"
-msgid "Disable"
+#: /resources/settings.xml
+msgctxt "#32592"
+msgid "Arrange ratings providers in priority order. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
 msgstr ""

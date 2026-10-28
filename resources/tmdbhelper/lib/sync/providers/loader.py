@@ -6,6 +6,7 @@ from xbmcvfs import translatePath
 from tmdbhelper.lib.sync.providers.base import SyncProvider
 from tmdbhelper.lib.sync.providers.features import ACTION_FEATURES, SYNC_FEATURES, WATCHED_GETTERS
 from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSupplier
+from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
 
 
@@ -82,6 +83,18 @@ class SyncProviderLoader:
                 raise TypeError(f'Ratings supplier for {mediatype} must implement get_ratings()')
 
     @staticmethod
+    def validate_monitor_lists_class(provider):
+        supplier_class = provider.monitor_lists_class
+        if supplier_class is None:
+            return
+        if not isinstance(supplier_class, type) or not issubclass(supplier_class, MonitorListsSupplier):
+            raise TypeError('Monitor lists supplier must inherit MonitorListsSupplier')
+        for method in ('get_lists', 'get_list_items'):
+            implementation = getattr(supplier_class, method)
+            if not callable(implementation) or implementation is getattr(MonitorListsSupplier, method):
+                raise TypeError(f'Monitor lists supplier must implement {method}()')
+
+    @staticmethod
     def validate_directory(provider):
         if provider.directory_item_class is not None:
             from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
@@ -115,6 +128,7 @@ class SyncProviderLoader:
         self.validate_action_classes(provider)
         self.validate_getter_classes(provider)
         self.validate_ratings_classes(provider)
+        self.validate_monitor_lists_class(provider)
         self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')

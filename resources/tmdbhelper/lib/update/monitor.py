@@ -39,28 +39,12 @@ class MonitorUserLists:
         return ListTraktStaticLiked(-1, '').get_items(tmdb_type='both') or []
 
     @cached_property
-    def lists_mdblist_user(self):
-        if not get_setting('mdblist_apikey', 'str'):
-            return []
-        from tmdbhelper.lib.sync.providers.directories import get_provider_list_container
-        container = get_provider_list_container('mdblist_yourlists', 'mdblist', prompt=False)
-        if container is None:
-            return []
-        return container(-1, '').get_items() or []
+    def lists_provider(self):
+        return self.get_lists_provider()
 
-    @cached_property
-    def lists_mdblist_formatted(self):
-        return [j for j in (self.format_mdblist_item(i) for i in self.lists_mdblist_user) if j]
-
-    @staticmethod
-    def format_mdblist_item(i):
-        try:
-            i['params']['user_slug'] = '__api_mdblist__'
-            i['params']['list_slug'] = str(i['params']['list_id'])
-            i['label'] = f'MDbList: {i.get("label")}'
-            return i
-        except (KeyError, TypeError):
-            return
+    def get_lists_provider(self):
+        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+        return [item for supplier in SyncProviderRegistry().monitor_list_suppliers for item in supplier.lists]
 
     @cached_property
     def user_lists(self):
@@ -68,7 +52,7 @@ class MonitorUserLists:
         user_lists += self.lists_trakt_watchlist
         user_lists += self.lists_trakt_static_owned
         user_lists += self.lists_trakt_static_liked
-        user_lists += self.lists_mdblist_formatted
+        user_lists += self.lists_provider
         return user_lists
 
     @cached_property

@@ -30,6 +30,18 @@ class SyncProviderRegistry:
     def get_capable_providers(self, capability):
         return tuple(provider for provider in self.providers.values() if capability in provider.capabilities)
 
+    @cached_property
+    def monitor_list_suppliers(self):
+        return self.get_monitor_list_suppliers()
+
+    def get_monitor_list_suppliers(self):
+        return tuple(
+            provider.monitor_lists_class(provider)
+            for provider in self.get_capable_providers('monitor_lists'))
+
+    def get_monitor_list_supplier(self, user_slug):
+        return next((supplier for supplier in self.monitor_list_suppliers if supplier.user_slug == user_slug), None)
+
     def get_directory_items(self):
         return [
             provider.directory_item_class()

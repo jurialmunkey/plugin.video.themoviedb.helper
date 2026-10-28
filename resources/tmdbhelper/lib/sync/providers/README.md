@@ -44,6 +44,9 @@ Providers declare:
 - `ratings_classes`: optional media-type names (`movie`, `tvshow`, `season`,
   `episode`) mapped to RatingsSupplier subclasses. Each implements
   `get_ratings()`; registering any supplies the independent `ratings` capability.
+- `monitor_lists_class`: an optional MonitorListsSupplier subclass implementing
+  `get_lists()` and `get_list_items(list_slug)`. This supplies the independent
+  `monitor_lists` capability for library monitoring and list retrieval.
 - `scrobbler_class`: an optional ScrobbleRequest subclass for the scrobbling feature.
 - `directory_item_class`: an optional BaseDirItem subclass contributing a root
   folder. Its `params['info']` must name one of the provider's `list_routes`.
@@ -273,16 +276,18 @@ An installed provider must declare the requested route or an invalid-route
 error is raised. Concurrent requests recheck provider availability and prompt
 generation under a mutex.
 Declining returns no directory items. The sorting script resolves the module's
-sorting container; library-monitor list discovery uses the same provider route
-interface with prompts disabled. The shared MDbList API client, rating-response
-mappings, and library-building requests remain in core.
+sorting container. Library monitoring uses its own supplier interface below,
+without constructing directory containers. The shared MDbList API client and
+rating-response mappings remain in core.
 
 ## Ratings suppliers
 
-The Ratings providers control in Details settings enables/disables installed
-suppliers and sets their priority using Move up/Move down. Save applies the
-changes; Cancel leaves the saved configuration unchanged. Enabled Kodi modules
-with the ratings capability appear independently of sync-provider selections.
+In Sync settings, the Ratings group contains Providers and Priority. Providers
+uses a multiselect to enable/disable installed suppliers. Priority uses select
+dialogs to choose a provider and move it up/down. Save applies the order;
+Cancel leaves it unchanged. Each control preserves the other's configuration.
+Enabled Kodi modules with the ratings capability appear independently of
+sync-provider selections.
 New suppliers default to enabled and follow saved entries in alphabetical order;
 unavailable providers' saved order and disabled state are retained.
 
@@ -311,3 +316,35 @@ OMDb and before direct Trakt/TMDb sources. Existing built-in precedence and IMDb
 Top 250 behavior remain unchanged. MDbList's module supplies all four media
 types using the shared API client's rating methods; no MDbList-specific branch
 remains in the ratings dictionaries.
+
+## Monitored lists
+
+An optional `monitor_lists_class` derives from
+`tmdbhelper.lib.sync.providers.monitor_lists.MonitorListsSupplier` and receives
+its provider before any cached properties are accessed. The registry exposes
+one cached `monitor_list_suppliers` tuple per context. These suppliers are
+independent of watched, watchlist, scrobbling, and ratings selections.
+
+`get_lists()` supplies the cached `.lists` result: entries with `label` and
+`params` containing string `list_slug` and `user_slug` values. The default
+`user_slug` is `__api_<provider_id>__`. MDbList therefore keeps the existing
+`__api_mdblist__` identifier and numeric list IDs stored in `monitor_userlist`
+and `monitor_userslug`. No migration or new setting is required. MDbList list
+labels remain `MDbList: <name>` and use a module-owned ItemMapper.
+
+`get_list_items(list_slug)` returns the normalized records expected by
+LibraryBuilderUserList: each has `type` (`movie` or `show`) and a matching
+`movie`/`show` dictionary containing `title` and `ids` (`tmdb` and `imdb`).
+The module owns API requests and normalization. MDbList retains its existing
+separate movies/shows response handling and incomplete-record filtering.
+Unauthorized suppliers return no available lists or contents. Suppliers must
+not open settings, prompt for installation, or perform library/database writes.
+
+MonitorUserLists appends supplier entries to the existing core Trakt lists.
+LibraryBuilderUserList dispatches reserved provider identifiers through the
+registry and otherwise retains the existing Trakt request paths. An unavailable
+provider returns no items; it never falls back to a Trakt request or setup
+prompt. Reading or updating lists does not rewrite saved monitoring selections.
+Core retains limits, confirmation, progress, library creation, and tagging.
+The tagging subclass and manual list-addition script inherit the same request
+dispatch. No database table definitions or cache invalidation are changed.

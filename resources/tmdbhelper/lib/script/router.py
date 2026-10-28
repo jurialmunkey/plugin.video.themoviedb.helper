@@ -100,6 +100,8 @@ class Script(object):
         # User Configuration
         'configure_ratings_providers':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.ratings', 'configure_ratings_providers')(**kwargs),
+        'configure_ratings_provider_order':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.ratings', 'configure_ratings_provider_order')(**kwargs),
         'select_sync_provider':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'select_sync_provider')(**kwargs),
         'install_sync_provider':
