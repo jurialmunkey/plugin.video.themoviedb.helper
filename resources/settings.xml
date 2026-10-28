@@ -725,6 +725,18 @@
                 </setting>
             </group>
             <group id="2" label="32329">
+                <setting id="player_episode_groups" type="string" label="32593" help="32597">
+                    <level>0</level>
+                    <default>default</default>
+                    <constraints>
+                        <options>
+                            <option label="32594">default</option>
+                            <option label="32595">select</option>
+                            <option label="32596">group</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
                 <setting id="combined_players" type="boolean" label="32415" help="">
                     <level>0</level>
                     <default>True</default>

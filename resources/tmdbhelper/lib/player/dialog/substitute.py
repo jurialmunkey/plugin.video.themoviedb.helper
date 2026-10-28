@@ -17,8 +17,10 @@ class PlayerSubstitute:
         dictionary = PlayerDictionary(
             tmdb_type=self.item.tmdb_type,
             tmdb_id=self.item.tmdb_id,
-            season=self.item.get('season'),
-            episode=self.item.get('episode'),
+            season=getattr(self.item, 'season', None),
+            episode=getattr(self.item, 'episode', None),
+            virtual_season=getattr(self.item, 'virtual_season', None),
+            virtual_episode=getattr(self.item, 'virtual_episode', None),
             details=self.item.details,
         )
         for key, substitution in self.substitutions.items():

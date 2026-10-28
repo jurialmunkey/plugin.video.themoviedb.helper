@@ -107,4 +107,5 @@ class EpisodeGroupEpisodeItemMapper(EpisodeGroupItemMapper):
         return {
             'info': 'details', 'tmdb_type': 'tv', 'tmdb_id': self.tmdb_id,
             'season': self.group['season'], 'episode': self.group['episode'],
+            'virtual_season': self.group_season, 'virtual_episode': self.group_episode,
         }

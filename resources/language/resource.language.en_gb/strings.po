@@ -2857,3 +2857,28 @@ msgstr ""
 msgctxt "#32592"
 msgid "Arrange ratings providers in priority order. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
 msgstr ""
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32593"
+msgid "Episode numbering"
+msgstr ""
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32594"
+msgid "Default"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32595"
+msgid "Select"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32596"
+msgid "Group"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32597"
+msgid "Choose which season and episode numbers to pass to players. Default always uses TMDb numbering. Select asks which episode group to use when groups are available. Group uses the current episode group's numbering when playback starts from a group, otherwise TMDb numbering. A player's episode_groups option overrides this setting."
+msgstr ""
