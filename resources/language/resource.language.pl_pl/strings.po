@@ -2878,3 +2878,28 @@ msgstr "Priorytet"
 msgctxt "#32592"
 msgid "Arrange ratings providers in priority order. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
 msgstr "Ustaw dostawców ocen wg priorytetu. Dostawcy wyżej na liście mają pierwszeństwo przed znajdującymi się niżej. Oceny zapisane w pamięci podręcznej są zachowywane."
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32593"
+msgid "Episode numbering"
+msgstr "Numeracja odcinków"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32594"
+msgid "Default"
+msgstr "Domyślnie"
+
+#: /resources/settings.xml
+msgctxt "#32595"
+msgid "Select"
+msgstr "Wybierz"
+
+#: /resources/settings.xml
+msgctxt "#32596"
+msgid "Group"
+msgstr "Grupa"
+
+#: /resources/settings.xml
+msgctxt "#32597"
+msgid "Choose which season and episode numbers to pass to players. Default always uses TMDb numbering. Select asks which episode group to use when groups are available. Group uses the current episode group's numbering when playback starts from a group, otherwise TMDb numbering. A player's episode_groups option overrides this setting."
+msgstr "Wybierz, które numery sezonów i odcinków mają być przekazywane playerom. „Domyślnie” zawsze stosuje numerację TMDb. „Wybierz” pozwala określić, której grupy odcinków należy użyć, jeśli są dostępne różne grupy. „Grupa” stosuje numerację bieżącej grupy odcinków, gdy odtwarzanie rozpoczyna się od grupy, w przeciwnym razie stosowana jest numeracja TMDb. Opcja `episode_groups` playera ma pierwszeństwo przed tym ustawieniem."
