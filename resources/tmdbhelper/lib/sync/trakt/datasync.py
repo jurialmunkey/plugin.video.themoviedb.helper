@@ -33,8 +33,7 @@ class TraktSyncData(SyncDataParentProperties):
     def clear_method(self, method):
         for item_type in ('movie', 'show', 'season', 'episode'):
             item_id = f'{item_type}.trakt.{method}'
-            self.cache.del_item(table='lactivities', item_id=item_id)
-            self.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
+            self.instance_syncdata.invalidate_activity(item_id)
 
     def invalidate(self, features):
         sync_types = tuple(name for name, feature in SYNC_FEATURES.items() if feature in features)

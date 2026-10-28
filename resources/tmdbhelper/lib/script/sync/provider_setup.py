@@ -15,8 +15,9 @@ class SyncProviderSetup:
     later_property = 'SyncProviderSetup.Later'
     prompt_property = 'SyncProviderSetup.Prompt'
 
-    def __init__(self, capabilities):
+    def __init__(self, capabilities, list_name):
         self.capabilities = capabilities
+        self.list_name = list_name
         self.is_widget = self.get_is_widget()
         self.prompt_version = get_property(self.prompt_property)
 
@@ -66,11 +67,11 @@ class SyncProviderSetup:
     def confirm(self):
         if not self.is_widget:
             return Dialog().yesno(
-                get_localized(32550), get_localized(32555),
+                get_localized(32550), get_localized(32555).format(self.list_name),
                 yeslabel=get_localized(186), nolabel=get_localized(222),
                 defaultbutton=DLG_YESNO_YES_BTN)
         selected = Dialog().yesnocustom(
-            get_localized(32550), get_localized(32555),
+            get_localized(32550), get_localized(32555).format(self.list_name),
             yeslabel=get_localized(186), nolabel=get_localized(32556), customlabel=get_localized(13170),
             defaultbutton=DLG_YESNO_YES_BTN)
         if selected == 1:

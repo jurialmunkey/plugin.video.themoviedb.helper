@@ -4,6 +4,7 @@ from jurialmunkey.ftools import cached_property
 from jurialmunkey.checks import has_arg_value
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.files.dbdata import DatabaseStatements
+from tmdbhelper.lib.files.sqlite_mutex import SQLiteMutex
 
 
 class SyncItemDetailsDatabase(ItemDetailsDatabase):
@@ -212,6 +213,26 @@ class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
     clause_keys = ('last_watched_at', )
 
 
+class SyncDataGetterWatchedOn(SyncDataGetterAllItemsWatched):
+    query_clauses = (
+        'item_type=?',
+        "(? IS NULL OR STRFTIME('%Y', last_watched_at, 'localtime')=?)",
+        "(? IS NULL OR STRFTIME('%m', last_watched_at, 'localtime')=?)",
+        "(? IS NULL OR STRFTIME('%d', last_watched_at, 'localtime')=?)",
+        "(? IS NULL OR STRFTIME('%w', last_watched_at, 'localtime')=?)",
+    )
+
+    @property
+    def query_values(self):
+        return (
+            self.item_type,
+            self.watched_on.year, self.watched_on.year,
+            self.watched_on.month, self.watched_on.month,
+            self.watched_on.day, self.watched_on.day,
+            self.watched_on.weekday, self.watched_on.weekday,
+        )
+
+
 class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
     days = 30
     query_clauses = (
@@ -351,6 +372,11 @@ class SyncDataGetters:
 
     def get_all_watched_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllItemsWatched, item_type)
+
+    def get_watched_on_getter(self, item_type, watched_on):
+        sd = self.get_item_type_getter(SyncDataGetterWatchedOn, item_type)
+        sd.watched_on = watched_on
+        return sd
 
     def get_watched_history_stats_getter(self, item_type, days):
         sd = self.get_item_type_getter(SyncDataGetterWatchedHistoryStats, item_type)
@@ -515,6 +541,14 @@ class SyncData(SyncDataGetters):
             self.clear_unavailable_provider_activities(SYNC_FEATURES[sync_type])
         self.disabled_sync_types.add(sync_type)
 
+    def invalidate_activity(self, item_id):
+        lockname = f'{self.cache._db_file}.datasync.{item_id}.lockfile'
+        with SQLiteMutex(lockname, timeout=300, kodi_log=self.cache.kodi_log) as mutex_lock:
+            if mutex_lock.lockstate == -1:  # Abort or Timeout
+                return
+            self.cache.del_item(table='lactivities', item_id=item_id)
+            self.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
+
     def clear_unavailable_provider_activities(self, feature):
         provider_id = self.registry.get_selected_provider_id(feature)
         if not provider_id or provider_id in self.unavailable_providers:
@@ -524,8 +558,7 @@ class SyncData(SyncDataGetters):
             return  # An unsupported sync type must not invalidate the provider's supported data.
         from tmdbhelper.lib.sync.activity import SyncLastActivities
         for item_id in self.cache.get_provider_activity_ids(provider_id):
-            self.cache.del_item(table='lactivities', item_id=item_id)
-            self.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
+            self.invalidate_activity(item_id)
         SyncLastActivities.clear_provider(self.window, provider_id)
         self.unavailable_providers.add(provider_id)
 

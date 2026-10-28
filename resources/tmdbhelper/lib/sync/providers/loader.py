@@ -5,6 +5,8 @@ from threading import RLock
 from xbmcvfs import translatePath
 from tmdbhelper.lib.sync.providers.base import SyncProvider
 from tmdbhelper.lib.sync.providers.features import ACTION_FEATURES, SYNC_FEATURES, WATCHED_GETTERS
+from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSupplier
+from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
 
 
@@ -70,6 +72,45 @@ class SyncProviderLoader:
             if not callable(getter_class):
                 raise TypeError(f'Getter factory {name} must be callable')
 
+    @staticmethod
+    def validate_ratings_classes(provider):
+        for mediatype, supplier_class in provider.ratings_classes.items():
+            if mediatype not in RATINGS_MEDIATYPES:
+                raise ValueError(f'Unknown ratings media type: {mediatype}')
+            if not isinstance(supplier_class, type) or not issubclass(supplier_class, RatingsSupplier):
+                raise TypeError(f'Ratings supplier for {mediatype} must inherit RatingsSupplier')
+            if not callable(supplier_class.get_ratings) or supplier_class.get_ratings is RatingsSupplier.get_ratings:
+                raise TypeError(f'Ratings supplier for {mediatype} must implement get_ratings()')
+
+    @staticmethod
+    def validate_monitor_lists_class(provider):
+        supplier_class = provider.monitor_lists_class
+        if supplier_class is None:
+            return
+        if not isinstance(supplier_class, type) or not issubclass(supplier_class, MonitorListsSupplier):
+            raise TypeError('Monitor lists supplier must inherit MonitorListsSupplier')
+        for method in ('get_lists', 'get_list_items'):
+            implementation = getattr(supplier_class, method)
+            if not callable(implementation) or implementation is getattr(MonitorListsSupplier, method):
+                raise TypeError(f'Monitor lists supplier must implement {method}()')
+
+    @staticmethod
+    def validate_directory(provider):
+        if provider.directory_item_class is not None:
+            from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
+            if not isinstance(provider.directory_item_class, type) or not issubclass(provider.directory_item_class, BaseDirItem):
+                raise TypeError('Provider directory item must inherit BaseDirItem')
+            route = provider.directory_item_class().params['info']
+            if route not in provider.list_routes:
+                raise ValueError('Provider directory item must target a registered list route')
+        for name, route in provider.list_routes.items():
+            if not isinstance(name, str) or not name.startswith(f'{provider.provider_id}_'):
+                raise ValueError(f'Provider list routes must start with {provider.provider_id}_: {name}')
+            if set(route) != {'module_name', 'import_attr'}:
+                raise ValueError(f'List route {name} must declare module_name and import_attr')
+            if any(not isinstance(value, str) or not value for value in route.values()):
+                raise ValueError(f'List route {name} must declare non-empty import names')
+
     def validate_provider(self, provider):
         if not isinstance(provider, SyncProvider):
             raise TypeError('Provider must inherit SyncProvider')
@@ -86,6 +127,9 @@ class SyncProviderLoader:
         self.validate_sync_classes(provider)
         self.validate_action_classes(provider)
         self.validate_getter_classes(provider)
+        self.validate_ratings_classes(provider)
+        self.validate_monitor_lists_class(provider)
+        self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')
         if provider.scrobbler_class is not None and not callable(provider.scrobbler_class):

@@ -12,4 +12,4 @@ class SyncProviderListProperties(ListProperties):
 
     def get_provider_available(self):
         from tmdbhelper.lib.script.sync.provider_setup import SyncProviderSetup
-        return SyncProviderSetup(self.sync_capabilities).ensure_provider()
+        return SyncProviderSetup(self.sync_capabilities, self.plugin_category).ensure_provider()

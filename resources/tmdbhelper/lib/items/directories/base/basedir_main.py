@@ -87,18 +87,6 @@ class BaseDirItemMainTVDb(BaseDirItemMainMovie):
     art_icon = 'resources/icons/tvdb/tvdb.png'
 
 
-class BaseDirItemMainMDbList(BaseDirItemMainMovie):
-    priority = 200
-    label = 'MDbList'
-    params = {'info': 'dir_mdblist'}
-    art_icon = 'resources/icons/mdblist/mdblist.png'
-
-    @property
-    def enabled(self):
-        from tmdbhelper.lib.addon.plugin import get_setting
-        return bool(get_setting('mdblist_apikey', 'str'))
-
-
 class BaseDirItemMainGemini(BaseDirItemMainMovie):
     priority = 205
     label_localized = 32149

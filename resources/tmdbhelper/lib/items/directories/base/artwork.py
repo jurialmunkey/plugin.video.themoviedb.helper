@@ -3,13 +3,6 @@
 
 # Normal artwork remains the default; only these explicit variants are exported.
 DIRECTORY_ICON_VARIANTS = {
-    'resources/icons/mdblist/curatedlists.png': ('both',),
-    'resources/icons/mdblist/likedlists.png': ('both',),
-    'resources/icons/mdblist/officiallists.png': ('movie', 'tv'),
-    'resources/icons/mdblist/searchlists.png': ('both',),
-    'resources/icons/mdblist/streamingcharts.png': ('movie', 'tv'),
-    'resources/icons/mdblist/toplists.png': ('both',),
-    'resources/icons/mdblist/yourlists.png': ('both',),
     'resources/icons/sync/calendar.png': ('tv',),
     'resources/icons/sync/collection.png': ('movie', 'tv', 'both'),
     'resources/icons/sync/dropped.png': ('tv',),

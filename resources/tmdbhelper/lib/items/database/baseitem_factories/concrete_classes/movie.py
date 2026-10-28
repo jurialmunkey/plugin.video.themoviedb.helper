@@ -8,6 +8,24 @@ class Movie(MediaItem):
     ftv_type = 'movies'
 
     @cached_property
+    def online_data(self):
+        return self.get_online_data()
+
+    def get_online_data(self):
+        if not self.online_data_cond or not self.common_apis.ftv_api:
+            return super().online_data
+
+        from tmdbhelper.lib.addon.thread import ParallelThread
+
+        def get_data_attr(attr):
+            return getattr(self, attr)
+
+        with ParallelThread(('online_data_tmdb', 'online_data_ftv'), get_data_attr):
+            pass
+
+        return super().online_data
+
+    @cached_property
     def online_data_collection(self):
         if self.cache_refresh == 'basic':
             return {}

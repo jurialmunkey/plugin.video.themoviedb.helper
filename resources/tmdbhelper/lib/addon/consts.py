@@ -13,7 +13,6 @@ SQLITE_FALSE = 0
 SQLITE_TRUE = 1
 
 TRAKT_MAX_ITEMS_PER_PAGE = 250
-MDBLIST_MAX_ITEMS_PER_PAGE = 1000
 
 TVDB_DISCLAIMER = 'Information provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe'
 
@@ -77,6 +76,7 @@ PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
 
 LASTACTIVITIES_DATA = 'TraktNewSyncLastActivities'
 LASTACTIVITIES_EXPIRY = 600
+KODI_LIBRARY_LAST_UPDATED = 'KodiLibrary.LastUpdated'
 
 UPNEXT_EPISODE_ART = {
     'thumb': lambda li: li.art.get('thumb') or '',
@@ -167,6 +167,9 @@ ROUTE_NOID = {
     'sync_history_stats': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_stats',
         'import_attr': 'ListHistoryStats'}},
+    'sync_watchedon': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_watchedon',
+        'import_attr': 'ListWatchedOn'}},
     'sync_mostwatched': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListMostWatched'}},
@@ -254,42 +257,6 @@ ROUTE_NOID = {
     'trakt_years': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_years',
         'import_attr': 'ListTraktYears'}},
-    'mdblist_sortby': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sorting',
-        'import_attr': 'ListMDbListSortBy'}},
-    'mdblist_locallist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_local',
-        'import_attr': 'ListMDbListLocal'}},
-    'mdblist_userlist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
-        'import_attr': 'ListMDbListCustom'}},
-    'mdblist_officiallist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
-        'import_attr': 'ListMDbListOfficial'}},
-    'mdblist_streamingcharts': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_charts',
-        'import_attr': 'ListMDbListStreamingCharts'}},
-    'mdblist_streamingchart': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_charts',
-        'import_attr': 'ListMDbListStreamingChart'}},
-    'mdblist_toplists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsTop'}},
-    'mdblist_yourlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsUser'}},
-    'mdblist_likedlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsLiked'}},
-    'mdblist_curatedlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsCurated'}},
-    'mdblist_officiallists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsOfficial'}},
-    'mdblist_searchlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsSearch'}},
     'dir_tvdb_awards': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tvdb.lists_awards',
         'import_attr': 'ListAwards'}},

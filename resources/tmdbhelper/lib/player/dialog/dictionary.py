@@ -190,10 +190,14 @@ class PlayerDictionaryDictMovie(PlayerDictionaryDict):
 class PlayerDictionaryDictEpisode(PlayerDictionaryDict):
     tmdb_type = 'tv'
 
-    def __init__(self, tmdb_id, details, season=None, episode=None, **kwargs):
+    def __init__(
+            self, tmdb_id, details, season=None, episode=None,
+            virtual_season=None, virtual_episode=None, **kwargs):
         super().__init__(tmdb_id, details)
         self.season = season
         self.episode = episode
+        self.virtual_season = virtual_season
+        self.virtual_episode = virtual_episode
 
     def get_routes(self):
         routes = super().get_routes()
@@ -210,8 +214,8 @@ class PlayerDictionaryDictEpisode(PlayerDictionaryDict):
             'eptrakt': lambda **kwargs: self.details.unique_ids.get('trakt'),
             'epslug': lambda **kwargs: self.details.unique_ids.get('slug'),
             'originaltitle': lambda **kwargs: self.details.infoproperties.get('tvshow.originaltitle'),
-            'season': lambda **kwargs: self.season,
-            'episode': lambda **kwargs: self.episode,
+            'season': lambda **kwargs: self.season if self.virtual_season is None else self.virtual_season,
+            'episode': lambda **kwargs: self.episode if self.virtual_episode is None else self.virtual_episode,
             'showpremiered': lambda **kwargs: self.details.infoproperties.get('tvshow.premiered'),
             'showyear': lambda **kwargs: self.details.infoproperties.get('tvshow.year'),
             'showname': self.get_tvshowtitle,
@@ -236,12 +240,16 @@ class PlayerDictionaryDictEpisode(PlayerDictionaryDict):
         return name
 
 
-def PlayerDictionary(tmdb_type, tmdb_id, season=None, episode=None, details=None):
+def PlayerDictionary(
+        tmdb_type, tmdb_id, season=None, episode=None, details=None,
+        virtual_season=None, virtual_episode=None):
     itemdict = (
         PlayerDictionaryDictMovie
         if tmdb_type != 'tv' or season is None or episode is None else
         PlayerDictionaryDictEpisode
     )
-    itemdict = itemdict(tmdb_id, details, season=season, episode=episode)
+    itemdict = itemdict(
+        tmdb_id, details, season=season, episode=episode,
+        virtual_season=virtual_season, virtual_episode=virtual_episode)
     itemdict.initialise_standard_keys()
     return itemdict

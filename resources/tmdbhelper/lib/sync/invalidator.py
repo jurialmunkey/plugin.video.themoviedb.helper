@@ -72,11 +72,10 @@ class SyncInvalidatorAll:
     def invalidate_method(self, provider_id, method):
         for item_type in ('movie', 'show', 'season', 'episode'):
             item_id = f'{item_type}.{provider_id}.{method}'
-            self.syncdata.cache.del_item(table='lactivities', item_id=item_id)
-            self.syncdata.window.get_property(f'syncdecorators.timerlock.sync_data.{item_id}', clear_property=True)
+            self.syncdata.invalidate_activity(item_id)
 
-    def invalidate(self):
-        if self.database_keys:
+    def invalidate(self, clear_data=True):
+        if clear_data and self.database_keys:
             self.syncdata.cache.del_column_values(keys=self.database_keys)
         self.syncdata.core_sync.invalidate(self.features)
         for provider in self.providers:
@@ -85,10 +84,11 @@ class SyncInvalidatorAll:
     def sync(self):
         for item_type in ('movie', 'show', 'season', 'episode'):
             keys = tuple(key for key in self.database_keys if item_type in self.sync_table[key])
-            self.syncdata.sync(item_type, keys, forced=True)
+            self.syncdata.sync(item_type, keys)
 
     def run(self, sync=False):
-        self.invalidate()
+        # Resync replaces columns after a successful response; keep them available until then.
+        self.invalidate(clear_data=not sync)
         if sync:
             self.sync()
         if self.notification:

@@ -1,8 +1,7 @@
-from xbmc import Monitor
-from xbmcgui import Dialog, DialogProgress, Window
+from xbmcgui import Dialog, DialogProgress
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import ADDON, executebuiltin, get_condvisibility, get_infolabel, get_localized, get_setting
-from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.addon.plugin import get_localized, get_setting
+from tmdbhelper.lib.addon.settings import AddonSettingsDialog
 from tmdbhelper.lib.files.futils import normalise_filesize
 from tmdbhelper.lib.files.imagecache import ImageCacheMaintenance
 
@@ -72,36 +71,11 @@ class ImageCacheCleanup:
         Dialog().ok(self.title, message.format(normalise_filesize(removed)))
 
 
-class ImageCacheSettings:
+class ImageCacheSettings(AddonSettingsDialog):
     """Return to the cleanup button after Kodi saves and closes settings."""
 
-    @cached_property
-    def window(self):
-        return Window(10140)
-
-    def focus_label(self, label, first_control):
-        # Read labels without wrapping native spin/slider controls in Python.
-        for control_id in range(first_control, first_control + 100):
-            if get_infolabel(f'Control.GetLabel({control_id})') == label:
-                self.window.setFocusId(control_id)
-                return True
-        return False
-
-    def reopen(self):
-        addon_id = ADDON.getAddonInfo('id')
-        executebuiltin(f'Addon.OpenSettings({addon_id})')
-        monitor = Monitor()
-        category_focused = False
-        for _ in range(100):
-            if get_condvisibility('Window.IsActive(addonsettings)') and self.window.getProperty('Addon.ID') == addon_id:
-                # Kodi allocates category controls from 100 and setting controls from 200.
-                if not category_focused:
-                    category_focused = self.focus_label(get_localized(10039), 100)
-                elif self.focus_label(get_localized(32567), 200):
-                    return
-            if monitor.waitForAbort(0.05):
-                return
-        kodi_log('Image cache cleanup: timed out restoring the settings position', 2)
+    def __init__(self):
+        super().__init__(10039, 32567)
 
 
 def clean_image_cache(**kwargs):

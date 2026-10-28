@@ -2,6 +2,7 @@ from xbmcgui import Dialog, DLG_YESNO_NO_BTN
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.script.sync.provider_install import SyncProviderInstall
+from tmdbhelper.lib.script.sync.provider_settings import SyncProviderSettings
 from tmdbhelper.lib.sync.providers.catalog import PROVIDERS
 from tmdbhelper.lib.sync.providers.features import FEATURE_LABELS
 from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
@@ -101,10 +102,16 @@ class SyncProviderListSelection(SyncProviderSelection):
         SyncProviderSetting(capability).save(provider.provider_id)
 
 
-def select_sync_provider(capability, **kwargs):
-    SyncProviderSelection(capability).select()
+def select_sync_provider(capability, return_settings=False, **kwargs):
+    selection = SyncProviderSelection(capability)
+    if return_settings:
+        return SyncProviderSettings(FEATURE_LABELS[capability]).select(selection)
+    selection.select()
 
 
-def install_sync_provider(**kwargs):
+def install_sync_provider(return_settings=False, **kwargs):
     from tmdbhelper.lib.script.sync.provider_catalog import SyncProviderInstallSelection
-    SyncProviderInstallSelection().select()
+    selection = SyncProviderInstallSelection()
+    if return_settings:
+        return SyncProviderSettings(32557).select(selection)
+    selection.select()
