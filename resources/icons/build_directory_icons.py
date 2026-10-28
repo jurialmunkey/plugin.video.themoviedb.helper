@@ -84,7 +84,7 @@ class IconComposer:
             canvas = Image.open(ICON_ROOT / family / 'recommended.png').convert('RGBA')
             ImageDraw.Draw(canvas).rectangle((0, 0, 719, 470), fill=(13, 37, 63, 255))
             return canvas
-        colors = {'mdblist': (66, 132, 202, 255), 'tvdb': (27, 38, 38, 255)}
+        colors = {'tvdb': (27, 38, 38, 255)}
         if family in colors:
             return Image.new('RGBA', (SIZE, SIZE), colors[family])
         return self.xcf.get('Layer')
@@ -100,15 +100,12 @@ class IconComposer:
                 color = tuple(round(a + (b - a) * t) for a, b in zip((106, 194, 197), (11, 181, 224)))
                 draw.line((x, 0, x, size[1]), fill=(*color, 255))
             return fill
-        color = {'trakt': (159, 66, 198), 'mdblist': (255, 255, 255), 'tvdb': (108, 213, 145)}[family]
+        color = {'trakt': (159, 66, 198), 'tvdb': (108, 213, 145)}[family]
         return Image.new('RGBA', size, (*color, 255))
 
     def add_footer(self, canvas, family, label):
         if family == 'trakt':
             canvas.alpha_composite(self.xcf.get('trakt-text-logo-dark.svg'), (172, 336))
-        elif family == 'mdblist':
-            source = Image.open(ICON_ROOT / family / 'mdblist.png').convert('RGBA')
-            canvas.alpha_composite(source.crop((0, 324, 512, 400)), (0, 324))
         elif family == 'tvdb':
             source = Image.open(ICON_ROOT / family / 'tvdb.png').convert('RGBA')
             logo = source.crop((108, 170, 405, 340))
@@ -176,13 +173,6 @@ ICONS = (
     ('trakt', 'searchlists', 'magnifier-text-lined', ''),
     ('trakt', 'up-next', 'arrow-right-alt-filled', ''),
     ('trakt', 'groupings', 'layer-21', ''),
-    ('mdblist', 'toplists', 'trophy-1', ''),
-    ('mdblist', 'curatedlists', 'pen-16', ''),
-    ('mdblist', 'officiallists', 'shield-12', ''),
-    ('mdblist', 'streamingcharts', 'chart-5', ''),
-    ('mdblist', 'likedlists', 'heart-filled', ''),
-    ('mdblist', 'yourlists', 'user-19', ''),
-    ('mdblist', 'searchlists', 'magnifier-text-lined', ''),
     ('tvdb', 'awards', 'award-5', ''),
     ('tvdb', 'genres', 'layer-21', ''),
 )

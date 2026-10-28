@@ -9,6 +9,8 @@ class SyncProvider:
     action_classes = {}
     getter_classes = {}
     scrobbler_class = None
+    directory_item_class = None
+    list_routes = {}
 
     @property
     def capabilities(self):
@@ -16,6 +18,8 @@ class SyncProvider:
         features.update(ACTION_FEATURES[name] for name in self.action_classes)
         if self.scrobbler_class is not None:
             features.add('scrobbling')
+        if self.list_routes:
+            features.add('lists')
         return tuple(sorted(features))
 
     def get_sync_class(self, sync_type):

@@ -42,6 +42,14 @@ Providers declare:
   getters for watched/progress list behaviour. All three are required when the
   provider declares the watched capability; every getter must be callable.
 - `scrobbler_class`: an optional ScrobbleRequest subclass for the scrobbling feature.
+- `directory_item_class`: an optional BaseDirItem subclass contributing a root
+  folder. Its `params['info']` must name one of the provider's `list_routes`.
+- `list_routes`: optional route names mapped to `module_name` / `import_attr`
+  dictionaries, using the same lazy named imports as core routes. Every name
+  starts with `<provider_id>_`; duplicate routes are rejected. The imported
+  objects are directory container classes with the existing `(handle,
+  paramstring, **params)` interface. Registering routes exposes the `lists`
+  capability. Empty defaults keep existing interface-version-3 providers valid.
 - `is_authorized()` and `get_last_activities()`: provider authentication and activity
   timestamps grouped by plural item type and activity key.
 
@@ -79,6 +87,8 @@ supports at least one requested feature. Loaded providers determine actual
 capabilities; selection rechecks those declarations after installing/enabling
 and before assigning a provider to a feature. Keep catalogue capabilities aligned
 with the corresponding provider declarations when support changes.
+Catalogue entries also declare `provider_id`, allowing unavailable providers'
+namespaced list routes to offer installation or enabling.
 Each `sync_provider_<feature>` setting stores an empty value for an unconfigured
 feature, `never` for an explicitly disabled feature, or the chosen provider ID.
 Empty settings keep associated directory lists visible for discovery and setup;
@@ -233,3 +243,30 @@ Native Kodi library playback retains Kodi's own watched/resume persistence;
 scrobbling another source writes to the matching library item only when Kodi is
 the selected scrobbler. See the standalone provider's README for identity matching,
 date limitations, and non-library tracking findings.
+
+
+## Provider list directories
+
+Directories are additive: all enabled providers may expose their own root folder,
+independently of history, watchlist, collection, and scrobbling selections. There
+is no single `sync_provider_lists` setting. Folder visibility and authorization
+belong to the provider's directory item and API layer.
+
+Providers own their menu items, list containers, properties, mappers, sort
+options, icons, and type-variant artwork selection. Reuse BaseDirItem and its
+item builder for menus, and ListDefault/ListStandard with
+`list_properties_class`, `configure_list_properties()`, and
+`get_items_finalised()` for lists. Properties retrieve entries through the API
+or appropriate database interfaces; mappers turn those entries into item
+dictionaries. Configure attributes before accessing cached properties.
+
+The MDbList module registers `mdblist_directory` and all existing `mdblist_*`
+list routes. Core keeps those legacy names and `dir_mdblist` as forwarding
+entries, with the latter targeting `mdblist_directory`. Missing or disabled
+catalogue providers offer installation/enabling through Kodi and retry the
+requested route without changing sync-provider selections. Concurrent requests
+recheck provider availability and prompt generation under a mutex.
+Declining returns no directory items. The sorting script resolves the module's
+sorting container; library-monitor list discovery uses the same provider route
+interface with prompts disabled. Shared MDbList API clients, ratings, and
+library-building requests remain in core.

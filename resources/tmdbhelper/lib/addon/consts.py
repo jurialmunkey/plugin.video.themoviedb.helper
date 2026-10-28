@@ -258,42 +258,19 @@ ROUTE_NOID = {
     'trakt_years': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.trakt.lists_years',
         'import_attr': 'ListTraktYears'}},
-    'mdblist_sortby': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_sorting',
-        'import_attr': 'ListMDbListSortBy'}},
-    'mdblist_locallist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_local',
-        'import_attr': 'ListMDbListLocal'}},
-    'mdblist_userlist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
-        'import_attr': 'ListMDbListCustom'}},
-    'mdblist_officiallist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_custom',
-        'import_attr': 'ListMDbListOfficial'}},
-    'mdblist_streamingcharts': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_charts',
-        'import_attr': 'ListMDbListStreamingCharts'}},
-    'mdblist_streamingchart': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_charts',
-        'import_attr': 'ListMDbListStreamingChart'}},
-    'mdblist_toplists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsTop'}},
-    'mdblist_yourlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsUser'}},
-    'mdblist_likedlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsLiked'}},
-    'mdblist_curatedlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsCurated'}},
-    'mdblist_officiallists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsOfficial'}},
-    'mdblist_searchlists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.mdblist.lists_lists',
-        'import_attr': 'ListMDbListListsSearch'}},
+    'dir_mdblist': {'provider': 'mdblist', 'info': 'mdblist_directory'},
+    'mdblist_sortby': {'provider': 'mdblist'},
+    'mdblist_locallist': {'provider': 'mdblist'},
+    'mdblist_userlist': {'provider': 'mdblist'},
+    'mdblist_officiallist': {'provider': 'mdblist'},
+    'mdblist_streamingcharts': {'provider': 'mdblist'},
+    'mdblist_streamingchart': {'provider': 'mdblist'},
+    'mdblist_toplists': {'provider': 'mdblist'},
+    'mdblist_yourlists': {'provider': 'mdblist'},
+    'mdblist_likedlists': {'provider': 'mdblist'},
+    'mdblist_curatedlists': {'provider': 'mdblist'},
+    'mdblist_officiallists': {'provider': 'mdblist'},
+    'mdblist_searchlists': {'provider': 'mdblist'},
     'dir_tvdb_awards': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tvdb.lists_awards',
         'import_attr': 'ListAwards'}},

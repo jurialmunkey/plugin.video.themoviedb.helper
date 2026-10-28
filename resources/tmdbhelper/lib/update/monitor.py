@@ -42,8 +42,11 @@ class MonitorUserLists:
     def lists_mdblist_user(self):
         if not get_setting('mdblist_apikey', 'str'):
             return []
-        from tmdbhelper.lib.items.directories.mdblist.lists_lists import ListMDbListListsUser
-        return ListMDbListListsUser(-1, '').get_items() or []
+        from tmdbhelper.lib.sync.providers.directories import get_provider_list_container
+        container = get_provider_list_container('mdblist_yourlists', 'mdblist', prompt=False)
+        if container is None:
+            return []
+        return container(-1, '').get_items() or []
 
     @cached_property
     def lists_mdblist_formatted(self):

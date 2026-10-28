@@ -70,6 +70,23 @@ class SyncProviderLoader:
             if not callable(getter_class):
                 raise TypeError(f'Getter factory {name} must be callable')
 
+    @staticmethod
+    def validate_directory(provider):
+        if provider.directory_item_class is not None:
+            from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
+            if not isinstance(provider.directory_item_class, type) or not issubclass(provider.directory_item_class, BaseDirItem):
+                raise TypeError('Provider directory item must inherit BaseDirItem')
+            route = provider.directory_item_class().params['info']
+            if route not in provider.list_routes:
+                raise ValueError('Provider directory item must target a registered list route')
+        for name, route in provider.list_routes.items():
+            if not isinstance(name, str) or not name.startswith(f'{provider.provider_id}_'):
+                raise ValueError(f'Provider list routes must start with {provider.provider_id}_: {name}')
+            if set(route) != {'module_name', 'import_attr'}:
+                raise ValueError(f'List route {name} must declare module_name and import_attr')
+            if any(not isinstance(value, str) or not value for value in route.values()):
+                raise ValueError(f'List route {name} must declare non-empty import names')
+
     def validate_provider(self, provider):
         if not isinstance(provider, SyncProvider):
             raise TypeError('Provider must inherit SyncProvider')
@@ -86,6 +103,7 @@ class SyncProviderLoader:
         self.validate_sync_classes(provider)
         self.validate_action_classes(provider)
         self.validate_getter_classes(provider)
+        self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')
         if provider.scrobbler_class is not None and not callable(provider.scrobbler_class):

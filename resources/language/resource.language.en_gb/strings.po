@@ -2802,3 +2802,8 @@ msgstr ""
 msgctxt "#32579"
 msgid "512 MB"
 msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_directory.py
+msgctxt "#32580"
+msgid "Install or enable the {0} sync module to browse its lists?"
+msgstr ""

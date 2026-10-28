@@ -15,7 +15,6 @@ class BaseDirList:
         sync=False,
         trakt=False,
         tmdb=False,
-        mdblist=False,
         tvdb=False,
         random=False,
         trakt_genre=False,
@@ -27,7 +26,6 @@ class BaseDirList:
         self.sync = sync
         self.tmdb = tmdb
         self.trakt = trakt
-        self.mdblist = mdblist
         self.tvdb = tvdb
         self.random = random
         self.trakt_genre = trakt_genre
@@ -88,7 +86,6 @@ class BaseDirList:
         basedir += self.basedir_tmdb
         basedir += self.basedir_sync
         basedir += self.basedir_trakt
-        basedir += self.basedir_mdblist
         basedir += self.basedir_tvdb
         basedir += self.basedir_trakt_genre
         basedir += self.basedir_tmdb_v4
@@ -99,7 +96,11 @@ class BaseDirList:
     @property
     def basedir_main(self):
         from tmdbhelper.lib.items.directories.base.basedir_main import get_all_main_class_instances
-        return [] if not self.main else get_all_main_class_instances()
+        if not self.main:
+            return []
+        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+        items = get_all_main_class_instances() + SyncProviderRegistry().get_directory_items()
+        return sorted(items, key=lambda item: item.priority)
 
     @property
     def basedir_random(self):
@@ -120,11 +121,6 @@ class BaseDirList:
     def basedir_trakt(self):
         from tmdbhelper.lib.items.directories.base.basedir_trakt import get_all_trakt_class_instances
         return [] if not self.trakt else get_all_trakt_class_instances()
-
-    @property
-    def basedir_mdblist(self):
-        from tmdbhelper.lib.items.directories.base.basedir_mdblist import get_all_mdblist_class_instances
-        return [] if not self.mdblist else get_all_mdblist_class_instances()
 
     @property
     def basedir_tvdb(self):
@@ -176,7 +172,6 @@ class ListBaseDir(ContainerDirectory):
             'dir_tmdb_v4': lambda: f'TheMovieDb {get_localized(32079)}',
             'dir_sync': lambda: get_localized(32403),
             'dir_trakt': 'Trakt',
-            'dir_mdblist': 'MDbList',
             'dir_tvdb': 'TVDb',
             'dir_random': lambda: get_localized(590),
             'dir_custom_node': 'Nodes',
@@ -202,7 +197,6 @@ class ListBaseDir(ContainerDirectory):
             'dir_tmdb': lambda: BaseDirList(tmdb=True).build_basedir(group=group, info='dir_tmdb'),
             'dir_trakt': lambda: BaseDirList(trakt=True).build_basedir(group=group, info='dir_trakt'),
             'dir_sync': lambda: BaseDirList(sync=True).build_basedir(group=group, info='dir_sync'),
-            'dir_mdblist': lambda: BaseDirList(mdblist=True).build_basedir(group=group),
             'dir_tvdb': lambda: BaseDirList(tvdb=True).build_basedir(group=group),
             'dir_random': lambda: BaseDirList(random=True).build_basedir(),
             'dir_calendar_dvd': lambda: BaseDirList(calendar=ListBaseDir.get_trakt_calendar_item(info='trakt_dvdcalendar', **kwargs)).build_basedir('movie'),
