@@ -28,6 +28,11 @@ def refresh_item(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         sync.episode = episode
         sync.cache_refresh = 'force'
         sync.cache_translations = True
+        sync.cache.del_list_values(
+            table='user_art',
+            values=(sync.item_id, f'{sync.item_id}.%'),
+            conditions='parent_id=? OR parent_id LIKE ?',
+        )
         sync.data
 
     with BusyDialog():
@@ -60,7 +65,7 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
         },
         'all': {
             'baseitems': ('person', 'tvshow', 'season', 'episode', 'movie', 'collection', ),
-            'tables': (),
+            'tables': ('user_art', ),
         },
     }
 
@@ -96,6 +101,11 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
             for i in routes[mediatype]['baseitems']:
                 statement = f'DELETE FROM baseitem WHERE mediatype="{i}"'
                 progress_dialog.update(statement)
+                database.del_list_values(
+                    table='user_art',
+                    values=(i, ),
+                    conditions='parent_id IN (SELECT id FROM baseitem WHERE mediatype=?)',
+                )
                 database.execute_sql(statement)
             for i in routes[mediatype]['tables']:
                 statement = f'DELETE FROM {i}'

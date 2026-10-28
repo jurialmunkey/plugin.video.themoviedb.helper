@@ -52,7 +52,7 @@ class ItemDetailsDatabase(Database):
             return super().create_database_execute(connection)
 
     # DB version must be max of table_version
-    database_version = 49
+    database_version = 50
 
     database_changes = {
         21: (),
@@ -139,6 +139,45 @@ class ItemDetailsDatabase(Database):
         49: (
             'ALTER TABLE season ADD episode_count INTEGER',
             'UPDATE baseitem SET expiry=0 WHERE mediatype="tvshow"',
+        ),
+        50: (
+            # Rebuild cached details with episode counts and independent user artwork.
+            'DROP TABLE IF EXISTS episode_group_season_episodes',
+            'DROP TABLE IF EXISTS episode_group_seasons',
+            'DROP TABLE IF EXISTS episode_groups',
+            'DROP TABLE IF EXISTS episode',
+            'DROP TABLE IF EXISTS season',
+            'DROP TABLE IF EXISTS tvshow',
+            'DROP TABLE IF EXISTS belongs',
+            'DROP TABLE IF EXISTS collection',
+            'DROP TABLE IF EXISTS movie',
+            'DROP TABLE IF EXISTS ratings',
+            'DROP TABLE IF EXISTS person',
+            'DROP TABLE IF EXISTS genre',
+            'DROP TABLE IF EXISTS language',
+            'DROP TABLE IF EXISTS languages',
+            'DROP TABLE IF EXISTS country',
+            'DROP TABLE IF EXISTS countries',
+            'DROP TABLE IF EXISTS studio',
+            'DROP TABLE IF EXISTS company',
+            'DROP TABLE IF EXISTS network',
+            'DROP TABLE IF EXISTS broadcaster',
+            'DROP TABLE IF EXISTS video',
+            'DROP TABLE IF EXISTS certification',
+            'DROP TABLE IF EXISTS crewmember',
+            'DROP TABLE IF EXISTS castmember',
+            'DROP TABLE IF EXISTS provider',
+            'DROP TABLE IF EXISTS service',
+            'DROP TABLE IF EXISTS custom',
+            'DROP TABLE IF EXISTS art',
+            'DROP TABLE IF EXISTS fanart_tv',
+            'DROP TABLE IF EXISTS default_art',
+            'DROP TABLE IF EXISTS user_art',
+            'DROP TABLE IF EXISTS unique_id',
+            'DROP TABLE IF EXISTS translation',
+            'DROP TABLE IF EXISTS simplecache',
+            'DROP TABLE IF EXISTS lactivities',
+            'DROP TABLE IF EXISTS baseitem',
         ),
     }
 
