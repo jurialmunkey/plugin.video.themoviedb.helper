@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-10-27 12:00+0200\n"
+"PO-Revision-Date: 2026-10-28 12:00+0200\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -78,8 +78,8 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32013"
-msgid "Get watched indicators, episode counts, and resume points"
-msgstr "Pobierz statusy obejrzenia, licznik odcinków i punkty wznawiania"
+msgid "Sync watched and resume status"
+msgstr "Synchronizuj statusy obejrzenia i punkty wznawiania"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
@@ -2676,8 +2676,8 @@ msgstr "Opcje synchronizacji"
 
 #: /resources/tmdbhelper/lib/script/sync/provider_setup.py
 msgctxt "#32550"
-msgid "Sync provider setup"
-msgstr "Konfiguracja dostawcy synchronizacji"
+msgid "TMDbHelper Sync Provider"
+msgstr "Dostawca synchronizacji TMDbHelper"
 
 #: /resources/tmdbhelper/lib/script/sync/provider_install.py
 msgctxt "#32551"
@@ -2701,8 +2701,8 @@ msgstr "{0} nie obsługuje {1}. Wybierz innego dostawcę dla tej listy."
 
 #: /resources/tmdbhelper/lib/script/sync/provider_setup.py
 msgctxt "#32555"
-msgid "This list requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
-msgstr "Ta lista wymaga dostawcy synchronizacji. Wybierz dostawcę, którego chcesz użyć, zainstalować lub włączyć. Instalacja korzysta z zainstalowanych repozytoriów."
+msgid "{0} requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
+msgstr "{0} wymaga dostawcy synchronizacji. Wybierz dostawcę, którego chcesz użyć, zainstaluj go lub włącz. Instalator korzysta z zainstalowanych repozytoriów."
 
 #: /resources/tmdbhelper/lib/script/sync/provider_setup.py
 msgctxt "#32556"
@@ -2823,3 +2823,8 @@ msgstr "256 MB"
 msgctxt "#32579"
 msgid "512 MB"
 msgstr "512 MB"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_directory.py
+msgctxt "#32580"
+msgid "Install or enable the {0} sync module to browse its lists?"
+msgstr "Zainstalowaćć lub włączyć moduł synchronizacji {0}, aby przeglądać jego listy?"
