@@ -38,6 +38,14 @@ Providers declare:
   including class factories derived from DataType. Each declares a non-empty
   `method` string so invalidation can identify its activity timestamps.
 - `action_classes`: action names from `ACTION_FEATURES` to action classes.
+- `service_action_classes`: optional independent service action names mapped to
+  callable action classes. Names start with the provider ID and must be unique
+  across providers and core service actions. This exposes `service_actions`.
+  Every authorized provider contributes these actions regardless of sync selections.
+  The dispatcher assigns `sync_provider` before accessing any action properties.
+- `migrate_settings()`: optional migration hook called under the loader lock after
+  validation and addon-ID assignment, before the provider is returned or its API
+  client is constructed. The default is a no-op for existing providers.
 - `getter_classes`: `movies_to_watch`, `shows_to_watch`, and `shows_in_progress`
   getters for watched/progress list behaviour. All three are required when the
   provider declares the watched capability; every getter must be callable.
@@ -111,8 +119,9 @@ each provider as `addon_id`, so trust checks use catalogue addon IDs rather than
 provider-declared IDs or display names. List setup inherits the same confirmation.
 Item actions use the provider selected for
 the same feature. Unsupported synced-state actions are absent from Sync Options.
-Personal-list actions for every authorized service, Trakt comments, ratings, and
-favorites belong to core and are available independently of these selectors.
+Provider personal-list actions, core Trakt personal-list actions, comments,
+ratings, and favorites are available independently of these selectors. MDbList
+registers its module-owned static-list action as `mdblistuser`.
 Ratings and favorites sync directly through the authenticated Trakt API without
 requiring the Trakt provider addon. Their sync implementations, source-to-database
 mapping, and activity tracking live in `sync/trakt/`. `SyncData` dispatches these
@@ -277,8 +286,9 @@ error is raised. Concurrent requests recheck provider availability and prompt
 generation under a mutex.
 Declining returns no directory items. The sorting script resolves the module's
 sorting container. Library monitoring uses its own supplier interface below,
-without constructing directory containers. The shared MDbList API client and
-rating-response mappings remain in core.
+without constructing directory containers. The MDbList API client and
+rating-response mappings belong entirely to the module. Core does not construct
+or expose an MDbList API client.
 
 ## Ratings suppliers
 
@@ -314,8 +324,8 @@ valid. Lower providers fill missing fields.
 Provider results occupy the former MDbList position in `rating_attribs`: after
 OMDb and before direct Trakt/TMDb sources. Existing built-in precedence and IMDb
 Top 250 behavior remain unchanged. MDbList's module supplies all four media
-types using the shared API client's rating methods; no MDbList-specific branch
-remains in the ratings dictionaries.
+types using its module-owned API client's rating methods; no MDbList-specific
+branch remains in the ratings dictionaries.
 
 ## Monitored lists
 
@@ -348,3 +358,18 @@ prompt. Reading or updating lists does not rewrite saved monitoring selections.
 Core retains limits, confirmation, progress, library creation, and tagging.
 The tagging subclass and manual list-addition script inherit the same request
 dispatch. No database table definitions or cache invalidation are changed.
+
+## Provider credentials and migration
+
+MDbList stores its API key in its own addon settings as `apikey`. The core API
+settings page opens the module's settings through `open_sync_provider_settings`,
+using the existing install/enable flow when needed. This does not select a sync
+provider. All MDBList requests require the module to be installed and enabled.
+
+The module's `migrate_settings()` hook checks core's hidden legacy
+`mdblist_apikey` setting whenever the provider is loaded, including discovery and
+installation. It copies the key only if the module has no key, reads back the
+destination to verify persistence, and then clears the core value. An existing
+module key takes precedence. An empty legacy value makes subsequent loads a
+no-op; failed writes preserve the source for retry. The hidden declaration is
+retained solely so Kodi can still retrieve values from older installations.

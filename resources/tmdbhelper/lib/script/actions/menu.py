@@ -3,6 +3,17 @@ from tmdbhelper.lib.api.contains import CommonContainerAPIs
 
 
 class ServiceActions(CommonContainerAPIs):
+    def __init__(self, registry=None):
+        self._registry = registry
+
+    @cached_property
+    def registry(self):
+        return self.get_registry()
+
+    def get_registry(self):
+        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+        return self._registry if self._registry is not None else SyncProviderRegistry()
+
     @cached_property
     def actions(self):
         return self.get_actions()
@@ -11,9 +22,20 @@ class ServiceActions(CommonContainerAPIs):
         actions = {}
         if self.trakt_api.authenticator.is_authorized:
             actions.update(self.get_trakt_actions())
-        if self.mdblist_api is not None:
-            actions.update(self.get_mdblist_actions())
+        provider_actions = self.get_provider_actions()
+        duplicates = set(actions).intersection(provider_actions)
+        if duplicates:
+            raise ValueError(f'Duplicate service actions: {", ".join(sorted(duplicates))}')
+        actions.update(provider_actions)
         return actions
+
+    def get_provider_actions(self):
+        return {
+            name: ('sync_provider', provider, action_class)
+            for provider in self.registry.get_capable_providers('service_actions')
+            if provider.is_authorized()
+            for name, action_class in provider.service_action_classes.items()
+        }
 
     def get_trakt_actions(self):
         from tmdbhelper.lib.script.actions.trakt.userlist import ItemUserList
@@ -23,10 +45,6 @@ class ServiceActions(CommonContainerAPIs):
         return {name: ('trakt_api', self.trakt_api, action_class) for name, action_class in (
             ('userlist', ItemUserList), ('rating', ItemRating), ('comments', ItemComments),
             ('favorites', ItemFavorites))}
-
-    def get_mdblist_actions(self):
-        from tmdbhelper.lib.script.actions.mdblist.userlist import ItemUserList
-        return {'mdblistuser': ('mdblist_api', self.mdblist_api, ItemUserList)}
 
     def get_item(self, name, *args):
         api_attribute, api, action_class = self.actions[name]

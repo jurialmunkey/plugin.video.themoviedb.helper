@@ -401,22 +401,22 @@
                 </setting>
             </group>
             <group id="2" label="32422">
-                <setting id="mdblist_apikey" type="string" label="32423" help="">
+                <setting id="mdblist_settings" type="action" label="10004" help="">
                     <level>0</level>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.mdblist)</data>
+                    </control>
+                </setting>
+                <!-- Retained only so Kodi can read and clear pre-module keys. -->
+                <setting id="mdblist_apikey" type="string" label="32423" help="">
+                    <level>4</level>
                     <default/>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
-                    <control type="edit" format="string">
-                        <heading>32423</heading>
-                    </control>
-                </setting>
-                <setting id="mdblist_apikey_access" type="boolean" label="32483" help="" parent="mdblist_apikey">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
+                    <control type="edit" format="string"/>
                     <visible>false</visible>
-                    <enable>false</enable>
                 </setting>
             </group>
             <group id="3" label="32124">

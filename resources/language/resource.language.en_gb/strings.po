@@ -2289,7 +2289,7 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
+msgid "Add your personal MDbList API key in the MDbList module settings."
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync.py

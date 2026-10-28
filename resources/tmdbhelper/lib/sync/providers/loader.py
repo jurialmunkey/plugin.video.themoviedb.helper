@@ -63,6 +63,14 @@ class SyncProviderLoader:
                 raise TypeError(f'Action factory {name} must be callable')
 
     @staticmethod
+    def validate_service_action_classes(provider):
+        for name, action_class in provider.service_action_classes.items():
+            if not isinstance(name, str) or not name.startswith(provider.provider_id):
+                raise ValueError('Service action names must start with the provider ID')
+            if not callable(action_class):
+                raise TypeError(f'Service action factory {name} must be callable')
+
+    @staticmethod
     def validate_getter_classes(provider):
         if 'watched' in provider.capabilities:
             missing = set(WATCHED_GETTERS).difference(provider.getter_classes)
@@ -126,6 +134,7 @@ class SyncProviderLoader:
             raise TypeError('Provider must implement get_last_activities()')
         self.validate_sync_classes(provider)
         self.validate_action_classes(provider)
+        self.validate_service_action_classes(provider)
         self.validate_getter_classes(provider)
         self.validate_ratings_classes(provider)
         self.validate_monitor_lists_class(provider)
@@ -141,6 +150,7 @@ class SyncProviderLoader:
             with self.module_lock:
                 provider = self.validate_provider(self.load_module().Provider())
                 provider.addon_id = self.addon['addonid']
+                provider.migrate_settings()
                 return provider
         except Exception as exc:
             raise RuntimeError(f"Unable to load sync provider {self.addon['addonid']}: {exc}") from exc
