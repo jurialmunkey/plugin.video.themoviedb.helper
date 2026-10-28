@@ -2827,4 +2827,54 @@ msgstr "512 MB"
 #: /resources/tmdbhelper/lib/script/sync/provider_directory.py
 msgctxt "#32580"
 msgid "The route \"{0}\" is not available in TMDbHelper. It may be available in the {1} sync module. Install or enable this module?"
-msgstr „Ścieżka \"{0}\" nie jest dostępna w TMDbHelper. Być może jest dostępna w module synchronizacji {1}. Czy chcesz zainstalować lub włączyć ten moduł?”
+msgstr „Ścieżka \"{0}\" nie jest dostępna w TMDbHelper. Być może jest dostępna w module synchronizacji {1}. Zainstalować lub włączyć ten moduł?”
+
+#: /resources/settings.xml
+msgctxt "#32581"
+msgid "Ratings providers"
+msgstr "Dostawcy ocen"
+
+#: /resources/settings.xml
+msgctxt "#32582"
+msgid "Enable or disable installed ratings providers and set their priority. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
+msgstr "Włącz lub wyłącz zainstalowanych dostawców ocen i ustaw ich priorytet. Dostawcy wyżej na liście mają pierwszeństwo przed znajdującymi się niżej. Oceny zapisane w pamięci podręcznej są zachowywane."
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32583"
+msgid "{0}. {1} ({2})"
+msgstr "{0}. {1} ({2})"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32584"
+msgid "Enabled"
+msgstr "Włączony"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32585"
+msgid "Disabled"
+msgstr "Wyłączony"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32586"
+msgid "Move up"
+msgstr "Przenieś wyżej"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32587"
+msgid "Move down"
+msgstr "Przenieś niżej"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32588"
+msgid "No ratings providers are installed."
+msgstr "Nie zainstalowano żadnych dostawców ocen."
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32589"
+msgid "Enable"
+msgstr "Wlącz"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32590"
+msgid "Disable"
+msgstr "Wyłącz"
