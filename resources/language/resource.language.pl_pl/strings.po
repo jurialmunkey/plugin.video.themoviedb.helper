@@ -2869,12 +2869,12 @@ msgctxt "#32588"
 msgid "No ratings providers are installed."
 msgstr "Nie zainstalowano żadnych dostawców ocen."
 
-#: /resources/tmdbhelper/lib/script/ratings/providers.py
-msgctxt "#32589"
-msgid "Enable"
-msgstr "Wlącz"
+#: /resources/settings.xml
+msgctxt "#32591"
+msgid "Priority"
+msgstr "Priorytet"
 
-#: /resources/tmdbhelper/lib/script/ratings/providers.py
-msgctxt "#32590"
-msgid "Disable"
-msgstr "Wyłącz"
+#: /resources/settings.xml
+msgctxt "#32592"
+msgid "Arrange ratings providers in priority order. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
+msgstr "Ustaw dostawców ocen wg priorytetu. Dostawcy wyżej na liście mają pierwszeństwo przed znajdującymi się niżej. Oceny zapisane w pamięci podręcznej są zachowywane."
