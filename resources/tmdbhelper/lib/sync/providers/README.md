@@ -261,10 +261,9 @@ or appropriate database interfaces; mappers turn those entries into item
 dictionaries. Configure attributes before accessing cached properties.
 
 The MDbList module registers `mdblist_directory` and all existing `mdblist_*`
-list routes. Core keeps those legacy names and `dir_mdblist` as forwarding
-entries, with the latter targeting `mdblist_directory`. Missing or disabled
-catalogue providers offer installation/enabling through Kodi and retry the
-requested route without changing sync-provider selections. Concurrent requests
+list routes. Core keeps the existing list route names as forwarding entries.
+Missing or disabled catalogue providers offer installation/enabling through Kodi
+and retry the requested route without changing sync-provider selections. Concurrent requests
 recheck provider availability and prompt generation under a mutex.
 Declining returns no directory items. The sorting script resolves the module's
 sorting container; library-monitor list discovery uses the same provider route
