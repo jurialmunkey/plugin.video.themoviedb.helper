@@ -18,7 +18,11 @@ def get_provider_list_container(info, provider_id=None, prompt=True):
     if not prompt or addon_id is None:
         return
     from tmdbhelper.lib.script.sync.provider_directory import SyncProviderDirectorySetup
-    provider = SyncProviderDirectorySetup(addon_id).ensure_provider()
+    provider = SyncProviderDirectorySetup(addon_id, info).ensure_provider()
     if provider is None:
         return
-    return importmodule(**provider.list_routes[info])
+    try:
+        route = provider.list_routes[info]
+    except KeyError:
+        raise ValueError(f'info={info} is not a valid route in {provider.display_name}') from None
+    return importmodule(**route)

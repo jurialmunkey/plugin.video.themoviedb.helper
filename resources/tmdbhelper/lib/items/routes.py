@@ -16,12 +16,6 @@ def get_container(info):
             route = routes[info]
         except KeyError:
             continue
-        if 'provider' in route:
-            from tmdbhelper.lib.sync.providers.directories import get_provider_list_container
-            container = get_provider_list_container(route.get('info', info), route['provider'])
-            if container is not None:
-                return container
-            return importmodule(module_name='tmdbhelper.lib.items.container', import_attr='ContainerDirectory')
         return importmodule(**route['route'])
 
     if info and info[:4] != 'dir_':

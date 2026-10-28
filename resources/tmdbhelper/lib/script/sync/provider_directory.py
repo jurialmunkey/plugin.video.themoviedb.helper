@@ -9,8 +9,9 @@ from tmdbhelper.lib.script.sync.provider_install import SyncProviderInstall
 class SyncProviderDirectorySetup(SyncProviderInstall):
     mutex_lockname = 'SyncProviderDirectorySetup'
 
-    def __init__(self, addon_id):
+    def __init__(self, addon_id, route):
         super().__init__(addon_id)
+        self.route = route
         self.prompt_version = get_property(self.prompt_property)
 
     @property
@@ -30,7 +31,7 @@ class SyncProviderDirectorySetup(SyncProviderInstall):
             return
         get_property(self.prompt_property, str(try_int(self.prompt_version) + 1))
         if Dialog().yesno(
-                get_localized(32550), get_localized(32580).format(self.display_name),
+                get_localized(32550), get_localized(32580).format(self.route, self.display_name),
                 yeslabel=get_localized(186), nolabel=get_localized(222),
                 defaultbutton=DLG_YESNO_YES_BTN):
             return self.install()

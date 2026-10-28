@@ -261,10 +261,14 @@ or appropriate database interfaces; mappers turn those entries into item
 dictionaries. Configure attributes before accessing cached properties.
 
 The MDbList module registers `mdblist_directory` and all existing `mdblist_*`
-list routes. Core keeps the existing list route names as forwarding entries.
-Missing or disabled catalogue providers offer installation/enabling through Kodi
-and retry the requested route without changing sync-provider selections. Concurrent requests
-recheck provider availability and prompt generation under a mutex.
+list routes. Core resolves provider routes through the registry without
+per-list forwarding entries. If no route is found, a `<provider_id>_` prefix
+matching a trusted catalogue provider with the lists capability offers
+installation/enabling through Kodi. The dialog names the requested route and
+provider; successful setup retries that route without changing sync selections.
+An installed provider must declare the requested route or an invalid-route
+error is raised. Concurrent requests recheck provider availability and prompt
+generation under a mutex.
 Declining returns no directory items. The sorting script resolves the module's
 sorting container; library-monitor list discovery uses the same provider route
 interface with prompts disabled. Shared MDbList API clients, ratings, and

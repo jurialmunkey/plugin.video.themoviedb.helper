@@ -2805,5 +2805,5 @@ msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync/provider_directory.py
 msgctxt "#32580"
-msgid "Install or enable the {0} sync module to browse its lists?"
+msgid "The route \"{0}\" is not available in TMDbHelper. It may be available in the {1} sync module. Install or enable this module?"
 msgstr ""
