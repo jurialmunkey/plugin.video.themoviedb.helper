@@ -168,6 +168,9 @@ ROUTE_NOID = {
     'sync_history_stats': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_stats',
         'import_attr': 'ListHistoryStats'}},
+    'sync_watchedon': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_watchedon',
+        'import_attr': 'ListWatchedOn'}},
     'sync_mostwatched': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListMostWatched'}},

@@ -213,6 +213,26 @@ class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
     clause_keys = ('last_watched_at', )
 
 
+class SyncDataGetterWatchedOn(SyncDataGetterAllItemsWatched):
+    query_clauses = (
+        'item_type=?',
+        "(? IS NULL OR STRFTIME('%Y', last_watched_at, 'localtime')=?)",
+        "(? IS NULL OR STRFTIME('%m', last_watched_at, 'localtime')=?)",
+        "(? IS NULL OR STRFTIME('%d', last_watched_at, 'localtime')=?)",
+        "(? IS NULL OR STRFTIME('%w', last_watched_at, 'localtime')=?)",
+    )
+
+    @property
+    def query_values(self):
+        return (
+            self.item_type,
+            self.watched_on.year, self.watched_on.year,
+            self.watched_on.month, self.watched_on.month,
+            self.watched_on.day, self.watched_on.day,
+            self.watched_on.weekday, self.watched_on.weekday,
+        )
+
+
 class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
     days = 30
     query_clauses = (
@@ -352,6 +372,11 @@ class SyncDataGetters:
 
     def get_all_watched_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllItemsWatched, item_type)
+
+    def get_watched_on_getter(self, item_type, watched_on):
+        sd = self.get_item_type_getter(SyncDataGetterWatchedOn, item_type)
+        sd.watched_on = watched_on
+        return sd
 
     def get_watched_history_stats_getter(self, item_type, days):
         sd = self.get_item_type_getter(SyncDataGetterWatchedHistoryStats, item_type)
