@@ -1,6 +1,3 @@
-from jurialmunkey.ftools import cached_property
-
-
 class FindQueriesDatabaseTraktStats:
 
     trakt_stats_columns = {
@@ -23,77 +20,40 @@ class FindQueriesDatabaseTraktStats:
     trakt_stats
     """
 
+    @staticmethod
+    def map_stats(data):
+        return {f"{item['name']}_{item['type']}": item['stat'] for item in data}
+
     def get_trakt_stats(self, forced=False):
-        table = 'trakt_stats'
-
-        def mapping_function(data):
-            return {f"{i['name']}_{i['type']}": i['stat'] for i in data} if data else {}
-
-        def get_cached():
-            # kwgs = {'values': (id_value, item_type, ), 'conditions': f'{id_type}=? AND item_type=?'}
-            kwgs = {}
-            keys = ('name', 'type', 'stat', )
-            return self.get_cached_values(table, keys, mapping_function, **kwgs)
-
-        def set_cached():
-            if not self.trakt_api.is_authorized:
-                return
-            sync = GetTraktStatsRequest(self.trakt_api)
-            if not sync.values:
-                return
-            self.set_cached_values(table, sync.keys, sync.values, expiry=1200)  # Cache for 20 minutes
-            return get_cached()
-
-        return (None if forced else get_cached()) or set_cached()
-
-
-class GetTraktStatsRequest:
-    url = 'users/me/stats'
-
-    def __init__(self, trakt_api):
-        self.trakt_api = trakt_api
-
-    @cached_property
-    def keys(self):
-        return tuple(FindQueriesDatabaseTraktStats.trakt_stats_columns.keys())
-
-    @cached_property
-    def response_json(self):
-        from json import JSONDecodeError
-        response = self.trakt_api.get_response(self.url)
-        try:
-            return response.json()
-        except AttributeError:
+        from tmdbhelper.lib.sync.providers.stats import Stats
+        supplier = Stats()
+        if supplier.provider is None:
             return
-        except JSONDecodeError:
+        if not forced:
+            data = self.get_cached_values('trakt_stats', ('name', 'type', 'stat'))
+            if data is not None:
+                return self.map_stats(data)
+        items = supplier.items
+        if items is None:
             return
+        self.set_stats_snapshot(items)
+        return self.map_stats(items)
 
-    @cached_property
-    def values(self):
-        return [
-            tuple([i[k] for k in self.keys])
-            for i in self.items
-        ]
+    def set_stats_snapshot(self, items):
+        keys = tuple(self.trakt_stats_columns)
+        values = [tuple(item[key] for key in keys) for item in items]
+        with self.access.connection.open() as connection:
+            connection.execute('BEGIN')
+            self.del_list_values('trakt_stats', conditions='1=1', connection=connection)
+            self.access.set_cached_list_values('trakt_stats', keys, values)
+            self.set_expiry('trakt_stats', expiry=1200)
+            connection.execute('COMMIT')
 
-    @cached_property
-    def items(self):
-        if not self.response_json:
-            return []
-        return self.get_items(self.response_json)
-
-    def get_items(self, stat, name=None, base=None):
-        if isinstance(stat, int):
-            return [{
-                'name': name,
-                'type': base or 'user',
-                'stat': stat,
-            }]
-        return [
-            item
-            for item_name, item_stat in stat.items()
-            for item in self.get_items(
-                stat=item_stat,
-                name=item_name,
-                base=name if not base else f'{base}_{name}'
-            )
-        ] if isinstance(stat, dict) else []
+    def invalidate_stats(self):
+        with self.access.connection.open() as connection:
+            connection.execute('BEGIN')
+            items = self.get_all_values('trakt_stats', ('name', 'type', 'stat'))
+            self.del_list_values('trakt_stats', conditions='1=1', connection=connection)
+            self.access.del_cached('expiry', 'trakt_stats')
+            connection.execute('COMMIT')
+        return self.map_stats(items)

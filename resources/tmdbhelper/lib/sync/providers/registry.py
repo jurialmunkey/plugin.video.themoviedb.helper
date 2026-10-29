@@ -2,7 +2,7 @@ from jurialmunkey.ftools import cached_property
 from jurialmunkey.modimp import importmodule
 from tmdbhelper.lib.sync.providers.discovery import SyncProviderDiscovery
 from tmdbhelper.lib.sync.providers.loader import SyncProviderLoader
-from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
+from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting, SyncProviderSettingFactory
 
 
 class SyncProviderRegistry:
@@ -87,6 +87,13 @@ class SyncProviderRegistry:
             return
         if capability in provider.capabilities:
             return provider
+
+    def get_selected_providers(self, capability):
+        provider_ids = SyncProviderSettingFactory(capability).provider_ids
+        return tuple(
+            provider for provider_id in provider_ids
+            if (provider := self.providers.get(provider_id)) is not None
+            and capability in provider.capabilities)
 
     @staticmethod
     def get_selected_provider_id(capability):

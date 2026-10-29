@@ -651,13 +651,22 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=collection,return_settings=true)</data>
                     </control>
                 </setting>
-                <setting id="sync_provider_scrobbling" type="string" label="32138" help="32548">
+                <setting id="sync_provider_scrobbling" type="string" label="32138" help="32599">
                     <level>0</level>
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
                     <control type="button" format="action">
                         <close>true</close>
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling,return_settings=true)</data>
+                    </control>
+                </setting>
+                <setting id="sync_provider_stats" type="string" label="32598" help="32548">
+                    <level>0</level>
+                    <default></default>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=stats,return_settings=true)</data>
                     </control>
                 </setting>
             </group>

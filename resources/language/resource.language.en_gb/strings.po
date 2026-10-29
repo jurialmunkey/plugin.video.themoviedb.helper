@@ -2882,3 +2882,13 @@ msgstr ""
 msgctxt "#32597"
 msgid "Choose which season and episode numbers to pass to players. Default always uses TMDb numbering. Select asks which episode group to use when groups are available. Group uses the current episode group's numbering when playback starts from a group, otherwise TMDb numbering. A player's episode_groups option overrides this setting."
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32598"
+msgid "Stats"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32599"
+msgid "Select the providers to scrobble playback to. Install or enable supported providers here, or clear all selections to disable scrobbling."
+msgstr ""
