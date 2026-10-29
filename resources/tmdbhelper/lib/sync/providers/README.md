@@ -74,6 +74,10 @@ Providers declare:
 - `ratings_classes`: optional media-type names (`movie`, `tvshow`, `season`,
   `episode`) mapped to RatingsSupplier subclasses. Each implements
   `get_ratings()`; registering any supplies the independent `ratings` capability.
+- `imdb_top250_classes`: optional `movie` / `tvshow` names mapped to
+  IMDbTop250Supplier subclasses implementing `get_items()`. Each media type must
+  also have a ratings supplier. Registering any supplies the `imdb_top250`
+  capability; empty defaults preserve existing interface-version-3 providers.
 - `monitor_lists_class`: an optional MonitorListsSupplier subclass implementing
   `get_lists()` and `get_list_items(list_slug)`. This supplies the independent
   `monitor_lists` capability for library monitoring and list retrieval.
@@ -355,9 +359,34 @@ valid. Lower providers fill missing fields.
 
 Provider results occupy the former MDbList position in `rating_attribs`: after
 OMDb and before direct Trakt/TMDb sources. Existing built-in precedence and IMDb
-Top 250 behavior remain unchanged. MDbList's module supplies all four media
+Top 250 output format remain unchanged. MDbList's module supplies all four media
 types using its module-owned API client's rating methods; no MDbList-specific
 branch remains in the ratings dictionaries.
+
+## IMDb Top 250
+
+Subclasses of `tmdbhelper.lib.sync.providers.imdb_top250.IMDbTop250Supplier`
+receive `provider` and `tmdb_type` (`movie` or `tv`) before the cached `.items`
+property is accessed. `get_items()` returns normalized dictionaries with `rank`,
+`tmdb_type`, `tmdb_id`, `title`, `year`, and `slug`, ordered by rank. The supplier
+owns API requests, authorization where required, and source mapping. It returns
+an empty list when no data is available; malformed data and programming errors
+must not be hidden. Suppliers do not access the query database.
+
+The `IMDbTop250` helper uses the existing ratings priority and enabled-provider
+settings for the requested media type. It skips providers without the matching
+Top 250 supplier and requests each remaining supplier sequentially until one
+returns a non-empty list. Results from different providers are not merged.
+There is no separate Top 250 selector or automatic provider installation.
+
+`FindQueriesDatabaseIMDbTop250` converts those records into the existing query
+table's columns and owns cache reads and writes. Schema, expiry, output-key
+selection, and ratings consumers are unchanged. Provider priority changes take
+effect on the next cache refresh, as with ratings. Without an available supplier,
+an uncached lookup returns no result and does not write an empty cache entry.
+
+The Trakt module registers movie and TV suppliers using the existing public
+Justin IMDb lists. These requests do not require account authorization.
 
 ## Monitored lists
 

@@ -6,6 +6,7 @@ from xbmcvfs import translatePath
 from tmdbhelper.lib.sync.providers.base import SyncProvider
 from tmdbhelper.lib.sync.providers.features import ACTION_FEATURES, SYNC_FEATURES, WATCHED_GETTERS
 from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSupplier
+from tmdbhelper.lib.sync.providers.imdb_top250 import IMDB_TOP250_MEDIATYPES, IMDbTop250Supplier
 from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
 from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES, ServiceDataType
@@ -102,6 +103,18 @@ class SyncProviderLoader:
                 raise TypeError(f'Ratings supplier for {mediatype} must implement get_ratings()')
 
     @staticmethod
+    def validate_imdb_top250_classes(provider):
+        for mediatype, supplier_class in provider.imdb_top250_classes.items():
+            if mediatype not in IMDB_TOP250_MEDIATYPES:
+                raise ValueError(f'Unknown IMDb Top 250 media type: {mediatype}')
+            if mediatype not in provider.ratings_classes:
+                raise ValueError(f'IMDb Top 250 supplier requires ratings support for {mediatype}')
+            if not isinstance(supplier_class, type) or not issubclass(supplier_class, IMDbTop250Supplier):
+                raise TypeError(f'IMDb Top 250 supplier for {mediatype} must inherit IMDbTop250Supplier')
+            if not callable(supplier_class.get_items) or supplier_class.get_items is IMDbTop250Supplier.get_items:
+                raise TypeError(f'IMDb Top 250 supplier for {mediatype} must implement get_items()')
+
+    @staticmethod
     def validate_monitor_lists_class(provider):
         supplier_class = provider.monitor_lists_class
         if supplier_class is None:
@@ -151,6 +164,7 @@ class SyncProviderLoader:
         self.validate_service_action_classes(provider)
         self.validate_getter_classes(provider)
         self.validate_ratings_classes(provider)
+        self.validate_imdb_top250_classes(provider)
         self.validate_monitor_lists_class(provider)
         self.validate_directory(provider)
         if not provider.capabilities:

@@ -166,8 +166,6 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.image_cache', 'clean_image_cache')(**kwargs),
         'log_request':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.logging', 'log_request')(**kwargs),
-        'log_sync':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.logging', 'log_sync')(**kwargs),
         'recache_kodidb':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.maintenance', 'recache_kodidb')(confirmation=True),
         # 'build_awards':

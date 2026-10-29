@@ -11,6 +11,7 @@ class SyncProvider:
     service_action_classes = {}
     getter_classes = {}
     ratings_classes = {}
+    imdb_top250_classes = {}
     monitor_lists_class = None
     scrobbler_class = None
     directory_item_class = None
@@ -28,6 +29,8 @@ class SyncProvider:
             features.add('lists')
         if self.ratings_classes:
             features.add('ratings')
+        if self.imdb_top250_classes:
+            features.add('imdb_top250')
         if self.monitor_lists_class is not None:
             features.add('monitor_lists')
         if self.service_action_classes:
