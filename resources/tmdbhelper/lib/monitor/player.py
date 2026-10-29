@@ -453,6 +453,6 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         # Update our properties
         self.set_properties(self.details)
 
-        # Start the selected scrobbler after any resume seek.
+        # Start the selected scrobblers after any resume seek.
         self.wait_for_seek(10)
         self.scrobbler_start()

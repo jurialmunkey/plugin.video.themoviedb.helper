@@ -121,7 +121,7 @@ Action discovery is shared by Sync Options and context-menu availability. Each
 container configures one discovery context for its list items before finalisation.
 
 The available feature selectors are history/progress, watchlist, collection,
-scrobbling, and stats. Each selector offers
+scrobbling, and stats. Single-provider selectors offer
 None, enabled providers declaring that feature, and installation/enabling options
 from `catalog.py`. The catalogue records trusted addon IDs, display names, and
 supported capabilities so missing or disabled modules are offered only for
@@ -134,6 +134,12 @@ Catalogue entries also declare `provider_id`, allowing unavailable providers'
 namespaced list routes to offer installation or enabling.
 Each `sync_provider_<feature>` setting stores an empty value for an unconfigured
 feature, `never` for an explicitly disabled feature, or the chosen provider ID.
+Scrobbling uses a multiselect and stores a JSON array of provider IDs in
+`sync_provider_scrobbling`; existing single-provider values remain readable.
+The dialog checks all selected, available providers and also offers installation
+or enabling of supported providers. Confirming no selections stores `never`.
+Cancelling, declining a provider trust warning, or failing provider installation
+leaves the saved selection unchanged. Installation rechecks actual capabilities.
 Empty settings keep associated directory lists visible for discovery and setup;
 `never` hides them and suppresses setup. Choosing None in a feature selector
 stores `never`; selecting a provider enables the feature again. For an
@@ -168,11 +174,15 @@ Empty snapshots are cached; failed or incomplete responses are not.
 List removal targets the service owning the displayed list; other services retain
 their add-to-list action. The `sync_trakt` script route aliases `sync_options`.
 
-Scrobbling has one independent provider selection. That provider receives playback
-start and stop requests. Shared playback timing, completion thresholds, and TMDb
+Scrobbling has an independent selection of multiple providers. Each selected,
+available, authorized provider receives playback start and stop requests.
+`PlayerScrobblers` coordinates independent `PlayerProviderScrobbler` instances,
+so a successful completion is not repeated while another provider retries a failed
+response. A separate playback instance handles the single TMDb rating prompt.
+Shared playback timing, completion thresholds, and TMDb
 rating prompts remain in TMDbHelper. Rating prompts run without a selected or
 authorized scrobbler. Watched writes belong exclusively to the selected scrobbling
-provider; core does not also increment the Kodi library playcount. Provider modules
+providers; core does not also increment the Kodi library playcount. Provider modules
 own payloads, service requests,
 authentication, and interpretation of scrobble results. Core coordinates sync-cache
 refreshes after successful stop requests. A reported history change also forces
@@ -237,8 +247,11 @@ or closing the dialog preserves all current selections.
 Custom opens `SyncProviderFeatureSelection(provider)`. This provider-agnostic
 multiselect reads capabilities and current selections from the loaded provider
 and settings. Checked features select that provider; unchecked features clear only
-its own assignments. Unchecked features already marked `never` keep that state;
-explicitly checking one assigns the provider. Cancelling the multiselect changes
+its own assignments. For scrobbling, checking adds the provider alongside existing
+selections, and unchecking removes only that provider. Confirmed logout likewise
+removes only that provider from scrobbling selections. Unchecked features already
+marked `never` keep that state; explicitly checking one assigns the provider.
+Cancelling the multiselect changes
 nothing. Trakt invokes onboarding after
 successful device authentication, never during token refresh. Confirmed Trakt
 logout clears its feature selections while retaining the installed module.
@@ -285,8 +298,8 @@ chronological log of individual plays. The provider refreshes snapshots at most
 once per minute during normal reads, and actions invalidate/resync immediately.
 Native Kodi library playback retains Kodi's own watched/resume persistence;
 scrobbling another source writes to the matching library item only when Kodi is
-the selected scrobbler. See the standalone provider's README for identity matching,
-date limitations, and non-library tracking findings.
+one of the selected scrobblers. See the standalone provider's README for identity
+matching, date limitations, and non-library tracking findings.
 
 
 ## Provider list directories

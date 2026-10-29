@@ -169,6 +169,7 @@ class PlayerScrobbler():
 
 def PlayerScrobblerFactory(total_time):
     from tmdbhelper.lib.sync.datasync import SyncDataFactory
+    from tmdbhelper.lib.monitor.scrobblers import PlayerScrobblers
     syncdata = SyncDataFactory()
-    provider = syncdata.registry.get_selected_provider('scrobbling')
-    return PlayerScrobbler(total_time, provider, syncdata)
+    providers = syncdata.registry.get_selected_providers('scrobbling')
+    return PlayerScrobblers(total_time, providers, syncdata)

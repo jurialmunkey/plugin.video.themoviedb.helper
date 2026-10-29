@@ -2887,3 +2887,8 @@ msgstr ""
 msgctxt "#32598"
 msgid "Stats"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32599"
+msgid "Select the providers to scrobble playback to. Install or enable supported providers here, or clear all selections to disable scrobbling."
+msgstr ""
