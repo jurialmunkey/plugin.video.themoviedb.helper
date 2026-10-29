@@ -2903,3 +2903,13 @@ msgstr "Grupa"
 msgctxt "#32597"
 msgid "Choose which season and episode numbers to pass to players. Default always uses TMDb numbering. Select asks which episode group to use when groups are available. Group uses the current episode group's numbering when playback starts from a group, otherwise TMDb numbering. A player's episode_groups option overrides this setting."
 msgstr "Wybierz, które numery sezonów i odcinków mają być przekazywane playerom. „Domyślnie” zawsze stosuje numerację TMDb. „Wybierz” pozwala określić, której grupy odcinków należy użyć, jeśli są dostępne różne grupy. „Grupa” stosuje numerację bieżącej grupy odcinków, gdy odtwarzanie rozpoczyna się od grupy, w przeciwnym razie stosowana jest numeracja TMDb. Opcja `episode_groups` playera ma pierwszeństwo przed tym ustawieniem."
+
+#: /resources/settings.xml
+msgctxt "#32598"
+msgid "Stats"
+msgstr "Statystyki"
+
+#: /resources/settings.xml
+msgctxt "#32599"
+msgid "Select the providers to scrobble playback to. Install or enable supported providers here, or clear all selections to disable scrobbling."
+msgstr "Wybierz dostawców, u których ma być rejestrowane odtwarzanie. Zainstaluj lub włącz obsługiwanych dostawców tutaj albo wyczyść wszystkie wybory, aby wyłączyć rejestrowanie."
