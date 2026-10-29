@@ -2,7 +2,7 @@ PROVIDERS = {
     'script.module.tmdbhelper.sync.trakt': {
         'provider_id': 'trakt',
         'display_name': 'Trakt',
-        'capabilities': ('watched', 'watchlist', 'collection', 'scrobbling'),
+        'capabilities': ('watched', 'watchlist', 'collection', 'scrobbling', 'lists', 'ratings', 'monitor_lists'),
     },
     'script.module.tmdbhelper.sync.mdblist': {
         'provider_id': 'mdblist',

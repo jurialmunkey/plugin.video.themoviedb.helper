@@ -13,47 +13,34 @@ class MonitorUserLists:
     def monitored_lists(self):
         list_slugs = (get_setting('monitor_userlist', 'str') or '').split(self.separator)
         user_slugs = (get_setting('monitor_userslug', 'str') or '').split(self.separator)
-        return list(zip(list_slugs, user_slugs))
+        return [self.get_configured_reference(list_slug, user_slug)
+                for list_slug, user_slug in zip(list_slugs, user_slugs)]
 
     @cached_property
-    def lists_trakt_watchlist(self):
-        return [
-            {
-                'label': f'{get_localized(32193)} {get_localized(20342)}',
-                'params': {'user_slug': 'me', 'list_slug': 'watchlist/movies'}
-            },
-            {
-                'label': f'{get_localized(32193)} {get_localized(20343)}',
-                'params': {'user_slug': 'me', 'list_slug': 'watchlist/shows'}
-            }
-        ]
+    def registry(self):
+        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+        return SyncProviderRegistry()
 
-    @cached_property
-    def lists_trakt_static_owned(self):
-        from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned
-        return ListTraktStaticOwned(-1, '').get_items(tmdb_type='both') or []
+    def get_configured_reference(self, list_slug, user_slug):
+        reference = self.registry.get_monitor_list_reference(user_slug, list_slug)
+        if reference is None:
+            return list_slug, user_slug
+        supplier, slug = reference
+        return slug, supplier.user_slug
 
-    @cached_property
-    def lists_trakt_static_liked(self):
-        from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticLiked
-        return ListTraktStaticLiked(-1, '').get_items(tmdb_type='both') or []
+    def is_monitored(self, list_slug, user_slug):
+        return self.get_configured_reference(list_slug, user_slug) in self.monitored_lists
 
     @cached_property
     def lists_provider(self):
         return self.get_lists_provider()
 
     def get_lists_provider(self):
-        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
-        return [item for supplier in SyncProviderRegistry().monitor_list_suppliers for item in supplier.lists]
+        return [item for supplier in self.registry.monitor_list_suppliers for item in supplier.lists]
 
     @cached_property
     def user_lists(self):
-        user_lists = []
-        user_lists += self.lists_trakt_watchlist
-        user_lists += self.lists_trakt_static_owned
-        user_lists += self.lists_trakt_static_liked
-        user_lists += self.lists_provider
-        return user_lists
+        return self.lists_provider
 
     @cached_property
     def dialog_list(self):

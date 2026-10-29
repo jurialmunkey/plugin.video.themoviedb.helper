@@ -432,14 +432,6 @@ class SyncData(SyncDataGetters):
         self._registry = registry
 
     @cached_property
-    def core_sync(self):
-        return self.get_core_sync()
-
-    def get_core_sync(self):
-        from tmdbhelper.lib.sync.trakt.datasync import TraktSyncData
-        return TraktSyncData(self)
-
-    @cached_property
     def registry(self):
         return self.get_registry()
 
@@ -457,22 +449,20 @@ class SyncData(SyncDataGetters):
 
     def get_sync_provider(self, sync_type):
         from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES
-        if sync_type in self.core_sync.sync_classes:
-            return
-        provider = self.registry.get_selected_provider(SYNC_FEATURES[sync_type])
+        from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES
+        provider = (
+            self.registry.get_service_sync_provider(sync_type)
+            if sync_type in SERVICE_SYNC_FEATURES else
+            self.registry.get_selected_provider(SYNC_FEATURES[sync_type]))
         if provider is not None and provider.is_authorized():
             return provider
 
     def get_sync_class(self, sync_type):
-        if sync_type in self.core_sync.sync_classes:
-            return self.core_sync.get_sync_class(sync_type)
         provider = self.get_sync_provider(sync_type)
         if provider is not None:
             return provider.get_sync_class(sync_type)
 
     def create_sync(self, sync_type, item_type):
-        if sync_type in self.core_sync.sync_classes:
-            return self.core_sync.create_sync(sync_type, item_type)
         provider = self.get_sync_provider(sync_type)
         if provider is None:
             return
@@ -523,22 +513,20 @@ class SyncData(SyncDataGetters):
         return data[0] if data else None
 
     def sync(self, item_type, keys, forced=False):
+        from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES
         sync_types = {self.routes[key] for key in keys if self.routes.get(key)}
         for sync_type in sync_types:
             sync_item = self.create_sync(sync_type, item_type)
             if sync_item is not None:
                 sync_item.sync(forced=forced)
-            elif sync_type not in self.disabled_sync_types:
+            elif sync_type not in SERVICE_SYNC_FEATURES and sync_type not in self.disabled_sync_types:
                 self.clear_disabled_sync_type(sync_type)
 
     def clear_disabled_sync_type(self, sync_type):
         from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES
         keys = tuple(key for key, key_sync_type in self.routes.items() if key_sync_type == sync_type)
         self.cache.del_column_values(keys=keys)
-        if sync_type in self.core_sync.sync_classes:
-            self.core_sync.clear_activities((sync_type,))
-        else:
-            self.clear_unavailable_provider_activities(SYNC_FEATURES[sync_type])
+        self.clear_unavailable_provider_activities(SYNC_FEATURES[sync_type])
         self.disabled_sync_types.add(sync_type)
 
     def invalidate_activity(self, item_id):

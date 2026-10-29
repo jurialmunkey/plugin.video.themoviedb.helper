@@ -1,12 +1,10 @@
 from jurialmunkey.parser import boolean, try_int
-from tmdbhelper.lib.addon.plugin import get_localized
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.tmdate import get_datetime_today, get_timedelta, get_calendar_name, datetime_in_range
-from tmdbhelper.lib.items.directories.trakt.lists_standard import ListTraktStandardProperties
-from tmdbhelper.lib.items.directories.trakt.lists_filtered import ListTraktFiltered
-from tmdbhelper.lib.items.directories.trakt.mapper_calendar import (
+from tmdbhelper.lib.items.directories.lists_trakt import ListTraktStandardProperties
+from tmdbhelper.lib.items.directories.lists_trakt import ListTraktFiltered
+from tmdbhelper.lib.items.directories.mapper_calendar import (
     FactoryCalendarEpisodeItemMapper,
-    FactoryCalendarMovieItemMapper,
 )
 from tmdbhelper.lib.items.directories.lists_local import UncachedListLocalData, UncachedListLocalItemsPage
 from tmdbhelper.lib.items.directories.lists_default import ItemCache
@@ -138,21 +136,6 @@ class CalendarItemStacker:
         return [i.item for i in items]
 
 
-class ListTraktMyAiring(ListTraktFiltered):
-    """
-    For tv/movie type calendars
-    """
-
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.trakt_authorization = True
-        list_properties.request_url = 'calendars/my/{trakt_type}s'
-        list_properties.plugin_name = f'{get_localized(32201)} {{plural}} {{localized}}'
-        list_properties.localize = 32202
-        list_properties.sub_type = True
-        return list_properties
-
-
 class CachedResponse:
     def __init__(self, trakt_api, url, trakt_filters):
         self.trakt_filters = trakt_filters
@@ -178,7 +161,7 @@ class CachedResponse:
         return self.get_cached_response()
 
 
-class ListTraktCalendarProperties(ListTraktStandardProperties):
+class ListCalendarProperties(ListTraktStandardProperties):
     """
     For episode type calendars
     """
@@ -292,15 +275,7 @@ class ListTraktCalendarProperties(ListTraktStandardProperties):
         return item_mapper.item
 
 
-class ListTraktCalendarMovieProperties(ListTraktCalendarProperties):
-    def get_mapped_item(self, item, add_infoproperties=None):
-        item_mapper = FactoryCalendarMovieItemMapper(item, add_infoproperties)
-        if not self.get_mapped_item_air_date_is_in_range(item_mapper):
-            return
-        return item_mapper.item
-
-
-class ListLocalCalendarProperties(ListTraktCalendarProperties):
+class ListLocalCalendarProperties(ListCalendarProperties):
 
     @cached_property
     def kodi_db(self):
@@ -338,8 +313,8 @@ class ListLocalCalendarProperties(ListTraktCalendarProperties):
         return UncachedListLocalData(self.api_response_json, self.page, self.limit).data
 
 
-class ListTraktCalendar(ListTraktFiltered):
-    list_properties_class = ListTraktCalendarProperties
+class ListCalendar(ListTraktFiltered):
+    list_properties_class = ListCalendarProperties
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
@@ -357,33 +332,7 @@ class ListTraktCalendar(ListTraktFiltered):
         return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)
 
 
-class ListTraktMoviesCalendar(ListTraktFiltered):
-
-    list_properties_class = ListTraktCalendarMovieProperties
-
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.trakt_authorization = True
-        list_properties.request_url = 'calendars/{trakt_user}/movies/{start_date}/{total_days}'
-        list_properties.container_content = 'movies'
-        list_properties.trakt_type = 'movie'
-        return list_properties
-
-    def get_items(self, *args, startdate, days, user=True, tmdb_type='movie', **kwargs):
-        self.list_properties.trakt_user = 'my' if boolean(user) else 'all'
-        self.list_properties.trakt_date = try_int(startdate)
-        self.list_properties.trakt_days = try_int(days)
-        return super().get_items(*args, tmdb_type=tmdb_type, **kwargs)
-
-
-class ListTraktDVDsCalendar(ListTraktMoviesCalendar):
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.request_url = 'calendars/{trakt_user}/dvd/{start_date}/{total_days}'
-        return list_properties
-
-
-class ListLocalCalendar(ListTraktCalendar):
+class ListLocalCalendar(ListCalendar):
     list_properties_class = ListLocalCalendarProperties
 
     def get_items(self, *args, user=True, **kwargs):  # Absorb user param

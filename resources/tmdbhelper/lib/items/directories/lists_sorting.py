@@ -11,34 +11,25 @@ def get_sort_methods(info=None):
         'trakt_watchlist_released': 'sync_watchlist_released',
         'trakt_watchlist_anticipated': 'sync_watchlist_anticipated',
     }.get(info, info)
+    from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+    registry = SyncProviderRegistry()
+    for provider in registry.providers.values():
+        if info in provider.list_routes:
+            container = registry.get_list_container(f'{provider.provider_id}_sortby', provider.provider_id)
+            if container is not None:
+                return container.get_sort_methods(info)
     items = [
         {
             'name': f'{get_localized(32287)}: {get_localized(571)}',
             'params': {}},
         {
-            'name': f'{get_localized(32287)}: {get_localized(32451)} {get_localized(32286)}',
-            'params': {'sort_by': 'rank', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', )},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(32452)} {get_localized(32286)}',
-            'params': {'sort_by': 'rank', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', )},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(32063)} {get_localized(584)}',
-            'params': {'sort_by': 'added', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', )},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(32063)} {get_localized(585)}',
-            'params': {'sort_by': 'added', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', )},
-        {
             'name': f'{get_localized(32287)}: {get_localized(32473)} {get_localized(584)}',
             'params': {'sort_by': 'collected', 'sort_how': 'asc'},
-            'allowlist': ('sync_collection', 'trakt_userlist')},
+            'allowlist': ('sync_collection',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32473)} {get_localized(585)}',
             'params': {'sort_by': 'collected', 'sort_how': 'desc'},
-            'allowlist': ('sync_collection', 'trakt_userlist')},
+            'allowlist': ('sync_collection',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(369)} (A-Z)',
             'params': {'sort_by': 'title', 'sort_how': 'asc'}},
@@ -46,21 +37,11 @@ def get_sort_methods(info=None):
             'name': f'{get_localized(32287)}: {get_localized(369)} (Z-A)',
             'params': {'sort_by': 'title', 'sort_how': 'desc'}},
         {
-            'name': f'{get_localized(32287)}: {get_localized(563)} {get_localized(584)}',
-            'params': {'sort_by': 'percentage', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', )},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(563)} {get_localized(585)}',
-            'params': {'sort_by': 'percentage', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', )},
-        {
             'name': f'{get_localized(32287)}: {get_localized(345)} {get_localized(584)}',
-            'params': {'sort_by': 'year', 'sort_how': 'asc'},
-            'blocklist': ('trakt_userlist',)},
+            'params': {'sort_by': 'year', 'sort_how': 'asc'}},
         {
             'name': f'{get_localized(32287)}: {get_localized(345)} {get_localized(585)}',
-            'params': {'sort_by': 'year', 'sort_how': 'desc'},
-            'blocklist': ('trakt_userlist',)},
+            'params': {'sort_by': 'year', 'sort_how': 'desc'}},
         {
             'name': f'{get_localized(32287)}: {get_localized(32453).capitalize()}',
             'params': {'sort_by': 'plays', 'sort_how': 'asc'},
@@ -72,43 +53,27 @@ def get_sort_methods(info=None):
         {
             'name': f'{get_localized(32287)}: {get_localized(32242)} {get_localized(584)}',
             'params': {'sort_by': 'released', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
+            'allowlist': ('sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(32242)} {get_localized(585)}',
             'params': {'sort_by': 'released', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
+            'allowlist': ('sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(2050)} {get_localized(584)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
+            'allowlist': ('sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(2050)} {get_localized(585)}',
             'params': {'sort_by': 'runtime', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
+            'allowlist': ('sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(205)} {get_localized(584)}',
             'params': {'sort_by': 'votes', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
+            'allowlist': ('sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(205)} {get_localized(585)}',
             'params': {'sort_by': 'votes', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist', 'sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(32175)} {get_localized(584)}',
-            'params': {'sort_by': 'popularity', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist',)},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(32175)} {get_localized(585)}',
-            'params': {'sort_by': 'popularity', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist',)},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(16102)} {get_localized(584)}',
-            'params': {'sort_by': 'watched', 'sort_how': 'asc'},
-            'allowlist': ('trakt_userlist',)},
-        {
-            'name': f'{get_localized(32287)}: {get_localized(16102)} {get_localized(585)}',
-            'params': {'sort_by': 'watched', 'sort_how': 'desc'},
-            'allowlist': ('trakt_userlist',)},
+            'allowlist': ('sync_inprogress', 'sync_watchlist', 'sync_watchlist_released', 'sync_watchlist_anticipated',)},
         {
             'name': f'{get_localized(32287)}: {get_localized(590)}',
             'params': {'sort_by': 'random'}}]

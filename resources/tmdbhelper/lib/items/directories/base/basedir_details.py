@@ -69,15 +69,6 @@ class BaseDirItemDetailsRecommendations(BaseDirItem):
     types = ('movie', 'tv', 'episode',)
 
 
-class BaseDirItemDetailsTraktRelated(BaseDirItem):
-    priority = 160
-    label_type = 'localize'
-    label_localized = 32064
-    params = {'info': 'trakt_related'}
-    art_icon = 'resources/icons/trakt/related.png'
-    types = ('movie', 'tv', 'episode',)
-
-
 class BaseDirItemDetailsSimilar(BaseDirItem):
     priority = 170
     label_type = 'localize'
@@ -129,24 +120,6 @@ class BaseDirItemDetailsReviews(BaseDirItem):
     label_localized = 32188
     params = {'info': 'reviews'}
     art_icon = 'resources/icons/themoviedb/reviews.png'
-    types = ('movie', 'tv', 'episode',)
-
-
-class BaseDirItemDetailsTraktComments(BaseDirItem):
-    priority = 230
-    label_type = 'localize'
-    label_localized = 32305
-    params = {'info': 'trakt_comments'}
-    art_icon = 'resources/icons/trakt/comments.png'
-    types = ('movie', 'tv', 'episode',)
-
-
-class BaseDirItemDetailsTraktWatchers(BaseDirItem):
-    priority = 240
-    label_type = 'localize'
-    label_localized = 32065
-    params = {'info': 'trakt_watchers'}
-    art_icon = 'resources/icons/trakt/viewers.png'
     types = ('movie', 'tv', 'episode',)
 
 
@@ -210,15 +183,6 @@ class BaseDirItemDetailsVideos(BaseDirItem):
     label_localized = 10025
     params = {'info': 'videos'}
     art_icon = 'resources/icons/themoviedb/movies.png'
-    types = ('movie', 'tv', 'episode',)
-
-
-class BaseDirItemDetailsTraktInLists(BaseDirItem):
-    priority = 320
-    label_type = 'localize'
-    label_localized = 32232
-    params = {'info': 'trakt_inlists'}
-    art_icon = 'resources/icons/themoviedb/trakt.png'
     types = ('movie', 'tv', 'episode',)
 
 

@@ -28,10 +28,18 @@ class SyncProviderRegistry:
             duplicates = set(registered.service_action_classes).intersection(provider.service_action_classes)
             if duplicates:
                 raise ValueError(f'Duplicate provider service actions: {", ".join(sorted(duplicates))}')
+            duplicates = set(registered.service_sync_classes).intersection(provider.service_sync_classes)
+            if duplicates:
+                raise ValueError(f'Duplicate provider service sync types: {", ".join(sorted(duplicates))}')
         providers[provider.provider_id] = provider
 
     def get_capable_providers(self, capability):
         return tuple(provider for provider in self.providers.values() if capability in provider.capabilities)
+
+    def get_service_sync_provider(self, sync_type):
+        return next((
+            provider for provider in self.providers.values()
+            if sync_type in provider.service_sync_classes), None)
 
     @cached_property
     def monitor_list_suppliers(self):
@@ -44,6 +52,15 @@ class SyncProviderRegistry:
 
     def get_monitor_list_supplier(self, user_slug):
         return next((supplier for supplier in self.monitor_list_suppliers if supplier.user_slug == user_slug), None)
+
+    def get_monitor_list_reference(self, user_slug, list_slug):
+        supplier = self.get_monitor_list_supplier(user_slug)
+        if supplier is not None:
+            return supplier, list_slug
+        for supplier in self.monitor_list_suppliers:
+            translated = supplier.get_legacy_list_slug(user_slug, list_slug)
+            if translated is not None:
+                return supplier, translated
 
     def get_directory_items(self):
         return [

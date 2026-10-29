@@ -8,6 +8,7 @@ from tmdbhelper.lib.sync.providers.features import ACTION_FEATURES, SYNC_FEATURE
 from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSupplier
 from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
+from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES, ServiceDataType
 
 
 class SyncProviderLoader:
@@ -51,6 +52,16 @@ class SyncProviderLoader:
                 raise ValueError(f'Unknown sync type: {name}')
             if not isinstance(sync_class, type) or not issubclass(sync_class, DataType):
                 raise TypeError(f'{name} must inherit DataType')
+            if not isinstance(getattr(sync_class, 'method', None), str) or not sync_class.method:
+                raise ValueError(f'{name} must declare a non-empty method')
+
+    @staticmethod
+    def validate_service_sync_classes(provider):
+        for name, sync_class in provider.service_sync_classes.items():
+            if name not in SERVICE_SYNC_FEATURES:
+                raise ValueError(f'Unknown service sync type: {name}')
+            if not isinstance(sync_class, type) or not issubclass(sync_class, ServiceDataType):
+                raise TypeError(f'{name} must inherit ServiceDataType')
             if not isinstance(getattr(sync_class, 'method', None), str) or not sync_class.method:
                 raise ValueError(f'{name} must declare a non-empty method')
 
@@ -130,9 +141,12 @@ class SyncProviderLoader:
             raise ValueError('Provider must declare a non-empty display_name')
         if type(provider).is_authorized is SyncProvider.is_authorized:
             raise TypeError('Provider must implement is_authorized()')
-        if provider.sync_classes and type(provider).get_last_activities is SyncProvider.get_last_activities:
+        if (
+                (provider.sync_classes or provider.service_sync_classes)
+                and type(provider).get_last_activities is SyncProvider.get_last_activities):
             raise TypeError('Provider must implement get_last_activities()')
         self.validate_sync_classes(provider)
+        self.validate_service_sync_classes(provider)
         self.validate_action_classes(provider)
         self.validate_service_action_classes(provider)
         self.validate_getter_classes(provider)

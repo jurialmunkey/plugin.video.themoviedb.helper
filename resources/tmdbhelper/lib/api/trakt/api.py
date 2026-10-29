@@ -118,16 +118,6 @@ class TraktAPI(NoCacheRequestAPI):
             headers=self.headers,
             method='delete')
 
-    def get_user_rating(self, item_type, trakt_id):
-        from tmdbhelper.lib.api.trakt.user_ratings import TraktUserRating
-        return TraktUserRating(self, item_type, trakt_id).rating
-
-    def invalidate_user_ratings(self, item_type=None):
-        from tmdbhelper.lib.api.trakt.user_ratings import TraktUserRatings
-        item_types = (item_type,) if item_type is not None else TraktUserRatings.item_types
-        for rating_type in item_types:
-            TraktUserRatings(self, rating_type).invalidate()
-
     def post_response(self, *args, postdata=None, response_method='post', **kwargs):
         from tmdbhelper.lib.files.futils import json_dumps as data_dumps
         return self.get_simple_api_request(
