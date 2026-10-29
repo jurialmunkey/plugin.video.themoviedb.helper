@@ -35,17 +35,3 @@ def log_request(**kwargs):
             f'plugin.video.themoviedb.helper/log_request\n{filename}')
         Dialog().ok(kwargs['log_request'].capitalize(), msg)
         Dialog().textviewer(filename, dumps(kwargs['response'], indent=2))
-
-
-def log_sync(log_sync, trakt_type='show', id_type=None, extended=None, **kwargs):
-    from json import dumps
-    from xbmcgui import Dialog
-    from tmdbhelper.lib.addon.dialog import BusyDialog
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    from tmdbhelper.lib.files.futils import validify_filename
-    from tmdbhelper.lib.files.futils import dumps_to_file
-    with BusyDialog():
-        data = TraktAPI().get_sync(log_sync, trakt_type, id_type=id_type, extended=extended)
-        filename = validify_filename(f'sync__{log_sync}_{trakt_type}_{id_type}_{extended}.json')
-        dumps_to_file(data, 'log_request', filename)
-        Dialog().textviewer(filename, dumps(data, indent=2))

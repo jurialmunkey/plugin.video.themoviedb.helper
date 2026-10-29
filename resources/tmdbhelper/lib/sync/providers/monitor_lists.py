@@ -22,3 +22,7 @@ class MonitorListsSupplier:
 
     def get_list_items(self, list_slug):
         raise NotImplementedError
+
+    def get_legacy_list_slug(self, user_slug, list_slug):
+        """Translate a pre-provider reference, or return None when it is not owned."""
+        return None

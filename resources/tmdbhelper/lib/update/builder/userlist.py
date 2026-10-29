@@ -1,6 +1,5 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.update.builder.media import LibraryBuilder
-from tmdbhelper.lib.sync.providers.monitor_lists import is_provider_user_slug
 
 
 """
@@ -86,39 +85,17 @@ class LibraryBuilderUserList(LibraryBuilder):
     """
 
     @cached_property
-    def monitor_list_supplier(self):
-        return self.get_monitor_list_supplier()
-
-    def get_monitor_list_supplier(self):
-        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
-        return SyncProviderRegistry().get_monitor_list_supplier(self.user_slug)
-
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
-
-    @cached_property
-    def request_func(self):
-        return self.trakt_api.get_response_json
-
-    @property
-    def request_args(self):
-        if self.list_slug.startswith('watchlist'):
-            return ('users', self.user_slug, self.list_slug)
-        return ('users', self.user_slug, 'lists', self.list_slug, 'items')
-
-    @cached_property
     def request(self):
         return self.get_request()
 
     def get_request(self):
         if not self.user_slug or not self.list_slug:
             return
-        if is_provider_user_slug(self.user_slug):
-            supplier = self.monitor_list_supplier
-            return supplier.get_list_items(self.list_slug) if supplier is not None else None
-        return self.request_func(*self.request_args)
+        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+        reference = SyncProviderRegistry().get_monitor_list_reference(self.user_slug, self.list_slug)
+        if reference is not None:
+            supplier, slug = reference
+            return supplier.get_list_items(slug)
 
     """
     Build

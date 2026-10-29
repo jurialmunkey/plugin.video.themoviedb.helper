@@ -2,7 +2,6 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.addon.thread import ParallelThread
-from tmdbhelper.lib.api.trakt.ratings import map_trakt_ratings
 from tmdbhelper.lib.sync.providers.ratings_settings import RatingsProviderSettings
 from jurialmunkey.parser import try_int
 
@@ -15,7 +14,6 @@ class RatingsDict(BaseList):
     rating_attribs = (
         'omdb_ratings',
         'provider_ratings',
-        'trakt_ratings',
         'tmdb_ratings',
         'imdb_top250',
     )
@@ -114,19 +112,6 @@ class RatingsDict(BaseList):
             return self.common_apis.omdb_api.get_ratings_awards(imdb_id=self.imdb_id) or {}
         except (KeyError, TypeError, IndexError, ValueError):
             return {}
-
-    @cached_property
-    def trakt_ratings_uri(self):
-        return f'{self.trakt_type}s/{self.imdb_id}/ratings'
-
-    @cached_property
-    def trakt_ratings(self):
-        if not self.common_apis.trakt_api or not self.common_apis.trakt_api.authenticator.is_authorized or not self.imdb_id:
-            return {}
-        data = self.common_apis.trakt_api.get_response_json(self.trakt_ratings_uri, extended='all')
-        if not data:
-            return {}
-        return map_trakt_ratings(data)
 
     @cached_property
     def tmdb_ratings(self):
@@ -232,7 +217,6 @@ class RatingsDict(BaseList):
 class RatingsSeasonsDict(RatingsDict):
     rating_attribs = (
         'provider_ratings',
-        'trakt_ratings',
     )
 
     def get_mediatype(self):
@@ -252,10 +236,6 @@ class RatingsSeasonsDict(RatingsDict):
     def item_id(self):
         return self.get_season_id(self.tmdb_type, self.tmdb_id, self.season)
 
-    @cached_property
-    def trakt_ratings_uri(self):
-        return f'{self.trakt_type}s/{self.imdb_id}/seasons/{self.season}/ratings'
-
 
 class RatingsEpisodesDict(RatingsSeasonsDict):
     def get_mediatype(self):
@@ -269,7 +249,3 @@ class RatingsEpisodesDict(RatingsSeasonsDict):
     @property
     def item_id(self):
         return self.get_episode_id(self.tmdb_type, self.tmdb_id, self.season, self.episode)
-
-    @cached_property
-    def trakt_ratings_uri(self):
-        return f'{self.trakt_type}s/{self.imdb_id}/seasons/{self.season}/episodes/{self.episode}/ratings'

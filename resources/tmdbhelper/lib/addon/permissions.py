@@ -46,7 +46,6 @@ class PermissionHandler:
         'none': 0,
         'internal': 2 ** 0,
         'fanarttv': 2 ** 1,
-        'mdblist': 2 ** 2,
         'omdb': 2 ** 3,
         'tmdb': 2 ** 4,
         'trakt': 2 ** 5,
@@ -55,7 +54,6 @@ class PermissionHandler:
 
     _PERMISSION_TYPES = {
         'fanarttv': 'fanarttv_clientkey_access',
-        'mdblist': 'mdblist_apikey_access',
         'omdb': 'omdb_apikey_access',
         'trakt': 'trakt_token_access',
         'tvdb': 'tvdb_token_access',

@@ -43,7 +43,7 @@ class ItemUserList(ItemAction):
         """
 
         from tmdbhelper.lib.update.monitor import MonitorUserLists
-        if list_user_slug_tuple and list_user_slug_tuple not in MonitorUserLists().monitored_lists:
+        if list_user_slug_tuple and not MonitorUserLists().is_monitored(*list_user_slug_tuple):
             return
 
         if confirm and not Dialog().yesno(get_localized(20444), get_localized(32362)):
@@ -69,8 +69,11 @@ class ItemUserList(ItemAction):
 
     @busy_decorator
     def get_users_lists(self):
-        from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned
-        container = ListTraktStaticOwned(-1, '')
+        from tmdbhelper.lib.sync.providers.directories import get_provider_list_container
+        container_class = get_provider_list_container('trakt_mylists', 'trakt')
+        if container_class is None:
+            return []
+        container = container_class(-1, '')
         container.trakt_api = self.trakt_api
         users_lists = container.get_items(tmdb_type='both') or []
         users_lists.append({'label': get_localized(32299)})

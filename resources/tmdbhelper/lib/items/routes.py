@@ -16,6 +16,8 @@ def get_container(info):
             route = routes[info]
         except KeyError:
             continue
+        if 'redirect' in route:
+            return get_container(route['redirect'])
         return importmodule(**route['route'])
 
     if info and info[:4] != 'dir_':

@@ -92,24 +92,68 @@ class ListTraktStandard(ListStandard):
         return list_properties
 
 
-class ListTraktBoxOffice(ListTraktStandard):  # Box Office doesn't support filters or pagination
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.request_url = '{trakt_type}s/boxoffice'
-        list_properties.localize = 32207
-        list_properties.sub_type = True
-        return list_properties
+class ListTraktFilteredProperties(ListTraktStandardProperties):
+    @cached_property
+    def plugin_category(self):
+        plugin_category = self.plugin_name.format(localized=self.localized, plural=self.plural)
+        plugin_category = f'{plugin_category} ({" ".join([f"{v}".capitalize() for v in self.trakt_filters.values()])})' if self.trakt_filters else plugin_category
+        return plugin_category
 
 
-class ListTraktRecommendations(ListTraktStandard):  # Box Office doesn't support filters or pagination
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.trakt_authorization = True
-        list_properties.trakt_filters = {
-            'ignore_collected': 'true',
-            'ignore_watchlisted': 'true'
+class ListTraktFiltered(ListTraktStandard):
+
+    list_properties_class = ListTraktFilteredProperties
+
+    def get_items(
+        self, *args,
+        genres=None,
+        subgenres=None,
+        query=None,
+        years=None,
+        languages=None,
+        countries=None,
+        runtimes=None,
+        studio_ids=None,
+        certifications=None,
+        watchnow=None,
+        network_ids=None,
+        status=None,
+        ratings=None,
+        votes=None,
+        tmdb_ratings=None,
+        tmdb_votes=None,
+        imdb_ratings=None,
+        imdb_votes=None,
+        rt_meters=None,
+        rt_user_meters=None,
+        metascores=None,
+        **kwargs
+    ):
+
+        self.list_properties.trakt_filters = {
+            k: v for k, v in (
+                ('genres', genres),
+                ('subgenres', subgenres),
+                ('query', query),
+                ('years', years),
+                ('languages', languages),
+                ('countries', countries),
+                ('runtimes', runtimes),
+                ('studio_ids', studio_ids),
+                ('certifications', certifications),
+                ('watchnow', watchnow),
+                ('network_ids', network_ids),
+                ('status', status),
+                ('ratings', ratings),
+                ('votes', votes),
+                ('tmdb_ratings', tmdb_ratings),
+                ('tmdb_votes', tmdb_votes),
+                ('imdb_ratings', imdb_ratings),
+                ('imdb_votes', imdb_votes),
+                ('rt_meters', rt_meters),
+                ('rt_user_meters', rt_user_meters),
+                ('metascores', metascores),
+            ) if k and v
         }
-        list_properties.request_url = 'recommendations/{trakt_type}s'
-        list_properties.localize = 32198
-        list_properties.sub_type = True
-        return list_properties
+
+        return super().get_items(*args, **kwargs)

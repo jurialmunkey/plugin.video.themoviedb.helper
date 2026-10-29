@@ -109,9 +109,21 @@ def select_sync_provider(capability, return_settings=False, **kwargs):
     selection.select()
 
 
+def configure_sync_provider(addon_id, **kwargs):
+    from tmdbhelper.lib.script.sync.provider_setup import SyncProviderOnboarding
+    SyncProviderOnboarding(addon_id).configure()
+
+
 def install_sync_provider(return_settings=False, **kwargs):
     from tmdbhelper.lib.script.sync.provider_catalog import SyncProviderInstallSelection
     selection = SyncProviderInstallSelection()
     if return_settings:
         return SyncProviderSettings(32557).select(selection)
     selection.select()
+
+
+def open_sync_provider_settings(addon_id, **kwargs):
+    from xbmcaddon import Addon
+    provider = SyncProviderInstall(addon_id).install()
+    if provider is not None:
+        Addon(provider.addon_id).openSettings()

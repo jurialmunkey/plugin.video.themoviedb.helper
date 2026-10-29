@@ -35,11 +35,6 @@ class CommonContainerAPIs():
         return TVDb()
 
     @cached_property
-    def mdblist_api(self):
-        from tmdbhelper.lib.api.mdblist.api import MDbListAPI
-        return MDbListAPI()
-
-    @cached_property
     def omdb_api(self):
         from tmdbhelper.lib.api.omdb.api import OMDb
         from tmdbhelper.lib.addon.plugin import get_setting

@@ -13,7 +13,7 @@ class ActionDiscovery:
         return self.get_service_actions()
 
     def get_service_actions(self):
-        return ServiceActions()
+        return ServiceActions(self.syncdata.registry, syncdata=self.syncdata)
 
     @cached_property
     def provider_actions(self):

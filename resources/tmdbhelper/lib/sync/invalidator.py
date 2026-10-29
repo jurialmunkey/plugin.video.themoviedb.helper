@@ -2,7 +2,6 @@ from xbmcgui import Dialog
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.sync.features import FEATURE_LABELS, SYNC_FEATURES
-from tmdbhelper.lib.sync.providers.features import FEATURE_LABELS as PROVIDER_FEATURE_LABELS
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 from tmdbhelper.lib.sync.activity import SyncLastActivities
 
@@ -57,17 +56,22 @@ class SyncInvalidatorAll:
         return self.get_providers()
 
     def get_providers(self):
-        if not set(self.features).intersection(PROVIDER_FEATURE_LABELS):
-            return ()
-        return tuple(provider for provider in self.syncdata.registry.providers.values()
-                     if set(self.features).intersection(provider.capabilities))
+        return tuple(
+            provider for provider in self.syncdata.registry.providers.values()
+            if any(SYNC_FEATURES[name] in self.features
+                   for name in (*provider.sync_classes, *provider.service_sync_classes)))
 
     def invalidate_provider(self, provider):
-        methods = {sync_class.method for name, sync_class in provider.sync_classes.items()
-                   if SYNC_FEATURES[name] in self.features}
+        sync_classes = {**provider.sync_classes, **provider.service_sync_classes}
+        methods = {
+            sync_class.method for name, sync_class in sync_classes.items()
+            if SYNC_FEATURES[name] in self.features}
         for method in methods:
             self.invalidate_method(provider.provider_id, method)
         SyncLastActivities(self.syncdata, provider).clear()
+        for name, sync_class in provider.service_sync_classes.items():
+            if SYNC_FEATURES[name] in self.features:
+                sync_class.invalidate_cache(provider)
 
     def invalidate_method(self, provider_id, method):
         for item_type in ('movie', 'show', 'season', 'episode'):
@@ -77,7 +81,6 @@ class SyncInvalidatorAll:
     def invalidate(self, clear_data=True):
         if clear_data and self.database_keys:
             self.syncdata.cache.del_column_values(keys=self.database_keys)
-        self.syncdata.core_sync.invalidate(self.features)
         for provider in self.providers:
             self.invalidate_provider(provider)
 

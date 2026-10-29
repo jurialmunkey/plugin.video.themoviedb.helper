@@ -87,7 +87,7 @@ class BaseDirItemCalendarNextFortnight(BaseDirItemCalendarLastFornight):
 
 def configure(i, **params):
     instance = i()
-    instance.params.update(params)
+    instance.params = dict(instance.params, **params)
     return instance
 
 
