@@ -45,6 +45,7 @@ class ListSeasons(ContainerDirectory):
         } if not get_setting('seasons_specials') else {}
 
         sync = BaseViewFactory('seasons', 'tv', tmdb_id, filters=filters, limit=limit)
+        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('season', 'container')
         try:
             return sync.data + self.get_special_seasons(tmdb_id)
