@@ -1,5 +1,5 @@
 FEATURE_LABELS = {'watched': 32408, 'watchlist': 32193, 'collection': 32192,
-                  'scrobbling': 32138}
+                  'scrobbling': 32138, 'stats': 32598}
 
 SYNC_FEATURES = {
     'SyncWatched': 'watched', 'SyncPlayback': 'watched',

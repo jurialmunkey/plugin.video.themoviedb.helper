@@ -660,6 +660,15 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling,return_settings=true)</data>
                     </control>
                 </setting>
+                <setting id="sync_provider_stats" type="string" label="32598" help="32548">
+                    <level>0</level>
+                    <default></default>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=stats,return_settings=true)</data>
+                    </control>
+                </setting>
             </group>
             <group id="3" label="32028">
                 <setting id="ratings_providers" type="action" label="32411" help="32582">

@@ -78,6 +78,9 @@ Providers declare:
   IMDbTop250Supplier subclasses implementing `get_items()`. Each media type must
   also have a ratings supplier. Registering any supplies the `imdb_top250`
   capability; empty defaults preserve existing interface-version-3 providers.
+- `stats_class`: an optional StatsSupplier subclass implementing `get_items()`.
+  Registering it exposes the independently selected `stats` capability. Existing
+  providers inherit a `None` default and retain interface-version-3 compatibility.
 - `monitor_lists_class`: an optional MonitorListsSupplier subclass implementing
   `get_lists()` and `get_list_items(list_slug)`. This supplies the independent
   `monitor_lists` capability for library monitoring and list retrieval.
@@ -118,7 +121,7 @@ Action discovery is shared by Sync Options and context-menu availability. Each
 container configures one discovery context for its list items before finalisation.
 
 The available feature selectors are history/progress, watchlist, collection,
-and scrobbling. Each selector offers
+scrobbling, and stats. Each selector offers
 None, enabled providers declaring that feature, and installation/enabling options
 from `catalog.py`. The catalogue records trusted addon IDs, display names, and
 supported capabilities so missing or disabled modules are offered only for
@@ -172,11 +175,11 @@ authorized scrobbler. Watched writes belong exclusively to the selected scrobbli
 provider; core does not also increment the Kodi library playcount. Provider modules
 own payloads, service requests,
 authentication, and interpretation of scrobble results. Core coordinates sync-cache
-refreshes after successful stop requests and Trakt stats refreshes after a reported
-history change. Stats retrieval, caching, scheduling, and skin properties remain
-in core and are available independently of sync-provider selection.
-The core Trakt playback refresh receives an explicit core API client and does
-not require an undocumented API attribute on a provider.
+refreshes after successful stop requests. A reported history change also forces
+stats refresh when the playback provider is the selected stats source, independently
+of the watched source. Stats persistence, scheduling, totals, and skin properties
+remain in core; API retrieval and source mapping belong to the selected supplier.
+Core playback refresh does not construct a service API client for stats.
 
 TMDbHelper retains database infrastructure, common sync/mapping base classes,
 list-item construction, directory configuration, and invalidation. Provider modules
@@ -362,6 +365,36 @@ OMDb and before direct Trakt/TMDb sources. Existing built-in precedence and IMDb
 Top 250 output format remain unchanged. MDbList's module supplies all four media
 types using its module-owned API client's rating methods; no MDbList-specific
 branch remains in the ratings dictionaries.
+
+## Account stats
+
+The Stats source uses `sync_provider_stats` and the same selector, None option,
+and Default/Custom onboarding flow as watchlist and collection. Selection is
+independent of watched, scrobbling, and ratings sources. There is no automatic
+first-capable fallback. Existing installations must select a source or configure
+one through provider onboarding; no Trakt source is silently assigned.
+
+`tmdbhelper.lib.sync.providers.stats.StatsSupplier` receives `provider` before its
+cached `.items` property is accessed. `get_items()` returns dictionaries containing
+`name`, `type`, and integer `stat`. `name` is the metric (for example `minutes`),
+while `type` is the category (for example `movies` or `shows`). Providers use these
+common names for comparable metrics and may supply additional categories. Suppliers
+own requests and mapping, and do not access the query database. The Stats helper
+checks the selected provider's authorization before constructing its supplier.
+`None` means unavailable or failed: retain the previous snapshot without extending
+its expiry. An empty list is a successful empty snapshot. Zero values are valid.
+Malformed source data and programming errors must not be hidden.
+
+Core retains `trakt_stats`, `get_trakt_stats()`, the `get_trakt_stats` script route,
+and `TraktStats.*` skin properties as legacy names for generic selected-source
+stats. Complete successful snapshots replace the previous rows and expire after
+twenty minutes; empty snapshots are cached too. Core calculates combined totals
+and minute conversions. Source changes clear the stats rows, expiry, and previously
+published skin properties through the dedicated stats invalidator. Missing or
+disabled sources supply no stats, without falling back to direct Trakt requests.
+Startup requests stats independently of Trakt authorization. Manual stats
+invalidation optionally refreshes the selected source. The Trakt module supplies
+`users/me/stats` and owns its recursive source-to-record mapping.
 
 ## IMDb Top 250
 

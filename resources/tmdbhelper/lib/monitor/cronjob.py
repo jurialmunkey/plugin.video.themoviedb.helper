@@ -18,6 +18,8 @@ class CronJobMonitor(SafeThread):
     def _on_startup(self):
         self._do_recache_kodidb()
         self._do_trakt_authorization()
+        from tmdbhelper.lib.script.stats import get_stats
+        get_stats()
 
     def _on_poll(self):
         self._do_database_maintenance()
@@ -63,13 +65,8 @@ class CronJobMonitor(SafeThread):
             self._do_delete_old_log_files_in_folder(folder, regex)
 
     def _do_trakt_authorization(self):
-        from jurialmunkey.window import get_property
         self.trakt_api.authorize()
         self.update_monitor.waitForAbort(1)
-        if not get_property('TraktIsAuth', is_type=float):
-            return
-        from tmdbhelper.lib.script.method.trakt import get_stats
-        get_stats()
 
     def _do_library_update(self):
         from tmdbhelper.lib.addon.plugin import executebuiltin

@@ -33,9 +33,8 @@ class SyncProviderSetting:
         if provider_id == self.value:
             return
         if self.capability != 'scrobbling':
-            from tmdbhelper.lib.sync.invalidator import SyncInvalidatorAll
-            invalidator = SyncInvalidatorAll()
-            invalidator.features = (self.capability,)
+            from tmdbhelper.lib.sync.invalidator import SyncInvalidator
+            invalidator = SyncInvalidator(self.capability)
             invalidator.notification = False
             invalidator.invalidate()
         set_setting(self.setting, provider_id, 'str')

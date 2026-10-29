@@ -4,6 +4,7 @@ from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.sync.features import FEATURE_LABELS, SYNC_FEATURES
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 from tmdbhelper.lib.sync.activity import SyncLastActivities
+from tmdbhelper.lib.sync.providers.stats import StatsInvalidator
 
 
 class SyncInvalidatorAll:
@@ -126,7 +127,7 @@ class SyncInvalidatorRatings(SyncInvalidatorAll):
 def SyncInvalidator(datatype):
     routes = {'watched': SyncInvalidatorWatchedProgress, 'collection': SyncInvalidatorCollection,
               'watchlist': SyncInvalidatorWatchlist, 'favorites': SyncInvalidatorFavorites,
-              'ratings': SyncInvalidatorRatings, 'all': SyncInvalidatorAll}
+              'ratings': SyncInvalidatorRatings, 'stats': StatsInvalidator, 'all': SyncInvalidatorAll}
     try:
         selected = routes[datatype]
     except KeyError:
