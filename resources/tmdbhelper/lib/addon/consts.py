@@ -182,6 +182,9 @@ ROUTE_NOID = {
     'sync_nextepisodes': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListNextEpisodes'}},
+    'sync_currentlywatching': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_currentlywatching',
+        'import_attr': 'ListCurrentlyWatching'}},
     'sync_sortby': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_sorting',
         'import_attr': 'ListSortBy'}},

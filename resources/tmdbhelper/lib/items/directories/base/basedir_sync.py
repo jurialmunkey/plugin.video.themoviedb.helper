@@ -129,6 +129,13 @@ class BaseDirItemNextEpisodes(BaseDirItemOnDeckMovies):
     group = 32196
 
 
+class BaseDirItemCurrentlyWatching(BaseDirItemNextEpisodes):
+    priority = 225
+    label_localized = 32600
+    params = {'info': 'sync_currentlywatching'}
+    sorting = False
+
+
 class BaseDirItemOnDeckUnWatchedEpisodes(BaseDirItemOnDeckMovies):
     priority = 200
     label_type = 'suffixed'
