@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-10-28 12:00+0200\n"
+"PO-Revision-Date: 2026-10-29 12:00+0200\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -2310,8 +2310,8 @@ msgstr "Nie znaleziono danych uwierzytelniających API MDbList."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "Dodaj swój osobisty klucz API MDbList w ustawieniach TMDbHelper."
+msgid "Add your personal MDbList API key in the MDbList module settings."
+msgstr "Dodaj swój osobisty klucz API MDbList w ustawieniach modułu MDbList."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32518"
