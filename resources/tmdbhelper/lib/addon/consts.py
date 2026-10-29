@@ -135,8 +135,8 @@ ROUTE_NOID = {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_random',
         'import_attr': 'ListRandomBecauseYouWatched'}},
     'library_nextaired': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.lists_calendar',
-        'import_attr': 'ListLocalCalendar'}},
+        'module_name': 'tmdbhelper.lib.items.directories.lists_library_calendar',
+        'import_attr': 'ListLibraryCalendar'}},
     'library_airingnext': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_airingnext',
         'import_attr': 'ListLibraryAiringNext'}},
@@ -182,6 +182,9 @@ ROUTE_NOID = {
     'sync_nextepisodes': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.sync.lists_standard',
         'import_attr': 'ListNextEpisodes'}},
+    'sync_currentlywatching': {'route': {
+        'module_name': 'tmdbhelper.lib.items.directories.sync.lists_currentlywatching',
+        'import_attr': 'ListCurrentlyWatching'}},
     'sync_sortby': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.lists_sorting',
         'import_attr': 'ListSortBy'}},

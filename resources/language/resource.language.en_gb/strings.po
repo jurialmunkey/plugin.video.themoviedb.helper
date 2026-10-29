@@ -2892,3 +2892,13 @@ msgstr ""
 msgctxt "#32599"
 msgid "Select the providers to scrobble playback to. Install or enable supported providers here, or clear all selections to disable scrobbling."
 msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
+msgctxt "#32600"
+msgid "Currently Watching"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
+msgctxt "#32601"
+msgid "Currently Watching Movies & TV Shows"
+msgstr ""

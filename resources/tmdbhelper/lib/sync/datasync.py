@@ -286,6 +286,25 @@ class SyncDataGetterAllUnwatchedItemsPlayback(SyncDataGetterAllUnwatchedItems):
     clause_keys = ('playback_progress', )
 
 
+class SyncDataGetterCurrentlyWatchingPlayback(SyncDataGetterAllItemsPlayback):
+    query_clauses = (
+        'item_type=?',
+        'playback_progress > 0 AND playback_progress < 100',
+        'NOT EXISTS (SELECT 1 FROM simplecache AS parent '
+        'WHERE parent.item_type=? AND parent.tmdb_id=simplecache.tmdb_id '
+        'AND (parent.progress_watched_hidden_at IS NOT NULL OR parent.dropped_hidden_at IS NOT NULL))',
+    )
+    additional_keys = ('playback_paused_at', )
+
+    @property
+    def query_values(self):
+        return ('episode', 'show', )
+
+    def get_items(self):
+        self.instance_syncdata.sync('show', ('progress_watched_hidden_at', 'dropped_hidden_at'))
+        return super().get_items()
+
+
 class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHidden):
     clause_keys = ('upnext_episode_id', )
     query_clauses = ('item_type=?', 'tmdb_id=?', )
@@ -393,6 +412,9 @@ class SyncDataGetters:
 
     def get_all_unwatched_playback_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllUnwatchedItemsPlayback, item_type)
+
+    def get_currently_watching_playback_getter(self):
+        return self.get_item_type_getter(SyncDataGetterCurrentlyWatchingPlayback, 'episode')
 
     def get_tmdb_id_getter(self, sync_data_class, tmdb_id):
         sd = sync_data_class(self)

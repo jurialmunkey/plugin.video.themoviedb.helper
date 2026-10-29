@@ -129,6 +129,21 @@ class BaseDirItemNextEpisodes(BaseDirItemOnDeckMovies):
     group = 32196
 
 
+class BaseDirItemCurrentlyWatching(BaseDirItemNextEpisodes):
+    priority = 225
+    label_localized = 32600
+    params = {'info': 'sync_currentlywatching'}
+    sorting = False
+    art_icon = 'resources/icons/sync/currentlywatching.png'
+
+
+class BaseDirItemCurrentlyWatchingMixed(BaseDirItemCurrentlyWatching):
+    priority = 226
+    label_localized = 32601
+    types = ('both', )
+    art_icon = 'resources/icons/sync/currentlywatching-both.png'
+
+
 class BaseDirItemOnDeckUnWatchedEpisodes(BaseDirItemOnDeckMovies):
     priority = 200
     label_type = 'suffixed'
