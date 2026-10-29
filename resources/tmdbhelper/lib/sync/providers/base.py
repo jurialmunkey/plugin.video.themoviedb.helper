@@ -7,6 +7,7 @@ class SyncProvider:
     display_name = None
     sync_classes = {}
     action_classes = {}
+    service_action_classes = {}
     getter_classes = {}
     ratings_classes = {}
     monitor_lists_class = None
@@ -26,6 +27,8 @@ class SyncProvider:
             features.add('ratings')
         if self.monitor_lists_class is not None:
             features.add('monitor_lists')
+        if self.service_action_classes:
+            features.add('service_actions')
         return tuple(sorted(features))
 
     def get_sync_class(self, sync_type):
@@ -33,6 +36,10 @@ class SyncProvider:
 
     def is_authorized(self):
         raise NotImplementedError
+
+    def migrate_settings(self):
+        """Migrate provider settings before constructing any API clients."""
+        pass
 
     def get_last_activities(self):
         raise NotImplementedError

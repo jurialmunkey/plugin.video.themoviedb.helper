@@ -25,6 +25,9 @@ class SyncProviderRegistry:
             duplicates = set(registered.list_routes).intersection(provider.list_routes)
             if duplicates:
                 raise ValueError(f'Duplicate provider list routes: {", ".join(sorted(duplicates))}')
+            duplicates = set(registered.service_action_classes).intersection(provider.service_action_classes)
+            if duplicates:
+                raise ValueError(f'Duplicate provider service actions: {", ".join(sorted(duplicates))}')
         providers[provider.provider_id] = provider
 
     def get_capable_providers(self, capability):
