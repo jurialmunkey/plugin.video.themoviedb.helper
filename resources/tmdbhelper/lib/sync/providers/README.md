@@ -16,6 +16,7 @@ Provider addons follow this layout:
 addon.xml
 LICENSE.txt
 resources/
+    script.py               # opens this provider's configuration in TMDbHelper
     icon.png                # provider icon
     fanart.jpg
     lib/
@@ -27,9 +28,23 @@ resources/
             sync/
 ```
 
-The `xbmc.python.module` extension declares `resources/lib` as its library.
-Artwork is declared in the metadata extension's `assets` element. Package only
-the individual provider folder when distributing either addon.
+Declare `xbmc.python.script` with library `resources/script.py` before the
+`xbmc.python.module` extension, which retains `resources/lib` as its library.
+Kodi uses the first extension as the main type. The script main type makes
+providers available under Program add-ons and prevents Kodi from classifying
+these independently installed providers as orphaned dependency modules.
+The module extension remains available to provider discovery and loading.
+Keep the existing addon ID and the dependency on TMDbHelper; core must not add
+reverse dependencies on providers.
+
+The script entry point calls
+`RunScript(plugin.video.themoviedb.helper,configure_sync_provider,addon_id=<addon_id>)`
+through `xbmc.executebuiltin`. The core route delegates to
+`SyncProviderOnboarding(addon_id).configure()`, reusing the Default, Cancel,
+and Custom configuration flow. Running a provider does not change selections
+until the user confirms. Providers using this route require TMDbHelper 6.19.3
+or later. Artwork is declared in the metadata extension's `assets` element.
+Package only the individual provider folder when distributing an addon.
 
 Providers declare:
 

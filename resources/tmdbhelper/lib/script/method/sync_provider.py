@@ -109,6 +109,11 @@ def select_sync_provider(capability, return_settings=False, **kwargs):
     selection.select()
 
 
+def configure_sync_provider(addon_id, **kwargs):
+    from tmdbhelper.lib.script.sync.provider_setup import SyncProviderOnboarding
+    SyncProviderOnboarding(addon_id).configure()
+
+
 def install_sync_provider(return_settings=False, **kwargs):
     from tmdbhelper.lib.script.sync.provider_catalog import SyncProviderInstallSelection
     selection = SyncProviderInstallSelection()

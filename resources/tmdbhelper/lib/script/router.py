@@ -98,6 +98,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.image_functions', 'genre_fanart')(**kwargs),
 
         # User Configuration
+        'configure_sync_provider':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'configure_sync_provider')(**kwargs),
         'configure_ratings_providers':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.ratings', 'configure_ratings_providers')(**kwargs),
         'configure_ratings_provider_order':
