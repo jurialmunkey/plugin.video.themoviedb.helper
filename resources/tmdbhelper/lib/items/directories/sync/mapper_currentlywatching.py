@@ -43,3 +43,16 @@ class CurrentlyWatchingItemMapper(ItemMapper):
         item = super().get_item()
         item['path'] = self.mapped_item['path']
         return item
+
+
+class CurrentlyWatchingMovieItemMapper(CurrentlyWatchingItemMapper):
+    def get_mapped_item(self):
+        return ItemMappingBasicFactory({
+            'id': self.meta['tmdb_id'],
+            'title': self.meta['title'],
+        }, item_type='movie').get_item()
+
+
+def FactoryCurrentlyWatchingItemMapper(meta, add_infoproperties=None):
+    mapper_class = CurrentlyWatchingMovieItemMapper if meta['item_type'] == 'movie' else CurrentlyWatchingItemMapper
+    return mapper_class(meta, add_infoproperties)

@@ -140,6 +140,7 @@ ICONS = (
     ('sync', 'recentlywatched', 'time-8', 'history'),
     ('sync', 'mostwatched', 'award-5', 'most watched'),
     ('sync', 'up-next', 'arrow-right-alt-filled', 'up next'),
+    ('sync', 'currentlywatching', 'media-control-1', 'watching'),
     ('sync', 'dropped', 'forbidden-1', 'dropped'),
     ('sync', 'recommended', 'thumb-1', 'recommended'),
     ('sync', 'recommended-mostwatched', 'trophy-5', 'recommended'),
