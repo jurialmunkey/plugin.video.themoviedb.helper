@@ -5,7 +5,7 @@
 DIRECTORY_ICON_VARIANTS = {
     'resources/icons/sync/calendar.png': ('tv',),
     'resources/icons/sync/collection.png': ('movie', 'tv', 'both'),
-    'resources/icons/sync/currentlywatching.png': ('tv', 'both'),
+    'resources/icons/sync/currentlywatching.png': ('movie', 'tv', 'both'),
     'resources/icons/sync/dropped.png': ('tv',),
     'resources/icons/sync/inprogress.png': ('movie', 'tv'),
     'resources/icons/sync/mostwatched.png': ('movie', 'tv', 'episode'),
