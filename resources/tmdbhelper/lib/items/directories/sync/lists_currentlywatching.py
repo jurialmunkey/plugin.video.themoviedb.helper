@@ -1,11 +1,20 @@
 from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.addon.plugin import convert_type
 from tmdbhelper.lib.items.directories.sync.lists_standard import ListNextEpisodes, ListProviderSyncProperties
+from tmdbhelper.lib.items.directories.sync.lists_currentlywatchingmovies import ListCurrentlyWatchingMoviesProperties
 from tmdbhelper.lib.items.directories.sync.mapper_currentlywatching import CurrentlyWatchingItemMapper, FactoryCurrentlyWatchingItemMapper
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 
 
 class ListCurrentlyWatchingProperties(ListProviderSyncProperties):
     item_mapper_class = CurrentlyWatchingItemMapper
+
+    @cached_property
+    def plural(self):
+        return self.get_plural()
+
+    def get_plural(self):
+        return convert_type(self.item_type, 'plural')
 
     @cached_property
     def syncdata(self):
@@ -85,13 +94,19 @@ class ListCurrentlyWatching(ListNextEpisodes):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.localize = 32600
+        list_properties.plugin_name = '{localized} {plural}'
         list_properties.sort_by = 'recentlywatched'
         return list_properties
 
     def get_items(self, tmdb_type, **kwargs):
-        self.list_properties_class = (
-            ListCurrentlyWatchingMixedProperties if tmdb_type == 'both' else ListCurrentlyWatchingProperties)
-        self.list_properties.item_type = 'both' if tmdb_type == 'both' else 'episode'
-        self.list_properties.container_content = 'videos' if tmdb_type == 'both' else 'episodes'
-        self.list_properties.localize = 32601 if tmdb_type == 'both' else 32600
+        self.list_properties_class = {
+            'movie': ListCurrentlyWatchingMoviesProperties,
+            'both': ListCurrentlyWatchingMixedProperties,
+        }.get(tmdb_type, ListCurrentlyWatchingProperties)
+        item_type, container_content = {
+            'movie': ('movie', 'movies'),
+            'both': ('both', 'videos'),
+        }.get(tmdb_type, ('episode', 'episodes'))
+        self.list_properties.item_type = item_type
+        self.list_properties.container_content = container_content
         return super().get_items(tmdb_type=tmdb_type, **kwargs)

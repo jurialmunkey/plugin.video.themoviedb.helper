@@ -2899,11 +2899,6 @@ msgid "Currently Watching"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
-msgctxt "#32601"
-msgid "Currently Watching Movies & TV Shows"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
 msgctxt "#32602"
 msgid "Your Next Movies"
 msgstr ""
