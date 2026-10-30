@@ -2922,32 +2922,32 @@ msgstr "Obecnie oglądane"
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
 msgctxt "#32601"
 msgid "Currently Watching Movies & TV Shows"
-msgstr "Obecnie oglądane Filmy i Seriale"
+msgstr "Obecnie oglądane filmy i seriale"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
 msgctxt "#32602"
 msgid "Your Next Movies"
-msgstr ""
+msgstr "Twoje następne filmy"
 
 #: /resources/settings.xml
 msgctxt "#32603"
 msgid "Update movie collections in the background"
-msgstr ""
+msgstr "Aktualizuj kolekcje filmów w tle"
 
 #: /resources/settings.xml
 msgctxt "#32604"
 msgid "After Your Next Movies is first used, discover new collections daily and refresh older collections within the daily request limit. Bundled collection data is refreshed with addon updates."
-msgstr ""
+msgstr "Po pierwszym użyciu „Twoich następnych filmów" codziennie odkrywaj nowe kolekcje i odświeżaj starsze kolekcje w ramach dziennego limitu zapytań. Dołączone dane kolekcji są odświeżane wraz z aktualizacjami dodatku."
 
 #: /resources/settings.xml
 msgctxt "#32605"
 msgid "Daily movie collection request limit"
-msgstr ""
+msgstr "Dzienny limit zapytań o kolekcje filmów"
 
 #: /resources/settings.xml
 msgctxt "#32606"
 msgid "Maximum collection-detail requests per day, including retries. New collections take priority over the oldest overdue entries. Higher limits help if bundled data has not been refreshed for a long time."
-msgstr ""
+msgstr "Maksymalna liczba zapytań o szczegóły kolekcji na dzień, łącznie z ponowieniami. Nowe kolekcje mają pierwszeństwo przed najstarszymi zaległymi wpisami. Wyższe limity pomagają, jeśli dołączone dane nie były odświeżane przez długi czas."
 
 #: /resources/tmdbhelper/lib/items/directories/sync/mapper_nextmovies.py
 msgctxt "#32607"
