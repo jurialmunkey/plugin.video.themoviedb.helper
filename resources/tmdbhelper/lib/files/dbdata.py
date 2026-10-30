@@ -221,15 +221,19 @@ class DatabaseStatements:
 
     @staticmethod
     def insert_or_update_if_null(table, keys=('id', ), conflict_constraint='id'):
+        conflict_keys = tuple(k.strip() for k in conflict_constraint.split(','))
+        update_keys = ', '.join(
+            f'{k}=ifnull({k},excluded.{k})' for k in keys if k not in conflict_keys)
+        update_clause = f'DO UPDATE SET {update_keys}' if update_keys else 'DO NOTHING'
         return (
             'INSERT INTO {table}({keys}) VALUES ({values}) '
-            'ON CONFLICT ({conflict_constraint}) DO UPDATE SET {update_keys} '
+            'ON CONFLICT ({conflict_constraint}) {update_clause} '
         ).format(
             table=table,
             keys=', '.join(keys),
             values=', '.join(['?' for _ in keys]),
             conflict_constraint=conflict_constraint,
-            update_keys=', '.join([f'{k}=ifnull({k},excluded.{k})' for k in keys])
+            update_clause=update_clause
         )
 
     @staticmethod
