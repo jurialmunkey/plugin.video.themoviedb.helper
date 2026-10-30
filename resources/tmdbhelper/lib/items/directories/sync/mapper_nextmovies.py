@@ -1,6 +1,6 @@
 from datetime import timezone
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.plugin import get_infolabel
+from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, format_date_obj
 from tmdbhelper.lib.items.directories.mapper_basic import ItemMapper
 from tmdbhelper.lib.items.itemlist import ItemMappingBasicFactory
@@ -26,6 +26,12 @@ class NextMovieItemMapper(ItemMapper):
 
     def get_unique_ids(self):
         return self.mapped_item['unique_ids']
+
+    def get_context_menu(self):
+        command = (
+            'RunScript(plugin.video.themoviedb.helper,drop_collection,'
+            f'collection_id={self.meta["collection_id"]})')
+        return super().get_context_menu() + [(get_localized(32607), command)]
 
     def get_infoproperties(self):
         properties = {

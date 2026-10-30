@@ -46,6 +46,8 @@ class Script(object):
         # Context Menu
         'related_lists':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.related_lists', 'related_lists')(**kwargs),
+        'drop_collection':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.collectiondrops', 'drop_collection')(**kwargs),
 
         # TMDb Utils
         'sync_tmdb':

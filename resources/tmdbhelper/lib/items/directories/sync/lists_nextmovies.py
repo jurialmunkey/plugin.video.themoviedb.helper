@@ -1,4 +1,4 @@
-from datetime import timezone
+from datetime import datetime, timezone
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
 from tmdbhelper.lib.addon.tmdate import convert_timestamp, get_datetime_today
@@ -7,6 +7,7 @@ from tmdbhelper.lib.items.directories.sync.lists_standard import ListStandardSyn
 from tmdbhelper.lib.items.directories.sync.mapper_nextmovies import NextMovieItemMapper
 from tmdbhelper.lib.items.directories.sync.nextmovies import MovieCollectionProgress
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
+from tmdbhelper.lib.sync.collectiondrops import get_collection_drop_store
 
 
 class ListNextMoviesProperties(ListProviderSyncProperties):
@@ -31,10 +32,19 @@ class ListNextMoviesProperties(ListProviderSyncProperties):
             for item in getter.items if item['tmdb_id']
         }
 
-    @staticmethod
-    def get_watched_item(item):
+    @classmethod
+    def get_watched_item(cls, item):
         watched = convert_timestamp(item['last_watched_at']).replace(tzinfo=timezone.utc).astimezone()
-        return dict(item, watched_datetime=watched, watched_date=watched.date())
+        return dict(
+            item, watched_datetime=watched, watched_date=watched.date(),
+            watched_timestamp=cls.get_utc_timestamp(item['last_watched_at']))
+
+    @staticmethod
+    def get_utc_timestamp(value):
+        timestamp = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        if timestamp.tzinfo is None:
+            return timestamp.replace(tzinfo=timezone.utc)
+        return timestamp.astimezone(timezone.utc)
 
     @cached_property
     def collection_movies(self):
@@ -44,14 +54,58 @@ class ListNextMoviesProperties(ListProviderSyncProperties):
         return get_collection_index().get_collection_movies(self.watched)
 
     @cached_property
+    def drop_store(self):
+        return self.get_drop_store()
+
+    @staticmethod
+    def get_drop_store():
+        return get_collection_drop_store()
+
+    @cached_property
+    def collection_activity(self):
+        return self.get_collection_activity()
+
+    def get_collection_activity(self):
+        return {
+            collection_id: self.get_latest_watch(members)
+            for collection_id, members in self.collection_movies.items()
+        }
+
+    def get_latest_watch(self, members):
+        return max(
+            self.watched[member['movie_id']]['watched_timestamp']
+            for member in members if member['movie_id'] in self.watched)
+
+    @cached_property
+    def dropped_collections(self):
+        return self.get_dropped_collections()
+
+    def get_dropped_collections(self):
+        drops = self.drop_store.get_drops()
+        revived = self.get_revived_collections(drops)
+        if not revived:
+            return set(drops)
+        self.drop_store.remove(revived)
+        return set(self.drop_store.get_drops())
+
+    def get_revived_collections(self, drops):
+        return {
+            collection_id: dropped_at for collection_id, dropped_at in drops.items()
+            if collection_id in self.collection_activity
+            and self.collection_activity[collection_id] > self.get_utc_timestamp(dropped_at)
+        }
+
+    @cached_property
     def progress_items(self):
         return self.get_progress_items()
 
     def get_progress_items(self):
         today = get_datetime_today().date()
+        dropped = self.dropped_collections
         items = (
             MovieCollectionProgress(collection_id, members, self.watched, today).item
             for collection_id, members in self.collection_movies.items()
+            if collection_id not in dropped
         )
         return [item for item in items if item is not None]
 
