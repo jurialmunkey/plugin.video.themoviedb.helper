@@ -2920,11 +2920,6 @@ msgid "Currently Watching"
 msgstr "Obecnie oglądane"
 
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
-msgctxt "#32601"
-msgid "Currently Watching Movies & TV Shows"
-msgstr "Obecnie oglądane filmy i seriale"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
 msgctxt "#32602"
 msgid "Your Next Movies"
 msgstr "Twoje następne filmy"
