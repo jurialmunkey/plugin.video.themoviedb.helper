@@ -2902,3 +2902,28 @@ msgstr ""
 msgctxt "#32601"
 msgid "Currently Watching Movies & TV Shows"
 msgstr ""
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
+msgctxt "#32602"
+msgid "Your Next Movies"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32603"
+msgid "Update movie collections in the background"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32604"
+msgid "After Your Next Movies is first used, discover new collections daily and refresh older collections within the daily request limit. Bundled collection data is refreshed with addon updates."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32605"
+msgid "Daily movie collection request limit"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32606"
+msgid "Maximum collection-detail requests per day, including retries. New collections take priority over the oldest overdue entries. Higher limits help if bundled data has not been refreshed for a long time."
+msgstr ""

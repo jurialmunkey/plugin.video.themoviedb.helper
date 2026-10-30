@@ -13,7 +13,7 @@ DIRECTORY_ICON_VARIANTS = {
     'resources/icons/sync/recommended-mostwatched.png': ('movie', 'tv'),
     'resources/icons/sync/recommended.png': ('movie', 'tv'),
     'resources/icons/sync/towatch.png': ('movie', 'tv'),
-    'resources/icons/sync/up-next.png': ('tv',),
+    'resources/icons/sync/up-next.png': ('movie', 'tv'),
     'resources/icons/sync/watchlist-anticipated.png': ('movie', 'tv', 'season', 'episode', 'both'),
     'resources/icons/sync/watchlist-released.png': ('movie', 'tv', 'season', 'episode', 'both'),
     'resources/icons/sync/watchlist.png': ('movie', 'tv', 'season', 'episode', 'both'),
