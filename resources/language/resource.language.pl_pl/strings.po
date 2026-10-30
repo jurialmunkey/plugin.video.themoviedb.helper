@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-10-18 12:00+0200\n"
+"PO-Revision-Date: 2026-10-30 12:00+0200\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -78,8 +78,8 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32013"
-msgid "Get watched indicators, episode counts, and resume points"
-msgstr "Pobierz statusy obejrzenia, licznik odcinków i punkty wznawiania"
+msgid "Sync watched and resume status"
+msgstr "Synchronizuj statusy obejrzenia i punkty wznawiania"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
@@ -195,7 +195,7 @@ msgctxt "#32040"
 msgid "All seasons"
 msgstr "Wszystkie Sezony"
 
-#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#: /resources/tmdbhelper/lib/items/directories/sync/lists_standard.py
 msgctxt "#32041"
 msgid "Your In-Progress TV Shows"
 msgstr "Twoje w trakcie oglądania Seriale"
@@ -212,7 +212,7 @@ msgctxt "#30028"
 msgid "Galician (Spain)"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#: /resources/tmdbhelper/lib/items/directories/sync/lists_standard.py
 msgctxt "#32045"
 msgid "Your In-Progress Movies"
 msgstr "Twoje w trakcie oglądania Filmy"
@@ -227,7 +227,7 @@ msgctxt "#32047"
 msgid "Undrop TV show"
 msgstr "Cofnij porzucenie serialu"
 
-#: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
+#: /resources/tmdbhelper/lib/items/directories/sync/lists_standard.py
 msgctxt "#32048"
 msgid "Dropped TV Shows"
 msgstr "Seriale porzucone"
@@ -235,7 +235,7 @@ msgstr "Seriale porzucone"
 #: /resources/settings.xml
 msgctxt "#32049"
 msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
-msgstr "Kolejność sortowania listy następnych odcinków. Wg airdate sortuje odcinki wg daty premiery. Wg recentlywatched sortuje odcinki wg ostatnio oglądanego serialu. Wg todays to recentlywatched z odcinkami emitowanymi dzisiaj na początku. Wg lastweek to ostatnio oglądane z odcinkami emitowanymi w ostatnim tygodniu na początku."
+msgstr "Kolejność sortowania listy następnych odcinków. Wg [I]airdate[/I] sortuje odcinki wg daty premiery. Wg [I]recentlywatched[/I] sortuje odcinki wg ostatnio oglądanego serialu. Wg [I]todays[/I] to [I]recentlywatched[/I] z odcinkami emitowanymi dzisiaj na początku. Wg [I]lastweek[/I] to ostatnio oglądane z odcinkami emitowanymi w ostatnim tygodniu na początku."
 
 #: /resources/settings.xml
 msgctxt "#32050"
@@ -326,7 +326,7 @@ msgctxt "#32069"
 msgid "Last Air Date"
 msgstr "Data ostatniej emisji"
 
-#: /resources/lib/player.py
+#: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
 msgstr "Wybierz akcję"
@@ -399,14 +399,14 @@ msgstr "Mnożnik strony (listy synchronizacji bazy danych)"
 #: /resources/lib/player.py
 msgctxt "#32061"
 msgid "Play with"
-msgstr "Odtwórz w"
+msgstr "Odtwórz za pomocą"
 
-#: /resources/settings.xml
+#: /resources/lib/context.py
 msgctxt "#32066"
 msgid "Debug logging"
 msgstr "Rejestruj komunikaty diagnostyczne"
 
-#: /resources/lib/tmdb.py
+#: /resources/settings.xml
 msgctxt "#32070"
 msgid "Male"
 msgstr "Mężczyzna"
@@ -459,7 +459,7 @@ msgstr "Inne"
 #: /resources/settings.xml
 msgctxt "#32081"
 msgid "Next page item"
-msgstr "Pokaż 'Następna strona' w widżetach"
+msgstr "Pokaż 'Następna strona'"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32098"
@@ -479,7 +479,7 @@ msgstr "Automatycznie aktualizuj bibliotekę i dodawaj brakujące odcinki"
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
-msgstr "Zawartość"
+msgstr "Typ zawartości"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32105"
@@ -501,7 +501,7 @@ msgctxt "#32093"
 msgid "Next episodes sort method"
 msgstr "Metoda sortowania kolejnych odcinków seriali"
 
-#: /resources/lib/traktapi.py
+#: /resources/settings.xml
 msgctxt "#32095"
 msgid "Enter the code"
 msgstr "Wprowadź kod"
@@ -519,17 +519,17 @@ msgstr "Autoryzacja konta w serwisie Trakt"
 #: /resources/lib/container.py
 msgctxt "#32100"
 msgid "Do you wish to clear the existing items or add more?"
-msgstr "Czy chcesz wyczyścić istniejące pozycje lub dodać więcej?"
+msgstr "Chcesz wyczyścić istniejące pozycje, czy dodać więcej?"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32115"
 msgid "Reset {} artwork to default?"
-msgstr "Zresetować {} do domyślnego?"
+msgstr "Przywrócić grafikę {} do domyślnej?"
 
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32116"
 msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
-msgstr "Usuwa grafikę przypisaną przez użytkownika i resetuje ją do domyślnego wyboru zdefiniowanego w ustawieniach."
+msgstr "Usuwa grafikę przypisaną przez użytkownika i przywraca ją do domyślnego wyboru zdefiniowanego w ustawieniach."
 
 #: /resources/lib/container.py
 msgctxt "#32101"
@@ -731,7 +731,7 @@ msgctxt "#32165"
 msgid "Add another item?"
 msgstr "Dodać kolejną pozycję?"
 
-#: /resources/settings.xml
+#: /resources/lib/context.py
 msgctxt "#32130"
 msgid "Auto-update library at time"
 msgstr "Aktualizuj bibliotekę automatycznie"
@@ -751,7 +751,7 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "Wybierz listę(y)"
 
-#: /resources/settings.xml
+#: /resources/lib/context.py
 msgctxt "#32154"
 msgid "Update library now"
 msgstr "Zaktualizuj bibliotekę teraz"
@@ -763,10 +763,12 @@ msgstr "Kalendarz emisji biblioteki zawiera linki do lokalnych seriali"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
-msgid "Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
+msgid ""
+"Adding Trakt lists to library is limited to [B]{}[/B] TV Shows and [B]{}[/B] Movies per list.\n"
 "This limit is set to ensure that the APIs providing data for free are respected."
-msgstr "Dodawanie listy serwisu Trakt do biblioteki jest ograniczone do [B]{}[/B] seriali i [B]{}[/B] filmów na listę.\n"
-"Ten limit ma na celu zapewnienie przestrzegania regulaminów w serwisach udostępniających dane API bezpłatnie."
+msgstr ""
+"Dodawanie listy serwisu Trakt do biblioteki jest ograniczone do [B]{}[/B] seriali i [B]{}[/B] filmów na listę.\n"
+"Ten limit ma na celu zapewnienie poszanowania dla bezpłatnych interfejsów API udostępniających te dane."
 
 #: /resources/lib/context.py
 msgctxt "#32166"
@@ -1113,10 +1115,10 @@ msgctxt "#32233"
 msgid "Refresh details"
 msgstr "Odśwież informacje"
 
-#: /resources/lib/listitem.py
+#: /resources/lib/script.py
 msgctxt "#32235"
 msgid "Browse lists"
-msgstr "Przeglądaj Infolisty"
+msgstr "Przeglądaj infolisty"
 
 #: /resources/lib/players.py
 msgctxt "#32236"
@@ -1181,7 +1183,7 @@ msgstr "Z osobami"
 #: /resources/lib/userdiscover.py
 msgctxt "#32250"
 msgid "Primary Release Year"
-msgstr "Pierwotny rok wydania"
+msgstr "Rok pierwotnego wydania"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32251"
@@ -1326,7 +1328,7 @@ msgstr "W tym tygodniu"
 #: /resources/lib/basedir.py
 msgctxt "#32285"
 msgid "This Fortnight"
-msgstr "W nast. dwóch tygodniach"
+msgstr "W kolejnych dwóch tygodniach"
 
 #: /resources/lib/_trakt_itemlists.py
 msgctxt "#32286"
@@ -1393,7 +1395,7 @@ msgid ""
 "{} was successful for {}!\n"
 "{} ID {}"
 msgstr ""
-"{} powiodło się {}!\n"
+"{} powiodło się dla {}!\n"
 "{} ID {}"
 
 #: /resources/lib/syncitem.py
@@ -1441,7 +1443,7 @@ msgctxt "#32306"
 msgid "No comments found!"
 msgstr "Brak komentarzy!"
 
-#: /addon.xml
+#: /resources/lib/request/api.py
 msgctxt "#32309"
 msgid "Browse sorted list"
 msgstr "Przeglądaj posortowaną listę"
@@ -1530,7 +1532,7 @@ msgctxt "#32322"
 msgid "Select player"
 msgstr "Wybierz playera"
 
-#: /resources/lib/helpers/timedate.py
+#: /resources/lib/helpers/update.py
 msgctxt "#32326"
 msgid "This Month"
 msgstr "W tym miesiącu"
@@ -1634,7 +1636,7 @@ msgctxt "#32350"
 msgid "Retrieve English language plot translations to use as a fallback when primrary language translation is missing. Note that this setting will considerably increase detailed information lookup times and database disk usage."
 msgstr "Pobierz opisy fabuły w języku angielskim, aby użyć ich zastępczo w przypadku braku opisów w języku podstawowym. Pamiętaj, że to ustawienie wydłuży czas wyszukiwania informacji i zwiększy wykorzystanie dysku przez bazę danych."
 
-#: /resources/settings.xml
+#: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "Fikcyjny ResolvedURL"
@@ -1698,7 +1700,7 @@ msgstr "Opóźnienie po rozwiązaniu (sekundy)"
 #: /resources/settings.xml
 msgctxt "#32377"
 msgid "Use online artwork in image monitor"
-msgstr "Użyj grafiki online w monitorze obrazów"
+msgstr "Używaj grafik online w monitorze obrazów"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1780,12 +1782,22 @@ msgctxt "#32399"
 msgid "Retrieving Artwork"
 msgstr "Pobieranie grafik"
 
-#: /resources/lib/script/router.py
+#: /resources/settings.xml
+msgctxt "#32402"
+msgid "Scrobble items on MDbList while watching"
+msgstr "Rejestruj pozycje na MDbList podczas oglądania"
+
+#: /resources/settings.xml
+msgctxt "#32403"
+msgid "Sync"
+msgstr "Synchronizuj"
+
+#: /resources/settings.xml
 msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Usuń {} cache"
 
-#: /resources/settings.xml
+#: /resources/lib/script/router.py
 msgctxt "#32390"
 msgid "Use alternative .nfo filename"
 msgstr "Użyj alternatywnej nazwy pliku .nfo"
@@ -1849,7 +1861,7 @@ msgstr "Obsługa MDbList ma obecnie charakter eksperymentalny"
 #: /resources/settings.xml
 msgctxt "#32404"
 msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Spłaszczaj seriale z wieloma odc. emitowanymi jednego dnia"
+msgstr "Spłaszczaj seriale z wieloma odcinkami emitowanymi jednego dnia"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
@@ -1879,7 +1891,7 @@ msgstr "Z dostawcą"
 #: /resources/settings.xml
 msgctxt "#32413"
 msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "Sprawdzaj kalendarz nast. odcinków (wolniej, ale dokładniej)"
+msgstr "Sprawdzaj kalendarz następnych odcinków (wolniej, ale dokładniej)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
@@ -1896,7 +1908,7 @@ msgctxt "#32416"
 msgid "Premieres"
 msgstr "Premiery"
 
-#: /resources/settings.xml
+#: /resources/lib/script/sync.py
 msgctxt "#32418"
 msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
 msgstr "Dodaje tekst na początku oceny MPAA. Na przykład, jeśli ustawiono „Ocenione”, ocena „PG” jest wyświetlana jako „Ocenione PG”. Pozycje zapisane w pamięci podręcznej będą wymagały odświeżenia."
@@ -1996,6 +2008,11 @@ msgctxt "#32437"
 msgid "Configure provider data allowlist"
 msgstr "Skonfiguruj listę dozwolonych dostawców"
 
+#: /resources/settings.xml
+msgctxt "#32450"
+msgid "Prefer fallbacks in English"
+msgstr "Preferuj grafiki zastępcze w języku angielskim"
+
 #: /resources/lib/script/method.py
 msgctxt "#32438"
 msgid "Provider allowlist updated"
@@ -2003,8 +2020,8 @@ msgstr "Zaktualizowano listę dozwolonych dostawców"
 
 #: /resources/lib/script/method.py
 msgctxt "#32439"
-msgid "The provider allowlist has been updated. Please note that updating provider details requires the item cache to be refreshed. The item cache can be deleted in the expert settings section."
-msgstr "Lista dozwolonych dostawców została zaktualizowana. Pamiętaj, że aktualizacja danych dostawcy wymaga odświeżenia pamięci podręcznej pozycji. Pamięć podręczną można usunąć w sekcji ustawień eksperckich."
+msgid "The provider allowlist has been updated."
+msgstr "Lista dozwolonych dostawców została zaktualizowana."
 
 #: /resources/lib/player/configure.py
 msgctxt "#32440"
@@ -2046,7 +2063,7 @@ msgctxt "#32449"
 msgid "Ignore region release filter"
 msgstr "Ignoruj filtr regionu wydania"
 
-#: /resources/lib/api/trakt/api.py
+#: /resources/settings.xml
 msgctxt "#32451"
 msgid "Lowest"
 msgstr "Najniższy"
@@ -2092,6 +2109,11 @@ msgid "Cache items in custom lists you own for 24 hours"
 msgstr "Przechowuj w cache pozycje z własnych list przez 24h"
 
 #: /resources/settings.xml
+msgctxt "#32479"
+msgid "Determines what artwork to use when artwork from your region is unavailable. Enable to prefer English artwork. Disable to prefer artwork in your language from other regions."
+msgstr "Określa, jakiej grafiki należy używać, gdy grafika z Twojego regionu jest niedostępna. Włącz tę opcję, aby preferować grafikę w języku angielskim. Wyłącz tę opcję, aby preferować grafikę w Twoim języku pochodzącą z innych regionów."
+
+#: /resources/settings.xml
 msgctxt "#32466"
 msgid "Play automatically using available providers"
 msgstr "Odtwarzaj automatycznie korzystając z dostępnych dostawców"
@@ -2119,7 +2141,7 @@ msgstr "Powiadamiaj o błędach połączenia"
 #: /resources/settings.xml
 msgctxt "#32472"
 msgid "Cache image location"
-msgstr "Lokalizacja obrazu pamięci podręcznej"
+msgstr "Lokalizacja pamięci podręcznej obrazów"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
@@ -2148,7 +2170,7 @@ msgstr "Zmień domyślnego playera dla serialu, sezonu lub odcinka"
 
 #: /resources/settings.xml
 msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from to use as the seed for becauase you watched style recommendations."
+msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
 msgstr "Zwiększa pulę ostatnio oglądanych, losowo wybranych pozycji, które można wykorzystać jako materiał wyjściowy dla rekomendacji w \"ponieważ oglądałeś\"."
 
 #: /resources/settings.xml
@@ -2209,12 +2231,12 @@ msgstr "{} już istnieje w {}!"
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
 msgid "Successfully removed {} from {}"
-msgstr "Pomyślnie usunięto {} {} z {}"
+msgstr "Pomyślnie usunięto {} z {}"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32494"
 msgid "Successfully added {} to {}"
-msgstr "Pomyślnie dodano {} {} do {}"
+msgstr "Pomyślnie dodano {} do {}"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32495"
@@ -2276,7 +2298,7 @@ msgctxt "#32509"
 msgid "Use alternative TMDb API url"
 msgstr "Użyj alternatywnego adresu URL interfejsu API TMDB"
 
-#: /resources/tmdbhelper/lib/script/sync.py
+#: /resources/settings.xml
 msgctxt "#32514"
 msgid "Add to MDbList list"
 msgstr "Dodaj do listy MDbList"
@@ -2288,8 +2310,8 @@ msgstr "Nie znaleziono danych uwierzytelniających API MDbList."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "Dodaj swój osobisty klucz API MDbList w ustawieniach TMDbHelper."
+msgid "Add your personal MDbList API key in the MDbList module settings."
+msgstr "Dodaj swój osobisty klucz API MDbList w ustawieniach modułu MDbList."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32518"
@@ -2324,12 +2346,12 @@ msgstr "Listy użytkownika"
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32527"
 msgid "Remove from {}"
-msgstr "Usuń z {}"
+msgstr "Usuń z [B]{}[/B]"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32528"
 msgid "Add to {}"
-msgstr "Dodaj do {}"
+msgstr "Dodaj do [B]{}[/B]"
 
 #: /resources/settings.xml
 msgctxt "#32529"
@@ -2348,8 +2370,8 @@ msgstr "Metoda dostępna tylko dla kont VIP"
 
 #: /resources/settings.xml
 msgctxt "#32534"
-msgid "Trakt sync progress notifications"
-msgstr "Powiadamiaj o postępie synchronizacji Trakt"
+msgid "Sync progress notifications"
+msgstr "Powiadamiaj o postępie synchronizacji"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32535"
@@ -2381,8 +2403,7 @@ msgctxt "#32540"
 msgid "All digital releases"
 msgstr "Wszystkie wydania cyfrowe"
 
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_details.py
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_episode_groups.py
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_details.py /resources/tmdbhelper/lib/items/directories/tmdb/lists_episode_groups.py /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/groupsseason.py
 msgctxt "#32541"
 msgid "Groups"
 msgstr "Grupy"
@@ -2407,8 +2428,7 @@ msgctxt "#32545"
 msgid "Streaming Charts"
 msgstr "Trendy streamingu"
 
-#: /resources/settings.xml
-#: /resources/tmdbhelper/lib/items/context.py
+#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
 msgctxt "#32546"
 msgid "Trakt / MDbList options"
 msgstr "Opcje Trakt / MDbList"
@@ -2417,6 +2437,11 @@ msgstr "Opcje Trakt / MDbList"
 msgctxt "#32547"
 msgid "Subgenres"
 msgstr "Podgatunki"
+
+#: /resources/settings.xml
+msgctxt "#32548"
+msgid "Choose a provider for this feature, install or enable a supported provider, or choose None to disable it and hide its lists."
+msgstr "Wybierz dostawcę dla tej funkcji, zainstaluj lub włącz obsługiwanego dostawcę albo wybierz Brak, aby ją wyłączyć i ukryć listy."
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2488,7 +2513,7 @@ msgstr ""
 
 msgctxt "#30047"
 msgid "Polish (Poland)"
-msgstr ""
+msgstr "Polski (Polska)"
 
 msgctxt "#30048"
 msgid "Portuguese (Brazil)"
@@ -2570,6 +2595,10 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr ""
 
+msgctxt "#30068"
+msgid "Croatian (Croatia)"
+msgstr ""
+
 #: /resources/settings.xml
 msgctxt "#32001"
 msgid "OMDb API key"
@@ -2585,12 +2614,12 @@ msgctxt "#32005"
 msgid "Language and country"
 msgstr "Język i kraj"
 
-#: /resources/lib/requestapi.py
+#: /resources/lib/utils.py
 msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Nieautoryzowany błąd 401"
 
-#: /resources/settings.xml
+#: /resources/lib/requestapi.py
 msgctxt "#32010"
 msgid "Authenticate Trakt account..."
 msgstr "Uwierzytelnij konto Trakt..."
@@ -2639,3 +2668,283 @@ msgstr "Domyślny player dla filmów"
 msgctxt "#32025"
 msgid "Default player for episodes"
 msgstr "Domyślny player dla odcinków"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32549"
+msgid "Sync Options"
+msgstr "Opcje synchronizacji"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32550"
+msgid "TMDbHelper Sync Provider"
+msgstr "Dostawca synchronizacji TMDbHelper"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_install.py
+msgctxt "#32551"
+msgid "Install {0}"
+msgstr "Zainstaluj {0}"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_install.py
+msgctxt "#32552"
+msgid "Enable {0}"
+msgstr "Włącz {0}"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_features.py
+msgctxt "#32553"
+msgid "Choose features for {0}"
+msgstr "Wybierz funkcje dla {0}"
+
+#: /resources/tmdbhelper/lib/script/method/sync_provider.py
+msgctxt "#32554"
+msgid "{0} does not support {1}. Choose another provider for this list."
+msgstr "{0} nie obsługuje {1}. Wybierz innego dostawcę dla tej listy."
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32555"
+msgid "{0} requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
+msgstr "{0} wymaga dostawcy synchronizacji. Wybierz dostawcę, którego chcesz użyć, zainstaluj go lub włącz. Instalator korzysta z zainstalowanych repozytoriów."
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32556"
+msgid "Later"
+msgstr "Później"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/script/sync/provider_catalog.py
+msgctxt "#32557"
+msgid "Install sync provider"
+msgstr "Zainstaluj dostawcę synchronizacji"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_catalog.py
+msgctxt "#32558"
+msgid "{0} (install)"
+msgstr "{0} (zainstaluj)"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_catalog.py
+msgctxt "#32559"
+msgid "{0} (enable)"
+msgstr "{0} (włącz)"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_default.py
+msgctxt "#32560"
+msgid "Set {0} as the default sync provider? This clears all current provider selections and uses {0} for every feature it supports."
+msgstr "Ustawić {0} jako domyślnego dostawcę synchronizacji? Spowoduje to wyczyszczenie wszystkich bieżących wyborów dostawców i użycie {0} dla każdej obsługiwanej funkcji."
+
+#: /resources/tmdbhelper/lib/script/sync/provider_default.py
+msgctxt "#32561"
+msgid "Default"
+msgstr "Domyślny"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_default.py
+msgctxt "#32562"
+msgid "Custom"
+msgstr "Niestandardowy"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_catalog.py
+msgctxt "#32563"
+msgid "You are enabling {0}, a third-party sync service outside TMDbHelper's trusted list. Only continue if you trust this service and understand the risks, including sharing your viewing activity and account data."
+msgstr "Włączasz {0}, zewnętrzną usługę synchronizacji spoza listy zaufanych TMDbHelper. Kontynuuj tylko, jeśli ufasz tej usłudze i rozumiesz ryzyko, w tym udostępnianie Twojej aktywności oglądania i danych konta."
+
+#: /resources/settings.xml
+msgctxt "#32564"
+msgid "Image cache size"
+msgstr "Rozmiar pamięci podręcznej obrazów"
+
+#: /resources/settings.xml
+msgctxt "#32565"
+msgid "Size limit per folder. Unlimited disables cleanup."
+msgstr "Limit rozmiaru na folder. 'Nieograniczony' wyłącza czyszczenie."
+
+#: /resources/settings.xml
+msgctxt "#32566"
+msgid "Unlimited"
+msgstr "Nieograniczony"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32567"
+msgid "Clean image cache"
+msgstr "Wyczyść pamięć podręczną obrazów"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32568"
+msgid "Scanning {0}: {1} of {2} files"
+msgstr "Skanowanie {0}: {1} z {2} plików"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32569"
+msgid "Cleaning {0}"
+msgstr "Czyszczenie {0}"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32570"
+msgid "Space reclaimed: {0}"
+msgstr "Odzyskane miejsce: {0}"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32571"
+msgid "Image cache cleanup finished. Space reclaimed: {0}."
+msgstr "Czyszczenie pamięci podręcznej obrazów zakończone. Odzyskane miejsce: {0}."
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32572"
+msgid "Image cache cleanup cancelled. Space reclaimed: {0}."
+msgstr "Czyszczenie pamięci podręcznej obrazów anulowane. Odzyskane miejsce: {0}."
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32573"
+msgid "Image cache cleanup is disabled while the target size is Unlimited."
+msgstr "Czyszczenie pamięci podręcznej obrazów jest wyłączone, gdy docelowy rozmiar to 'Nieograniczony'."
+
+#: /resources/settings.xml
+msgctxt "#32574"
+msgid "Save settings and clean to the selected size limit."
+msgstr "Zapisz ustawienia i wyczyść do wybranego limitu rozmiaru."
+
+#: /resources/settings.xml
+msgctxt "#32575"
+msgid "32 MB"
+msgstr "32 MB"
+
+#: /resources/settings.xml
+msgctxt "#32576"
+msgid "64 MB"
+msgstr "64 MB"
+
+#: /resources/settings.xml
+msgctxt "#32577"
+msgid "128 MB"
+msgstr "128 MB"
+
+#: /resources/settings.xml
+msgctxt "#32578"
+msgid "256 MB"
+msgstr "256 MB"
+
+#: /resources/settings.xml
+msgctxt "#32579"
+msgid "512 MB"
+msgstr "512 MB"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_directory.py
+msgctxt "#32580"
+msgid "The route \"{0}\" is not available in TMDbHelper. It may be available in the {1} sync module. Install or enable this module?"
+msgstr „Ścieżka \"{0}\" nie jest dostępna w TMDbHelper. Być może jest dostępna w module synchronizacji {1}. Zainstalować lub włączyć ten moduł?”
+
+#: /resources/settings.xml
+msgctxt "#32581"
+msgid "Ratings providers"
+msgstr "Dostawcy ocen"
+
+#: /resources/settings.xml
+msgctxt "#32582"
+msgid "Enable or disable installed ratings providers and set their priority. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
+msgstr "Włącz lub wyłącz zainstalowanych dostawców ocen i ustaw ich priorytet. Dostawcy wyżej na liście mają pierwszeństwo przed znajdującymi się niżej. Oceny zapisane w pamięci podręcznej są zachowywane."
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32583"
+msgid "{0}. {1} ({2})"
+msgstr "{0}. {1} ({2})"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32584"
+msgid "Enabled"
+msgstr "Włączony"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32585"
+msgid "Disabled"
+msgstr "Wyłączony"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32586"
+msgid "Move up"
+msgstr "Przenieś wyżej"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32587"
+msgid "Move down"
+msgstr "Przenieś niżej"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32588"
+msgid "No ratings providers are installed."
+msgstr "Nie zainstalowano żadnych dostawców ocen."
+
+#: /resources/settings.xml
+msgctxt "#32591"
+msgid "Priority"
+msgstr "Priorytet"
+
+#: /resources/settings.xml
+msgctxt "#32592"
+msgid "Arrange ratings providers in priority order. Providers higher in the list take precedence over lower providers. Cached ratings are retained."
+msgstr "Ustaw dostawców ocen wg priorytetu. Dostawcy wyżej na liście mają pierwszeństwo przed znajdującymi się niżej. Oceny zapisane w pamięci podręcznej są zachowywane."
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32593"
+msgid "Episode numbering"
+msgstr "Numeracja odcinków"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32594"
+msgid "Default"
+msgstr "Domyślnie"
+
+#: /resources/settings.xml
+msgctxt "#32595"
+msgid "Select"
+msgstr "Wybierz"
+
+#: /resources/settings.xml
+msgctxt "#32596"
+msgid "Group"
+msgstr "Grupa"
+
+#: /resources/settings.xml
+msgctxt "#32597"
+msgid "Choose which season and episode numbers to pass to players. Default always uses TMDb numbering. Select asks which episode group to use when groups are available. Group uses the current episode group's numbering when playback starts from a group, otherwise TMDb numbering. A player's episode_groups option overrides this setting."
+msgstr "Wybierz, które numery sezonów i odcinków mają być przekazywane playerom. „Domyślnie” zawsze stosuje numerację TMDb. „Wybierz” pozwala określić, której grupy odcinków należy użyć, jeśli są dostępne różne grupy. „Grupa” stosuje numerację bieżącej grupy odcinków, gdy odtwarzanie rozpoczyna się od grupy, w przeciwnym razie stosowana jest numeracja TMDb. Opcja `episode_groups` playera ma pierwszeństwo przed tym ustawieniem."
+
+#: /resources/settings.xml
+msgctxt "#32598"
+msgid "Stats"
+msgstr "Statystyki"
+
+#: /resources/settings.xml
+msgctxt "#32599"
+msgid "Select the providers to scrobble playback to. Install or enable supported providers here, or clear all selections to disable scrobbling."
+msgstr "Wybierz dostawców, u których ma być rejestrowane odtwarzanie. Zainstaluj lub włącz obsługiwanych dostawców tutaj albo wyczyść wszystkie wybory, aby wyłączyć rejestrowanie."
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
+msgctxt "#32600"
+msgid "Currently Watching"
+msgstr "Obecnie oglądane"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
+msgctxt "#32602"
+msgid "Your Next Movies"
+msgstr "Twoje następne filmy"
+
+#: /resources/settings.xml
+msgctxt "#32603"
+msgid "Update movie collections in the background"
+msgstr "Aktualizuj kolekcje filmów w tle"
+
+#: /resources/settings.xml
+msgctxt "#32604"
+msgid "After Your Next Movies is first used, discover new collections daily and refresh older collections within the daily request limit. Bundled collection data is refreshed with addon updates."
+msgstr "Po pierwszym użyciu „Twoich następnych filmów" codziennie odkrywaj nowe kolekcje i odświeżaj starsze kolekcje w ramach dziennego limitu zapytań. Dołączone dane kolekcji są odświeżane wraz z aktualizacjami dodatku."
+
+#: /resources/settings.xml
+msgctxt "#32605"
+msgid "Daily movie collection request limit"
+msgstr "Dzienny limit zapytań o kolekcje filmów"
+
+#: /resources/settings.xml
+msgctxt "#32606"
+msgid "Maximum collection-detail requests per day, including retries. New collections take priority over the oldest overdue entries. Higher limits help if bundled data has not been refreshed for a long time."
+msgstr "Maksymalna liczba zapytań o szczegóły kolekcji na dzień, łącznie z ponowieniami. Nowe kolekcje mają pierwszeństwo przed najstarszymi zaległymi wpisami. Wyższe limity pomagają, jeśli dołączone dane nie były odświeżane przez długi czas."
+
+#: /resources/tmdbhelper/lib/items/directories/sync/mapper_nextmovies.py
+msgctxt "#32607"
+msgid "Drop collection"
+msgstr "Porzuć kolekcję"
