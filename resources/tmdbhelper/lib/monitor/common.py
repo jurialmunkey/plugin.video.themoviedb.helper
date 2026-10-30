@@ -60,14 +60,14 @@ class CommonMonitorDetails(CommonContainerAPIs):
         return self.query_database.del_identifier(identifier)
 
     @cached_property
-    def all_awards(self):
-        return CommonRatingsAPIs.get_awards_data()
+    def awards_database(self):
+        return CommonRatingsAPIs.get_awards_database()
 
     def get_all_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
         ratings_api = CommonRatingsAPIs()
 
-        # Reuse awards to avoid rescraping
-        ratings_api.all_awards = self.all_awards
+        # Reuse the reader; each lookup opens its own read-only connection.
+        ratings_api.awards_database = self.awards_database
 
         # Set defaults
         ratings_api.tmdb_type = tmdb_type
