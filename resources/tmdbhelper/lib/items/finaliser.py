@@ -2,6 +2,40 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.filters import is_excluded
 
 
+class ListFinaliser:
+    def __init__(self, container, items):
+        self.container = container
+        self.list_items = items
+
+    @cached_property
+    def finalisers(self):
+        return self.get_finalisers()
+
+    def get_finalisers(self):
+        return [
+            self.container.get_item_finaliser(item)
+            for item in self.list_items if item
+        ]
+
+    def prepare_kodi_details(self):
+        try:
+            prepare_listitems = self.container.kodi_db.prepare_listitems
+        except AttributeError:  # Some directories use a library index without detail enrichment.
+            return
+        prepare_listitems([
+            item.list_item for item in self.finalisers
+            if item and item.is_visible
+        ])
+
+    @cached_property
+    def items(self):
+        return self.get_items()
+
+    def get_items(self):
+        self.prepare_kodi_details()
+        return [item.item if item else None for item in self.finalisers]
+
+
 class ItemFinaliserBasic:
     def __init__(self, container, list_item):
         self.container = container  # parent container class

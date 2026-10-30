@@ -9,6 +9,18 @@ set_playprogress = jurialmunkey_jsnrpc.set_playprogress
 get_directory = jurialmunkey_jsnrpc.get_directory
 
 
+MOVIE_DETAILS_PROPERTIES = [
+    "title", "genre", "year", "rating", "director", "trailer", "tagline", "plot", "plotoutline", "originaltitle",
+    "writer", "studio", "mpaa", "cast", "country", "imdbnumber", "runtime", "set",
+    "showlink", "streamdetails", "top250", "votes", "fanart", "thumbnail", "file", "sorttitle", "setid",
+    "dateadded", "tag", "art", "userrating", "ratings", "premiered", "uniqueid"]
+
+TVSHOW_DETAILS_PROPERTIES = [
+    "title", "genre", "year", "rating", "plot", "studio", "mpaa", "cast", "episode", "imdbnumber",
+    "premiered", "votes", "fanart", "thumbnail", "file", "originaltitle", "sorttitle", "episodeguide",
+    "season", "dateadded", "tag", "art", "userrating", "ratings", "runtime", "uniqueid"]
+
+
 def get_jsonrpc(method=None, params=None, query_id=1):
     return jurialmunkey_jsnrpc.get_jsonrpc(method, params, query_id)
 
@@ -24,6 +36,12 @@ def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False):
         return KodiLibrary(dbtype='both', cache_refresh=cache_refresh)
 
 
+def get_mapped_details(details, dbid, key):
+    from tmdbhelper.lib.api.kodi.mapping import ItemMapper
+    details['dbid'] = dbid
+    return ItemMapper(key=key).get_info(details)
+
+
 def get_item_details(dbid=None, method=None, key=None, properties=None):
     if not dbid or not method or not key or not properties:
         return {}
@@ -33,28 +51,52 @@ def get_item_details(dbid=None, method=None, key=None, properties=None):
     try:
         details = get_jsonrpc(method, params)
         details = details['result'][f'{key}details']
-        details['dbid'] = dbid
-        from tmdbhelper.lib.api.kodi.mapping import ItemMapper
-        return ItemMapper(key=key).get_info(details)
+        return get_mapped_details(details, dbid, key)
     except (AttributeError, KeyError):
         return {}
 
 
 def get_movie_details(dbid=None):
-    properties = [
-        "title", "genre", "year", "rating", "director", "trailer", "tagline", "plot", "plotoutline", "originaltitle",
-        "writer", "studio", "mpaa", "cast", "country", "imdbnumber", "runtime", "set",
-        "showlink", "streamdetails", "top250", "votes", "fanart", "thumbnail", "file", "sorttitle", "setid",
-        "dateadded", "tag", "art", "userrating", "ratings", "premiered", "uniqueid"]
-    return get_item_details(dbid=dbid, method="VideoLibrary.GetMovieDetails", key="movie", properties=properties)
+    return get_item_details(
+        dbid=dbid, method="VideoLibrary.GetMovieDetails",
+        key="movie", properties=MOVIE_DETAILS_PROPERTIES)
 
 
 def get_tvshow_details(dbid=None):
-    properties = [
-        "title", "genre", "year", "rating", "plot", "studio", "mpaa", "cast", "episode", "imdbnumber",
-        "premiered", "votes", "fanart", "thumbnail", "file", "originaltitle", "sorttitle", "episodeguide",
-        "season", "dateadded", "tag", "art", "userrating", "ratings", "runtime", "uniqueid"]
-    return get_item_details(dbid=dbid, method="VideoLibrary.GetTVShowDetails", key="tvshow", properties=properties)
+    return get_item_details(
+        dbid=dbid, method="VideoLibrary.GetTVShowDetails",
+        key="tvshow", properties=TVSHOW_DETAILS_PROPERTIES)
+
+
+def get_list_details(titles, dbids, method, key, properties):
+    """Map candidates by the Kodi IDs already selected by the library matcher."""
+    if not titles or not dbids:
+        return {}
+    params = {
+        'properties': properties,
+        'filter': {'field': 'title', 'operator': 'is', 'value': titles},
+    }
+    response = get_jsonrpc(method, params)
+    try:
+        details = response['result'][f'{key}s']
+    except KeyError:
+        return {}
+    return {
+        item[f'{key}id']: get_mapped_details(item, item[f'{key}id'], key)
+        for item in details if item[f'{key}id'] in dbids
+    }
+
+
+def get_movie_list_details(titles, dbids):
+    return get_list_details(
+        titles, dbids, method='VideoLibrary.GetMovies',
+        key='movie', properties=MOVIE_DETAILS_PROPERTIES)
+
+
+def get_tvshow_list_details(titles, dbids):
+    return get_list_details(
+        titles, dbids, method='VideoLibrary.GetTVShows',
+        key='tvshow', properties=TVSHOW_DETAILS_PROPERTIES)
 
 
 def get_season_details(dbid=None):
