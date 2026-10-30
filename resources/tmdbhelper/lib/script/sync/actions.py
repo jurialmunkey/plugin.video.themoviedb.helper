@@ -2,6 +2,8 @@ from tmdbhelper.lib.script.sync.provider import ItemSync
 
 
 class ItemWatched(ItemSync):
+    sync_types = ('SyncWatched', 'SyncPlayback')
+    show_sync_types = ('SyncNextEpisodes', 'SyncAllNextEpisodes')
     allow_seasons = True
     allow_episodes = True
     preconfigured = True
@@ -15,12 +17,14 @@ class ItemUnwatched(ItemWatched):
 
 
 class ItemWatchlist(ItemSync):
+    sync_types = ('SyncWatchlist',)
     localized_name_add = 32291
     localized_name_rem = 32292
     sync_key = 'watchlist_listed_at'
 
 
 class ItemCollection(ItemSync):
+    sync_types = ('SyncCollection',)
     localized_name_add = 32289
     localized_name_rem = 32290
     allow_episodes = True
@@ -28,6 +32,8 @@ class ItemCollection(ItemSync):
 
 
 class ItemDropped(ItemSync):
+    sync_types = ('SyncHiddenDropped',)
+    show_sync_types = ('SyncNextEpisodes', 'SyncAllNextEpisodes')
     allow_movies = False
     allow_shows = True
     allow_seasons = True

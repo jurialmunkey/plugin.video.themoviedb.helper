@@ -104,8 +104,16 @@ do not construct another `Provider()` inside sync implementations or getters.
 The action dispatcher supplies `syncdata`, `sync_provider`, and `sync_feature`
 before accessing action properties. Authorization, reads, writes, and invalidation
 within the operation therefore reuse the same provider and its cached API client.
-Successful synced-state actions invalidate and resync their feature before
-refreshing containers, restoring skin-facing values for other cached items too.
+Successful synced-state actions use `SyncActionInvalidator` before refreshing
+containers. Actions declare `sync_types` for their item type and
+`show_sync_types` for parent-show dependencies. The invalidator uses the existing
+sync factories to normalize activity identities, deduplicates them, and refreshes
+only dependencies assigned to the action's provider. It retains cached columns
+until successful responses replace them. Explicit maintenance and provider
+changes continue to use the broader feature invalidators.
+MDbList watched additions use a concrete invalidator that preserves the history
+timestamp for incremental requests; removals invalidate it for a full snapshot.
+Trakt rating actions invalidate only the affected media type's ratings snapshot.
 Shared action properties use `item_type` and `base_item_type` for media types;
 these are Python properties and do not rename database columns. Service browsing
 authorization belongs to the service API/directory layer. Next-episode identifier
