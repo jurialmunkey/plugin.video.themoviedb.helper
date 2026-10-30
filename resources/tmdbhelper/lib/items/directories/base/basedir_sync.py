@@ -137,6 +137,14 @@ class BaseDirItemCurrentlyWatching(BaseDirItemNextEpisodes):
     art_icon = 'resources/icons/sync/currentlywatching.png'
 
 
+class BaseDirItemNextMovies(BaseDirItemNextEpisodes):
+    priority = 221
+    label_localized = 32602
+    types = ('movie', )
+    params = {'info': 'sync_nextmovies'}
+    sorting = False
+
+
 class BaseDirItemCurrentlyWatchingMixed(BaseDirItemCurrentlyWatching):
     priority = 226
     label_localized = 32601

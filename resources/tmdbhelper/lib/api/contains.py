@@ -1,8 +1,5 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.files.futils import validate_join
-import xbmcvfs
-import json
+from tmdbhelper.lib.awards.database import AwardsDatabase
 
 
 class CommonContainerAPIs():
@@ -66,18 +63,12 @@ class CommonRatingsAPIs(CommonContainerAPIs):
     }
 
     @cached_property
-    def all_awards(self):
-        return self.get_awards_data()
+    def awards_database(self):
+        return self.get_awards_database()
 
     @staticmethod
-    def get_awards_data():
-        try:
-            filepath = validate_join('special://home/addons/plugin.video.themoviedb.helper/resources/jsondata/', 'awards.json')
-            with xbmcvfs.File(filepath, 'r') as file:
-                return json.load(file)
-        except (IOError, json.JSONDecodeError):
-            kodi_log('ERROR: Failed to load awards data!')
-            return {'movie': {}, 'tv': {}}
+    def get_awards_database():
+        return AwardsDatabase()
 
     @cached_property
     def tvdb_awards(self):
@@ -85,10 +76,7 @@ class CommonRatingsAPIs(CommonContainerAPIs):
 
     def get_tvdb_awards(self):
         info = {}
-        try:
-            awards = self.all_awards[self.tmdb_type][str(self.tmdb_id)]
-        except(KeyError, TypeError, AttributeError):
-            return info
+        awards = self.awards_database.get_item_awards(self.tmdb_type, self.tmdb_id)
         for t in ['awards_won', 'awards_nominated']:
             item_awards = awards.get(t)
             if not item_awards:

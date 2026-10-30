@@ -247,6 +247,26 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="nextmovies_updates" type="boolean" label="32603" help="32604">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="nextmovies_daily_budget" type="integer" label="32605" help="32606">
+                    <level>2</level>
+                    <default>25</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <maximum>400</maximum>
+                        <step>1</step>
+                    </constraints>
+                    <control type="spinner" format="integer"/>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="nextmovies_updates" operator="is">True</condition>
+                        </dependency>
+                    </dependencies>
+                </setting>
             </group>
         </category>
         <category id="library" label="14022" help="">

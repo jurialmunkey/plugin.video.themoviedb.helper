@@ -20,12 +20,24 @@ class CronJobMonitor(SafeThread):
         self._do_trakt_authorization()
         from tmdbhelper.lib.script.stats import get_stats
         get_stats()
+        self._do_collection_update()
 
     def _on_poll(self):
         self._do_database_maintenance()
         self._do_delete_old_databases()
         self._do_library_update_check()
         self._do_delete_old_log_files()
+        self._do_collection_update()
+
+    def _do_collection_update(self):
+        from tmdbhelper.lib.collections.kodi import update_collection_index
+        thread = getattr(self, 'collection_thread', None)
+        if thread is not None and thread.is_alive():
+            return
+        self.collection_thread = SafeThread(
+            target=update_collection_index,
+            kwargs={'abort': lambda: self.exit or self.update_monitor.abortRequested()})
+        self.collection_thread.start()
 
     @cached_property
     def trakt_api(self):
