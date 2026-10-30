@@ -133,6 +133,11 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return ItemFinaliser
 
     @cached_property
+    def list_finaliser(self):
+        from tmdbhelper.lib.items.finaliser import ListFinaliser
+        return ListFinaliser
+
+    @cached_property
     def action_discovery(self):
         return self.get_action_discovery()
 
@@ -140,13 +145,16 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         from tmdbhelper.lib.script.actions.discovery import ActionDiscovery
         return ActionDiscovery(self.sync_playdata.syncdata)
 
-    def make_item(self, li):
+    def get_item_finaliser(self, li):
         li.action_discovery = self.action_discovery
-        ci = self.item_finaliser(self, li)
+        return self.item_finaliser(self, li)
+
+    def make_item(self, li):
+        ci = self.get_item_finaliser(li)
         return ci.item if ci else None
 
     def make_items(self, items):
-        make_items = [self.make_item(i) for i in items if i]
+        make_items = self.list_finaliser(self, items).items
         make_items = self.sort_items_by_dbid(make_items) if self.sort_by_dbid else make_items
         return make_items
 

@@ -1,5 +1,6 @@
 from tmdbhelper.lib.items.directories.lists_default import UncachedItemsPage, ListDefault, ListProperties
 from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.ftools import cached_property
 
 
@@ -18,9 +19,22 @@ class ListStandardProperties(ListProperties):
 
     @cached_property
     def final_items(self):
+        return self.get_final_items()
+
+    def get_page_items(self, page, response):
+        items_page = self.class_pages(self, page)
+        items_page.response = response
+        return items_page.items
+
+    def get_final_items(self):
+        # Resolve URL configuration and any authorisation before starting workers.
+        _ = self.url
+        pages = range(self.page, self.next_page)
+        with ParallelThread(pages, self.get_api_response) as pt:
+            responses = pt.queue
         return [
-            i for xpage in range(self.page, self.next_page)
-            for i in self.class_pages(self, xpage).items
+            i for page, response in zip(pages, responses)
+            for i in self.get_page_items(page, response)
         ]
 
     def get_uncached_items(self):
