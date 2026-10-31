@@ -21,3 +21,11 @@ class SyncProviderDiscovery:
             addon for addon in result.get('addons', ())
             if addon['addonid'].startswith(self.addon_prefix)
         )
+
+    def get_addon_id(self, provider_id):
+        return f'{self.addon_prefix}{provider_id}'
+
+    def get_addon(self, provider_id):
+        """Return the addon named after the provider ID, or None if it is not discovered."""
+        addon_id = self.get_addon_id(provider_id)
+        return next((addon for addon in self.addons if addon['addonid'] == addon_id), None)

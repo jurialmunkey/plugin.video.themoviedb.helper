@@ -7,20 +7,56 @@ from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting, SyncPro
 
 class SyncProviderRegistry:
     @cached_property
+    def discovery(self):
+        return self.get_discovery()
+
+    def get_discovery(self):
+        return SyncProviderDiscovery()
+
+    @cached_property
+    def loaded_providers(self):
+        """Providers loaded so far by addon ID, shared by single and full loading."""
+        return {}
+
+    @cached_property
     def providers(self):
         return self.get_providers()
 
     def get_providers(self):
         providers = {}
-        for addon in SyncProviderDiscovery().addons:
-            self.register_provider(providers, addon)
+        for addon in self.discovery.addons:
+            self.register_provider(providers, self.load_provider(addon))
         return providers
 
+    def load_provider(self, addon):
+        try:
+            return self.loaded_providers[addon['addonid']]
+        except KeyError:
+            pass
+        provider = self.loaded_providers[addon['addonid']] = SyncProviderLoader(addon).load()
+        return provider
+
+    def get_provider(self, provider_id):
+        """Load only the provider's own addon when its ID follows the addon naming convention.
+        Other providers are found by loading every provider. Raises KeyError if unavailable."""
+        addon = self.discovery.get_addon(provider_id)
+        if addon is None:
+            return self.providers[provider_id]
+        provider = self.load_provider(addon)
+        if provider.provider_id != provider_id:
+            return self.providers[provider_id]
+        return provider
+
+    def find_provider(self, provider_id):
+        try:
+            return self.get_provider(provider_id)
+        except KeyError:  # The selected addon may have been disabled or uninstalled.
+            return
+
     @staticmethod
-    def register_provider(providers, addon):
-        provider = SyncProviderLoader(addon).load()
+    def register_provider(providers, provider):
         if provider.provider_id in providers:
-            raise ValueError(f"Duplicate sync provider ID {provider.provider_id}: {addon['addonid']}")
+            raise ValueError(f"Duplicate sync provider ID {provider.provider_id}: {provider.addon_id}")
         for registered in providers.values():
             duplicates = set(registered.list_routes).intersection(provider.list_routes)
             if duplicates:
@@ -80,19 +116,15 @@ class SyncProviderRegistry:
         provider_id = self.get_selected_provider_id(capability)
         if not provider_id:
             return
-        providers = self.providers
-        try:
-            provider = providers[provider_id]
-        except KeyError:  # The selected addon may have been disabled or uninstalled.
-            return
-        if capability in provider.capabilities:
+        provider = self.find_provider(provider_id)
+        if provider is not None and capability in provider.capabilities:
             return provider
 
     def get_selected_providers(self, capability):
         provider_ids = SyncProviderSettingFactory(capability).provider_ids
         return tuple(
             provider for provider_id in provider_ids
-            if (provider := self.providers.get(provider_id)) is not None
+            if (provider := self.find_provider(provider_id)) is not None
             and capability in provider.capabilities)
 
     @staticmethod

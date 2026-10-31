@@ -281,7 +281,11 @@ original provider control afterward, including when selection is cancelled.
 Provider setup launched from lists or other scripts does not reopen settings.
 
 Duplicate IDs, incompatible interfaces, and broken entry points produce explicit
-errors. Discovery and provider imports are scoped to a Python invocation;
+errors. Selected-provider lookups load only the provider's own addon when its
+addon ID is `script.module.tmdbhelper.sync.<provider_id>`; other providers are
+found by loading every discovered provider. Listing all providers loads the rest
+and applies the duplicate checks. Each provider is loaded once per registry.
+Discovery and provider imports are scoped to a Python invocation;
 setup refreshes discovery after installation or enabling. Updating already-loaded
 provider code still requires a new invocation.
 

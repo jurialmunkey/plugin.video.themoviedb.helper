@@ -33,7 +33,8 @@ class ActionDiscovery:
         return self.get_is_available()
 
     def get_is_available(self):
-        return bool(self.service_actions.actions or self.provider_actions)
+        # Selected providers first: service actions need every provider loaded.
+        return bool(self.provider_actions or self.service_actions.actions)
 
     def get_provider_item(self, name, *args):
         feature, provider, action_class = self.provider_actions[name]
