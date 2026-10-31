@@ -1,7 +1,7 @@
 from collections import OrderedDict, deque
 from concurrent.futures import Future, ThreadPoolExecutor
 from queue import Empty, Queue
-from threading import RLock, Thread
+from threading import Event, RLock, Thread
 from traceback import format_exc
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.items.database.details.backend import DetailsBackend
@@ -20,17 +20,25 @@ class LookupJob:
 
 
 class DetailsCoordinator(Thread):
-    """One cache/commit owner and at most twenty independent online lookups."""
+    """One cache/commit owner and at most twenty independent online lookups.
+
+    Requests are admitted in full so cached items are answered immediately. Online
+    fetches take turns between requests. Commits yield to newly submitted requests
+    so that lists already in the cache are not held up by another list's writes.
+    """
 
     batch_size = 20
+    commit_cap = 2  # Commits per loop while newly submitted requests are waiting
 
     def __init__(self, backend_class=DetailsBackend):
         super().__init__(name='TMDbHelper item details')
         self.backend_class = backend_class
         self.events = Queue()
+        self.requests_waiting = Event()
         self.pending = {}
         self.admissions = OrderedDict()
         self.ready = OrderedDict()
+        self.completed = deque()
         self.active = 0
         self.failure = None
         self.lock = RLock()
@@ -50,23 +58,27 @@ class DetailsCoordinator(Thread):
                 self.waiters.add(future)
                 future.add_done_callback(self.remove_waiter)
             self.events.put(('submit', deque(zip(requests, futures)), group or object()))
+            self.requests_waiting.set()
         return futures
 
     def remove_waiter(self, future):
         with self.lock:
             self.waiters.discard(future)
 
+    @property
+    def has_work(self):
+        return bool(self.admissions or self.completed)
+
     def get_batch(self):
-        if self.admissions:
-            batch = []
-        else:
-            batch = [self.events.get()]
-        for _ in range(self.batch_size - 1):
+        # Clear before draining so that a request submitted meanwhile is not missed.
+        # Drain every queued event so that no request is left behind a cleared flag.
+        self.requests_waiting.clear()
+        batch = [] if self.has_work else [self.events.get()]
+        while True:
             try:
                 batch.append(self.events.get_nowait())
             except Empty:
-                break
-        return batch
+                return batch
 
     def run(self):
         self.backend = None
@@ -84,6 +96,7 @@ class DetailsCoordinator(Thread):
                         self.process_event(*event)
                     self.admit()
                     self.dispatch()
+                    self.commit_pending()
         except BaseException as exc:
             self.failure = exc
             kodi_log(f'Item detail lookup failed:\n{format_exc()}', 1)
@@ -103,17 +116,16 @@ class DetailsCoordinator(Thread):
         elif kind == 'dependency':
             self.dependency_finished(*args)
         elif kind == 'fetched':
-            self.fetched(*args)
+            self.fetch_completed(*args)
 
     def admit(self):
-        for _ in range(self.batch_size):
-            if not self.admissions:
-                return
+        """Admit every waiting request in arrival order. Cached items are answered
+        immediately and online lookups are queued for dispatch, so a request with
+        many uncached items does not hold up the requests behind it."""
+        while self.admissions:
             group, items = self.admissions.popitem(last=False)
-            request, future = items.popleft()
-            if items:
-                self.admissions[group] = items
-            self.lookup(request, future, group)
+            for request, future in items:
+                self.lookup(request, future, group)
 
     def lookup(self, request, future, group):
         if future.done():
@@ -174,8 +186,17 @@ class DetailsCoordinator(Thread):
             lookup.close()
         self.ready.setdefault(job.group, deque()).append(job)
 
+    @property
+    def is_commit_backlogged(self):
+        """Pause new fetches while finished fetches wait to be written."""
+        return len(self.completed) >= 2 * self.batch_size
+
+    @property
+    def can_dispatch(self):
+        return self.active < self.batch_size and not self.is_commit_backlogged and not self.stopping
+
     def dispatch(self):
-        while self.ready and self.active < self.batch_size and not self.stopping:
+        while self.ready and self.can_dispatch:
             group, jobs = self.ready.popitem(last=False)
             job = jobs.popleft()
             if jobs:
@@ -189,8 +210,21 @@ class DetailsCoordinator(Thread):
             future.add_done_callback(
                 lambda future, job=job: self.events.put(('fetched', job, future)))
 
-    def fetched(self, job, future):
+    def fetch_completed(self, job, future):
+        """Free the worker for the next fetch; the result is committed separately."""
         self.active -= 1
+        self.completed.append((job, future))
+
+    def is_commit_permitted(self, committed):
+        return committed < self.commit_cap or not self.requests_waiting.is_set()
+
+    def commit_pending(self):
+        committed = 0
+        while self.completed and not self.stopping and self.is_commit_permitted(committed):
+            self.commit_completed(*self.completed.popleft())
+            committed += 1
+
+    def commit_completed(self, job, future):
         try:
             self.commit(job, future.result())
         except Exception as exc:
