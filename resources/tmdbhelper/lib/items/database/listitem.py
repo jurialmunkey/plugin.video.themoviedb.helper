@@ -46,10 +46,11 @@ class ListItemConfig:
     def listitem(self):
         return ListItem(**self.item)
 
-    def get_configured_listitem(self, data):
+    def get_configured_listitem(self, merged):
+        """Apply the details that the item detail service merged into this item's data."""
         if self.next_page and not self.parent.pagination:
             return
-        self.listitem.set_details(data, override=True, reverse_artwork=True) if data else None
+        self.listitem.set_merged_details(merged) if merged else None
         return self.listitem
 
     @cached_property
@@ -119,7 +120,9 @@ class ListItemBatch:
         with TimerList(
                 self.parent.timer_lists, ' - service',
                 log_threshold=0.001, logging=self.parent.log_timers):
-            data = self.parent.client.get_items([item.request for item in self.requested_items])
+            data = self.parent.client.get_items(
+                [item.request for item in self.requested_items],
+                [item.listitem.get_merge_data() for item in self.requested_items])
         details = dict(zip(self.requested_items, data))
         return [item.get_configured_listitem(details.get(item)) for item in self.items]
 

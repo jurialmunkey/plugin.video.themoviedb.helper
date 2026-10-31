@@ -10,6 +10,7 @@ from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.plugin import get_version
 from tmdbhelper.lib.files.sqlite_mutex import SQLiteMutex
 from tmdbhelper.lib.items.database.details.coordinator import DetailsCoordinator
+from tmdbhelper.lib.items.database.details.merge import ConfiguredItemMerger
 from tmdbhelper.lib.items.database.details.protocol import (
     DetailsLookupError, DetailsServiceError, DetailsServiceUnavailable,
     MAX_REQUEST_ITEMS, PROTOCOL_VERSION, RESPONSE_TIMEOUT, ServiceLocation,
@@ -58,17 +59,19 @@ class DetailsRequestHandler(BaseRequestHandler):
     def get_response(self, message):
         if message['version'] != PROTOCOL_VERSION or message['token'] != self.server.token:
             raise DetailsServiceUnavailable('Item detail service protocol/token mismatch')
-        items = message['items']
-        if items is None:
+        entries = message['items']
+        if entries is None:
             if not self.server.coordinator.is_alive() or self.server.coordinator.stopping:
                 raise DetailsServiceUnavailable('Item detail coordinator stopped')
             return {'items': []}
-        if not isinstance(items, list) or len(items) > MAX_REQUEST_ITEMS:
+        if not isinstance(entries, list) or len(entries) > MAX_REQUEST_ITEMS:
             raise DetailsServiceError('Invalid item detail batch')
-        requests = [DetailsRequest(**item) for item in items]
+        requests = [DetailsRequest(**entry['request']) for entry in entries]
         futures = self.server.coordinator.submit(requests)
         deadline = monotonic() + RESPONSE_TIMEOUT
-        results = [self.get_result(future, deadline) for future in futures]
+        results = [
+            self.get_entry_result(entry, self.get_result(future, deadline))
+            for entry, future in zip(entries, futures)]
         return {
             'items': [item for item, error in results],
             'errors': {f'{x}': error for x, (item, error) in enumerate(results) if error},
@@ -82,6 +85,18 @@ class DetailsRequestHandler(BaseRequestHandler):
             return (None, str(exc))
         except FutureTimeoutError:
             raise DetailsServiceError('Item detail lookup timed out')
+
+    @staticmethod
+    def get_entry_result(entry, result):
+        """Merge the details into the entry's list item data, if it sent any.
+        Merging runs on this handler thread so that lists do not queue behind each other."""
+        details, error = result
+        if not details or entry['item'] is None:
+            return result
+        try:
+            return (ConfiguredItemMerger(entry['item'], details).merged, None)
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            return (None, f'Unable to merge item details: {exc}')
 
 
 class DetailsServer(ThreadingMixIn, TCPServer):

@@ -7,7 +7,7 @@ from xbmcgui import Window
 from xbmcvfs import translatePath
 
 
-PROTOCOL_VERSION = 2
+PROTOCOL_VERSION = 3  # Items are {'request': DetailsRequest dict, 'item': list item merge data or None}
 MAX_MESSAGE_BYTES = 32 * 1024 * 1024
 MAX_REQUEST_ITEMS = 200
 PING_TIMEOUT = 5

@@ -93,28 +93,38 @@ class DetailsClient:
             return endpoint
         return self.get_endpoint(failed_endpoint=endpoint)
 
-    def get_batch_items(self, requests):
-        items = [request.as_dict() for request in requests]
+    def get_batch_items(self, entries):
         endpoint = self.get_current_endpoint()
         try:
-            return self.exchange(endpoint, items)
+            return self.exchange(endpoint, entries)
         except (OSError, DetailsServiceUnavailable):
             if self.monitor.abortRequested():
                 raise
-        return self.exchange(self.get_retry_endpoint(endpoint), items)
+        return self.exchange(self.get_retry_endpoint(endpoint), entries)
 
-    def get_batch(self, requests):
+    def get_batch(self, entries):
         try:
-            return self.get_batch_items(requests)
+            return self.get_batch_items(entries)
         except (OSError, DetailsServiceError) as exc:
             kodi_log(f'Item detail service request failed: {exc}', 1)
-            return [None for _ in requests]
+            return [None for _ in entries]
 
-    def get_items(self, requests):
+    @staticmethod
+    def get_entries(requests, items=None):
+        """Pair each request with the list item data to merge its details into.
+        Requests without list item data are answered with the details alone."""
+        items = items or [None for _ in requests]
+        return [
+            {'request': request.as_dict(), 'item': item}
+            for request, item in zip(requests, items)
+        ]
+
+    def get_items(self, requests, items=None):
+        entries = self.get_entries(requests, items)
         return [
             item
-            for offset in range(0, len(requests), MAX_REQUEST_ITEMS)
-            for item in self.get_batch(requests[offset:offset + MAX_REQUEST_ITEMS])
+            for offset in range(0, len(entries), MAX_REQUEST_ITEMS)
+            for item in self.get_batch(entries[offset:offset + MAX_REQUEST_ITEMS])
         ]
 
     def get_item(self, request):

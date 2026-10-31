@@ -1,7 +1,8 @@
 from xbmcgui import ListItem as KodiListItem
 from jurialmunkey.ftools import cached_property
-from jurialmunkey.parser import try_int, merge_two_dicts, boolean
+from jurialmunkey.parser import try_int, boolean
 from infotagger.listitem import ListItemInfoTag
+from tmdbhelper.lib.items.database.details.merge import ItemDetailsMerger
 from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELOAD_FORCED
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
@@ -274,17 +275,18 @@ class _ListItem(object):
     def set_details(self, details=None, reverse=False, override=False, reverse_artwork=False):
         if not details:
             return
-        self.stream_details = merge_two_dicts(details.get('stream_details', {}), self.stream_details, reverse=reverse)
-        self.infolabels = merge_two_dicts(details.get('infolabels', {}), self.infolabels, reverse=reverse)
-        self.infoproperties = merge_two_dicts(details.get('infoproperties', {}), self.infoproperties, reverse=reverse)
-        self.art = merge_two_dicts(details.get('art', {}), self.art, reverse=bool(reverse or reverse_artwork))
-        self.unique_ids = merge_two_dicts(details.get('unique_ids', {}), self.unique_ids, reverse=reverse)
-        self.cast = self.cast or details.get('cast', [])
-        if not override:
-            return
-        self.label = details.get('label') or self.label
-        self.infolabels['title'] = details.get('infolabels', {}).get('title') or self.infolabels.get('title')
-        self.infolabels['tvshowtitle'] = details.get('infolabels', {}).get('tvshowtitle') or self.infolabels.get('tvshowtitle')
+        merger = ItemDetailsMerger(
+            self.get_merge_data(), details,
+            reverse=reverse, override=override, reverse_artwork=reverse_artwork)
+        self.set_merged_details(merger.merged)
+
+    def get_merge_data(self):
+        """The list item data that details are merged with."""
+        return {key: getattr(self, key) for key in ItemDetailsMerger.item_keys}
+
+    def set_merged_details(self, merged):
+        for key, value in merged.items():
+            setattr(self, key, value)
 
     @cached_property
     def url(self):
