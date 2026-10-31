@@ -1,7 +1,7 @@
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
-from tmdbhelper.lib.addon.logger import TimerList
+from tmdbhelper.lib.addon.logger import TimerList, kodi_log
 from tmdbhelper.lib.items.database.details.client import DetailsClient
 from tmdbhelper.lib.items.database.details.request import DetailsRequest
 
@@ -27,11 +27,20 @@ class ListItemConfig:
             return False
         if not self.tmdb_type:
             return False
+        if not self.request:
+            return False
         return True
 
     @cached_property
     def request(self):
-        return self.parent.get_request(self.tmdb_type, self.tmdb_id, self.season, self.episode)
+        return self.get_request()
+
+    def get_request(self):
+        # One malformed item must not prevent details for the rest of the list.
+        try:
+            return self.parent.get_request(self.tmdb_type, self.tmdb_id, self.season, self.episode)
+        except ValueError as exc:
+            kodi_log(f'Item details skipped for {self.mediatype} {self.tmdb_id}: {exc}', 1)
 
     @cached_property
     def listitem(self):

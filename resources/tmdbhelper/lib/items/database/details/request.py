@@ -34,9 +34,14 @@ class DetailsRequest:
         object.__setattr__(self, 'tmdb_id', identifier)
         object.__setattr__(self, 'language', self.language or get_language())
         for name in ('season', 'episode', 'tvshow_tmdb_id'):
-            value = getattr(self, name)
-            if value is not None:
-                object.__setattr__(self, name, int(value))
+            object.__setattr__(self, name, self.get_optional_int(getattr(self, name)))
+
+    @staticmethod
+    def get_optional_int(value):
+        """Empty values are unset; factory data conditions reject unset numbers."""
+        if value in (None, ''):
+            return
+        return int(value)
 
     @classmethod
     def from_type(cls, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):

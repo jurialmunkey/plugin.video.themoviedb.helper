@@ -5,7 +5,7 @@ from threading import RLock, Thread
 from traceback import format_exc
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.items.database.details.backend import DetailsBackend
-from tmdbhelper.lib.items.database.details.protocol import DetailsServiceUnavailable
+from tmdbhelper.lib.items.database.details.protocol import DetailsLookupError, DetailsServiceUnavailable
 
 
 class LookupJob:
@@ -90,7 +90,9 @@ class DetailsCoordinator(Thread):
         finally:
             self.fail_waiters()
             if self.executor is not None:
-                self.executor.shutdown(wait=True)
+                # A hung online lookup must not delay the restart. Late results
+                # are discarded because nothing reads the event queue any more.
+                self.executor.shutdown(wait=False)
             if self.backend is not None:
                 self.backend.close()
 
@@ -146,6 +148,10 @@ class DetailsCoordinator(Thread):
             return
         if not all(future.done() for future in job.dependencies):
             return
+        errors = [future.exception() for future in job.dependencies if future.exception()]
+        if errors:
+            self.fail(job, DetailsLookupError(f'Dependency of {job.request.identity} failed: {errors[0]}'))
+            return
         values = [future.result() for future in job.dependencies]
         if not all(values):
             self.finish(job)
@@ -185,10 +191,18 @@ class DetailsCoordinator(Thread):
 
     def fetched(self, job, future):
         self.active -= 1
-        queue = future.result()
-        if queue:
-            self.backend.commit(job.request, queue)
+        try:
+            self.commit(job, future.result())
+        except Exception as exc:
+            kodi_log(f'Item detail lookup failed for {job.request.identity}:\n{format_exc()}', 1)
+            self.fail(job, DetailsLookupError(f'{job.request.identity}: {exc}'))
+            return
         self.finish(job)
+
+    def commit(self, job, queue):
+        # User art is cleared on refresh even when the online lookup returned nothing.
+        if queue or job.request.clear_user_art:
+            self.backend.commit(job.request, queue)
 
     def finish(self, job):
         del self.pending[job.key]
@@ -199,6 +213,12 @@ class DetailsCoordinator(Thread):
             if data is None:
                 data = self.backend.fallback(request)
             future.set_result(data)
+
+    def fail(self, job, error):
+        del self.pending[job.key]
+        for request, future in job.waiters:
+            if not future.done():
+                future.set_exception(error)
 
     def fail_waiters(self):
         with self.lock:

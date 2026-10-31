@@ -7,9 +7,12 @@ from xbmcgui import Window
 from xbmcvfs import translatePath
 
 
-PROTOCOL_VERSION = 1
+PROTOCOL_VERSION = 2
 MAX_MESSAGE_BYTES = 32 * 1024 * 1024
-MAX_REQUEST_ITEMS = 2000
+MAX_REQUEST_ITEMS = 200
+PING_TIMEOUT = 5
+REQUEST_TIMEOUT = 300
+RESPONSE_TIMEOUT = REQUEST_TIMEOUT - 20  # Answer before the client gives up waiting
 
 
 class DetailsServiceError(RuntimeError):
@@ -18,6 +21,10 @@ class DetailsServiceError(RuntimeError):
 
 class DetailsServiceUnavailable(DetailsServiceError):
     pass
+
+
+class DetailsLookupError(DetailsServiceError):
+    """An individual item lookup failed; the service itself is still healthy."""
 
 
 class ServiceLocation:
@@ -64,7 +71,7 @@ def receive_exact(connection, size, monitor, deadline):
     return data
 
 
-def receive_message(connection, monitor, timeout=300):
+def receive_message(connection, monitor, timeout=REQUEST_TIMEOUT):
     deadline = monotonic() + timeout
     size = struct.unpack('!I', receive_exact(connection, 4, monitor, deadline))[0]
     if size > MAX_MESSAGE_BYTES:
@@ -72,8 +79,12 @@ def receive_message(connection, monitor, timeout=300):
     return json.loads(receive_exact(connection, size, monitor, deadline))
 
 
-def send_message(connection, message):
+def encode_message(message):
     data = json.dumps(message, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
     if len(data) > MAX_MESSAGE_BYTES:
         raise DetailsServiceError('Item detail service message is too large')
-    connection.sendall(struct.pack('!I', len(data)) + data)
+    return struct.pack('!I', len(data)) + data
+
+
+def send_message(connection, message):
+    connection.sendall(encode_message(message))

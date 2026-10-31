@@ -1,16 +1,22 @@
 import traceback
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from secrets import token_hex
 from socketserver import BaseRequestHandler, ThreadingMixIn, TCPServer
 from threading import Event, Thread
+from time import monotonic
 from xbmc import Monitor
+from xbmcaddon import Addon
 from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.addon.plugin import get_version
 from tmdbhelper.lib.files.sqlite_mutex import SQLiteMutex
 from tmdbhelper.lib.items.database.details.coordinator import DetailsCoordinator
 from tmdbhelper.lib.items.database.details.protocol import (
-    DetailsServiceError, DetailsServiceUnavailable, MAX_REQUEST_ITEMS,
-    PROTOCOL_VERSION, ServiceLocation, receive_message, send_message,
+    DetailsLookupError, DetailsServiceError, DetailsServiceUnavailable,
+    MAX_REQUEST_ITEMS, PROTOCOL_VERSION, RESPONSE_TIMEOUT, ServiceLocation,
+    encode_message, receive_message,
 )
 from tmdbhelper.lib.items.database.details.request import DetailsRequest
+from tmdbhelper.lib.items.database.details.settings import DetailsSettings
 
 
 class DetailsMonitor(Monitor):
@@ -36,9 +42,18 @@ class DetailsRequestHandler(BaseRequestHandler):
             return
         self.request.settimeout(5)
         try:
-            send_message(self.request, response)
-        except (OSError, DetailsServiceError):
+            self.request.sendall(self.get_encoded_response(response))
+        except OSError:
             return  # The requesting widget may have been closed.
+
+    @staticmethod
+    def get_encoded_response(response):
+        try:
+            return encode_message(response)
+        except DetailsServiceError as exc:
+            # Report oversize responses as a request error, not a dropped connection,
+            # so that the client does not mistake it for a failed service.
+            return encode_message({'error': str(exc)})
 
     def get_response(self, message):
         if message['version'] != PROTOCOL_VERSION or message['token'] != self.server.token:
@@ -52,7 +67,21 @@ class DetailsRequestHandler(BaseRequestHandler):
             raise DetailsServiceError('Invalid item detail batch')
         requests = [DetailsRequest(**item) for item in items]
         futures = self.server.coordinator.submit(requests)
-        return {'items': [future.result() for future in futures]}
+        deadline = monotonic() + RESPONSE_TIMEOUT
+        results = [self.get_result(future, deadline) for future in futures]
+        return {
+            'items': [item for item, error in results],
+            'errors': {f'{x}': error for x, (item, error) in enumerate(results) if error},
+        }
+
+    @staticmethod
+    def get_result(future, deadline):
+        try:
+            return (future.result(timeout=max(deadline - monotonic(), 0)), None)
+        except DetailsLookupError as exc:
+            return (None, str(exc))
+        except FutureTimeoutError:
+            raise DetailsServiceError('Item detail lookup timed out')
 
 
 class DetailsServer(ThreadingMixIn, TCPServer):
@@ -73,12 +102,21 @@ class DetailsService:
     def __init__(self):
         self.monitor = DetailsMonitor()
         self.location = ServiceLocation()
+        self.settings = DetailsSettings()
+        self.version = get_version()
+
+    @property
+    def is_outdated(self):
+        """The add-on was updated while this script kept running the old code."""
+        return Addon().getAddonInfo('version') != self.version
 
     def run(self):
-        with SQLiteMutex(f'{self.location.name}.Instance', timeout=0) as mutex:
+        # Wait briefly so a replacement started during an outdated instance's exit
+        # still acquires the lock once the old instance releases it.
+        with SQLiteMutex(f'{self.location.name}.Instance', timeout=10) as mutex:
             if mutex.lockstate == -1:
                 return
-            while not self.monitor.abortRequested():
+            while not self.monitor.abortRequested() and not self.is_outdated:
                 try:
                     self.run_instance()
                 except Exception:
@@ -92,11 +130,16 @@ class DetailsService:
         listener = Thread(target=server.serve_forever, name='TMDbHelper detail listener')
         try:
             self.monitor.settings_changed.clear()
+            settings = self.settings.get_snapshot()
             coordinator.start()
             listener.start()
-            self.location.endpoint = {'port': server.server_address[1], 'token': server.token}
+            self.location.endpoint = {
+                'port': server.server_address[1], 'token': server.token,
+                'version': self.version}
             while not self.monitor.waitForAbort(1):
-                if self.location.restart == server.token or self.monitor.settings_changed.is_set():
+                if self.location.restart == server.token:
+                    break
+                if self.is_settings_changed(settings):
                     break
                 if not coordinator.is_alive() or not listener.is_alive():
                     raise DetailsServiceUnavailable(f'Item detail worker stopped: {coordinator.failure}')
@@ -110,3 +153,9 @@ class DetailsService:
             if coordinator.ident is not None:
                 coordinator.stop()
             server.server_close()
+
+    def is_settings_changed(self, settings):
+        if not self.monitor.settings_changed.is_set():
+            return False
+        self.monitor.settings_changed.clear()
+        return self.settings.get_snapshot() != settings

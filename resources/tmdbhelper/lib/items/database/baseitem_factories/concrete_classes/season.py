@@ -30,6 +30,8 @@ class Season(Tvshow):
         return True
 
     def get_lookup_dependencies(self, request):
+        if not self.data_cond:
+            return ()
         return (request.get_dependency('tvshow', season=None, episode=None), )
 
     @property
