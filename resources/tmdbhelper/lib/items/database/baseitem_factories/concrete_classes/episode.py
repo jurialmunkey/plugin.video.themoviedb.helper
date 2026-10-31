@@ -1,7 +1,5 @@
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.season import Season
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.tvshow import Tvshow
-from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.files.locker import mutexlock
 
 
 class Episode(Season):
@@ -30,29 +28,8 @@ class Episode(Season):
             return False
         return True
 
-    @cached_property
-    def parent_item_data(self):
-        return self.get_parent_item_data()
-
-    @property
-    def mutex_lockname(self):
-        return f'Database.ItemDetails.tv.{self.tmdb_id}.{self.season}.lockfile'
-
-    @mutexlock
-    def get_parent_item_data(self):
-        try:
-            base_dbc = Season()
-            base_dbc.mediatype = 'season'
-            base_dbc.tmdb_type = 'tv'
-            base_dbc.tmdb_id = self.tmdb_id
-            base_dbc.season = self.season
-            base_dbc.common_apis = self.common_apis
-            base_dbc.cache = self.cache
-            base_dbc.cache_refresh = self.cache_refresh
-            base_dbc.cache_translations = self.cache_translations
-        except (TypeError, KeyError, IndexError, ValueError):
-            return
-        return base_dbc.data
+    def get_lookup_dependencies(self, request):
+        return (request.get_dependency('season', episode=None), )
 
     @property
     def item_id(self):

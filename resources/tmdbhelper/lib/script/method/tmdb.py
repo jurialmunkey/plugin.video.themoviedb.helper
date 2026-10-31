@@ -28,11 +28,7 @@ def refresh_item(tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         sync.episode = episode
         sync.cache_refresh = 'force'
         sync.cache_translations = True
-        sync.cache.del_list_values(
-            table='user_art',
-            values=(sync.item_id, f'{sync.item_id}.%'),
-            conditions='parent_id=? OR parent_id LIKE ?',
-        )
+        sync.clear_user_art = True
         sync.data
 
     with BusyDialog():

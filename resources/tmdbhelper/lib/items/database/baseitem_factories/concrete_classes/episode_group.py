@@ -88,10 +88,14 @@ class EpisodeGroup(BaseItem):
         self.return_basemeta_db('episode_group_seasons').delete_cached_data()
         super().set_cached_data(*args, **kwargs)
 
-    def get_data(self):
-        data = super().get_data()
-        if data:
-            return data
+    def get_lookup_dependencies(self, request):
+        if not self.tvshow_tmdb_id:
+            return ()
+        return (request.get_dependency(
+            'tvshow', tmdb_id=self.tvshow_tmdb_id, tvshow_tmdb_id=None,
+            season=None, episode=None), )
+
+    def get_lookup_fallback(self):
         cache_refresh = self.cache_refresh
         self.cache_refresh = 'never'
         try:

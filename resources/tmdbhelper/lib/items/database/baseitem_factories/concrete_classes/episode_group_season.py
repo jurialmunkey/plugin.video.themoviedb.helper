@@ -1,6 +1,5 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.episode_group import EpisodeGroup
-from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
 from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.episode_groups import EpisodeGroupSeasons
 
 
@@ -15,15 +14,12 @@ class EpisodeGroupSeason(EpisodeGroup):
         rows = self.get_cached_list_values(self.table, ('group_id', ), (self.tmdb_id, ), 'tmdb_id=?')
         return rows[0]['group_id'] if rows else None
 
-    @cached_property
-    def parent_item_data(self):
-        database_obj = BaseItemFactory('episode_group', common_apis=self.common_apis)
-        database_obj.tmdb_id = self.group_id
-        database_obj.tvshow_tmdb_id = self.tvshow_tmdb_id
-        database_obj.cache = self.cache
-        database_obj.connection = self.connection
-        database_obj.cache_refresh = self.cache_refresh
-        return database_obj.data
+    def get_lookup_dependencies(self, request):
+        if not self.group_id:
+            return ()
+        return (request.get_dependency(
+            'episode_group', tmdb_id=self.group_id,
+            tvshow_tmdb_id=self.tvshow_tmdb_id), )
 
     @property
     def data_cond(self):

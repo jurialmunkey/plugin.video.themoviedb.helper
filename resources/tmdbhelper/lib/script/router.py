@@ -172,6 +172,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.maintenance', 'recache_kodidb')(confirmation=True),
         'restart_service':
             lambda **kwargs: importmodule('tmdbhelper.lib.monitor.service', 'restart_service_monitor')(),
+        'details_service':
+            lambda **kwargs: importmodule('tmdbhelper.lib.items.database.details.service', 'DetailsService')().run(),
         'test_func':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.test', 'test_func')(**kwargs),
         'open_settings':
