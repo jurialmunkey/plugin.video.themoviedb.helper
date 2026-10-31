@@ -162,10 +162,6 @@ msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Käytä sisältyviä soittimia"
 
-#: /resources/settings.xml
-msgctxt "#32038"
-msgid "Get additional details from the local Kodi library database"
-msgstr "Nouda lisätietoja paikallisesta Kodi-kirjaston tietokannasta"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -242,60 +238,28 @@ msgctxt "#32074"
 msgid "Library Integration"
 msgstr "Kirjastointegraatio"
 
-#: /resources/settings.xml
-msgctxt "#32075"
-msgid "TV"
-msgstr "Televisio"
 
-#: /resources/settings.xml
-msgctxt "#32076"
-msgid "Update library after adding items"
-msgstr "Päivitä kirjasto kohteiden lisäyksen jälkeen"
 
-#: /resources/settings.xml
-msgctxt "#32077"
-msgid "Ignore folder creation checks"
-msgstr "Älä huomioi kansioiden luontitarkastuksia"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "Vielä katsottavana"
 
-#: /resources/settings.xml
-msgctxt "#32080"
-msgid "Other"
-msgstr "Muu"
 
-#: /resources/settings.xml
-msgctxt "#32081"
-msgid "Next page item"
-msgstr "Seuraava sivu -kohde"
 
 #: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr "Yhdistä tuotantokaudet"
 
-#: /resources/settings.xml
-msgctxt "#32086"
-msgid "Auto-update library and add new/missing episodes"
-msgstr "Päivitä kirjasto automaattisesti ja lisää uudet/puuttuvat jaksot"
 
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
 msgstr "Sisältö"
 
-#: /resources/settings.xml
-msgctxt "#32092"
-msgid "Widgets"
-msgstr "Widgetit"
 
-#: /resources/settings.xml
-msgctxt "#32093"
-msgid "Next episodes sort method"
-msgstr "Seuraavien jaksojen järjestystapa"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -382,15 +346,7 @@ msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Haluatko varmasti lisätä tämän Trakt-listan Kodin kirjastoon?"
 
-#: /resources/lib/context.py
-msgctxt "#32130"
-msgid "Auto-update library at time"
-msgstr "Päivitä kirjasto automaattisesti"
 
-#: /resources/settings.xml
-msgctxt "#32131"
-msgid "Auto-update library from Trakt list(s)"
-msgstr "Päivitä kirjasto automaattisesti Trakt-listoista"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
@@ -402,15 +358,7 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "Valitse listat"
 
-#: /resources/lib/context.py
-msgctxt "#32154"
-msgid "Update library now"
-msgstr "Päivitä kirjasto nyt"
 
-#: /resources/settings.xml
-msgctxt "#32156"
-msgid "Next aired library calendar links to local tvshow"
-msgstr "Kirjaston Seuraavat esitykset -kalenteri kohdistuu paikalliseen sarjaan"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -436,10 +384,6 @@ msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
 msgstr "[B]{}[/B] käyttäjältä [B]{}[/B]"
 
-#: /resources/settings.xml
-msgctxt "#32169"
-msgid "Logout of Trakt account..."
-msgstr "Kirjaudu ulos Trakt-tililtäsi..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -1192,25 +1136,13 @@ msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "Syötä uusi painotus kohteelle {}"
 
-#: /resources/settings.xml
-msgctxt "#32347"
-msgid "Log output of Trakt request"
-msgstr "Kirjaa Trakt-pyynnöt"
 
-#: /resources/settings.xml
-msgctxt "#32348"
-msgid "Log output of TMDb request"
-msgstr "Kirjaa TMDb-pyynnöt"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "Tyhjä selvitetty URL-osoite"
 
-#: /resources/settings.xml
-msgctxt "#32352"
-msgid "Dummy video duration (seconds)"
-msgstr "Tyhjä videon kesto (sekuntia)"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1258,10 +1190,6 @@ msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
 msgstr "Haluatko lisätä kohteen kirjastoon nyt?"
 
-#: /resources/settings.xml
-msgctxt "#32363"
-msgid "Delay after resolving (seconds)"
-msgstr "Selvityksen jälkeinen viive (sekuntia)"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1288,20 +1216,12 @@ msgctxt "#32370"
 msgid "landscape"
 msgstr "landscape-kuvat"
 
-#: /resources/settings.xml
-msgctxt "#32371"
-msgid "Preferred artwork for thumbs"
-msgstr "Pienoiskuvina käytettävä mediakuvitus"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
 msgstr "fanart-kuvat"
 
-#: /resources/settings.xml
-msgctxt "#32373"
-msgid "Restrict to library strm"
-msgstr ""
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1323,10 +1243,6 @@ msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Poista {} välimuisti"
 
-#: /resources/lib/script/router.py
-msgctxt "#32390"
-msgid "Use alternative .nfo filename"
-msgstr "Käytä vaihtoehtoista .nfo-tiedoston nimeä"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
@@ -1354,10 +1270,6 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr "Pikapäivitys"
 
-#: /resources/settings.xml
-msgctxt "#32395"
-msgid "Log timer reports for directories"
-msgstr "Kirjaa hakemistojen ajastusraportit"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -1369,30 +1281,14 @@ msgctxt "#32398"
 msgid "Medium"
 msgstr "Keskitasoinen"
 
-#: /resources/settings.xml
-msgctxt "#32400"
-msgid "Play local Kodi library files"
-msgstr "Toista paikalliset Kodi-kirjaston tiedostot"
 
-#: /resources/settings.xml
-msgctxt "#32404"
-msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Yhdistä sarjat, joista esitetään useita jaksoja samana päivänä"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr "Keskeneräiset jaksosi"
 
-#: /resources/settings.xml
-msgctxt "#32409"
-msgid "Cache database location"
-msgstr "Puskuroi tietokannan sijainti välimuistiin"
 
-#: /resources/settings.xml
-msgctxt "#32410"
-msgid "Max concurrent threads (0 is unlimited)"
-msgstr "Yhdenaikaisten säikeiden enimmäismäärä (0 on rajaton)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -1404,40 +1300,20 @@ msgctxt "#32412"
 msgid "With Watch Provider"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32413"
-msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "Varmista seuraavat jaksot kalenterista (hitaampi, mutta tarkempi)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
 msgid "Most Watched"
 msgstr "Katsotuimmat"
 
-#: /resources/settings.xml
-msgctxt "#32415"
-msgid "Combine all players for plugin into single entry"
-msgstr "Yhdistä lisäosan kaikki soittimet yhteen merkintään"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
 msgid "Premieres"
 msgstr "Ensiesitykset"
 
-#: /resources/lib/script/sync.py
-msgctxt "#32418"
-msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
-msgstr "Lisää MPAA-ikäluokitusten eteen tekstin. Esim. teksti \"Ikäluokitus\" tuottaa \"PG\"-luokituksella \"Ikäluokitus PG\". Vaatii välimuistiin puskuroitujen kohteiden päivityksen."
 
-#: /resources/settings.xml
-msgctxt "#32419"
-msgid "The language and country settings used when looking up data from TMDb and Trakt APIs"
-msgstr "Kieli jota käytetään etsittäessä tietoja TMDb- ja Trakt-rajapintojen välityksellä"
 
-#: /resources/settings.xml
-msgctxt "#32420"
-msgid "TMDb artwork quality"
-msgstr "TMDb-mediakuvitusten laatu"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
@@ -1519,10 +1395,6 @@ msgctxt "#32436"
 msgid "Details"
 msgstr "Tietoja"
 
-#: /resources/settings.xml
-msgctxt "#32437"
-msgid "Configure provider data allowlist"
-msgstr "Määritä toimittajan sallitut tiedot"
 
 #: /resources/lib/script/method.py
 msgctxt "#32438"
@@ -1564,10 +1436,6 @@ msgctxt "#32446"
 msgid "plugin:// search URL for {}"
 msgstr "plugin://-haku-URL kohteelle {}"
 
-#: /resources/settings.xml
-msgctxt "#32449"
-msgid "Ignore region release filter"
-msgstr "Älä huomioi alueellista julkaisusuodatinta"
 
 #: /resources/settings.xml
 msgctxt "#32451"
@@ -1609,40 +1477,16 @@ msgctxt "#32460"
 msgid "Awards"
 msgstr "Palkinnot"
 
-#: /resources/settings.xml
-msgctxt "#32463"
-msgid "Cache items in custom lists you own for 24 hours"
-msgstr "Puskuroi omistamiesi mukautettujen listojen kohteet 24 tunnin ajan"
 
-#: /resources/settings.xml
-msgctxt "#32466"
-msgid "Play automatically using available providers"
-msgstr "Toista automaattisesti käytettävissä olevilla toimittajilla"
 
-#: /resources/settings.xml
-msgctxt "#32467"
-msgid "Refresh cached Kodi Library details"
-msgstr "Päivitä välimuistiin puskuroidut Kodin kirjaston tiedot"
 
-#: /resources/settings.xml
-msgctxt "#32468"
-msgid "Authorisation and sync notifications on startup"
-msgstr "Todennus- ja synkronointi-ilmoitukset käynnistettäessä"
 
 #: /resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: /resources/settings.xml
-msgctxt "#32471"
-msgid "Connection error notifications"
-msgstr "Ilmoitukset yhteysvirheistä"
 
-#: /resources/settings.xml
-msgctxt "#32472"
-msgid "Cache image location"
-msgstr "Kuvavälimuistin sijainti"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
@@ -1669,20 +1513,8 @@ msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "Valitse sarjan, kauden tai jakson oletussoitin"
 
-#: /resources/settings.xml
-msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32482"
-msgid "Random seed pool for recommendations"
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32483"
-msgid "Allow 3rd party plugin access to API key/token"
-msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32484"
@@ -1751,25 +1583,13 @@ msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
 msgstr "Lisää/poista mukautetuista solmuista"
 
-#: /resources/settings.xml
-msgctxt "#32497"
-msgid "Container content fallback for service listitems without mediatypes"
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32498"
-msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
-msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
 msgstr "Sivukertoimet (korkeampi on hitaampi)"
 
-#: /resources/settings.xml
-msgctxt "#32500"
-msgid "Page multiplier (TMDb basic lists)"
-msgstr "Sivukerroin (TMDb:n peruslistat)"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
@@ -1928,15 +1748,7 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "Zulu (Etelä-Afrikka)"
 
-#: /resources/settings.xml
-msgctxt "#32001"
-msgid "OMDb API key"
-msgstr "OMDb API-avain"
 
-#: /resources/settings.xml
-msgctxt "#32004"
-msgid "MPAA rating prefix"
-msgstr "MPAA-arvion etuliite"
 
 #: /resources/settings.xml
 msgctxt "#32005"
@@ -1948,10 +1760,6 @@ msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Unauthorised 401 -virhe"
 
-#: /resources/lib/requestapi.py
-msgctxt "#32010"
-msgid "Authenticate Trakt account..."
-msgstr "Todenna Trakt-tili..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
@@ -1968,35 +1776,11 @@ msgctxt "#32014"
 msgid "Players"
 msgstr "Soittimet"
 
-#: /resources/settings.xml
-msgctxt "#32016"
-msgid "Update players from URL"
-msgstr "Päivitä soittimet URL-osoitteesta"
 
-#: /resources/settings.xml
-msgctxt "#32017"
-msgid "API Keys"
-msgstr "API-avaimet"
 
-#: /resources/settings.xml
-msgctxt "#32019"
-msgid "Fanart.tv client key"
-msgstr "Fanart.tv Client -avain"
 
-#: /resources/settings.xml
-msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "Käytä lisäosan mediakuvituksille Fanart.tv-palvelua (hitaampi)"
 
-#: /resources/settings.xml
-msgctxt "#32024"
-msgid "Default player for movies"
-msgstr "Elokuvien oletussoitin"
 
-#: /resources/settings.xml
-msgctxt "#32025"
-msgid "Default player for episodes"
-msgstr "Jaksojen oletussoitin"
 
 #: /resources/settings.xml
 msgctxt "#32027"

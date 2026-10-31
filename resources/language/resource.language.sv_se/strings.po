@@ -172,10 +172,6 @@ msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Använd paketerade spelare"
 
-#: /resources/settings.xml
-msgctxt "#32038"
-msgid "Get additional details from the local Kodi library database"
-msgstr "Hämta ytterligare information från den lokala Kodi-biblioteksdatabasen"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -253,60 +249,28 @@ msgctxt "#32074"
 msgid "Library Integration"
 msgstr "Integration av bibliotek"
 
-#: /resources/settings.xml
-msgctxt "#32075"
-msgid "TV"
-msgstr "TV"
 
-#: /resources/settings.xml
-msgctxt "#32076"
-msgid "Update library after adding items"
-msgstr "Uppdatera biblioteket efter att ha lagt till poster"
 
-#: /resources/settings.xml
-msgctxt "#32077"
-msgid "Ignore folder creation checks"
-msgstr "Ignorera kontroller för skapande av mappar"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "Kvar att titta på"
 
-#: /resources/settings.xml
-msgctxt "#32080"
-msgid "Other"
-msgstr "Annan"
 
-#: /resources/settings.xml
-msgctxt "#32081"
-msgid "Next page item"
-msgstr "Nästa sidpost"
 
 #: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr "Platta ut säsonger"
 
-#: /resources/settings.xml
-msgctxt "#32086"
-msgid "Auto-update library and add new/missing episodes"
-msgstr "Uppdatera biblioteket automatiskt och lägg till nya/saknade avsnitt"
 
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
 msgstr "Innehåll"
 
-#: /resources/settings.xml
-msgctxt "#32092"
-msgid "Widgets"
-msgstr "Widgetar"
 
-#: /resources/settings.xml
-msgctxt "#32093"
-msgid "Next episodes sort method"
-msgstr "Nästa avsnitts sorteringsmetod"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -403,15 +367,7 @@ msgstr ""
 "Är du säker på att du vill lägga till den här Trakt-listan i ditt Kodi-"
 "bibliotek?"
 
-#: /resources/lib/context.py
-msgctxt "#32130"
-msgid "Auto-update library at time"
-msgstr "Automatisk uppdatering av bibliotek klockan"
 
-#: /resources/settings.xml
-msgctxt "#32131"
-msgid "Auto-update library from Trakt list(s)"
-msgstr "Automatisk uppdatering av bibliotek från Trakt-lista(er)"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
@@ -423,15 +379,7 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "Välj lista(or)"
 
-#: /resources/lib/context.py
-msgctxt "#32154"
-msgid "Update library now"
-msgstr "Uppdatera biblioteket nu"
 
-#: /resources/settings.xml
-msgctxt "#32156"
-msgid "Next aired library calendar links to local tvshow"
-msgstr "Nästa sändning som bibliotekskalendern länkar till lokal tv-serie"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -461,10 +409,6 @@ msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
 msgstr "[B]{}[/B] av användare [B]{}[/B]"
 
-#: /resources/settings.xml
-msgctxt "#32169"
-msgid "Logout of Trakt account..."
-msgstr "Logga ut från Trakt-kontot..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -1223,25 +1167,13 @@ msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "Ange ny prioritet för {}"
 
-#: /resources/settings.xml
-msgctxt "#32347"
-msgid "Log output of Trakt request"
-msgstr "Logga utdata från Trakt-förfrågan"
 
-#: /resources/settings.xml
-msgctxt "#32348"
-msgid "Log output of TMDb request"
-msgstr "Logga utdata från TMDb-begäran"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "Dummy ResolvedURL"
 
-#: /resources/settings.xml
-msgctxt "#32352"
-msgid "Dummy video duration (seconds)"
-msgstr "Dummy-videons varaktighet (sekunder)"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1289,10 +1221,6 @@ msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
 msgstr "Vill du lägga till den här posten i biblioteket nu?"
 
-#: /resources/settings.xml
-msgctxt "#32363"
-msgid "Delay after resolving (seconds)"
-msgstr "Fördröjning efter uppslag (sekunder)"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1319,20 +1247,12 @@ msgctxt "#32370"
 msgid "landscape"
 msgstr "liggande"
 
-#: /resources/settings.xml
-msgctxt "#32371"
-msgid "Preferred artwork for thumbs"
-msgstr "Föredragen bakgrund för miniatyrer"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
 msgstr "fanart"
 
-#: /resources/settings.xml
-msgctxt "#32373"
-msgid "Restrict to library strm"
-msgstr "Begränsa till bibliotek strm"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1354,10 +1274,6 @@ msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Ta bort {}-cache"
 
-#: /resources/lib/script/router.py
-msgctxt "#32390"
-msgid "Use alternative .nfo filename"
-msgstr "Använd alternativt .nfo-filnamn"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
@@ -1390,10 +1306,6 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr "Snabbuppdatering"
 
-#: /resources/settings.xml
-msgctxt "#32395"
-msgid "Log timer reports for directories"
-msgstr "Logga timerrapporter för kataloger"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -1405,30 +1317,14 @@ msgctxt "#32398"
 msgid "Medium"
 msgstr "Medel"
 
-#: /resources/settings.xml
-msgctxt "#32400"
-msgid "Play local Kodi library files"
-msgstr "Spela upp lokala Kodi-biblioteksfiler"
 
-#: /resources/settings.xml
-msgctxt "#32404"
-msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Platta ut tv-serier med flera avsnitt som sänds samma dag"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr "Dina pågående avsnitt"
 
-#: /resources/settings.xml
-msgctxt "#32409"
-msgid "Cache database location"
-msgstr "Cache-databasens plats"
 
-#: /resources/settings.xml
-msgctxt "#32410"
-msgid "Max concurrent threads (0 is unlimited)"
-msgstr "Max antal samtidiga trådar (0 är obegränsat)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -1440,50 +1336,20 @@ msgctxt "#32412"
 msgid "With Watch Provider"
 msgstr "Med leverantör för visningar"
 
-#: /resources/settings.xml
-msgctxt "#32413"
-msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "Nästa avsnitt kontrollerar kalendern (långsammare men mer exakt)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
 msgid "Most Watched"
 msgstr "Mest sedda"
 
-#: /resources/settings.xml
-msgctxt "#32415"
-msgid "Combine all players for plugin into single entry"
-msgstr "Kombinera alla spelare för insticksmodul till en enda post"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
 msgid "Premieres"
 msgstr "Premiärer"
 
-#: /resources/lib/script/sync.py
-msgctxt "#32418"
-msgid ""
-"Adds text to the start of the MPAA rating. For example if set to 'Rated' a "
-"'PG' rating is displayed as 'Rated PG'. Cached items will need to be "
-"refreshed."
-msgstr ""
-"Lägger till text i början av MPAA-klassificeringen. Om den till exempel är "
-"inställd på \"Rated\" visas en \"PG\"-klassificering som \"Rated PG\". "
-"Cachade poster måste uppdateras."
 
-#: /resources/settings.xml
-msgctxt "#32419"
-msgid ""
-"The language and country settings used when looking up data from TMDb and "
-"Trakt APIs"
-msgstr ""
-"Språk- och landsinställningar som används vid sökning av data från TMDb och "
-"Trakt API:er"
 
-#: /resources/settings.xml
-msgctxt "#32420"
-msgid "TMDb artwork quality"
-msgstr "TMDb bakgrundskvalitet"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
@@ -1569,10 +1435,6 @@ msgctxt "#32436"
 msgid "Details"
 msgstr "Detaljer"
 
-#: /resources/settings.xml
-msgctxt "#32437"
-msgid "Configure provider data allowlist"
-msgstr "Konfigurera tillåten list för leverantörsdata"
 
 #: /resources/lib/script/method.py
 msgctxt "#32438"
@@ -1619,10 +1481,6 @@ msgctxt "#32446"
 msgid "plugin:// search URL for {}"
 msgstr "plugin:// sök-URL för {}"
 
-#: /resources/settings.xml
-msgctxt "#32449"
-msgid "Ignore region release filter"
-msgstr "Ignorera filter för lanseringsregion"
 
 #: /resources/settings.xml
 msgctxt "#32451"
@@ -1664,40 +1522,16 @@ msgctxt "#32460"
 msgid "Awards"
 msgstr "Utmärkelser"
 
-#: /resources/settings.xml
-msgctxt "#32463"
-msgid "Cache items in custom lists you own for 24 hours"
-msgstr "Cache-lagring av objekt i egna listor i 24 timmar"
 
-#: /resources/settings.xml
-msgctxt "#32466"
-msgid "Play automatically using available providers"
-msgstr "Spela automatiskt med hjälp av tillgängliga leverantörer"
 
-#: /resources/settings.xml
-msgctxt "#32467"
-msgid "Refresh cached Kodi Library details"
-msgstr "Uppdatera cachad information för Kodi-biblioteket"
 
-#: /resources/settings.xml
-msgctxt "#32468"
-msgid "Authorisation and sync notifications on startup"
-msgstr "Behörighets- och synkroniseringsmeddelanden vid start"
 
 #: /resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: /resources/settings.xml
-msgctxt "#32471"
-msgid "Connection error notifications"
-msgstr "Meddelanden om fel i anslutningen"
 
-#: /resources/settings.xml
-msgctxt "#32472"
-msgid "Cache image location"
-msgstr "Plats för cache-bild"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
@@ -1724,25 +1558,8 @@ msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "Ändra standardspelare för tv-serie, säsong eller avsnitt"
 
-#: /resources/settings.xml
-msgctxt "#32481"
-msgid ""
-"Increases the pool of recently watched items randomly selected from the seed "
-"to use for \"Because You Watched\" style recommendations."
-msgstr ""
-"Ökar antalet nyligen sedda objekt som slumpmässigt valts ut från seed för "
-"att användas för rekommendationer i stil med \"För att du tittade på\"."
 
-#: /resources/settings.xml
-msgctxt "#32482"
-msgid "Random seed pool for recommendations"
-msgstr "Slumpmässig seed-pool för rekommendationer"
 
-#: /resources/settings.xml
-msgctxt "#32483"
-msgid "Allow 3rd party plugin access to API key/token"
-msgstr ""
-"Tillåt åtkomst till API-nyckel/token för insticksmodul från tredje part"
 
 #: /resources/settings.xml
 msgctxt "#32484"
@@ -1810,66 +1627,23 @@ msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
 msgstr "Lägg till/ta bort som anpassad nod"
 
-#: /resources/settings.xml
-msgctxt "#32497"
-msgid "Container content fallback for service listitems without mediatypes"
-msgstr "Container innehåll reserv för service listitems utan mediatyper"
 
-#: /resources/settings.xml
-msgctxt "#32498"
-msgid ""
-"Some plugins have poor metadata and fail to fill the item mediatype which "
-"results in the service monitor not completing an item lookup. This setting "
-"allows the service monitor to use the container content type when item "
-"mediatype is missing. Note this setting will likely result more frequent "
-"incorrect matches due to the end plugin having bad metadata."
-msgstr ""
-"Vissa insticksmoduler har dåliga metadata och fyller inte i objektets "
-"mediatyp, vilket leder till att tjänsteövervakaren inte slutför en "
-"objektsökning. Den här inställningen gör det möjligt för tjänstemonitorn att "
-"använda innehållstypen container när mediatyp för objekt saknas. Observera "
-"att den här inställningen sannolikt kommer att leda till fler felaktiga "
-"matchningar på grund av att slutinsticket har dåliga metadata."
 
 #: /resources/settings.xml
 msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
 msgstr "Sidmultiplikatorer (högre är långsammare)"
 
-#: /resources/settings.xml
-msgctxt "#32500"
-msgid "Page multiplier (TMDb basic lists)"
-msgstr "Sidmultiplikator (TMDb grundlistor)"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
 msgid "Add {} to node"
 msgstr "Lägg till {} till nod"
 
-#: /resources/settings.xml
-msgctxt "#32505"
-msgid "Genre icons folder (TMDb)"
-msgstr "Mapp med genreikoner (TMDb)"
 
-#: /resources/settings.xml
-msgctxt "#32506"
-msgid "Provider icons folder (TMDb)"
-msgstr "Ikonmapp för leverantör (TMDb)"
 
-#: /resources/settings.xml
-msgctxt "#32507"
-msgid "Genre icon folder (Trakt)"
-msgstr "Genre-ikonmapp (Trakt)"
 
-#: /resources/settings.xml
-msgctxt "#32508"
-msgid "Recache Kodi Library details when building players"
-msgstr "Mellanlagra Kodi-bibliotekets detaljer igen när du bygger spelare"
 
-#: /resources/settings.xml
-msgctxt "#32509"
-msgid "Use alternative TMDb API url"
-msgstr "Använd alternativ URL för TMDb-API"
 
 #: /resources/settings.xml
 msgctxt "#32514"
@@ -1907,10 +1681,6 @@ msgctxt "#32521"
 msgid "Rated"
 msgstr "Betygsatt"
 
-#: /resources/settings.xml
-msgctxt "#32522"
-msgid "TMDb user options"
-msgstr "TMDb användaralternativ"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32524"
@@ -1942,10 +1712,6 @@ msgctxt "#32531"
 msgid "Method only available for VIP accounts."
 msgstr "Metoden är endast tillgänglig för VIP-konton."
 
-#: /resources/settings.xml
-msgctxt "#32534"
-msgid "Trakt sync progress notifications"
-msgstr "Meddelanden om framsteg för Trakt-synkronisering"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32535"
@@ -2109,15 +1875,7 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "Zulu (Sydafrika)"
 
-#: /resources/settings.xml
-msgctxt "#32001"
-msgid "OMDb API key"
-msgstr "OMDb API-nyckel"
 
-#: /resources/settings.xml
-msgctxt "#32004"
-msgid "MPAA rating prefix"
-msgstr "Prefix för MPAA-klassificering"
 
 #: /resources/settings.xml
 msgctxt "#32005"
@@ -2129,10 +1887,6 @@ msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Obehörigt 401-fel"
 
-#: /resources/lib/requestapi.py
-msgctxt "#32010"
-msgid "Authenticate Trakt account..."
-msgstr "Autentisera Trakt-konto..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
@@ -2150,33 +1904,3 @@ msgstr ""
 msgctxt "#32014"
 msgid "Players"
 msgstr "Spelare"
-
-#: /resources/settings.xml
-msgctxt "#32016"
-msgid "Update players from URL"
-msgstr "Uppdatera spelare från URL"
-
-#: /resources/settings.xml
-msgctxt "#32017"
-msgid "API Keys"
-msgstr "API-nycklar"
-
-#: /resources/settings.xml
-msgctxt "#32019"
-msgid "Fanart.tv client key"
-msgstr "Fanart.tv klientnyckel"
-
-#: /resources/settings.xml
-msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "Använd fanart.tv för insticksbakgrund (långsammare)"
-
-#: /resources/settings.xml
-msgctxt "#32024"
-msgid "Default player for movies"
-msgstr "Standardspelare för filmer"
-
-#: /resources/settings.xml
-msgctxt "#32025"
-msgid "Default player for episodes"
-msgstr "Standardspelare för avsnitt"

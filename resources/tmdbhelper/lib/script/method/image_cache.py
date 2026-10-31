@@ -75,7 +75,7 @@ class ImageCacheSettings(AddonSettingsDialog):
     """Return to the cleanup button after Kodi saves and closes settings."""
 
     def __init__(self):
-        super().__init__(10039, 32567)
+        super().__init__(32608, 32567)
 
 
 def clean_image_cache(**kwargs):

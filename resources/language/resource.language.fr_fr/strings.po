@@ -76,19 +76,11 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "Allemand (Autriche)"
 
-#: /resources/settings.xml
-msgctxt "#32013"
-msgid "Get watched indicators, episode counts, and resume points"
-msgstr "Obtenir des indicateurs de visionnage, le nombre d'épisodes et les points de reprise"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "Allemand (Suisse)"
 
-#: /resources/settings.xml
-msgctxt "#32015"
-msgid "Additional season: Up next"
-msgstr "Saison supplémentaire : À suivre"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -98,19 +90,11 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "Grec (Grèce)"
 
-#: /resources/settings.xml
-msgctxt "#32018"
-msgid "Additional season: Anticipated"
-msgstr "Saison supplémentaire : Prévue"
 
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "Anglais (Australie)"
 
-#: /resources/settings.xml
-msgctxt "#32020"
-msgid "Additional season: Specials"
-msgstr "Saison supplémentaire : Spéciale"
 
 msgctxt "#30014"
 msgid "English (Canada)"
@@ -185,10 +169,6 @@ msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "Finlandais (Finlande)"
 
-#: /resources/settings.xml
-msgctxt "#32039"
-msgid "Prefer fanart.tv artwork"
-msgstr "Préférer les illustrations de Fanart.tv"
 
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
 msgctxt "#32040"
@@ -232,30 +212,14 @@ msgctxt "#32048"
 msgid "Dropped TV Shows"
 msgstr "Séries TV abandonnées"
 
-#: /resources/settings.xml
-msgctxt "#32049"
-msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
-msgstr "Ordre de tri de la liste 'Vos prochains épisodes'. 'Par date de diffusion' trie les épisodes par date de première. 'Par vus récemment' trie les épisodes par série TV la plus récemment regardée. 'Par aujourd'hui' correspond à 'vus récemment' avec les épisodes diffusés aujourd'hui en premier. 'Par la semaine dernière' correspond à 'vus récemment' avec les épisodes diffusés la semaine passée triés par date de diffusion en premier."
 
-#: /resources/settings.xml
-msgctxt "#32050"
-msgid "Prefer artwork in your language"
-msgstr "Préférer les illustrations dans votre langue"
 
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
 msgctxt "#32051"
 msgid "Deleted cached {} items"
 msgstr "Suppression de {} éléments du cache"
 
-#: /resources/settings.xml
-msgctxt "#32052"
-msgid "Delete TMDb cached item details"
-msgstr "Supprimer les détails des éléments TMDb mis en cache"
 
-#: /resources/settings.xml
-msgctxt "#32053"
-msgid "TMDbHelper automatically performs regular cache maintenance. You should only delete the cache when instructed to troubleshoot issues. TMDbHelper relies on having cached items to perform well. Unnecessarily deleting the cache on a regular basis will degrade performance and places excessive strain on the free services providing this data."
-msgstr "TMDbHelper effectue automatiquement une maintenance régulière du cache. Vous ne devez supprimer le cache que lorsque vous y êtes invité pour résoudre des problèmes. TMDbHelper dépend des éléments mis en cache pour fonctionner correctement. La suppression inutile et régulière du cache dégradera les performances et exercera une pression excessive sur les services gratuits qui fournissent ces données."
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -306,10 +270,6 @@ msgctxt "#32065"
 msgid "Watchers"
 msgstr "Spectateurs"
 
-#: /resources/settings.xml
-msgctxt "#32038"
-msgid "Get additional details from the local Kodi library database"
-msgstr "Obtenir des détails supplémentaires de la médiathèque locale de Kodi"
 
 #: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
 msgctxt "#32067"
@@ -386,15 +346,7 @@ msgctxt "#32060"
 msgid "files extracted"
 msgstr "fichiers extraits"
 
-#: /resources/settings.xml
-msgctxt "#32082"
-msgid "Page multiplier (Other basic lists)"
-msgstr "Multiplicateur de pages (Autres listes de base)"
 
-#: /resources/settings.xml
-msgctxt "#32083"
-msgid "Page multiplier (Database sync lists)"
-msgstr "Multiplicateur de pages (listes de synchronisation de base de données)"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
@@ -426,20 +378,8 @@ msgctxt "#32074"
 msgid "Library Integration"
 msgstr "Intégration à la médiathèque"
 
-#: /resources/settings.xml
-msgctxt "#32075"
-msgid "TV"
-msgstr "TV"
 
-#: /resources/settings.xml
-msgctxt "#32076"
-msgid "Update library after adding items"
-msgstr "Mettre à jour la médiathèque après avoir ajouté des éléments"
 
-#: /resources/settings.xml
-msgctxt "#32077"
-msgid "Ignore folder creation checks"
-msgstr "Ignorer les contrôles de création de dossier"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32094"
@@ -451,15 +391,7 @@ msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "À visionner"
 
-#: /resources/settings.xml
-msgctxt "#32080"
-msgid "Other"
-msgstr "Autre"
 
-#: /resources/settings.xml
-msgctxt "#32081"
-msgid "Next page item"
-msgstr "Élément \"Page suivante\""
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32098"
@@ -471,10 +403,6 @@ msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr "Aplatir les saisons"
 
-#: /resources/settings.xml
-msgctxt "#32086"
-msgid "Auto-update library and add new/missing episodes"
-msgstr "Mise à jour automatique de la médiathèque et ajout des épisodes nouveaux/manquants"
 
 #: /resources/settings.xml
 msgctxt "#32090"
@@ -491,15 +419,7 @@ msgctxt "#32106"
 msgid "Enter {} URL"
 msgstr "Saisir l'URL de {}"
 
-#: /resources/settings.xml
-msgctxt "#32092"
-msgid "Widgets"
-msgstr "Widgets"
 
-#: /resources/settings.xml
-msgctxt "#32093"
-msgid "Next episodes sort method"
-msgstr "Méthode de tri des épisodes suivants"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -566,20 +486,12 @@ msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "Correspondre à TOUTES les valeurs"
 
-#: /resources/settings.xml
-msgctxt "#32127"
-msgid "RatingPosterDB API key"
-msgstr "Clé API RatingPosterDB"
 
 #: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
 msgctxt "#32128"
 msgid "Likes"
 msgstr "J'aime"
 
-#: /resources/settings.xml
-msgctxt "#32129"
-msgid "Override player monitor clearlogo with artwork from TMDbHelper"
-msgstr "Remplacer le clearlogo du moniteur de lecteur par une illustration de TMDbHelper"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
@@ -616,10 +528,6 @@ msgctxt "#32138"
 msgid "Scrobbling"
 msgstr "Scrobbling"
 
-#: /resources/settings.xml
-msgctxt "#32139"
-msgid "Rate items on TMDb after watching"
-msgstr "Noter les éléments sur TMDb après le visionnage"
 
 #: /resources/tmdbhelper/lib/player/configure.py
 msgctxt "#32140"
@@ -661,15 +569,7 @@ msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Êtes-vous sûr de vouloir ajouter cette liste Trakt à votre médiathèque Kodi ?"
 
-#: /resources/lib/context.py
-msgctxt "#32130"
-msgid "Auto-update library at time"
-msgstr "Mise à jour automatique de la médiathèque à"
 
-#: /resources/settings.xml
-msgctxt "#32131"
-msgid "Auto-update library from Trakt list(s)"
-msgstr "Mise à jour automatique de la médiathèque à partir de la (des) liste(s) Trakt"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
@@ -681,15 +581,7 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "Sélectionner la ou les listes"
 
-#: /resources/lib/context.py
-msgctxt "#32154"
-msgid "Update library now"
-msgstr "Mettre à jour la médiathèque maintenant"
 
-#: /resources/settings.xml
-msgctxt "#32156"
-msgid "Next aired library calendar links to local tvshow"
-msgstr "Relier le calendrier des épisodes prochainement diffusés aux séries TV locales de la médiathèque"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -715,10 +607,6 @@ msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
 msgstr "[B]{}[/B] par l'utilisateur [B]{}[/B]"
 
-#: /resources/settings.xml
-msgctxt "#32169"
-msgid "Logout of Trakt account..."
-msgstr "Déconnexion du compte Trakt..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -1471,25 +1359,13 @@ msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "Saisir une nouvelle priorité pour {}"
 
-#: /resources/settings.xml
-msgctxt "#32347"
-msgid "Log output of Trakt request"
-msgstr "Enregistrer la sortie de la requête Trakt"
 
-#: /resources/settings.xml
-msgctxt "#32348"
-msgid "Log output of TMDb request"
-msgstr "Enregistrer la sortie de la requête TMDb"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "ResolvedURL factice"
 
-#: /resources/settings.xml
-msgctxt "#32352"
-msgid "Dummy video duration (seconds)"
-msgstr "Durée de la vidéo factice (secondes)"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1537,10 +1413,6 @@ msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
 msgstr "Voulez-vous ajouter cet élément à la médiathèque maintenant ?"
 
-#: /resources/settings.xml
-msgctxt "#32363"
-msgid "Delay after resolving (seconds)"
-msgstr "Délai après résolution (secondes)"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1567,20 +1439,12 @@ msgctxt "#32370"
 msgid "landscape"
 msgstr "paysage"
 
-#: /resources/settings.xml
-msgctxt "#32371"
-msgid "Preferred artwork for thumbs"
-msgstr "Illustration préférée pour les vignettes"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
 msgstr "fanart"
 
-#: /resources/settings.xml
-msgctxt "#32373"
-msgid "Restrict to library strm"
-msgstr "Restreindre aux fichiers 'strm' de la médiathèque"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1602,10 +1466,6 @@ msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Supprimer le cache de {}"
 
-#: /resources/lib/script/router.py
-msgctxt "#32390"
-msgid "Use alternative .nfo filename"
-msgstr "Utiliser un nom de fichier .nfo alternatif"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
@@ -1633,10 +1493,6 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr "Mise à jour rapide"
 
-#: /resources/settings.xml
-msgctxt "#32395"
-msgid "Log timer reports for directories"
-msgstr "Rapports du minuteur de journalisation pour les répertoires"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -1648,30 +1504,14 @@ msgctxt "#32398"
 msgid "Medium"
 msgstr "Moyen"
 
-#: /resources/settings.xml
-msgctxt "#32400"
-msgid "Play local Kodi library files"
-msgstr "Lire les fichiers de la médiathèque locale Kodi"
 
-#: /resources/settings.xml
-msgctxt "#32404"
-msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Aplatir les séries TV avec plusieurs épisodes diffusés le même jour"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr "Vos épisodes en cours"
 
-#: /resources/settings.xml
-msgctxt "#32409"
-msgid "Cache database location"
-msgstr "Emplacement de la base de données du cache"
 
-#: /resources/settings.xml
-msgctxt "#32410"
-msgid "Max concurrent threads (0 is unlimited)"
-msgstr "Nombre maximal de threads simultanés (0 = illimité)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -1683,40 +1523,20 @@ msgctxt "#32412"
 msgid "With Watch Provider"
 msgstr "Avec fournisseur de visionnage"
 
-#: /resources/settings.xml
-msgctxt "#32413"
-msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "La vérification des prochains épisodes consulte le calendrier (plus lent mais plus précis)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
 msgid "Most Watched"
 msgstr "Les plus vus"
 
-#: /resources/settings.xml
-msgctxt "#32415"
-msgid "Combine all players for plugin into single entry"
-msgstr "Combiner tous les lecteurs du plugin en une seule entrée"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
 msgid "Premieres"
 msgstr "Premières"
 
-#: /resources/lib/script/sync.py
-msgctxt "#32418"
-msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
-msgstr "Ajoute du texte au début de la classification MPAA. Par exemple, si la valeur est « Classé », une classification « PG » sera affichée comme « Classé PG ». Les éléments mis en cache devront être actualisés."
 
-#: /resources/settings.xml
-msgctxt "#32419"
-msgid "The language and country settings used when looking up data from TMDb and Trakt APIs"
-msgstr "Les paramètres de langue et de pays utilisés lors de la recherche de données sur les API TMDb et Trakt"
 
-#: /resources/settings.xml
-msgctxt "#32420"
-msgid "TMDb artwork quality"
-msgstr "Qualité des illustrations TMDb"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
@@ -1798,10 +1618,6 @@ msgctxt "#32436"
 msgid "Details"
 msgstr "Détails"
 
-#: /resources/settings.xml
-msgctxt "#32437"
-msgid "Configure provider data allowlist"
-msgstr "Configurer la liste blanche des données des fournisseurs"
 
 #: /resources/lib/script/method.py
 msgctxt "#32438"
@@ -1848,10 +1664,6 @@ msgctxt "#32446"
 msgid "plugin:// search URL for {}"
 msgstr "URL de recherche plugin:// pour {}"
 
-#: /resources/settings.xml
-msgctxt "#32449"
-msgid "Ignore region release filter"
-msgstr "Ignorer le filtre de sortie par région"
 
 #: /resources/settings.xml
 msgctxt "#32451"
@@ -1893,40 +1705,16 @@ msgctxt "#32460"
 msgid "Awards"
 msgstr "Récompenses"
 
-#: /resources/settings.xml
-msgctxt "#32463"
-msgid "Cache items in custom lists you own for 24 hours"
-msgstr "Mettre en cache pendant 24 heures les éléments des listes personnalisées que vous possédez"
 
-#: /resources/settings.xml
-msgctxt "#32466"
-msgid "Play automatically using available providers"
-msgstr "Lire automatiquement avec les fournisseurs disponibles"
 
-#: /resources/settings.xml
-msgctxt "#32467"
-msgid "Refresh cached Kodi Library details"
-msgstr "Actualiser les détails de la médiathèque Kodi mis en cache"
 
-#: /resources/settings.xml
-msgctxt "#32468"
-msgid "Authorisation and sync notifications on startup"
-msgstr "Notifications d'autorisation et de synchronisation au démarrage"
 
 #: /resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: /resources/settings.xml
-msgctxt "#32471"
-msgid "Connection error notifications"
-msgstr "Notifications d'erreur de connexion"
 
-#: /resources/settings.xml
-msgctxt "#32472"
-msgid "Cache image location"
-msgstr "Emplacement du cache des images"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
@@ -1953,20 +1741,8 @@ msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "Changer le lecteur par défaut pour une série, une saison ou un épisode"
 
-#: /resources/settings.xml
-msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
-msgstr "Augmente le bassin d'éléments récemment regardés sélectionnés au hasard pour être utilisés dans les recommandations de style \"Parce que vous avez regardé\"."
 
-#: /resources/settings.xml
-msgctxt "#32482"
-msgid "Random seed pool for recommendations"
-msgstr "Bassin de sélection aléatoire pour les recommandations"
 
-#: /resources/settings.xml
-msgctxt "#32483"
-msgid "Allow 3rd party plugin access to API key/token"
-msgstr "Autoriser les plugins tiers à accéder à la clé/jeton d'API"
 
 #: /resources/settings.xml
 msgctxt "#32484"
@@ -2033,55 +1809,23 @@ msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
 msgstr "Ajouter/Supprimer en tant que Nœud Personnalisé"
 
-#: /resources/settings.xml
-msgctxt "#32497"
-msgid "Container content fallback for service listitems without mediatypes"
-msgstr "Contenu de conteneur de secours pour les listitems de service sans mediatypes"
 
-#: /resources/settings.xml
-msgctxt "#32498"
-msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
-msgstr "Certains plugins ont de mauvaises métadonnées et ne remplissent pas le mediatype de l'élément, ce qui empêche le moniteur de service de finaliser une recherche. Ce paramètre permet au moniteur de service d'utiliser le type de contenu du conteneur lorsque le mediatype de l'élément est manquant. Notez que ce paramètre entraînera probablement des correspondances incorrectes plus fréquentes."
 
 #: /resources/settings.xml
 msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
 msgstr "Multiplicateurs de page (plus élevé = plus lent)"
 
-#: /resources/settings.xml
-msgctxt "#32500"
-msgid "Page multiplier (TMDb basic lists)"
-msgstr "Multiplicateur de pages (listes de base TMDb)"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
 msgid "Add {} to node"
 msgstr "Ajouter {} au nœud"
 
-#: /resources/settings.xml
-msgctxt "#32505"
-msgid "Genre icons folder (TMDb)"
-msgstr "Dossier des icônes de genre (TMDb)"
 
-#: /resources/settings.xml
-msgctxt "#32506"
-msgid "Provider icons folder (TMDb)"
-msgstr "Dossier des icônes de fournisseur (TMDb)"
 
-#: /resources/settings.xml
-msgctxt "#32507"
-msgid "Genre icon folder (Trakt)"
-msgstr "Dossier des icônes de genre (Trakt)"
 
-#: /resources/settings.xml
-msgctxt "#32508"
-msgid "Recache Kodi Library details when building players"
-msgstr "Recalculer le cache des détails de la médiathèque Kodi lors de la construction des lecteurs"
 
-#: /resources/settings.xml
-msgctxt "#32509"
-msgid "Use alternative TMDb API url"
-msgstr "Utiliser une URL d'API TMDb alternative"
 
 #: /resources/settings.xml
 msgctxt "#32514"
@@ -2118,10 +1862,6 @@ msgctxt "#32521"
 msgid "Rated"
 msgstr "Noté"
 
-#: /resources/settings.xml
-msgctxt "#32522"
-msgid "TMDb user options"
-msgstr "Options utilisateur TMDb"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32524"
@@ -2153,10 +1893,6 @@ msgctxt "#32531"
 msgid "Method only available for VIP accounts."
 msgstr "Méthode disponible uniquement pour les comptes VIP."
 
-#: /resources/settings.xml
-msgctxt "#32534"
-msgid "Trakt sync progress notifications"
-msgstr "Notifications de progression de la synchronisation Trakt"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32535"
@@ -2320,15 +2056,7 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "Zoulou (Afrique du Sud)"
 
-#: /resources/settings.xml
-msgctxt "#32001"
-msgid "OMDb API key"
-msgstr "Clé API OMDb"
 
-#: /resources/settings.xml
-msgctxt "#32004"
-msgid "MPAA rating prefix"
-msgstr "Préfixe de classification MPAA"
 
 #: /resources/settings.xml
 msgctxt "#32005"
@@ -2340,10 +2068,6 @@ msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Erreur 401 non autorisé"
 
-#: /resources/lib/requestapi.py
-msgctxt "#32010"
-msgid "Authenticate Trakt account..."
-msgstr "Authentifier le compte Trakt..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
@@ -2359,33 +2083,3 @@ msgstr "Vous devez authentifier votre compte Trakt pour utiliser cette fonctionn
 msgctxt "#32014"
 msgid "Players"
 msgstr "Lecteurs"
-
-#: /resources/settings.xml
-msgctxt "#32016"
-msgid "Update players from URL"
-msgstr "Mettre à jour les lecteurs à partir de l'URL"
-
-#: /resources/settings.xml
-msgctxt "#32017"
-msgid "API Keys"
-msgstr "Clés API"
-
-#: /resources/settings.xml
-msgctxt "#32019"
-msgid "Fanart.tv client key"
-msgstr "Clé client Fanart.tv"
-
-#: /resources/settings.xml
-msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "Utiliser Fanart.tv pour les illustrations du plugin (plus lent)"
-
-#: /resources/settings.xml
-msgctxt "#32024"
-msgid "Default player for movies"
-msgstr "Lecteur par défaut pour les films"
-
-#: /resources/settings.xml
-msgctxt "#32025"
-msgid "Default player for episodes"
-msgstr "Lecteur par défaut pour les épisodes"

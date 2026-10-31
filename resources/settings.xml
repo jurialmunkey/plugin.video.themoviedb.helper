@@ -2,17 +2,7 @@
 <settings version="1">
     <section id="plugin.video.themoviedb.helper">
         <category id="general" label="128" help="">
-            <group id="1" label="248">
-                <setting id="mpaa_prefix" type="string" label="32004" help="32418">
-                    <level>0</level>
-                    <default></default>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>32004</heading>
-                    </control>
-                </setting>
+            <group id="1" label="32708">
                 <setting id="language" type="integer" label="32005" help="32419">
                     <level>0</level>
                     <default>18</default>
@@ -93,7 +83,17 @@
                         <heading>32005</heading>
                     </control>
                 </setting>
-                <setting id="ignore_regionreleasefilter" type="boolean" label="32449" help="">
+                <setting id="mpaa_prefix" type="string" label="32004" help="32418">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32004</heading>
+                    </control>
+                </setting>
+                <setting id="ignore_regionreleasefilter" type="boolean" label="32449" help="32609">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
@@ -104,71 +104,91 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="2" label="39123">
-                <setting id="artwork_quality" type="integer" label="32420" help="">
+            <group id="2" label="32709">
+                <setting id="startup_notifications" type="boolean" label="32468" help="32610">
                     <level>0</level>
-                    <default>0</default>
-                    <constraints>
-                        <options>
-                            <option label="32452">0</option>
-                            <option label="32009">1</option>
-                            <option label="32398">2</option>
-                            <option label="32008">3</option>
-                            <option label="32397">4</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
+                    <default>True</default>
+                    <control type="toggle"/>
                 </setting>
-                <setting id="regional_prefer" type="boolean" label="32450" help="32479" parent="artwork_quality">
+                <setting id="sync_notifications" type="boolean" label="32534" help="32611">
+                    <level>0</level>
+                    <default>True</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="connection_notifications" type="boolean" label="32471" help="32612">
+                    <level>0</level>
+                    <default>True</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+            <group id="3" label="32710">
+                <setting id="contextmenu_related_lists" type="boolean" label="32235" help="32613">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_sync_options" type="boolean" label="32549" help="32614">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_sync_tmdb" type="boolean" label="32522" help="32615">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_refresh_details" type="boolean" label="32233" help="32616">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_modify_artwork" type="boolean" label="32118" help="32617">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_add_to_library" type="boolean" label="32618" help="32619">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="contextmenu_make_node" type="boolean" label="32496" help="32620">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="lists" label="32092" help="">
+            <group id="1" label="32711">
+                <setting id="widgets_nextpage" type="boolean" label="32081" help="32621">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="flatten_seasons" type="boolean" label="32085" help="32622">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="3" label="32367">
-                <setting id="use_kodi_local_db" type="integer" label="32038" help="">
-                    <level>0</level>
-                    <default>0</default>
-                    <constraints>
-                        <options>
-                            <option label="13106">0</option>
-                            <option label="32006">1</option>
-                            <option label="32003">2</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
-                <setting id="recache_kodidb" type="action" label="32467" help="">
-                    <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper, recache_kodidb)</data>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action"/>
-                </setting>
-            </group>
-            <group id="4" label="32090">
-                <setting id="flatten_seasons" type="boolean" label="32085" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="seasons_specials" type="boolean" label="32020" help="">
+            <group id="2" label="32712">
+                <setting id="seasons_specials" type="boolean" label="32020" help="32623">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="seasons_anticipated" type="boolean" label="32018" help="">
+                <setting id="seasons_anticipated" type="boolean" label="32018" help="32624">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="seasons_groups" type="boolean" label="32542" help="">
+                <setting id="seasons_groups" type="boolean" label="32542" help="32625">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="seasons_upnext" type="boolean" label="32015" help="">
+                <setting id="seasons_upnext" type="boolean" label="32015" help="32626">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -179,45 +199,18 @@
                     </dependencies>
                 </setting>
             </group>
-            <group id="5" label="15101">
-                <setting id="delete_itemtype" type="action" label="32052" help="32053">
-                    <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper, delete_itemtype)</data>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action"/>
-                </setting>
-                <setting id="delete_listdata" type="action" label="32396" help="">
-                    <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper, delete_listdata)</data>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action"/>
-                </setting>
-            </group>
-        </category>
-        <category id="widgets" label="32092" help="">
-            <group id="1" label="32092">
-                <setting id="widgets_nextpage" type="boolean" label="32081" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-            </group>
-            <group id="2" label="32368">
-                <setting id="calendar_flatten" type="boolean" label="32404" help="">
+            <group id="3" label="32203">
+                <setting id="calendar_flatten" type="boolean" label="32404" help="32627">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="nextaired_linklibrary" type="boolean" label="32156" help="">
+                <setting id="nextaired_linklibrary" type="boolean" label="32156" help="32628">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="calendar_art" type="integer" label="32371" help="">
+                <setting id="calendar_art" type="integer" label="32371" help="32629">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
@@ -229,6 +222,8 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
+            </group>
+            <group id="4" label="32713">
                 <setting id="trakt_nextepisodesort" type="string" label="32093" help="32049">
                     <level>0</level>
                     <default>airdate</default>
@@ -242,11 +237,13 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="nextepisodes_usecalendar" type="boolean" label="32413" help="">
+                <setting id="nextepisodes_usecalendar" type="boolean" label="32413" help="32630">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+            </group>
+            <group id="5" label="32714">
                 <setting id="nextmovies_updates" type="boolean" label="32603" help="32604">
                     <level>0</level>
                     <default>true</default>
@@ -268,10 +265,258 @@
                     </dependencies>
                 </setting>
             </group>
+            <group id="6" label="32715">
+                <setting id="trakt_becausewatchedseed" type="integer" label="32482" help="32481">
+                    <level>0</level>
+                    <default>5</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>20</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+            </group>
+            <group id="7" label="32716">
+                <setting id="pagemulti_tmdb" type="integer" label="32500" help="32631">
+                    <level>0</level>
+                    <default>1</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>3</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="pagemulti_trakt" type="integer" label="32082" help="32632">
+                    <level>0</level>
+                    <default>1</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>3</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="pagemulti_sync" type="integer" label="32083" help="32633">
+                    <level>0</level>
+                    <default>1</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>3</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+            </group>
+            <group id="8" label="32470">
+                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="32634">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle" />
+                </setting>
+            </group>
+        </category>
+        <category id="artwork" label="32080" help="">
+            <group id="1" label="32520">
+                <setting id="artwork_quality" type="integer" label="32420" help="32635">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="32452">0</option>
+                            <option label="32009">1</option>
+                            <option label="32398">2</option>
+                            <option label="32008">3</option>
+                            <option label="32397">4</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="regional_prefer" type="boolean" label="32450" help="32479" parent="artwork_quality">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+            <group id="2" label="32717">
+                <setting id="fanarttv_lookup" type="boolean" label="32021" help="32636">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="fanarttv_prefer" type="boolean" label="32039" help="32637" parent="fanarttv_lookup">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="language_lookup" type="boolean" label="32050" help="32638" parent="fanarttv_lookup">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+            <group id="3" label="32718">
+                <setting id="genre_icon_location" type="path" label="32505" help="32639">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <sources>
+                            <source>files</source>
+                        </sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32505</heading>
+                    </control>
+                </setting>
+                <setting id="trakt_genre_icon_location" type="path" label="32507" help="32640">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <sources>
+                            <source>files</source>
+                        </sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32507</heading>
+                    </control>
+                </setting>
+                <setting id="provider_icon_location" type="path" label="32506" help="32641">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <sources>
+                            <source>files</source>
+                        </sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32506</heading>
+                    </control>
+                </setting>
+            </group>
+            <group id="4" label="32719">
+                <setting id="genre_fanart" type="boolean" label="32388" help="32642">
+                    <level>0</level>
+                    <default>False</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="provider_fanart" type="boolean" label="32389" help="32643">
+                    <level>0</level>
+                    <default>False</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="players" label="32014" help="">
+            <group id="1" label="32720">
+                <setting id="default_player_movies" type="string" label="32024" help="32644">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action">
+                        <data>RunScript(plugin.video.themoviedb.helper, set_defaultplayer=movie)</data>
+                    </control>
+                </setting>
+                <setting id="default_player_episodes" type="string" label="32025" help="32645">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action">
+                        <data>RunScript(plugin.video.themoviedb.helper, set_defaultplayer=tv)</data>
+                    </control>
+                </setting>
+                <setting id="default_player_provider" type="boolean" label="32466" help="32646">
+                    <level>0</level>
+                    <default>True</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="default_player_kodi" type="integer" label="32400" help="32647">
+                    <level>0</level>
+                    <default>1</default>
+                    <constraints>
+                        <options>
+                            <option label="13170">0</option>
+                            <option label="36588">1</option>
+                            <option label="413">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+            </group>
+            <group id="2" label="32721">
+                <setting id="player_episode_groups" type="string" label="32593" help="32597">
+                    <level>0</level>
+                    <default>default</default>
+                    <constraints>
+                        <options>
+                            <option label="32594">default</option>
+                            <option label="32595">select</option>
+                            <option label="32596">group</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="combined_players" type="boolean" label="32415" help="32648">
+                    <level>0</level>
+                    <default>True</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="bundled_players" type="boolean" label="32037" help="32649">
+                    <level>0</level>
+                    <default>True</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="players_url" type="string" label="32016" help="32650">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action">
+                        <data>RunScript(plugin.video.themoviedb.helper, update_players)</data>
+                    </control>
+                </setting>
+                <setting id="customise_players" type="action" label="32329" help="32651">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper, customise_players)</data>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action"/>
+                </setting>
+            </group>
+            <group id="3" label="32722">
+                <setting id="tmdb_user_rate_after_watching" type="boolean" label="32139" help="32652">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="tmdb_user_token"></dependency>
+                    </dependencies>
+                </setting>
+            </group>
         </category>
         <category id="library" label="14022" help="">
-            <group id="1" label="32074">
-                <setting id="movies_library" type="path" label="342" help="">
+            <group id="1" label="32723">
+                <setting id="movies_library" type="path" label="32653" help="32654">
                     <level>0</level>
                     <default>special://profile/addon_data/plugin.video.themoviedb.helper/movies/</default>
                     <constraints>
@@ -280,10 +525,10 @@
                         </sources>
                     </constraints>
                     <control type="button" format="path">
-                        <heading>342</heading>
+                        <heading>32653</heading>
                     </control>
                 </setting>
-                <setting id="tvshows_library" type="path" label="32075" help="">
+                <setting id="tvshows_library" type="path" label="32075" help="32655">
                     <level>0</level>
                     <default>special://profile/addon_data/plugin.video.themoviedb.helper/tvshows/</default>
                     <constraints>
@@ -295,17 +540,19 @@
                         <heading>32075</heading>
                     </control>
                 </setting>
-                <setting id="auto_update" type="boolean" label="32076" help="">
+            </group>
+            <group id="2" label="32724">
+                <setting id="auto_update" type="boolean" label="32076" help="32656">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="library_autoupdate" type="boolean" label="32086" help="">
+                <setting id="library_autoupdate" type="boolean" label="32086" help="32657">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="library_autoupdate_hour" type="integer" label="32130" help="" parent="library_autoupdate">
+                <setting id="library_autoupdate_hour" type="integer" label="32130" help="32658" parent="library_autoupdate">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
@@ -343,7 +590,7 @@
                     </dependencies>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="monitor_userlist" type="string" label="32131" help="" parent="library_autoupdate">
+                <setting id="monitor_userlist" type="string" label="32131" help="32659" parent="library_autoupdate">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -357,7 +604,7 @@
                         <data>RunScript(plugin.video.themoviedb.helper,monitor_userlist)</data>
                     </control>
                 </setting>
-                <setting id="monitor_userslug" type="string" help="">
+                <setting id="monitor_userslug" type="string" help="32660">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -372,7 +619,7 @@
                         <heading/>
                     </control>
                 </setting>
-                <setting id="last_autoupdate" type="string" label="32154" help="" parent="monitor_userslug">
+                <setting id="last_autoupdate" type="string" label="32154" help="32661" parent="monitor_userslug">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -387,174 +634,44 @@
                     </control>
                 </setting>
             </group>
-            <group id="2" label="10039">
-                <setting id="ignore_folderchecking" type="boolean" label="32077" help="">
+            <group id="3" label="32725">
+                <setting id="use_kodi_local_db" type="integer" label="32038" help="32662">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="13106">0</option>
+                            <option label="32006">1</option>
+                            <option label="32003">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="recache_kodidb" type="action" label="32467" help="32663">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper, recache_kodidb)</data>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action"/>
+                </setting>
+            </group>
+            <group id="4" label="32608">
+                <setting id="ignore_folderchecking" type="boolean" label="32077" help="32664">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="alternative_nfo" type="boolean" label="32390" help="">
+                <setting id="alternative_nfo" type="boolean" label="32390" help="32665">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
             </group>
         </category>
-        <category id="api keys" label="32017" help="">
-            <group id="1" label="32029">
-                <setting id="omdb_apikey" type="string" label="32001" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>32001</heading>
-                    </control>
-                </setting>
-                <setting id="omdb_apikey_access" type="boolean" label="32483" help="" parent="omdb_apikey">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                    <enable>false</enable>
-                </setting>
-            </group>
-            <group id="2" label="32422">
-                <setting id="mdblist_settings" type="action" label="10004" help="">
-                    <level>0</level>
-                    <control type="button" format="action">
-                        <close>true</close>
-                        <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.mdblist)</data>
-                    </control>
-                </setting>
-                <!-- Retained only so Kodi can read and clear pre-module keys. -->
-                <setting id="mdblist_apikey" type="string" label="32423" help="">
-                    <level>4</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string"/>
-                    <visible>false</visible>
-                </setting>
-            </group>
-            <group id="3" label="32124">
-                <setting id="ratingposterdb_apikey" type="string" label="32127" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>32127</heading>
-                    </control>
-                </setting>
-            </group>
-            <group id="4" label="32147">
-                <setting id="gemini_apikey" type="string" label="32148" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>32148</heading>
-                    </control>
-                </setting>
-            </group>
-            <group id="5" label="32030">
-                <setting id="fanarttv_clientkey" type="string" label="32019" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>32019</heading>
-                    </control>
-                </setting>
-                <setting id="fanarttv_lookup" type="boolean" label="32021" help="" parent="fanarttv_clientkey">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="fanarttv_prefer" type="boolean" label="32039" help="" parent="fanarttv_clientkey">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <dependencies>
-                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
-                    </dependencies>
-                </setting>
-                <setting id="language_lookup" type="boolean" label="32050" help="" parent="fanarttv_clientkey">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <dependencies>
-                        <dependency type="visible" operator="is" setting="fanarttv_lookup">true</dependency>
-                    </dependencies>
-                </setting>
-                <setting id="fanarttv_clientkey_access" type="boolean" label="32483" help="" parent="fanarttv_clientkey">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                    <enable>false</enable>
-                </setting>
-            </group>
-            <group id="6" label="32484">
-                <visible>false</visible>
-                <setting id="tvdb_token" type="string" label="32011" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition on="property" name="InfoBool">False</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="edit" format="string">
-                        <heading>32011</heading>
-                    </control>
-                </setting>
-                <setting id="tvdb_token_access" type="boolean" label="32483" help="" parent="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                    <enable>false</enable>
-                </setting>
-            </group>
-            <group id="7" label="32520">
-                <visible>false</visible>
-                <setting id="tmdb_user_token" type="string" label="32011" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition on="property" name="InfoBool">False</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="edit" format="string">
-                        <heading>32011</heading>
-                    </control>
-                </setting>
-                <setting id="tmdb_user_token_access" type="boolean" label="32483" help="" parent="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                    <enable>false</enable>
-                </setting>
-            </group>
-            <group id="8" label="32470">
-                <setting id="trakt_token" type="string" label="32011" help="">
+        <category id="services" label="32017" help="">
+            <group id="1" label="32470">
+                <setting id="trakt_token" type="string" label="32011" help="32702">
                     <level>0</level>
                     <default/>
                     <constraints><allowempty>true</allowempty></constraints>
@@ -567,7 +684,7 @@
                         <heading>32011</heading>
                     </control>
                 </setting>
-                <setting id="authenticate_trakt" type="action" label="32010" help="">
+                <setting id="authenticate_trakt" type="action" label="32010" help="32666">
                     <level>0</level>
                     <data>RunScript(plugin.video.themoviedb.helper,authenticate_trakt)</data>
                     <constraints>
@@ -577,14 +694,14 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="trakt_token_access" type="boolean" label="32483" help="" parent="authenticate_trakt">
+                <setting id="trakt_token_access" type="boolean" label="32483" help="32707" parent="authenticate_trakt">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                     <visible>false</visible>
                     <enable>false</enable>
                 </setting>
-                <setting id="revoke_trakt" type="action" label="32169" help="">
+                <setting id="revoke_trakt" type="action" label="32169" help="32667">
                     <level>0</level>
                     <data>RunScript(plugin.video.themoviedb.helper,revoke_trakt)</data>
                     <constraints>
@@ -599,51 +716,156 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle" />
-                </setting>
             </group>
-        </category>
-        <category id="accounts" label="32403" help="">
-            <group id="2" label="5">
-                <setting id="trakt_becausewatchedseed" type="integer" label="32482" help="32481">
+            <group id="2" label="32726">
+                <setting id="mdblist_settings" type="action" label="32668" help="32669">
                     <level>0</level>
-                    <default>5</default>
-                    <constraints>
-                        <minimum>1</minimum>
-                        <step>1</step>
-                        <maximum>20</maximum>
-                    </constraints>
-                    <control type="slider" format="integer">
-                        <popup>false</popup>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.mdblist)</data>
                     </control>
                 </setting>
-                <setting id="trakt_watchedindicators" type="boolean" label="32013" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle" />
-                </setting>
-                <setting id="invalidate_sync" type="string" label="32022" help="">
-                    <level>0</level>
+                <!-- Retained only so Kodi can read and clear pre-module keys. -->
+                <setting id="mdblist_apikey" type="string" label="32423" help="32670">
+                    <level>4</level>
+                    <default/>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
-                    <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_sync)</data>
+                    <control type="edit" format="string"/>
+                    <visible>false</visible>
+                </setting>
+            </group>
+            <group id="3" label="32727">
+                <setting id="omdb_apikey" type="string" label="32001" help="32671">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32001</heading>
                     </control>
                 </setting>
-                <setting id="install_sync_provider" type="action" label="32557" help="">
+                <setting id="omdb_apikey_access" type="boolean" label="32483" help="32703" parent="omdb_apikey">
                     <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper,install_sync_provider,return_settings=true)</data>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
+                <setting id="ratingposterdb_apikey" type="string" label="32127" help="32672">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32127</heading>
+                    </control>
+                </setting>
+                <setting id="gemini_apikey" type="string" label="32148" help="32673">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32148</heading>
+                    </control>
+                </setting>
+                <setting id="fanarttv_clientkey" type="string" label="32019" help="32674">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>32019</heading>
+                    </control>
+                </setting>
+                <setting id="fanarttv_clientkey_access" type="boolean" label="32483" help="32704" parent="fanarttv_clientkey">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
+            </group>
+            <group id="4" label="32028">
+                <setting id="ratings_providers" type="action" label="32411" help="32582">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper,configure_ratings_providers,return_settings=true)</data>
                     <control type="button" format="action">
                         <close>true</close>
                     </control>
                 </setting>
+                <setting id="ratings_provider_order" type="action" label="32591" help="32592">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper,configure_ratings_provider_order,return_settings=true)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="ratings_provider_configuration" type="string" label="32675" help="32676">
+                    <level>0</level>
+                    <default></default>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
             </group>
-
-            <group id="1" label="39031">
+            <group id="5" label="32728">
+                <visible>false</visible>
+                <setting id="tvdb_token" type="string" label="32011" help="32700">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition on="property" name="InfoBool">False</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>32011</heading>
+                    </control>
+                </setting>
+                <setting id="tvdb_token_access" type="boolean" label="32483" help="32705" parent="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
+                <setting id="tmdb_user_token" type="string" label="32011" help="32701">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition on="property" name="InfoBool">False</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <heading>32011</heading>
+                    </control>
+                </setting>
+                <setting id="tmdb_user_token_access" type="boolean" label="32483" help="32706" parent="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <visible>false</visible>
+                    <enable>false</enable>
+                </setting>
+            </group>
+        </category>
+        <category id="accounts" label="32403" help="">
+            <group id="1" label="32411">
                 <setting id="sync_provider_watched" type="string" label="32408" help="32548">
                     <level>0</level>
                     <default></default>
@@ -653,7 +875,7 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=watched,return_settings=true)</data>
                     </control>
                 </setting>
-                <setting id="sync_provider_watchlist" type="string" label="32193" help="32548">
+                <setting id="sync_provider_watchlist" type="string" label="32193" help="32677">
                     <level>0</level>
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
@@ -662,7 +884,7 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=watchlist,return_settings=true)</data>
                     </control>
                 </setting>
-                <setting id="sync_provider_collection" type="string" label="32192" help="32548">
+                <setting id="sync_provider_collection" type="string" label="32192" help="32678">
                     <level>0</level>
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
@@ -680,7 +902,7 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling,return_settings=true)</data>
                     </control>
                 </setting>
-                <setting id="sync_provider_stats" type="string" label="32598" help="32548">
+                <setting id="sync_provider_stats" type="string" label="32598" help="32679">
                     <level>0</level>
                     <default></default>
                     <constraints><allowempty>true</allowempty></constraints>
@@ -689,125 +911,36 @@
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=stats,return_settings=true)</data>
                     </control>
                 </setting>
-            </group>
-            <group id="3" label="32028">
-                <setting id="ratings_providers" type="action" label="32411" help="32582">
+                <setting id="install_sync_provider" type="action" label="32557" help="32680">
                     <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper,configure_ratings_providers,return_settings=true)</data>
+                    <data>RunScript(plugin.video.themoviedb.helper,install_sync_provider,return_settings=true)</data>
                     <control type="button" format="action">
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="ratings_provider_order" type="action" label="32591" help="32592">
+            </group>
+            <group id="2" label="32729">
+                <setting id="trakt_watchedindicators" type="boolean" label="32013" help="32681">
                     <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper,configure_ratings_provider_order,return_settings=true)</data>
-                    <control type="button" format="action">
-                        <close>true</close>
-                    </control>
+                    <default>false</default>
+                    <control type="toggle" />
                 </setting>
-                <setting id="ratings_provider_configuration" type="string" label="32581" help="">
+            </group>
+            <group id="3" label="32730">
+                <setting id="invalidate_sync" type="string" label="32022" help="32682">
                     <level>0</level>
-                    <default></default>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="edit" format="string"/>
-                    <visible>false</visible>
-                    <enable>false</enable>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action">
+                        <data>RunScript(plugin.video.themoviedb.helper, invalidate_sync)</data>
+                    </control>
                 </setting>
             </group>
         </category>
-        <category id="players" label="32014" help="">
-            <group id="1" label="32033">
-                <setting id="default_player_movies" type="string" label="32024" help="">
-                    <level>0</level>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper, set_defaultplayer=movie)</data>
-                    </control>
-                </setting>
-                <setting id="default_player_episodes" type="string" label="32025" help="">
-                    <level>0</level>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper, set_defaultplayer=tv)</data>
-                    </control>
-                </setting>
-                <setting id="default_player_provider" type="boolean" label="32466" help="">
-                    <level>0</level>
-                    <default>True</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="default_player_kodi" type="integer" label="32400" help="">
-                    <level>0</level>
-                    <default>1</default>
-                    <constraints>
-                        <options>
-                            <option label="13170">0</option>
-                            <option label="36588">1</option>
-                            <option label="413">2</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
-            </group>
-            <group id="2" label="32329">
-                <setting id="player_episode_groups" type="string" label="32593" help="32597">
-                    <level>0</level>
-                    <default>default</default>
-                    <constraints>
-                        <options>
-                            <option label="32594">default</option>
-                            <option label="32595">select</option>
-                            <option label="32596">group</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
-                <setting id="combined_players" type="boolean" label="32415" help="">
-                    <level>0</level>
-                    <default>True</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="bundled_players" type="boolean" label="32037" help="">
-                    <level>0</level>
-                    <default>True</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="players_url" type="string" label="32016" help="">
-                    <level>0</level>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action">
-                        <data>RunScript(plugin.video.themoviedb.helper, update_players)</data>
-                    </control>
-                </setting>
-                <setting id="customise_players" type="action" label="32329" help="">
-                    <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper, customise_players)</data>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action"/>
-                </setting>
-            </group>
-            <group id="3" label="32138">
-                <setting id="tmdb_user_rate_after_watching" type="boolean" label="32139" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                    <dependencies>
-                        <dependency type="visible" operator="!is" setting="tmdb_user_token"></dependency>
-                    </dependencies>
-                </setting>
-            </group>
-        </category>
-        <category id="details" label="32080" help="">
-            <group id="1" label="32436">
-                <setting id="provider_allowlist" type="string" label="32437" help="">
+        <category id="advanced" label="32608" help="">
+            <group id="1" label="32731">
+                <setting id="provider_allowlist" type="string" label="32437" help="32683">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -816,12 +949,12 @@
                         <data>RunScript(plugin.video.themoviedb.helper,provider_allowlist)</data>
                     </control>
                 </setting>
-                <setting id="use_online_artwork" type="boolean" label="32377" help="">
+                <setting id="use_online_artwork" type="boolean" label="32377" help="32684">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="use_online_ratings" type="boolean" label="32386" help="">
+                <setting id="use_online_ratings" type="boolean" label="32386" help="32685">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -831,7 +964,7 @@
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="service_prefers_online_clearlogo" type="boolean" label="32129" help="">
+                <setting id="service_prefers_online_clearlogo" type="boolean" label="32129" help="32686">
                     <level>0</level>
                     <default>false</default>
                     <dependencies>
@@ -840,153 +973,8 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="2" label="32499">
-                <setting id="pagemulti_tmdb" type="integer" label="32500" help="">
-                    <level>0</level>
-                    <default>1</default>
-                    <constraints>
-                        <minimum>1</minimum>
-                        <step>1</step>
-                        <maximum>3</maximum>
-                    </constraints>
-                    <control type="slider" format="integer">
-                        <popup>false</popup>
-                    </control>
-                </setting>
-                <setting id="pagemulti_trakt" type="integer" label="32082" help="">
-                    <level>0</level>
-                    <default>1</default>
-                    <constraints>
-                        <minimum>1</minimum>
-                        <step>1</step>
-                        <maximum>3</maximum>
-                    </constraints>
-                    <control type="slider" format="integer">
-                        <popup>false</popup>
-                    </control>
-                </setting>
-                <setting id="pagemulti_sync" type="integer" label="32083" help="">
-                    <level>0</level>
-                    <default>1</default>
-                    <constraints>
-                        <minimum>1</minimum>
-                        <step>1</step>
-                        <maximum>3</maximum>
-                    </constraints>
-                    <control type="slider" format="integer">
-                        <popup>false</popup>
-                    </control>
-                </setting>
-            </group>
-            <group id="3" label="10106">
-                <setting id="contextmenu_related_lists" type="boolean" label="32235" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="contextmenu_sync_options" type="boolean" label="32549" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="contextmenu_sync_tmdb" type="boolean" label="32522" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="contextmenu_refresh_details" type="boolean" label="32233" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="contextmenu_modify_artwork" type="boolean" label="32118" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="contextmenu_add_to_library" type="boolean" label="20444" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="contextmenu_make_node" type="boolean" label="32496" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-            </group>
-            <group id="4" label="39123">
-                <setting id="genre_icon_location" type="path" label="32505" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <sources>
-                            <source>files</source>
-                        </sources>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="path">
-                        <heading>32505</heading>
-                    </control>
-                </setting>
-                <setting id="trakt_genre_icon_location" type="path" label="32507" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <sources>
-                            <source>files</source>
-                        </sources>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="path">
-                        <heading>32507</heading>
-                    </control>
-                </setting>
-                <setting id="provider_icon_location" type="path" label="32506" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <sources>
-                            <source>files</source>
-                        </sources>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="path">
-                        <heading>32506</heading>
-                    </control>
-                </setting>
-                <setting id="genre_fanart" type="boolean" label="32388" help="">
-                    <level>0</level>
-                    <default>False</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="provider_fanart" type="boolean" label="32389" help="">
-                    <level>0</level>
-                    <default>False</default>
-                    <control type="toggle"/>
-                </setting>
-            </group>
-            <group id="5" label="25000">
-                <setting id="startup_notifications" type="boolean" label="32468" help="">
-                    <level>0</level>
-                    <default>True</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="sync_notifications" type="boolean" label="32534" help="">
-                    <level>0</level>
-                    <default>True</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="connection_notifications" type="boolean" label="32471" help="">
-                    <level>0</level>
-                    <default>True</default>
-                    <control type="toggle"/>
-                </setting>
-            </group>
-        </category>
-        <category id="expert" label="10039" help="">
-            <group id="1" label="32351">
-                <setting id="dummy_duration" type="string" label="32352" help="">
+            <group id="2" label="32732">
+                <setting id="dummy_duration" type="string" label="32352" help="32687">
                     <level>0</level>
                     <default>1.0</default>
                     <constraints>
@@ -1003,7 +991,7 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="dummy_delay" type="string" label="32363" help="">
+                <setting id="dummy_delay" type="string" label="32363" help="32688">
                     <level>0</level>
                     <default>1.0</default>
                     <constraints>
@@ -1020,26 +1008,24 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
-                <setting id="only_resolve_strm" type="boolean" label="32373" help="">
+                <setting id="only_resolve_strm" type="boolean" label="32373" help="32689">
                     <level>0</level>
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
-            </group>
-            <group id="2" label="14200">
-                <setting id="force_recache_kodidb" type="boolean" label="32508" help="">
+                <setting id="force_recache_kodidb" type="boolean" label="32508" help="32690">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="3" label="29921">
-                <setting id="use_alternate_api_url" type="boolean" label="32509">
+            <group id="3" label="32733">
+                <setting id="use_alternate_api_url" type="boolean" label="32509" help="32691">
                     <level>0</level>
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="max_threads" type="integer" label="32410" help="">
+                <setting id="max_threads" type="integer" label="32410" help="32692">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
@@ -1051,7 +1037,9 @@
                         <popup>false</popup>
                     </control>
                 </setting>
-                <setting id="cache_location" type="path" label="32409" help="">
+            </group>
+            <group id="4" label="32734">
+                <setting id="cache_location" type="path" label="32409" help="32693">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -1064,7 +1052,7 @@
                         <heading>32409</heading>
                     </control>
                 </setting>
-                <setting id="image_location" type="path" label="32472" help="">
+                <setting id="image_location" type="path" label="32472" help="32694">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -1102,19 +1090,35 @@
                         <close>true</close>
                     </control>
                 </setting>
+                <setting id="delete_itemtype" type="action" label="32052" help="32053">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper, delete_itemtype)</data>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action"/>
+                </setting>
+                <setting id="delete_listdata" type="action" label="32396" help="32695">
+                    <level>0</level>
+                    <data>RunScript(plugin.video.themoviedb.helper, delete_listdata)</data>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="action"/>
+                </setting>
             </group>
-            <group id="4" label="14260">
-                <setting id="timer_reports" type="boolean" label="32395" help="">
+            <group id="5" label="32735">
+                <setting id="debug_logging" type="boolean" label="32066" help="32696">
                     <level>0</level>
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="debug_logging" type="boolean" label="32066" help="">
+                <setting id="timer_reports" type="boolean" label="32395" help="32697">
                     <level>0</level>
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="log_request_tmdb" type="action" label="32348" help="">
+                <setting id="log_request_tmdb" type="action" label="32348" help="32698">
                     <level>0</level>
                     <data>RunScript(plugin.video.themoviedb.helper, log_request=tmdb)</data>
                     <constraints>
@@ -1122,7 +1126,7 @@
                     </constraints>
                     <control type="button" format="action"/>
                 </setting>
-                <setting id="log_request_trakt" type="action" label="32347" help="">
+                <setting id="log_request_trakt" type="action" label="32347" help="32699">
                     <level>0</level>
                     <data>RunScript(plugin.video.themoviedb.helper, log_request=trakt)</data>
                     <constraints>

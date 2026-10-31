@@ -161,10 +161,6 @@ msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Gebruik gebundelde spelers"
 
-#: /resources/settings.xml
-msgctxt "#32038"
-msgid "Get additional details from the local Kodi library database"
-msgstr "Krijg aanvullende details van de lokale Kodi bibliotheek database"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -241,60 +237,28 @@ msgctxt "#32074"
 msgid "Library Integration"
 msgstr "Bibliotheekintegratie"
 
-#: /resources/settings.xml
-msgctxt "#32075"
-msgid "TV"
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32076"
-msgid "Update library after adding items"
-msgstr "Update bibliotheek na het toevoegen van items"
 
-#: /resources/settings.xml
-msgctxt "#32077"
-msgid "Ignore folder creation checks"
-msgstr "Negeer controles voor het maken van mappen"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "Nog te kijken"
 
-#: /resources/settings.xml
-msgctxt "#32080"
-msgid "Other"
-msgstr "Ander"
 
-#: /resources/settings.xml
-msgctxt "#32081"
-msgid "Show next page item on widgets (requires skin reload)"
-msgstr "Toon volgende pagina item op widgets (vereist opnieuw laden van de skin)"
 
 #: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr "Seizoenen afvlakken"
 
-#: /resources/settings.xml
-msgctxt "#32086"
-msgid "Auto-update library and add new/missing episodes"
-msgstr "Bibliotheek automatisch bijwerken en nieuwe/ontbrekende afleveringen toevoegen"
 
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32092"
-msgid "Widgets"
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32093"
-msgid "Next episodes sort method"
-msgstr "Volgende afleveringen sorteermethode"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -381,15 +345,7 @@ msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Weet je zeker dat je deze Trakt lijst aan je Kodi bibliotheek wilt toevoegen?"
 
-#: /resources/lib/context.py
-msgctxt "#32130"
-msgid "Auto-update library at time"
-msgstr "Bibliotheek automatisch bijwerken op tijd"
 
-#: /resources/settings.xml
-msgctxt "#32131"
-msgid "Auto-update library from Trakt list(s)"
-msgstr "Bibliotheek automatisch bijwerken vanuit Trakt lijst(en)"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
@@ -401,15 +357,7 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "Selecteer lijst(en)"
 
-#: /resources/lib/context.py
-msgctxt "#32154"
-msgid "Update library now"
-msgstr "Bibliotheek nu bijwerken"
 
-#: /resources/settings.xml
-msgctxt "#32156"
-msgid "Next aired library calendar links to local tvshow"
-msgstr "Volgende uitgezonden bibliotheek kalender links naar lokale series"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -435,10 +383,6 @@ msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
 msgstr "[B]{}[/B] door gebruiker [B]{}[/B]"
 
-#: /resources/settings.xml
-msgctxt "#32169"
-msgid "Logout of Trakt account..."
-msgstr "Uitloggen van Trakt account..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -1191,25 +1135,13 @@ msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "Voer nieuwe prioriteit in voor {}"
 
-#: /resources/settings.xml
-msgctxt "#32347"
-msgid "Log output of Trakt request"
-msgstr "Logboekuitvoer van Trakt verzoek"
 
-#: /resources/settings.xml
-msgctxt "#32348"
-msgid "Log output of TMDb request"
-msgstr "Logboekuitvoer van TMDb verzoek"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32352"
-msgid "Dummy video duration (seconds)"
-msgstr "Dummy videoduur (seconden)"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1257,10 +1189,6 @@ msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
 msgstr "Wil je dit item nu aan de bibliotheek toevoegen?"
 
-#: /resources/settings.xml
-msgctxt "#32363"
-msgid "Delay before playing after dummy resolves (seconds)"
-msgstr "Vertraging voor het afspelen nadat de dummy is opgelost (seconden)"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1287,20 +1215,12 @@ msgctxt "#32370"
 msgid "landscape"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32371"
-msgid "Preferred artwork for thumbs"
-msgstr "Voorkeur artwork voor thumbs"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32373"
-msgid "Restrict dummy setResolvedUrl method to library strm"
-msgstr "Beperk de dummy setResolvedUrl methode tot bibliotheek strm"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1317,20 +1237,12 @@ msgctxt "#32376"
 msgid "Building Player Dialog"
 msgstr "Spelers dialoogvenster bouwen"
 
-#: /resources/settings.xml
-msgctxt "#32386"
-msgid "Delete Cache"
-msgstr "Cache verwijderen"
 
 #: /resources/lib/script/router.py
 msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Verwijder {} cache"
 
-#: /resources/lib/script/router.py
-msgctxt "#32390"
-msgid "Use alternative .nfo filename to avoid externally managed .nfo conflicts"
-msgstr "Gebruik een alternatieve .nfo bestandsnaam om extern beheerde .nfo conflicten te vermijden"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
@@ -1358,10 +1270,6 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr "Snelle update"
 
-#: /resources/settings.xml
-msgctxt "#32395"
-msgid "Log timer reports for directories"
-msgstr "Timerrapporten loggen voor mappen"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -1373,15 +1281,7 @@ msgctxt "#32398"
 msgid "Medium"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32400"
-msgid "Play local Kodi library files"
-msgstr "Speel lokale Kodi bibliotheekbestanden af"
 
-#: /resources/settings.xml
-msgctxt "#32404"
-msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Maak series plat met meerdere afleveringen die dezelfde dag worden uitgezonden"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
@@ -1541,15 +1441,7 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr "Zoeloe (Zuid-Afrika)"
 
-#: /resources/settings.xml
-msgctxt "#32001"
-msgid "OMDb API key"
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32004"
-msgid "MPAA rating prefix"
-msgstr "MPAA classificatie voorvoegsel"
 
 #: /resources/settings.xml
 msgctxt "#32005"
@@ -1561,10 +1453,6 @@ msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Ongeautoriseerde 401 fout"
 
-#: /resources/lib/requestapi.py
-msgctxt "#32010"
-msgid "Authenticate Trakt account..."
-msgstr "Verifieer Trakt account..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
@@ -1581,35 +1469,11 @@ msgctxt "#32014"
 msgid "Players"
 msgstr "spelers"
 
-#: /resources/settings.xml
-msgctxt "#32016"
-msgid "Update players from URL"
-msgstr "Spelers updaten vanaf URL"
 
-#: /resources/settings.xml
-msgctxt "#32017"
-msgid "API Keys"
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32019"
-msgid "Fanart.tv client key"
-msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (increases load times)"
-msgstr "Gebruik fanart.tv voor plugin artwork (verhoogt de laadtijden)"
 
-#: /resources/settings.xml
-msgctxt "#32024"
-msgid "Default player for movies"
-msgstr "Standaardspeler voor films"
 
-#: /resources/settings.xml
-msgctxt "#32025"
-msgid "Default player for episodes"
-msgstr "Standaardspeler voor afleveringen"
 
 #: /resources/settings.xml
 msgctxt "#32027"

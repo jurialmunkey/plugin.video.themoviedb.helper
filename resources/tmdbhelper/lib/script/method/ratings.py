@@ -16,4 +16,4 @@ def configure_ratings_selection(selection, return_settings):
     try:
         return selection.select()
     finally:
-        AddonSettingsDialog(32403, selection.setting_label).reopen()
+        AddonSettingsDialog(32017, selection.setting_label).reopen()

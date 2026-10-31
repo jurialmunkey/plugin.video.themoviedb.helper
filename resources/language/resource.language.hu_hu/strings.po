@@ -182,10 +182,6 @@ msgctxt "#32037"
 msgid "Use bundled players"
 msgstr "Beépített lejátszók használata"
 
-#: /resources/settings.xml
-msgctxt "#32038"
-msgid "Get additional details from the local Kodi library database"
-msgstr "További részletek a helyi Kodi médiatár adatbázisból"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -262,60 +258,28 @@ msgctxt "#32074"
 msgid "Library Integration"
 msgstr "Médiatár integráció"
 
-#: /resources/settings.xml
-msgctxt "#32075"
-msgid "TV"
-msgstr "TV"
 
-#: /resources/settings.xml
-msgctxt "#32076"
-msgid "Update library after adding items"
-msgstr "Médiatár frissítése, az elemek hozzáadása után"
 
-#: /resources/settings.xml
-msgctxt "#32077"
-msgid "Ignore folder creation checks"
-msgstr "Mappa létrehozási ellenőrzések figyelmen kívül hagyása"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "Még nézed"
 
-#: /resources/settings.xml
-msgctxt "#32080"
-msgid "Other"
-msgstr "Más"
 
-#: /resources/settings.xml
-msgctxt "#32081"
-msgid "Next page item"
-msgstr "Következő oldal elem"
 
 #: /resources/settings.xml
 msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr "Összevont évadok"
 
-#: /resources/settings.xml
-msgctxt "#32086"
-msgid "Auto-update library and add new/missing episodes"
-msgstr "Médiatár automatikus frissítése és új/hiányzó epizódok hozzáadása"
 
 #: /resources/settings.xml
 msgctxt "#32090"
 msgid "Content"
 msgstr "Tartalom"
 
-#: /resources/settings.xml
-msgctxt "#32092"
-msgid "Widgets"
-msgstr "Widgetek"
 
-#: /resources/settings.xml
-msgctxt "#32093"
-msgid "Next episodes sort method"
-msgstr "Következő epizódok rendezési módja"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -402,15 +366,7 @@ msgctxt "#32126"
 msgid "Are you sure you want to add this Trakt list to your Kodi library?"
 msgstr "Biztosan hozzáadod ezt a Trakt listát a Kodi médiatáradhoz?"
 
-#: /resources/lib/context.py
-msgctxt "#32130"
-msgid "Auto-update library at time"
-msgstr "Médiatár automatikus frissítése adott időpontban"
 
-#: /resources/settings.xml
-msgctxt "#32131"
-msgid "Auto-update library from Trakt list(s)"
-msgstr "Médiatár automatikus frissítése a Trakt listákról"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
@@ -422,15 +378,7 @@ msgctxt "#32133"
 msgid "Select List(s)"
 msgstr "Listák kiválasztása"
 
-#: /resources/lib/context.py
-msgctxt "#32154"
-msgid "Update library now"
-msgstr "Médiatár frissítése most"
 
-#: /resources/settings.xml
-msgctxt "#32156"
-msgid "Next aired library calendar links to local tvshow"
-msgstr "A következő sugárzott könyvtári naptár, a helyi tévéműsorra mutató hivatkozásokat tartalmaz"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -456,10 +404,6 @@ msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
 msgstr "[B]{}[/B] felhasználó által [B]{}[/B]"
 
-#: /resources/settings.xml
-msgctxt "#32169"
-msgid "Logout of Trakt account..."
-msgstr "Kijelentkezés a Trakt fiókból..."
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -1212,25 +1156,13 @@ msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "Állíts be új prioritást a {} nak"
 
-#: /resources/settings.xml
-msgctxt "#32347"
-msgid "Log output of Trakt request"
-msgstr "A Trakt kérés naplózási kimenete"
 
-#: /resources/settings.xml
-msgctxt "#32348"
-msgid "Log output of TMDb request"
-msgstr "A TMDb kérés naplózási kimenete"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "Dummy ResolvedURL"
 
-#: /resources/settings.xml
-msgctxt "#32352"
-msgid "Dummy video duration (seconds)"
-msgstr "Dummy videó időtartama (másodperc)"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1278,10 +1210,6 @@ msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
 msgstr "Hozzá szeretnéd adni ezt az elemet most a médiatárhoz?"
 
-#: /resources/settings.xml
-msgctxt "#32363"
-msgid "Delay after resolving (seconds)"
-msgstr "Feloldás utáni késleltetés (másodperc)"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1308,20 +1236,12 @@ msgctxt "#32370"
 msgid "landscape"
 msgstr "fekvő tájkép"
 
-#: /resources/settings.xml
-msgctxt "#32371"
-msgid "Preferred artwork for thumbs"
-msgstr "Előnyben részesített képtípus a bélyegképekhez"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
 msgstr "fanart"
 
-#: /resources/settings.xml
-msgctxt "#32373"
-msgid "Restrict to library strm"
-msgstr "Korlátozás a médiatár strm-jére"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1343,10 +1263,6 @@ msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "Gyorsítótár {} törlése"
 
-#: /resources/lib/script/router.py
-msgctxt "#32390"
-msgid "Use alternative .nfo filename"
-msgstr "Használj alternatív .nfo fájlnevet"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
@@ -1374,10 +1290,6 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr "Gyors frissítés"
 
-#: /resources/settings.xml
-msgctxt "#32395"
-msgid "Log timer reports for directories"
-msgstr "Könyvtárak naplózási időzítő jelentései"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -1389,30 +1301,14 @@ msgctxt "#32398"
 msgid "Medium"
 msgstr "Közepes"
 
-#: /resources/settings.xml
-msgctxt "#32400"
-msgid "Play local Kodi library files"
-msgstr "Helyi Kodi médiatárfájlok lejátszása"
 
-#: /resources/settings.xml
-msgctxt "#32404"
-msgid "Flatten tvshows with multiple episodes airing same day"
-msgstr "Több epizóddal egy napon sugárzott sorozatok egyesítése"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr "Saját folyamatban levő epizódok"
 
-#: /resources/settings.xml
-msgctxt "#32409"
-msgid "Cache database location"
-msgstr "Gyorsítótár adatbázis helye"
 
-#: /resources/settings.xml
-msgctxt "#32410"
-msgid "Max concurrent threads (0 is unlimited)"
-msgstr "Maximális egyidejű szálak száma (a 0 korlátlan)"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
@@ -1424,40 +1320,20 @@ msgctxt "#32412"
 msgid "With Watch Provider"
 msgstr "With Watch Provider"
 
-#: /resources/settings.xml
-msgctxt "#32413"
-msgid "Next episodes checks calendar (slower but more accurate)"
-msgstr "A következő epizódok ellenőrzik a naptárat (lassabb, de pontosabb)"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
 msgid "Most Watched"
 msgstr "Legtöbbet nézett"
 
-#: /resources/settings.xml
-msgctxt "#32415"
-msgid "Combine all players for plugin into single entry"
-msgstr "Összesíti az összes pluginhoz tartozó lejátszót egyetlen bejegyzésbe"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
 msgid "Premieres"
 msgstr "Bemutatók"
 
-#: /resources/lib/script/sync.py
-msgctxt "#32418"
-msgid "Adds text to the start of the MPAA rating. For example if set to 'Rated' a 'PG' rating is displayed as 'Rated PG'. Cached items will need to be refreshed."
-msgstr "Szöveget ad az MPAA besorolás elejéhez. Például, ha „Korhatárra van állítva”, a „PG” besorolás „Korhatárra besorolás”-ként jelenik meg. A gyorsítótárazott elemeket frissíteni kell."
 
-#: /resources/settings.xml
-msgctxt "#32419"
-msgid "The language and country settings used when looking up data from TMDb and Trakt APIs"
-msgstr "A TMDb és Trakt API-kból származó adatok keresésekor használt nyelvi és országbeállítások"
 
-#: /resources/settings.xml
-msgctxt "#32420"
-msgid "TMDb artwork quality"
-msgstr "TMDb képek minősége"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32421"
@@ -1539,10 +1415,6 @@ msgctxt "#32436"
 msgid "Details"
 msgstr "Részletek"
 
-#: /resources/settings.xml
-msgctxt "#32437"
-msgid "Configure provider data allowlist"
-msgstr "Szolgáltatói adatok engedélyezőlistájának konfigurálása"
 
 #: /resources/lib/script/method.py
 msgctxt "#32438"
@@ -1589,10 +1461,6 @@ msgctxt "#32446"
 msgid "plugin:// search URL for {}"
 msgstr "plugin:// keresési URL a következőhöz: {}"
 
-#: /resources/settings.xml
-msgctxt "#32449"
-msgid "Ignore region release filter"
-msgstr "Régiókiadás-szűrő figyelmen kívül hagyása"
 
 #: /resources/settings.xml
 msgctxt "#32451"
@@ -1634,40 +1502,16 @@ msgctxt "#32460"
 msgid "Awards"
 msgstr "Díjak"
 
-#: /resources/settings.xml
-msgctxt "#32463"
-msgid "Cache items in custom lists you own for 24 hours"
-msgstr "Egyéni listákban lévő elemek gyorsítótárazása 24 órára"
 
-#: /resources/settings.xml
-msgctxt "#32466"
-msgid "Play automatically using available providers"
-msgstr "Automatikus lejátszás az elérhető szolgáltatók használatával"
 
-#: /resources/settings.xml
-msgctxt "#32467"
-msgid "Refresh cached Kodi Library details"
-msgstr "A gyorsítótárban tárolt Kodi médiatár részleteinek frissítése"
 
-#: /resources/settings.xml
-msgctxt "#32468"
-msgid "Authorisation and sync notifications on startup"
-msgstr "Engedélyezési és szinkronizálási értesítések indításkor"
 
 #: /resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
 msgstr "Trakt"
 
-#: /resources/settings.xml
-msgctxt "#32471"
-msgid "Connection error notifications"
-msgstr "Kapcsolódási hibákról szóló értesítések"
 
-#: /resources/settings.xml
-msgctxt "#32472"
-msgid "Cache image location"
-msgstr "Gyorsítótár helye"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
@@ -1694,20 +1538,8 @@ msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
 msgstr "Alapértelmezett lejátszó módosítása sorozathoz, évadhoz vagy epizódhoz"
 
-#: /resources/settings.xml
-msgctxt "#32481"
-msgid "Increases the pool of recently watched items randomly selected from the seed to use for \"Because You Watched\" style recommendations."
-msgstr "Növeli a nemrég megtekintett elemek listáját, amelyeket véletlenszerűen választanak ki a kezdőértékből, és amelyeket a „Mert megnézted” stílusú ajánlásokhoz használnak."
 
-#: /resources/settings.xml
-msgctxt "#32482"
-msgid "Random seed pool for recommendations"
-msgstr "Véletlenszerű merítés az ajánlásokhoz"
 
-#: /resources/settings.xml
-msgctxt "#32483"
-msgid "Allow 3rd party plugin access to API key/token"
-msgstr "Harmadik féltől származó bővítmények API-kulcshoz/tokenhez való hozzáférésének engedélyezése"
 
 #: /resources/settings.xml
 msgctxt "#32484"
@@ -1774,55 +1606,23 @@ msgctxt "#32496"
 msgid "Add/Remove as Custom Node"
 msgstr "Hozzáadás/eltávolítás egyéni csomópontként"
 
-#: /resources/settings.xml
-msgctxt "#32497"
-msgid "Container content fallback for service listitems without mediatypes"
-msgstr "Médiatípusok nélküli szolgáltatáslistákhoz tartozó konténertartalom-tartalék"
 
-#: /resources/settings.xml
-msgctxt "#32498"
-msgid "Some plugins have poor metadata and fail to fill the item mediatype which results in the service monitor not completing an item lookup. This setting allows the service monitor to use the container content type when item mediatype is missing. Note this setting will likely result more frequent incorrect matches due to the end plugin having bad metadata."
-msgstr "Néhány bővítmény hibás metaadatokkal rendelkezik, és nem tölti ki az elem médiatípusát, aminek következtében a szolgáltatásfigyelő nem fejezi be az elemkeresést. Ez a beállítás lehetővé teszi a szolgáltatásfigyelő számára, hogy a konténer tartalomtípusát használja, ha az elem médiatípusa hiányzik. Vegye figyelembe, hogy ez a beállítás valószínűleg gyakrabban eredményez helytelen találatokat, mivel a záró bővítmény hibás metaadatokkal rendelkezik."
 
 #: /resources/settings.xml
 msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
 msgstr "Oldalszorzók (minél magasabb, annál lassabb)"
 
-#: /resources/settings.xml
-msgctxt "#32500"
-msgid "Page multiplier (TMDb basic lists)"
-msgstr "Oldalszorzó (TMDb alaplisták)"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
 msgid "Add {} to node"
 msgstr "{} hozzáadása a csomóponthoz"
 
-#: /resources/settings.xml
-msgctxt "#32505"
-msgid "Genre icons folder (TMDb)"
-msgstr "Műfaj ikonok mappa (TMDb)"
 
-#: /resources/settings.xml
-msgctxt "#32506"
-msgid "Provider icons folder (TMDb)"
-msgstr "Szolgáltatói ikonok mappa (TMDb)"
 
-#: /resources/settings.xml
-msgctxt "#32507"
-msgid "Genre icon folder (Trakt)"
-msgstr "Műfaj ikon mappa (Trakt)"
 
-#: /resources/settings.xml
-msgctxt "#32508"
-msgid "Recache Kodi Library details when building players"
-msgstr "A lejátszók építésekor újra kell kerestetni a Kodi médiatár részleteit"
 
-#: /resources/settings.xml
-msgctxt "#32509"
-msgid "Use alternative TMDb API url"
-msgstr "Alternatív TMDb API URL használata"
 
 #: /resources/settings.xml
 msgctxt "#32514"
@@ -1859,10 +1659,6 @@ msgctxt "#32521"
 msgid "Rated"
 msgstr "Értékelve"
 
-#: /resources/settings.xml
-msgctxt "#32522"
-msgid "TMDb user options"
-msgstr "TMDb felhasználói beállítások"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32524"
@@ -1894,10 +1690,6 @@ msgctxt "#32531"
 msgid "Method only available for VIP accounts."
 msgstr "A módszer csak VIP fiókok számára érhető el."
 
-#: /resources/settings.xml
-msgctxt "#32534"
-msgid "Trakt sync progress notifications"
-msgstr "Trakt szinkronizálási folyamatértesítések"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32535"
@@ -2061,15 +1853,7 @@ msgctxt "#30067"
 msgid "Zulu (South Africa)"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32001"
-msgid "OMDb API key"
-msgstr "OMDb API-kulcs"
 
-#: /resources/settings.xml
-msgctxt "#32004"
-msgid "MPAA rating prefix"
-msgstr "MPAA besorolási előtag"
 
 #: /resources/settings.xml
 msgctxt "#32005"
@@ -2081,10 +1865,6 @@ msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "Jogosulatlan 401-es hiba"
 
-#: /resources/lib/requestapi.py
-msgctxt "#32010"
-msgid "Authenticate Trakt account..."
-msgstr "Trakt fiók hitelesítése..."
 
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
@@ -2100,33 +1880,3 @@ msgstr "A funkció használatához hitelesítenie kell Trakt-fiókját."
 msgctxt "#32014"
 msgid "Players"
 msgstr "Lejátszó"
-
-#: /resources/settings.xml
-msgctxt "#32016"
-msgid "Update players from URL"
-msgstr "Lejátszók frissítése URL-címről"
-
-#: /resources/settings.xml
-msgctxt "#32017"
-msgid "API Keys"
-msgstr "API kulcsok"
-
-#: /resources/settings.xml
-msgctxt "#32019"
-msgid "Fanart.tv client key"
-msgstr "Fanart.tv klienskulcs"
-
-#: /resources/settings.xml
-msgctxt "#32021"
-msgid "Use fanart.tv for plugin artwork (slower)"
-msgstr "Használd a fanart.tv-t a képekhez (lassabb)"
-
-#: /resources/settings.xml
-msgctxt "#32024"
-msgid "Default player for movies"
-msgstr "Alapértelmezett lejátszó filmekhez"
-
-#: /resources/settings.xml
-msgctxt "#32025"
-msgid "Default player for episodes"
-msgstr "Alapértelmezett lejátszó epizódokhoz"
