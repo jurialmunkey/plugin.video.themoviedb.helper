@@ -99,10 +99,16 @@ class RatingsDict(BaseList):
 
     @cached_property
     def imdb_top250(self):
+        rank = self.get_imdb_top250_rank()
+        return {'top250': rank} if rank else {}
+
+    def get_imdb_top250_rank(self):
+        if not self.imdb_top250_list:  # No provider supplies a Top 250 list
+            return
         try:
-            return {'top250': self.imdb_top250_list.index(try_int(self.tmdb_id)) + 1}  # Must be an int to match
-        except (KeyError, TypeError, IndexError, ValueError):
-            return {}
+            return self.imdb_top250_list.index(try_int(self.tmdb_id)) + 1  # Must be an int to match
+        except ValueError:
+            return
 
     @cached_property
     def omdb_ratings(self):
