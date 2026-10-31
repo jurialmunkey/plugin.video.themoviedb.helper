@@ -10,6 +10,9 @@ when adding or extending functionality.
   `:zap:` for improvements, `:bookmark:` for version bumps, and `:robot:` for
   agent instructions).
 - Follow the shortcode with a space and a concise description of the change.
+- Commit messages are always a single line: the emoji shortcode and the
+  description only. Never add a body, bullet points, extended description,
+  `Co-Authored-By` or other attribution trailers, or any other lines.
 
 ## Agree on the approach before implementation
 
