@@ -113,3 +113,15 @@ class ItemListSyncDataWatchedOn(ItemListSyncDataWatched):
         entry = super().make_item(item)
         entry['last_watched_at'] = item.item['last_watched_at']
         return entry
+
+
+class ItemListSyncDataWatchedOnEpisodes(ItemListSyncDataWatchedOn):
+    """List watched episodes instead of shows to match the history stats."""
+
+    @property
+    def item_types(self):
+        if self.item_type == 'both':
+            return ('movie', 'episode', )
+        if self.item_type == 'show':
+            return ('episode', )
+        return (self.item_type, )

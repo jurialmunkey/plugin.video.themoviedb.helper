@@ -1,17 +1,20 @@
 from jurialmunkey.ftools import cached_property
+from jurialmunkey.parser import boolean
 from tmdbhelper.lib.items.directories.sync.lists_standard import ListHistory, ListProviderSyncProperties
 from tmdbhelper.lib.items.directories.sync.mapper_watchedon import WatchedOnItemMapper
-from tmdbhelper.lib.sync.watchedon import ItemListSyncDataWatchedOn, WatchedOnDateParts
+from tmdbhelper.lib.sync.watchedon import (
+    ItemListSyncDataWatchedOn, ItemListSyncDataWatchedOnEpisodes, WatchedOnDateParts)
 
 
 class ListWatchedOnProperties(ListProviderSyncProperties):
 
     item_mapper_class = WatchedOnItemMapper
+    sync_data_class = ItemListSyncDataWatchedOn
 
     def get_sync_data(self):
         if not self.provider_available:
             return
-        sync_data = ItemListSyncDataWatchedOn(
+        sync_data = self.sync_data_class(
             sort_by=self.sort_by,
             sort_how=self.sort_how,
             item_type=self.item_type,
@@ -42,6 +45,8 @@ class ListWatchedOn(ListHistory):
 
     list_properties_class = ListWatchedOnProperties
 
-    def get_items(self, tmdb_type, day=None, month=None, year=None, **kwargs):
+    def get_items(self, tmdb_type, day=None, month=None, year=None, episodes=False, **kwargs):
         self.list_properties.watched_on = WatchedOnDateParts(day=day, month=month, year=year)
+        if boolean(episodes):
+            self.list_properties.sync_data_class = ItemListSyncDataWatchedOnEpisodes
         return super().get_items(tmdb_type=tmdb_type, **kwargs)
