@@ -1,5 +1,4 @@
 from jurialmunkey.ftools import cached_property
-from tmdbhelper.lib.awards.database import AwardsDatabase
 
 
 class CommonContainerAPIs():
@@ -68,6 +67,7 @@ class CommonRatingsAPIs(CommonContainerAPIs):
 
     @staticmethod
     def get_awards_database():
+        from tmdbhelper.lib.awards.database import AwardsDatabase
         return AwardsDatabase()
 
     @cached_property

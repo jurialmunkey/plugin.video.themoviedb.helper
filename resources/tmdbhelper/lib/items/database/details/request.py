@@ -1,4 +1,3 @@
-from dataclasses import dataclass, replace
 from tmdbhelper.lib.addon.plugin import convert_type, get_language
 
 
@@ -7,34 +6,66 @@ ITEM_TYPES = (
     'episode_group', 'episode_group_season',
 )
 
+CACHE_REFRESH_LEVELS = (None, 'basic', 'never', 'force')
 
-@dataclass(frozen=True)
+
 class DetailsRequest:
-    mediatype: str
-    tmdb_id: object
-    season: object = None
-    episode: object = None
-    tvshow_tmdb_id: object = None
-    cache_refresh: object = None
-    cache_translations: bool = False
-    extendedinfo: bool = False
-    language: str = ''
-    clear_user_art: bool = False
+    """Immutable item detail request.
 
-    def __post_init__(self):
-        if self.mediatype not in ITEM_TYPES:
-            raise ValueError(f'Unsupported item detail type: {self.mediatype}')
-        if self.cache_refresh not in (None, 'basic', 'never', 'force'):
-            raise ValueError(f'Unsupported cache refresh level: {self.cache_refresh}')
-        identifier = self.tmdb_id
-        if self.mediatype not in ('episode_group', 'episode_group_season'):
-            identifier = int(identifier)
-        else:
-            identifier = str(identifier)
-        object.__setattr__(self, 'tmdb_id', identifier)
-        object.__setattr__(self, 'language', self.language or get_language())
-        for name in ('season', 'episode', 'tvshow_tmdb_id'):
-            object.__setattr__(self, name, self.get_optional_int(getattr(self, name)))
+    A plain class rather than a frozen dataclass: importing dataclasses (and inspect)
+    costs every plugin invocation, and only this class needs it.
+    """
+
+    fields = (
+        'mediatype', 'tmdb_id', 'season', 'episode', 'tvshow_tmdb_id', 'cache_refresh',
+        'cache_translations', 'extendedinfo', 'language', 'clear_user_art',
+    )
+
+    def __init__(
+            self, mediatype, tmdb_id, season=None, episode=None, tvshow_tmdb_id=None,
+            cache_refresh=None, cache_translations=False, extendedinfo=False, language='',
+            clear_user_art=False):
+        if mediatype not in ITEM_TYPES:
+            raise ValueError(f'Unsupported item detail type: {mediatype}')
+        if cache_refresh not in CACHE_REFRESH_LEVELS:
+            raise ValueError(f'Unsupported cache refresh level: {cache_refresh}')
+        self.set_field('mediatype', mediatype)
+        self.set_field('tmdb_id', self.get_identifier(mediatype, tmdb_id))
+        self.set_field('season', self.get_optional_int(season))
+        self.set_field('episode', self.get_optional_int(episode))
+        self.set_field('tvshow_tmdb_id', self.get_optional_int(tvshow_tmdb_id))
+        self.set_field('cache_refresh', cache_refresh)
+        self.set_field('cache_translations', cache_translations)
+        self.set_field('extendedinfo', extendedinfo)
+        self.set_field('language', language or get_language())
+        self.set_field('clear_user_art', clear_user_art)
+
+    def set_field(self, name, value):
+        object.__setattr__(self, name, value)
+
+    def __setattr__(self, name, value):
+        raise AttributeError(f'cannot assign to field {name!r}')
+
+    def __delattr__(self, name):
+        raise AttributeError(f'cannot delete field {name!r}')
+
+    def __eq__(self, other):
+        if other.__class__ is not self.__class__:
+            return NotImplemented
+        return self.as_tuple() == other.as_tuple()
+
+    def __hash__(self):
+        return hash(self.as_tuple())
+
+    def __repr__(self):
+        values = ', '.join(f'{name}={getattr(self, name)!r}' for name in self.fields)
+        return f'{self.__class__.__name__}({values})'
+
+    @staticmethod
+    def get_identifier(mediatype, tmdb_id):
+        if mediatype in ('episode_group', 'episode_group_season'):
+            return str(tmdb_id)
+        return int(tmdb_id)
 
     @staticmethod
     def get_optional_int(value):
@@ -57,9 +88,11 @@ class DetailsRequest:
         )
 
     def get_dependency(self, mediatype, **kwargs):
-        return replace(
-            self, mediatype=mediatype, extendedinfo=False,
-            clear_user_art=False, **kwargs)
+        changes = dict(mediatype=mediatype, extendedinfo=False, clear_user_art=False, **kwargs)
+        return self.__class__(**{**self.as_dict(), **changes})
+
+    def as_tuple(self):
+        return tuple(getattr(self, name) for name in self.fields)
 
     def as_dict(self):
         return dict(self.__dict__)

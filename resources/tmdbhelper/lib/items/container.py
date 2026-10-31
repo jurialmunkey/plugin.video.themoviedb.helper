@@ -16,6 +16,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     sort_by_dbid = False
     kodi_db = None
     thumb_override = 0
+    tmdb_id_lookup_params = ('imdb_id', 'tvdb_id', 'query', 'use_multisearch')  # Inputs that can resolve a tmdb_id
 
     def __init__(self, handle, paramstring, **kwargs):
         # plugin:// params configuration
@@ -247,7 +248,15 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if self.params.get('tmdb_id'):
             return
 
+        if not self.has_tmdb_id_lookup_params:
+            self.params['tmdb_id'] = None  # Nothing to look up, so skip loading the query database
+            return
+
         self.params['tmdb_id'] = self.query_database.get_tmdb_id(**self.params)
+
+    @property
+    def has_tmdb_id_lookup_params(self):
+        return any(self.params.get(k) for k in self.tmdb_id_lookup_params)
 
     def get_items(self, **kwargs):
         """ Abstract method for getting items
