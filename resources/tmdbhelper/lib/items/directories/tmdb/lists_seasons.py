@@ -5,6 +5,7 @@ from jurialmunkey.parser import try_int
 
 
 class ListSeasons(ContainerDirectory):
+    kodi_details = True
     hide_unaired = True
 
     def get_special_seasons(self, tmdb_id):
@@ -45,7 +46,6 @@ class ListSeasons(ContainerDirectory):
         } if not get_setting('seasons_specials') else {}
 
         sync = BaseViewFactory('seasons', 'tv', tmdb_id, filters=filters, limit=limit)
-        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('season', 'container')
         try:
             return sync.data + self.get_special_seasons(tmdb_id)
@@ -54,37 +54,41 @@ class ListSeasons(ContainerDirectory):
 
 
 class ListFlatSeasons(ContainerCacheOnlyDirectory):
+    kodi_details = True
+
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('flatseasons', 'tv', tmdb_id, filters=self.filters, limit=limit)
-        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = get_localized(32040)
         return sync.data
 
 
 class ListAnticipatedEpisodes(ContainerCacheOnlyDirectory):
+    kodi_details = True
+
     def get_items(self, tmdb_id, limit=None, **kwargs):
         sync = BaseViewFactory('anticipatedepisodes', 'tv', tmdb_id, filters=self.filters, limit=limit)
-        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = get_localized(32040)
         return sync.data
 
 
 class ListEpisodes(ContainerCacheOnlyDirectory):
+    kodi_details = True
+
     @property
     def hide_unaired(self):
         return get_setting('seasons_anticipated')
 
     def get_items(self, tmdb_id, season, limit=None, **kwargs):
         sync = BaseViewFactory('episodes', 'tv', tmdb_id, season=season, filters=self.filters, limit=limit)
-        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         self.plugin_category = f'{get_localized(20373)} {season}'
         return sync.data
 
 
 class ListSpecifiedEpisodes(ContainerDirectory):
+    kodi_details = True
 
     @staticmethod
     def get_item_details(tmdb_id, season, episode):
@@ -108,7 +112,6 @@ class ListSpecifiedEpisodes(ContainerDirectory):
         }
 
     def get_items(self, tmdb_id, episodes, **kwargs):
-        self.kodi_db = self.get_kodi_database('tv')
         self.container_content = convert_type('episode', 'container')
         return [
             self.get_item_details(tmdb_id, *i.split('x'))

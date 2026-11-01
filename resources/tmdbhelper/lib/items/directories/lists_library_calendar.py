@@ -139,6 +139,7 @@ class ListLibraryCalendarProperties(ListSliceProperties):
 
 
 class ListLibraryCalendar(ListDefault):
+    kodi_details = False
     list_properties_class = ListLibraryCalendarProperties
 
     @cached_property

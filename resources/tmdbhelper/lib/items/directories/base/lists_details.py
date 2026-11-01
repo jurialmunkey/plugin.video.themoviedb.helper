@@ -50,10 +50,10 @@ class ItemDetails:
 
 
 class ListDetails(ContainerDirectory):
+    kodi_details = True
     is_detailed = True
     is_cacheonly = False
 
     def get_items(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
-        self.kodi_db = self.get_kodi_database(tmdb_type)
         self.container_content = convert_type(tmdb_type, output='container', season=season, episode=episode)
         return ItemDetails(self, tmdb_type, tmdb_id, season, episode).itemlist

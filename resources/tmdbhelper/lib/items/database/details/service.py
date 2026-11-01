@@ -10,6 +10,7 @@ from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.plugin import get_version
 from tmdbhelper.lib.files.sqlite_mutex import SQLiteMutex
 from tmdbhelper.lib.items.database.details.coordinator import DetailsCoordinator
+from tmdbhelper.lib.items.database.details.enrichment import KodiDetailsEnrichment
 from tmdbhelper.lib.items.database.details.merge import ConfiguredItemMerger
 from tmdbhelper.lib.items.database.details.protocol import (
     DetailsLookupError, DetailsServiceError, DetailsServiceUnavailable,
@@ -66,16 +67,24 @@ class DetailsRequestHandler(BaseRequestHandler):
             return {'items': []}
         if not isinstance(entries, list) or len(entries) > MAX_REQUEST_ITEMS:
             raise DetailsServiceError('Invalid item detail batch')
-        requests = [DetailsRequest(**entry['request']) for entry in entries]
-        futures = self.server.coordinator.submit(requests)
-        deadline = monotonic() + RESPONSE_TIMEOUT
         results = [
-            self.get_entry_result(entry, self.get_result(future, deadline))
-            for entry, future in zip(entries, futures)]
+            self.get_entry_result(entry, result)
+            for entry, result in zip(entries, self.get_detail_results(entries))]
+        if message.get('kodi_details'):
+            results = self.get_kodi_results(entries, results)
         return {
             'items': [item for item, error in results],
             'errors': {f'{x}': error for x, (item, error) in enumerate(results) if error},
         }
+
+    def get_detail_results(self, entries):
+        """Details for each entry. Entries sent only for Kodi library matching have no request."""
+        requests = [DetailsRequest(**entry['request']) for entry in entries if entry['request'] is not None]
+        futures = iter(self.server.coordinator.submit(requests))
+        deadline = monotonic() + RESPONSE_TIMEOUT
+        return [
+            self.get_result(next(futures), deadline) if entry['request'] is not None else (None, None)
+            for entry in entries]
 
     @staticmethod
     def get_result(future, deadline):
@@ -97,6 +106,21 @@ class DetailsRequestHandler(BaseRequestHandler):
             return (ConfiguredItemMerger(entry['item'], details).merged, None)
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
             return (None, f'Unable to merge item details: {exc}')
+
+    @staticmethod
+    def get_kodi_results(entries, results):
+        """Merge Kodi library details into each item, including items whose details lookup
+        failed. Entries without list item data are details-only requests and are not enriched."""
+        items = [
+            None if entry['item'] is None else (item or entry['item'])
+            for entry, (item, error) in zip(entries, results)]
+        try:
+            enriched = KodiDetailsEnrichment(items).enriched
+        except Exception:
+            # Library matching must not cost the batch its item details.
+            kodi_log(f'Kodi library details failed:\n{traceback.format_exc()}', 1)
+            return results
+        return [(kodi or item, error) for kodi, (item, error) in zip(enriched, results)]
 
 
 class DetailsServer(ThreadingMixIn, TCPServer):

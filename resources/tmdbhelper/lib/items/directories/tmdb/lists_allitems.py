@@ -115,7 +115,6 @@ class ListGenres(ContainerDirectory):
             ItemGenres(name, tmdb_id, tmdb_type, self.genre_artwork).item
             for name, tmdb_id in items.items()
         ]
-        self.kodi_db = None
         self.container_content = 'genres'
         self.plugin_category = get_localized(135)  # convert_type(tmdb_type, 'plural')
         return items
@@ -147,7 +146,6 @@ class ListStudios(ContainerDirectory):
         items = self.query_database.get_studios(limit=int(limit), page=int(page))
         items = [ItemStudios(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
-        self.kodi_db = None
         self.container_content = 'studios'
         return items
 
@@ -177,7 +175,6 @@ class ListNetworks(ContainerDirectory):
         items = self.query_database.get_networks(limit=int(limit), page=int(page))
         items = [ItemNetworks(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
-        self.kodi_db = None
         self.container_content = 'studios'
         return items
 
@@ -208,7 +205,6 @@ class ListKeywords(ContainerDirectory):
         items = self.query_database.get_keywords(limit=int(limit), page=int(page))
         items = [ItemKeywords(**item).item for item in items]
         items.append({'next_page': int(page) + 1})
-        self.kodi_db = None
         self.container_content = 'tags'
         return items
 
@@ -238,7 +234,6 @@ class ListCollections(ContainerDirectory):
         items = self.query_database.get_collections(limit=int(limit), page=int(page))
         items = [ItemCollections(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
-        self.kodi_db = None
         self.container_content = 'sets'
         return items
 
@@ -279,7 +274,6 @@ class ListMovies(ContainerDirectory):
         items = self.query_database.get_movies(limit=int(limit), page=int(page))
         items = [ItemMovies(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
-        self.kodi_db = None
         self.container_content = 'movies'
         return items
 
@@ -320,7 +314,6 @@ class ListTvshows(ContainerDirectory):
         items = self.query_database.get_tvshows(limit=int(limit), page=int(page))
         items = [ItemTvshows(**i).item for i in items]
         items.append({'next_page': int(page) + 1})
-        self.kodi_db = None
         self.container_content = 'tvshows'
         return items
 
@@ -382,7 +375,6 @@ class ListProviders(ContainerDirectory):
     def get_items(self, tmdb_type, **kwargs):
         items = self.query_database.get_watch_providers(tmdb_type, self.tmdb_api.iso_country, allowlist_only=True)
         items = [ItemProviders(**i, provider_artwork=self.provider_artwork).item for i in items]
-        self.kodi_db = None
         self.container_content = ''
         self.plugin_category = 'JustWatch'
         return items

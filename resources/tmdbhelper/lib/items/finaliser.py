@@ -17,22 +17,11 @@ class ListFinaliser:
             for item in self.list_items if item
         ]
 
-    def prepare_kodi_details(self):
-        try:
-            prepare_listitems = self.container.kodi_db.prepare_listitems
-        except AttributeError:  # Some directories use a library index without detail enrichment.
-            return
-        prepare_listitems([
-            item.list_item for item in self.finalisers
-            if item and item.is_visible
-        ])
-
     @cached_property
     def items(self):
         return self.get_items()
 
     def get_items(self):
-        self.prepare_kodi_details()
         return [item.item if item else None for item in self.finalisers]
 
 
@@ -77,31 +66,14 @@ class ItemFinaliserMedia(ItemFinaliserBasic):
 
     @cached_property
     def is_excluded(self):
-        self.has_kodi_details   # Must add kodi_details first for filtering
+        # Kodi library details are merged in by the item detail service, so filters can use them
         return is_excluded(self.list_item, is_listitem=True, **self.container.filters)
-
-    @cached_property
-    def has_kodi_details(self):
-        return self.set_kodi_details(self.get_kodi_details())
-
-    def get_kodi_details(self):
-        try:
-            return self.container.kodi_db.get_kodi_details(self.list_item)
-        except AttributeError:
-            return
-
-    def set_kodi_details(self, kodi_details):
-        if not kodi_details:
-            return
-        self.list_item.set_details(details=kodi_details, reverse=self.container.kodi_db_preferred)
-        return kodi_details
 
     def get_item(self):
         if not self.is_visible:
             return
 
         self.has_unaired_formatting
-        self.has_kodi_details
 
         if self.is_excluded:
             return

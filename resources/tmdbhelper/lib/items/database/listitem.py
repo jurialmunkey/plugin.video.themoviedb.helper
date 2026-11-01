@@ -46,6 +46,11 @@ class ListItemConfig:
     def listitem(self):
         return ListItem(**self.item)
 
+    @property
+    def sent_request(self):
+        """The details request, or None when the item is sent only for Kodi library matching."""
+        return self.request if self.is_cacheable else None
+
     def get_configured_listitem(self, merged):
         """Apply the details that the item detail service merged into this item's data."""
         if self.next_page and not self.parent.pagination:
@@ -110,20 +115,25 @@ class ListItemBatch:
         self.items = [ListItemConfig(parent, item) for item in items]
 
     @cached_property
-    def requested_items(self):
-        return self.get_requested_items()
+    def sent_items(self):
+        return self.get_sent_items()
 
-    def get_requested_items(self):
-        return [item for item in self.items if item.is_cacheable]
+    def get_sent_items(self):
+        return [item for item in self.items if item.is_cacheable or self.is_kodi_item(item)]
+
+    def is_kodi_item(self, item):
+        """Items without cached details are still matched to the Kodi library when permitted."""
+        return self.parent.kodi_details and not item.next_page
 
     def get_configured_items(self):
         with TimerList(
                 self.parent.timer_lists, ' - service',
                 log_threshold=0.001, logging=self.parent.log_timers):
             data = self.parent.client.get_items(
-                [item.request for item in self.requested_items],
-                [item.listitem.get_merge_data() for item in self.requested_items])
-        details = dict(zip(self.requested_items, data))
+                [item.sent_request for item in self.sent_items],
+                [item.listitem.get_merge_data() for item in self.sent_items],
+                kodi_details=self.parent.kodi_details)
+        details = dict(zip(self.sent_items, data))
         return [item.get_configured_listitem(details.get(item)) for item in self.items]
 
 
@@ -132,6 +142,7 @@ class ListItemDetails:
     cache_refresh = None
     cache_translations = False
     extendedinfo = False
+    kodi_details = False  # Permit Kodi library details; the service applies the user's setting
     parent_params = {}
     timer_lists = {}
     log_timers = False

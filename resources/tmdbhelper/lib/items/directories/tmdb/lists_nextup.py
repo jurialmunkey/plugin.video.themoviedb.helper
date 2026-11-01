@@ -6,6 +6,8 @@ from tmdbhelper.lib.items.directories.tmdb.lists_seasons import ListFlatSeasons
 
 
 class ListNextRecommendation(ContainerDirectory):
+    kodi_details = True
+
     def get_items(self, tmdb_type, tmdb_id, season=None, episode=None, **kwargs):
         if tmdb_type not in ('movie', 'tv'):
             return
@@ -66,6 +68,5 @@ class ListNextRecommendation(ContainerDirectory):
         if not next_item:
             return
 
-        self.kodi_db = self.get_kodi_database(tmdb_type)
         self.container_content = 'episodes' if tmdb_type == 'tv' else 'movies'
         return [next_item]

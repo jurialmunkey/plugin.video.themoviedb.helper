@@ -90,6 +90,7 @@ class ListSyncAiringNext(ListDefault):
 
 
 class ListLibraryAiringNext(ListSyncAiringNext):
+    kodi_details = False
     list_properties_class = ListLibraryAiringNextProperties
 
     @cached_property

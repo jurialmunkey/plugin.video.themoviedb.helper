@@ -14,7 +14,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     container_update = ''  # Add path to call Containr.Update({}) at end of directory
     container_refresh = False  # True call Container.Refresh at end of directory
     sort_by_dbid = False
-    kodi_db = None
+    kodi_details = False  # Permit Kodi library details; the item detail service applies the user's setting
     thumb_override = 0
     tmdb_id_lookup_params = ('imdb_id', 'tvdb_id', 'query', 'use_multisearch')  # Inputs that can resolve a tmdb_id
 
@@ -102,19 +102,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         if self.is_widget and not get_setting('widgets_nextpage'):
             return False
         return True
-
-    @cached_property
-    def kodi_db_preferred(self):
-        if get_setting('use_kodi_local_db', 'int') == 2:
-            return True  # Overwrite TMDb data with Kodi DB data
-        return False  # Compliment missing TMDb data with Kodi Db data
-
-    def get_kodi_database(self, tmdb_type):
-        if get_setting('use_kodi_local_db', 'int') == 0:
-            return
-        with TimerList(self.timer_lists, 'get_kodi', log_threshold=0.001, logging=self.log_timers):
-            from tmdbhelper.lib.items.kodi import KodiDb
-            return KodiDb(tmdb_type)
 
     @cached_property
     def format_unaired_labels(self):
@@ -205,13 +192,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             self.container_content = 'seasons'
         elif lengths.index(max(lengths)) == 4:
             self.container_content = 'episodes'
-
-        if lengths[0] and (lengths[1] or lengths[3] or lengths[4]):
-            self.kodi_db = self.get_kodi_database('both')
-        elif lengths[0]:
-            self.kodi_db = self.get_kodi_database('movie')
-        elif (lengths[1] or lengths[3] or lengths[4]):
-            self.kodi_db = self.get_kodi_database('tv')
 
     def set_params_to_container(self):
         params = {f'param.{k}': f'{v}' for k, v in self.params.items() if k and v}
@@ -328,6 +308,7 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.extendedinfo = self.is_detailed
         lidc.timer_lists = self.timer_lists
         lidc.log_timers = self.log_timers
+        lidc.kodi_details = self.kodi_details
         return lidc
 
     def build_ratings_item(self, li):
