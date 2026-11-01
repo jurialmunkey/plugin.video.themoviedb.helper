@@ -253,7 +253,9 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         if not self.scrobbler:
             return
         self.scrobbler_update()
-        self.scrobbler.start(self.tmdb_type, self.tmdb_id)
+        self.scrobbler.start(
+            self.tmdb_type, self.tmdb_id,
+            paused=get_condvisibility("Player.Paused"))
 
     def scrobbler_pause(self):
         if not self.scrobbler:

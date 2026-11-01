@@ -10,6 +10,7 @@ class PlayerScrobbler():
         self.provider = provider
         self.syncdata = syncdata
         self.start_time = 0
+        self.frozen_time = None
         self.total_time = total_time
         self.tvdb_id = self.playerstring.get('tvdb_id')
         self.imdb_id = self.playerstring.get('imdb_id')
@@ -67,11 +68,24 @@ class PlayerScrobbler():
 
     @property
     def current_time(self):
+        if self.frozen_time is not None:
+            return self.frozen_time
         return set_timestamp(-self.start_time)
 
     @current_time.setter
     def current_time(self, value):
         self.start_time = set_timestamp(-value)
+        if self.frozen_time is not None:
+            self.frozen_time = value
+
+    @is_scrobbling
+    def freeze_time(self):
+        self.frozen_time = self.current_time
+
+    @is_scrobbling
+    def resume_time(self):
+        self.start_time = set_timestamp(-self.current_time)
+        self.frozen_time = None
 
     @property
     def progress(self):
@@ -97,22 +111,30 @@ class PlayerScrobbler():
         # kodi_log(f'SCROBBLER: [UPDATE] {self.content_id} -- {self.progress:.2f}%', 2)
 
     @is_scrobbling
-    def start(self, tmdb_type, tmdb_id):
+    def start(self, tmdb_type, tmdb_id, paused=False):
+        if not self.is_match(tmdb_type, tmdb_id):
+            return
+        if paused:
+            self.freeze_time()
+        else:
+            self.resume_time()
         if self.started or self.stopped:
             return self.sync(tmdb_type, tmdb_id)
-        if not self.is_match(tmdb_type, tmdb_id):
-            return self.stop(tmdb_type, tmdb_id)
         self.scrobble('start')
         self.started = True
 
     @is_scrobbling
     def pause(self, tmdb_type, tmdb_id):
+        if not self.is_match(tmdb_type, tmdb_id):
+            return
+        self.freeze_time()
         return self.sync(tmdb_type, tmdb_id)  # Pauses still check the completion threshold.
 
     @is_scrobbling
     def stop(self, tmdb_type, tmdb_id):
         if not self.started or self.stopped:
             return
+        self.freeze_time()
         kodi_log(f'SCROBBLER: [Stop] {self.content_id} -- {self.progress:.2f}%', 2)
         self.scrobble('stop') if not self.syncing else None
         self.set_tmdb_ratings()
