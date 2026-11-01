@@ -12,7 +12,6 @@ class RatingsDict(BaseList):
     cached_data_conditions = 'id=? AND expiry>=?'
 
     rating_attribs = (
-        'omdb_ratings',
         'provider_ratings',
         'imdb_top250',
     )
@@ -108,15 +107,6 @@ class RatingsDict(BaseList):
             return self.imdb_top250_list.index(try_int(self.tmdb_id)) + 1  # Must be an int to match
         except ValueError:
             return
-
-    @cached_property
-    def omdb_ratings(self):
-        if not self.common_apis.omdb_api or not self.imdb_id:
-            return {}
-        try:
-            return self.common_apis.omdb_api.get_ratings_awards(imdb_id=self.imdb_id) or {}
-        except (KeyError, TypeError, IndexError, ValueError):
-            return {}
 
     @cached_property
     def online_data_mapped(self):

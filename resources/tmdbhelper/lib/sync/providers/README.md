@@ -16,6 +16,14 @@ It is always available without addon discovery, installation, or account
 authorization. Its ratings contribution can be disabled and reordered separately.
 The external-addon catalogue and loader do not install or import this provider.
 
+OMDb is also internal, in `tmdbhelper.lib.sync.providers.omdb`, and uses the same
+validation and registration pipeline. Its provider-owned authorization check
+requires the existing `omdb_apikey` setting. With a key configured, OMDb appears
+in Ratings Providers and Priority and defaults to enabled unless previously
+disabled. Without a key it is not registered; its saved priority and disabled
+state are retained. Internal-provider availability is refreshed per registry.
+OMDb requires no separate addon installation or module enablement.
+
 Provider addons follow this layout:
 
 ```text
@@ -299,7 +307,7 @@ External provider addons are maintained separately from the plugin. Install each
 external provider
 in its own `script.module.tmdbhelper.sync.<service>` folder alongside
 `plugin.video.themoviedb.helper` in Kodi's addons directory. The plugin contains
-the shared interfaces, registry, and internal TMDb provider; external provider
+the shared interfaces, registry, and internal TMDb/OMDb providers; external provider
 implementations and artwork belong in the standalone modules.
 
 Install the provider-enabled TMDbHelper build together with matching provider
@@ -367,9 +375,11 @@ In Sync settings, the Ratings group contains Providers and Priority. Providers
 uses a multiselect to enable/disable installed suppliers. Priority uses select
 dialogs to choose a provider and move it up/down. Save applies the order;
 Cancel leaves it unchanged. Each control preserves the other's configuration.
-Enabled Kodi modules with the ratings capability and the internal TMDb provider
-appear independently of sync-provider selections. TMDb supplies movie and TV-show
-ratings; season and episode suppliers are unchanged.
+Enabled Kodi modules with the ratings capability and available internal providers
+appear independently of sync-provider selections. TMDb and OMDb supply movie and
+TV-show ratings; season and episode suppliers are unchanged. OMDb uses the existing
+API client and source mapper, preserving its ratings and awards fields. Its
+supplier requires an IMDb ID and a configured API key before requesting data.
 New suppliers default to enabled and follow saved entries in alphabetical order;
 unavailable providers' saved order and disabled state are retained.
 
@@ -393,10 +403,11 @@ the configured order, with the first provider winning overlapping non-missing
 fields. `None` and empty strings are missing; zero ratings and vote counts are
 valid. Lower providers fill missing fields.
 
-Provider results occupy the former MDbList position in `rating_attribs`: after
-OMDb and before IMDb Top 250. TMDb requests and vote mapping belong to its internal
-supplier, with no direct TMDb fallback in the ratings dictionaries. Configured
-provider priority determines overlapping TMDb fields just like other ratings.
+Provider results precede IMDb Top 250 in `rating_attribs`. TMDb and OMDb retrieval
+belong to their internal suppliers, with no direct fallback in the ratings
+dictionaries. Configured provider priority determines overlapping fields across
+all suppliers, including OMDb ratings and awards. Lower-priority providers fill
+missing fields.
 The IMDb Top 250 output format remains unchanged. MDbList's module supplies all
 four media types using its module-owned API client's rating methods; no MDbList-specific
 branch remains in the ratings dictionaries.
