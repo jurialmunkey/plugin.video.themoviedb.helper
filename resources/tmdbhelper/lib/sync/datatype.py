@@ -146,10 +146,11 @@ class DataType(SyncDataParentProperties):
     @mutexlock
     def sync(self, forced=False):
         if not forced and not self.is_expired:
-            return
+            return True
         if not self.sync_data():
-            return
+            return False
         self.store_last_activity()
+        return True
 
 
 class DataTypeEpisodesInShows:

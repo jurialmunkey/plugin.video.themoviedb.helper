@@ -163,6 +163,8 @@ class SyncAllNextEpisodesMetaItem:
 
     @cached_property
     def data(self):
+        if self.sync.response is None:
+            return
         data = [self.get_item(item_id) for item_id in self.sync.all_next_episodes]
         self.update_dialog_progress()
         return data
@@ -198,14 +200,21 @@ class SyncAllNextEpisodesMeta:
         return self.get_item_queue()
 
     def get_item_queue(self):
+        if not self.sd.sync_succeeded:
+            return
         self.main.dialog_progress_bg.max_value = len(self.sd.items) + 20
         from tmdbhelper.lib.addon.thread import ParallelThread
         with ParallelThread(self.sd.items, self.get_items) as pt:
             item_queue = pt.queue
-        return item_queue
+        return item_queue if all(items is not None for items in item_queue) else None
 
     @cached_property
     def items(self):
+        return self.get_meta_items()
+
+    def get_meta_items(self):
+        if self.item_queue is None:
+            return
         return [i for items in self.item_queue for i in items if i]
 
     @cached_property
@@ -220,6 +229,8 @@ class SyncNextEpisodesMetaItem(SyncAllNextEpisodesMetaItem):
 
     @cached_property
     def data(self):
+        if self.sync.response is None:
+            return
         return self.sync.next_episode_id_dictionary
 
     @property
@@ -230,6 +241,7 @@ class SyncNextEpisodesMetaItem(SyncAllNextEpisodesMetaItem):
 class SyncNextEpisodesMeta(SyncAllNextEpisodesMeta):
     meta_item_getter = SyncNextEpisodesMetaItem
 
-    @cached_property
-    def items(self):
+    def get_meta_items(self):
+        if self.item_queue is None:
+            return
         return [i for i in self.item_queue if i]

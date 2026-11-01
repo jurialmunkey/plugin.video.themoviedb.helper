@@ -87,8 +87,15 @@ class SyncDataGetterAll:
     def items(self):
         return self.get_items()
 
+    @cached_property
+    def sync_succeeded(self):
+        return self.get_sync_succeeded()
+
+    def get_sync_succeeded(self):
+        return self.instance_syncdata.sync(self.item_type, self.keys)
+
     def get_items(self):
-        self.instance_syncdata.sync(self.item_type, self.keys)
+        self.sync_succeeded
         return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
 
 
@@ -318,6 +325,7 @@ class SyncDataGetterEmpty:
     items = ()
     keys = ()
     additional_keys = ()
+    sync_succeeded = False
 
     def __init__(self, instance_syncdata):
         self.instance_syncdata = instance_syncdata
@@ -535,14 +543,23 @@ class SyncData(SyncDataGetters):
         return data[0] if data else None
 
     def sync(self, item_type, keys, forced=False):
+        """Refresh every requested type, returning whether its data is current."""
         from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES
         sync_types = {self.routes[key] for key in keys if self.routes.get(key)}
+        succeeded = True
         for sync_type in sync_types:
             sync_item = self.create_sync(sync_type, item_type)
             if sync_item is not None:
-                sync_item.sync(forced=forced)
-            elif sync_type not in SERVICE_SYNC_FEATURES and sync_type not in self.disabled_sync_types:
+                if not sync_item.sync(forced=forced):
+                    succeeded = False
+                continue
+            if sync_type not in SERVICE_SYNC_FEATURES and sync_type not in self.disabled_sync_types:
                 self.clear_disabled_sync_type(sync_type)
+            # An authorized provider's unsupported fields are intentionally empty.
+            # Missing or unauthorized providers cannot supply fresh prerequisites.
+            if self.get_sync_provider(sync_type) is None:
+                succeeded = False
+        return succeeded
 
     def clear_disabled_sync_type(self, sync_type):
         from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES

@@ -160,6 +160,19 @@ Providers declare:
 `(syncdata, provider)`. Forward that provider into nested factories and snapshots;
 do not construct another `Provider()` inside sync implementations or getters.
 
+`DataType.sync()` returns true when its data is current or a refresh succeeds;
+failed or throttled refreshes do not report success. `SyncData.sync()` refreshes
+every requested sync type and returns whether all prerequisites are current.
+Unsupported fields of an authorized provider are intentionally empty; a missing
+or unauthorized provider cannot supply fresh prerequisites.
+`SyncDataGetterAll.sync_succeeded` caches this outcome for one configured getter.
+Ordinary `.items` reads retain access to cached data after a failed refresh.
+Provider `shows_in_progress` wrappers expose their parent getter's outcome and
+check any required filter requests, such as Trakt's optional calendar lookup.
+Derived next-episode calculations require successful prerequisites and complete
+per-show responses before replacing cached results. They return `None` on
+failure and an empty collection only for a successful empty result.
+
 The action dispatcher supplies `syncdata`, `sync_provider`, and `sync_feature`
 before accessing action properties. Authorization, reads, writes, and invalidation
 within the operation therefore reuse the same provider and its cached API client.
