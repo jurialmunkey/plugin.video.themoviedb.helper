@@ -7,6 +7,8 @@ from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
 
 class SyncProviderDefaultSelection(SyncProviderFeatureSelection):
     def select(self):
+        if not self.capabilities:
+            return
         selected = Dialog().yesnocustom(
             get_localized(32550), get_localized(32560).format(self.provider.display_name),
             yeslabel=get_localized(32561), nolabel=get_localized(222), customlabel=get_localized(32562),
@@ -18,6 +20,8 @@ class SyncProviderDefaultSelection(SyncProviderFeatureSelection):
 
     def set_default(self):
         capabilities = self.capabilities
+        if not capabilities:
+            return
         # Kodi queues writes while settings is open, so set each final value only once.
         for feature in FEATURE_LABELS:
             provider_id = self.provider.provider_id if feature in capabilities else ''

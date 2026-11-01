@@ -3587,3 +3587,38 @@ msgstr ""
 msgctxt "#32739"
 msgid "Install or enable the TVDb module and open its API settings."
 msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32740"
+msgid "Provider modules"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32741"
+msgid "{0} ({1})"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager_features.py
+msgctxt "#32742"
+msgid "Set {0} as the default sync provider? This replaces the current sync selections and clears features it does not support. Ratings and scrobbling are configured separately."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager_features.py
+msgctxt "#32743"
+msgid "Enable {0} as a ratings provider?"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager_features.py
+msgctxt "#32744"
+msgid "Enable scrobbling with {0}?"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32745"
+msgid "Are you sure you want to disable {0}? The module and its features will be unavailable."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32746"
+msgid "Disabling this module will remove it from:\n{0}"
+msgstr ""

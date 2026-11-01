@@ -261,7 +261,10 @@ and prompt state after acquiring it. A prompt-generation property prevents
 already-queued widget requests from repeating the same setup attempt.
 
 `SyncProviderOnboarding(addon_id).configure()` installs or enables a catalogue
-provider and offers `SyncProviderDefaultSelection(provider)`. The dialog offers
+provider and offers `SyncProviderDefaultSelection(provider)` when it supports
+selectable sync features. Providers without these features, such as TVDb and
+Gemini, skip configuration and leave existing sync selections unchanged.
+The dialog offers
 Default, Cancel, and Custom, with Default focused. Default replaces every feature's
 provider selection, including `never`, with the selected provider for supported
 features and the empty, unconfigured state for unsupported features. Cancel
@@ -282,7 +285,8 @@ The **Install sync provider** setting below **Clear sync** opens the complete
 trusted catalogue, including installed and enabled providers. Missing providers
 have an `(install)` suffix; disabled providers have an `(enable)` suffix. Selecting
 one runs the same onboarding flow: install/enable as needed, then choose Default,
-Cancel, or Custom. The Custom multiselect shows its supported features.
+Cancel, or Custom when sync features are supported. The Custom multiselect shows
+its supported features.
 Existing assignments to that provider are
 preselected. Unchecking one resets its setting to the empty, unconfigured state;
 unchecked features assigned to other providers retain their settings.
@@ -540,3 +544,23 @@ the destination before clearing the legacy value and preserves existing module
 credentials. TVDb retains its bundled key and supports an optional personal key.
 The local awards database and its metadata consumers remain in core; browsing
 does not change item-details database ownership or the finalisation pipeline.
+
+## Provider module manager
+
+Run `RunScript(plugin.video.themoviedb.helper,manage_provider_modules)` to manage
+installed provider modules, including disabled third-party modules, and install
+missing modules from the trusted catalogue. Selecting an entry installs, enables,
+or disables it; the dialog refreshes after each action. The internal TMDb provider
+is not an external module and is not listed.
+
+Installing or enabling a module offers to make it the default sync provider.
+Accepting replaces watched, watchlist, collection, and stats selections, clearing
+unsupported selections. Ratings and scrobbling have separate prompts when
+supported. Ratings priority and other scrobbling providers are preserved.
+Providers offering only browsing do not receive these feature prompts.
+
+Disabling requires OK/Cancel confirmation showing the module's active sync,
+ratings, and scrobbling assignments. After Kodi confirms the module is disabled,
+those assignments are removed through the existing settings interfaces. Cancelling
+leaves the module and its configuration unchanged. Ratings cache contents retain
+their normal expiry behaviour, as with the ratings-provider selector.

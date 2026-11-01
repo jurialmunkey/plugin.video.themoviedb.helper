@@ -112,6 +112,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'select_sync_provider')(**kwargs),
         'install_sync_provider':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'install_sync_provider')(**kwargs),
+        'manage_provider_modules':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'manage_provider_modules')(**kwargs),
         'open_sync_provider_settings':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync_provider', 'open_sync_provider_settings')(**kwargs),
         'provider_allowlist':

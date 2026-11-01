@@ -127,6 +127,11 @@ def install_sync_provider(return_settings=False, **kwargs):
     selection.select()
 
 
+def manage_provider_modules(**kwargs):
+    from tmdbhelper.lib.script.sync.provider_manager import SyncProviderManager
+    SyncProviderManager().select()
+
+
 def open_sync_provider_settings(addon_id, **kwargs):
     from xbmcaddon import Addon
     provider = SyncProviderInstall(addon_id).install()
