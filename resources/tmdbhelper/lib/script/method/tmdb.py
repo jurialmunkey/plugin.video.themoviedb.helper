@@ -8,8 +8,11 @@ from tmdbhelper.lib.addon.plugin import get_localized
 @is_in_kwargs({'tmdb_type': ['movie', 'tv']})
 @get_tmdb_id
 def sync_tmdb(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync_type=None, **kwargs):
-    """ Open sync trakt menu for item """
-    from tmdbhelper.lib.script.sync.tmdb.menu import sync_item
+    """Compatibility entry point for TMDb actions in Sync Options."""
+    from tmdbhelper.lib.script.sync.menu_default import sync_item
+    sync_type = {
+        'favorite': 'tmdbfavorites', 'userlist': 'tmdbuserlist', 'rating': 'tmdbrating',
+    }.get(sync_type, sync_type)
     sync_item(tmdb_type=tmdb_type, tmdb_id=tmdb_id, season=season, episode=episode, sync_type=sync_type)
 
 

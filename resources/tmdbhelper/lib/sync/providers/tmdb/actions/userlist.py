@@ -1,7 +1,7 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.addon.plugin import get_localized
-from tmdbhelper.lib.script.sync.tmdb.item import ItemSync as TMDbItemSync
+from tmdbhelper.lib.sync.providers.tmdb.actions.item import ItemAction
 
 
 class ItemUserListChoice:
@@ -184,7 +184,7 @@ class ItemUserListChoiceYours(ItemUserListChoice):
     @cached_property
     def params(self):
         return {
-            'info': 'tmdb_v4_list',
+            'info': 'tmdb_list',
             'tmdb_type': 'both',
             'list_name': self.name,
             'list_id': self.list_id,
@@ -200,7 +200,7 @@ class ItemUserListChoiceYours(ItemUserListChoice):
         }
 
 
-class ItemUserList(TMDbItemSync):
+class ItemUserList(ItemAction):
     localized_name_add = 32298
     localized_name_rem = 32355
 
@@ -210,27 +210,23 @@ class ItemUserList(TMDbItemSync):
         return TMDbImagePath()
 
     @cached_property
-    def user_lists_response(self):
-        if not self.tmdb_user_api.authenticator.authorised_access:
-            return
-        path = self.tmdb_user_api.format_authorised_path('account/{account_id}/lists')
-        return self.tmdb_user_api.get_authorised_response_json(path)
-
-    @cached_property
     def user_lists_results(self):
-        try:
-            return self.user_lists_response['results'] or []
-        except (KeyError, TypeError, AttributeError):
-            return []
+        return self.get_user_lists_results()
+
+    def get_user_lists_results(self):
+        return self.sync_provider.user_lists.get_owned_lists()
 
     @cached_property
     def user_lists(self):
+        return self.get_user_lists()
+
+    def get_user_lists(self):
+        if self.user_lists_results is None:
+            return []
         user_lists = [
             ItemUserListChoiceYours(i, self)
             for i in self.user_lists_results if i
         ]
-        if not user_lists:
-            return []
         user_lists.append(ItemUserListChoiceNew(self))
         return user_lists
 

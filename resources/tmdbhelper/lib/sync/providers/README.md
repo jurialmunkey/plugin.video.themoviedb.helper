@@ -16,6 +16,51 @@ It is always available without addon discovery, installation, or account
 authorization. Its ratings contribution can be disabled and reordered separately.
 The external-addon catalogue and loader do not install or import this provider.
 
+With stored TMDb login credentials, the same internal provider also declares
+`SyncWatchlist` and the `watchlist` action. Without credentials it declares neither;
+provider discovery never starts interactive authentication. Select TMDb as the
+watchlist source through the existing sync selector. Reads and writes share the
+provider's cached `TMDbUser` client, independently of its public ratings client.
+Watchlists refresh every ten minutes because TMDb has no last-activities endpoint.
+Only complete paginated snapshots replace cached membership; failed requests
+preserve it, while successful empty responses clear it. Movie and show snapshots
+remain separate; seasons and episodes have no TMDb watchlist entries.
+
+Provider-owned mapping stores source order in `watchlist_rank` and uses local
+first-seen UTC dates for `watchlist_listed_at`, since TMDb does not return added-at
+timestamps. Retained entries keep their first-seen dates; observed removals clear
+them. These dates do not represent the original dates added on TMDb.
+Saved `tmdb_v4_watchlist` directories resolve to `sync_watchlist`, and explicit
+`sync_tmdb,sync_type=watchlist` calls delegate to the selected sync watchlist action.
+Successful watchlist actions use the standard provider invalidator before refreshing lists.
+
+TMDb registers its account browsing routes through `list_routes`. Its root folder
+is contributed through `directory_item_class` only when logged in, replacing the
+old Users folder. Recommendations, Favourites, Rated, Your Lists, and custom-list
+contents use provider-owned containers, properties, and mappers with the existing
+list finalisation pipeline. Account reads check stored credentials before using
+the user client and do not prompt for login. Routes remain registered when logged
+out so saved links safely return empty lists. The `dir_tmdb_v4` and remaining
+`tmdb_v4_*` account routes redirect to the matching `tmdb_*` routes.
+
+The provider's `TMDbUserLists` client owns pagination and is shared by watchlist
+sync, account browsing, library monitoring, and custom-list action enumeration.
+Monitoring is independent of all sync selections. The supplier uses
+`__api_tmdb__` with `watchlist/movie`, `watchlist/tv`, the corresponding favourites,
+rated and recommendation references, and `list/<id>` for owned custom lists.
+Its movie/show records include TMDb IDs and a null IMDb ID for the existing library
+builder. It retrieves complete lists before returning any contents; failed pages
+return no snapshot. No library writes or setup prompts occur in the supplier.
+
+TMDb registers `tmdbuserlist`, `tmdbrating`, and `tmdbfavorites` as service actions
+while logged in, independently of the watchlist selection. They appear directly
+in Sync Options with the TMDb service name and share the provider's user client.
+The old TMDb User Options submenu and its setting are removed. `sync_tmdb` remains
+a compatibility alias: `userlist`, `rating`, and `favorite` select the corresponding
+TMDb service action, while no selector opens Sync Options. Playback rating prompts
+explicitly select `tmdbrating`. The existing personal TMDb rating cache and request
+payloads remain in use; no shared Trakt sync columns or database schema are changed.
+
 OMDb is also internal, in `tmdbhelper.lib.sync.providers.omdb`, and uses the same
 validation and registration pipeline. Its provider-owned authorization check
 requires the existing `omdb_apikey` setting. With a key configured, OMDb appears

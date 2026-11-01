@@ -246,24 +246,6 @@ ROUTE_NOID = {
     'all_tvshows': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_allitems',
         'import_attr': 'ListTvshows'}},
-    'tmdb_v4_recommendations': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListRecommendations'}},
-    'tmdb_v4_favorites': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListFavourites'}},
-    'tmdb_v4_watchlist': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListWatchlist'}},
-    'tmdb_v4_rated': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListRated'}},
-    'tmdb_v4_list': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListList'}},
-    'tmdb_v4_lists': {'route': {
-        'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_authenticated',
-        'import_attr': 'ListLists'}},
     'random_genres': {'route': {
         'module_name': 'tmdbhelper.lib.items.directories.tmdb.lists_random',
         'import_attr': 'ListRandomGenre'}},
@@ -385,8 +367,15 @@ ROUTE_TMDBID = {
 }
 
 
-# Preserve saved widgets and favourites using the original Trakt entry points.
+# Preserve saved widgets and favourites using the original service entry points.
 ROUTE_NOID.update({
+    'dir_tmdb_v4': {'redirect': 'tmdb_directory'},
+    'tmdb_v4_recommendations': {'redirect': 'tmdb_recommendations'},
+    'tmdb_v4_favorites': {'redirect': 'tmdb_favorites'},
+    'tmdb_v4_rated': {'redirect': 'tmdb_rated'},
+    'tmdb_v4_lists': {'redirect': 'tmdb_lists'},
+    'tmdb_v4_list': {'redirect': 'tmdb_list'},
+    'tmdb_v4_watchlist': ROUTE_NOID['sync_watchlist'],
     'trakt_towatch': ROUTE_NOID['sync_towatch'],
     'trakt_becauseyouwatched': ROUTE_NOID['sync_becauseyouwatched'],
     'trakt_becausemostwatched': ROUTE_NOID['sync_becausemostwatched'],

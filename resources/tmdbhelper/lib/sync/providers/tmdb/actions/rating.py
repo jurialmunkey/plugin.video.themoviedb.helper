@@ -1,10 +1,10 @@
-from tmdbhelper.lib.script.sync.tmdb.item import ItemSync
+from tmdbhelper.lib.sync.providers.tmdb.actions.item import ItemAction
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
-class ItemRating(ItemSync):
+class ItemRating(ItemAction):
     localized_name_add = 32485
     localized_name_rem = 32530
     tmdb_list_type = 'rating'

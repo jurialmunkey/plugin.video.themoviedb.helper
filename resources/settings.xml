@@ -132,11 +132,6 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="contextmenu_sync_tmdb" type="boolean" label="32522" help="32615">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
                 <setting id="contextmenu_refresh_details" type="boolean" label="32233" help="32616">
                     <level>0</level>
                     <default>true</default>

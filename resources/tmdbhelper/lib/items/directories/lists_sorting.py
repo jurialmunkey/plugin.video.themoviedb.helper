@@ -5,6 +5,7 @@ from tmdbhelper.lib.api.mapping import get_empty_item
 
 def get_sort_methods(info=None):
     info = {
+        'tmdb_v4_watchlist': 'sync_watchlist',
         'trakt_collection': 'sync_collection',
         'trakt_inprogress': 'sync_inprogress',
         'trakt_watchlist': 'sync_watchlist',

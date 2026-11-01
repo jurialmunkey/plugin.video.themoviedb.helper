@@ -3,8 +3,9 @@ from tmdbhelper.lib.addon.dialog import busy_decorator
 from tmdbhelper.lib.script.sync.item import ItemSync as BasicItemSync
 
 
-class ItemSync(BasicItemSync):
+class ItemAction(BasicItemSync):
 
+    service_name = 'TMDb'
     tmdb_list_type = None
     convert_episodes = True
     convert_seasons = True
@@ -18,8 +19,12 @@ class ItemSync(BasicItemSync):
         return self.get_tmdb_user_api()
 
     def get_tmdb_user_api(self):
-        from tmdbhelper.lib.api.tmdb.users import TMDbUser
-        return TMDbUser()
+        return self.sync_provider.user_api
+
+    def get_query_database(self):
+        query_database = super().get_query_database()
+        query_database.tmdb_user_api = self.tmdb_user_api
+        return query_database
 
     """
     account_states

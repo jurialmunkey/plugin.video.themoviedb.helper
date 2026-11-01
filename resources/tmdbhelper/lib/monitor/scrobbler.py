@@ -156,14 +156,14 @@ class PlayerScrobbler():
         if self.content_id == get_property('Scrobbler.LastRated.ContentID'):
             return
         get_property('Scrobbler.LastRated.ContentID', set_property=self.content_id)
-        from tmdbhelper.lib.script.sync.tmdb.menu import sync_item
+        from tmdbhelper.lib.script.sync.menu_default import sync_item
         kodi_log(f'SCROBBLER: [Rate] {self.content_id}', 2)
         sync_item(
             tmdb_type=self.tmdb_type,
             tmdb_id=self.tmdb_id,
             season=self.season or None,
             episode=self.episode or None,
-            sync_type='rating'
+            sync_type='tmdbrating'
         )
 
 

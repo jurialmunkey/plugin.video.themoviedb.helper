@@ -1,5 +1,6 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
-from tmdbhelper.lib.api.tmdb.users import TMDbUser
+from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+from tmdbhelper.lib.sync.providers.tmdb.directories.mapper import TMDbUserListMapper
 from jurialmunkey.ftools import cached_property
 
 
@@ -10,11 +11,16 @@ class ListAuthenticatedProperties(ListStandardProperties):
     @cached_property
     def url(self):
         url = self.request_url.format(tmdb_type=self.tmdb_type)
-        url = self.tmdb_user_api.format_authorised_path(url)
+        url = self.provider.user_lists.format_path(url)
         return url
 
     def get_api_response(self, page=1):
-        return self.tmdb_user_api.get_authorised_response_json(self.url, page=page, **self.request_kwgs)
+        return self.provider.user_lists.get_response(self.url, page=page, **self.request_kwgs)
+
+    def get_uncached_items(self):
+        if not self.provider.is_user_authorized:
+            return {'items': []}
+        return super().get_uncached_items()
 
 
 class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
@@ -23,47 +29,24 @@ class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
 
 
 class ListAuthenticatedNoCacheListListsProperties(ListAuthenticatedNoCacheProperties):
-    def get_mapped_item(self, item, add_infoproperties=None):
-        list_id = str(item.get('id') or '')
-        user_id = self.tmdb_user_api.authenticator.authorised_access.get('account_id')
+    item_mapper_class = TMDbUserListMapper
 
-        return {
-            'label': item.get('name') or '',
-            'infolabels': {
-                'plot': item.get('description'),
-            },
-            'infoproperties': {
-                k: v for k, v in item.items()
-                if v and type(v) not in [list, dict]
-            },
-            'art': {
-                'icon': self.tmdb_imagepath.get_imagepath_fanart(item.get('backdrop_path')),
-                'fanart': self.tmdb_imagepath.get_imagepath_fanart(item.get('backdrop_path')),
-            },
-            'params': {
-                'info': 'tmdb_v4_list',
-                'tmdb_type': 'both',
-                'list_name': item.get('name') or '',
-                'list_id': list_id,
-                'user_id': user_id,
-                'plugin_category': item.get('name') or '',
-            },
-            'unique_ids': {
-                'list': list_id,
-                'user': user_id,
-            },
-            'context_menu': []
-        }
+    def get_mapped_item(self, item, add_infoproperties=None):
+        mapper = self.item_mapper_class(item, add_infoproperties)
+        mapper.tmdb_imagepath = self.tmdb_imagepath
+        mapper.user_id = self.provider.user_api.authenticator.stored_authorisation['account_id']
+        return mapper.item
 
 
 class ListAuthenticated(ListStandard):
     default_cacheonly = False
-    list_properties_class = ListAuthenticatedProperties
+    list_properties_class = ListAuthenticatedNoCacheProperties
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.dbid_sorted = True
-        list_properties.tmdb_user_api = TMDbUser()
+        list_properties.provider = SyncProviderRegistry().get_provider('tmdb')
+        list_properties.tmdb_api = list_properties.provider.api
         list_properties.tmdb_imagepath = self.tmdb_imagepath
         return list_properties
 
@@ -93,15 +76,6 @@ class ListFavourites(ListAuthenticatedNoCache):
         return list_properties
 
 
-class ListWatchlist(ListAuthenticatedNoCache):
-    def configure_list_properties(self, list_properties):
-        list_properties = super().configure_list_properties(list_properties)
-        list_properties.request_url = 'account/{{account_id}}/{tmdb_type}/watchlist'
-        list_properties.request_kwgs = {'sort_by': 'created_at.desc'}
-        list_properties.localize = 32193
-        return list_properties
-
-
 class ListRated(ListAuthenticatedNoCache):
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
@@ -123,6 +97,8 @@ class ListList(ListAuthenticatedNoCache):
 
 
 class ListLists(ListAuthenticatedNoCacheListLists):
+    kodi_details = False
+
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
         list_properties.request_url = 'account/{{account_id}}/lists'

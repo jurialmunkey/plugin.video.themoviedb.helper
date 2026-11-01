@@ -20,13 +20,6 @@ CONTEXT_MENU_ITEMS = {
         'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
         'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
     },
-    # TMDb User Options
-    '$ADDON[plugin.video.themoviedb.helper 32522]': {
-        'command': 'RunScript(plugin.video.themoviedb.helper,sync_tmdb,{})',
-        'setting': 'contextmenu_sync_tmdb',
-        'episode': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
-        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
-    },
     # Refresh Details
     '$ADDON[plugin.video.themoviedb.helper 32233]': {
         'command': 'RunScript(plugin.video.themoviedb.helper,refresh_details,{})',
