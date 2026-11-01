@@ -7,6 +7,7 @@ from tmdbhelper.lib.addon.consts import PARAM_WIDGETS_RELOAD, PARAM_WIDGETS_RELO
 from tmdbhelper.lib.addon.plugin import ADDONPATH, PLUGINPATH, get_condvisibility, get_localized, encode_url, get_flatseasons_info_param, GlobalSettingsDict
 from tmdbhelper.lib.addon.tmdate import is_unaired_timestamp
 from jurialmunkey.window import get_property
+from urllib.parse import parse_qsl
 
 """ Lazyimports
 from tmdbhelper.lib.items.context import ContextMenu
@@ -80,11 +81,20 @@ class BuildURL:
         return {f'paths_{x}': i for x, i in enumerate(self.path_x) if i}
 
     @property
+    def safe_encoded_url(self):
+        if not self.params:
+            return encode_url(self.path)
+        path, _, query = self.path.partition('?')
+        params = dict(parse_qsl(query, keep_blank_values=True))
+        params.update(self.params)
+        return encode_url(path, **params)
+
+    @property
     def url(self):
         self.params.update(self.params_reload)
         self.params.update(self.params_widget)
         self.params.update(self.params_path_x)
-        return encode_url(self.path, **self.params)
+        return self.safe_encoded_url
 
 
 class _ListItem(object):
