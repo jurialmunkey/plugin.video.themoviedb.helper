@@ -307,8 +307,6 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.cache_refresh = self.lidc_cache_refresh
         lidc.cache_translations = self.is_translated
         lidc.extendedinfo = self.is_detailed
-        lidc.timer_lists = self.timer_lists
-        lidc.log_timers = self.log_timers
         lidc.kodi_details = self.kodi_details
         lidc.sync_details = self.sync_details
         return lidc

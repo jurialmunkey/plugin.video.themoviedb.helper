@@ -1,7 +1,7 @@
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.items.listitem import ListItem
-from tmdbhelper.lib.addon.logger import TimerList, kodi_log
+from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.items.database.details.client import DetailsClient
 from tmdbhelper.lib.items.database.details.request import DetailsRequest
 
@@ -126,13 +126,10 @@ class ListItemBatch:
         return self.parent.kodi_details and not item.next_page
 
     def get_configured_items(self):
-        with TimerList(
-                self.parent.timer_lists, ' - service',
-                log_threshold=0.001, logging=self.parent.log_timers):
-            data = self.parent.client.get_items(
-                [item.sent_request for item in self.sent_items],
-                [item.listitem.get_merge_data() for item in self.sent_items],
-                kodi_details=self.parent.kodi_details)
+        data = self.parent.client.get_items(
+            [item.sent_request for item in self.sent_items],
+            [item.listitem.get_merge_data() for item in self.sent_items],
+            kodi_details=self.parent.kodi_details)
         details = dict(zip(self.sent_items, data))
         return [item.get_configured_listitem(details.get(item)) for item in self.items]
 
@@ -145,8 +142,6 @@ class ListItemDetails:
     kodi_details = False  # Permit Kodi library details; the service applies the user's setting
     sync_details = True  # Permit synced play data; the service applies the user's setting
     parent_params = {}
-    timer_lists = {}
-    log_timers = False
 
     def __init__(self, common_apis=None):
         self.common_apis = common_apis or CommonContainerAPIs()
