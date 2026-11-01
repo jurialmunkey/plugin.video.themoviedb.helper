@@ -347,7 +347,7 @@ class ContainerDirectory(ContainerDirectoryCommon):
         return li
 
     def build_detailed_items(self, items):
-        with TimerList(self.timer_lists, '--build', log_threshold=0.001, logging=self.log_timers):
+        with TimerList(self.timer_lists, '--lidc', log_threshold=0.001, logging=self.log_timers):
             items = self.lidc.configure_listitems_threaded(items)
             items = self.build_ratings_items(items)
             return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
