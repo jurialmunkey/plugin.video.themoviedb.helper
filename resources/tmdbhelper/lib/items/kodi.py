@@ -7,9 +7,10 @@ from tmdbhelper.lib.api.kodi.rpc import (
 
 
 class KodiDb():
-    def __init__(self, tmdb_type):
+    def __init__(self, tmdb_type, cache=None):
+        self.cache = cache  # Optional MemoryCache-compatible cache for the library indexes
         self.kodi_db_tv = {}
-        self.kodi_db = get_kodi_library(tmdb_type)
+        self.kodi_db = get_kodi_library(tmdb_type, cache=cache)
         self.prepared_details = {}
 
     def get_dbid(self, li):
@@ -76,7 +77,7 @@ class KodiDb():
             if episode is not None:
                 library, func = 'episode', get_episode_details
 
-            kodi_db_tv = self.kodi_db_tv.setdefault(dbid, get_kodi_library(library, dbid))
+            kodi_db_tv = self.kodi_db_tv.setdefault(dbid, get_kodi_library(library, dbid, cache=self.cache))
             child_dbid = kodi_db_tv.get_info('dbid', season=season, episode=episode)
             if not child_dbid:
                 return

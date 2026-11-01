@@ -25,15 +25,16 @@ def get_jsonrpc(method=None, params=None, query_id=1):
     return jurialmunkey_jsnrpc.get_jsonrpc(method, params, query_id)
 
 
-def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False):
+def get_kodi_library(tmdb_type, tvshowid=None, cache_refresh=False, cache=None):
+    """cache: optionally a MemoryCache-compatible cache to use instead of window properties."""
     if tmdb_type == 'movie':
-        return KodiLibrary(dbtype='movie', cache_refresh=cache_refresh)
+        return KodiLibrary(dbtype='movie', cache_refresh=cache_refresh, cache=cache)
     if tmdb_type == 'tv':
-        return KodiLibrary(dbtype='tvshow', cache_refresh=cache_refresh)
+        return KodiLibrary(dbtype='tvshow', cache_refresh=cache_refresh, cache=cache)
     if tmdb_type in ['season', 'episode'] and tvshowid:
-        return KodiLibrary(dbtype=tmdb_type, tvshowid=tvshowid, cache_refresh=cache_refresh)
+        return KodiLibrary(dbtype=tmdb_type, tvshowid=tvshowid, cache_refresh=cache_refresh, cache=cache)
     if tmdb_type == 'both':
-        return KodiLibrary(dbtype='both', cache_refresh=cache_refresh)
+        return KodiLibrary(dbtype='both', cache_refresh=cache_refresh, cache=cache)
 
 
 def get_mapped_details(details, dbid, key):
@@ -119,11 +120,13 @@ THREAD_LOCK = 'TMDbHelper.KodiLibrary.ThreadLock'
 
 
 class KodiLibrary(object):
-    def __init__(self, dbtype=None, tvshowid=None, logging=True, cache_refresh=False):
+    def __init__(self, dbtype=None, tvshowid=None, logging=True, cache_refresh=False, cache=None):
         self._dbtype = dbtype
         self._tvshowid = tvshowid
         self._logging = logging
         self._cache_refresh = cache_refresh
+        if cache is not None:
+            self._cache = cache
 
     @property
     def cache(self):

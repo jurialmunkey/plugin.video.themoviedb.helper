@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from threading import RLock
 from xbmcgui import Window
 from tmdbhelper.lib.addon.plugin import format_name
 from tmdbhelper.lib.addon.tmdate import set_timestamp
@@ -82,3 +83,35 @@ class MemoryCache(object):
 
         if cache_store_none:
             self.set(cache_name, empty_obj, cache_minutes)
+
+
+class ProcessMemoryCache(MemoryCache):
+    """A MemoryCache held in this Python process instead of in window properties.
+
+    For long-running services, where it avoids the window property calls. Objects are
+    returned as stored rather than as copies, so callers must not modify them.
+    """
+
+    def __init__(self, name):
+        super().__init__(name)
+        self.lock = RLock()
+        self.data = {}
+
+    def get(self, endpoint):
+        with self.lock:
+            try:
+                expires, data = self.data[endpoint]
+            except KeyError:
+                return
+        if expires <= set_timestamp(0, True):
+            return
+        return data
+
+    def set(self, endpoint, data, cache_minutes=60):
+        expires = set_timestamp(cache_minutes * TIME_MINUTES, True)
+        with self.lock:
+            self.data[endpoint] = (expires, data)
+
+    def clear(self):
+        with self.lock:
+            self.data.clear()

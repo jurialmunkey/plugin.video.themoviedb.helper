@@ -1,6 +1,33 @@
 from jurialmunkey.ftools import cached_property
+from jurialmunkey.window import get_property
+from tmdbhelper.lib.addon.consts import KODI_LIBRARY_LAST_UPDATED
 from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.files.mcache import ProcessMemoryCache
 from tmdbhelper.lib.items.database.details.merge import ItemDetailsMerger
+
+
+class KodiLibraryCache(ProcessMemoryCache):
+    """Kodi library indexes kept in the item detail service between lists.
+
+    The main service records when the Kodi library last changed. The indexes are
+    rebuilt after a change instead of waiting for them to expire.
+    """
+
+    def __init__(self):
+        super().__init__('KodiLibrary')
+        self.library_updated = None
+
+    def get_library_updated(self):
+        return get_property(KODI_LIBRARY_LAST_UPDATED)
+
+    def refresh(self):
+        """Clear the indexes if the library changed since they were built."""
+        library_updated = self.get_library_updated()
+        with self.lock:
+            if library_updated == self.library_updated:
+                return
+            self.library_updated = library_updated
+            self.clear()
 
 
 class KodiItemData:
@@ -20,8 +47,9 @@ class KodiDetailsEnrichment:
 
     library_types = {'movie': 'movie', 'tvshow': 'tv', 'season': 'tv', 'episode': 'tv'}
 
-    def __init__(self, items):
+    def __init__(self, items, library_cache=None):
         self.items = items
+        self.library_cache = library_cache  # A KodiLibraryCache shared between batches
 
     @cached_property
     def setting(self):
@@ -52,7 +80,9 @@ class KodiDetailsEnrichment:
         if not self.setting or not self.library_type:
             return
         from tmdbhelper.lib.items.kodi import KodiDb
-        return KodiDb(self.library_type)
+        if self.library_cache is not None:
+            self.library_cache.refresh()
+        return KodiDb(self.library_type, cache=self.library_cache)
 
     @cached_property
     def item_data(self):

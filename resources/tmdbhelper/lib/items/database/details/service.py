@@ -10,7 +10,7 @@ from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.plugin import get_version
 from tmdbhelper.lib.files.sqlite_mutex import SQLiteMutex
 from tmdbhelper.lib.items.database.details.coordinator import DetailsCoordinator
-from tmdbhelper.lib.items.database.details.enrichment import KodiDetailsEnrichment
+from tmdbhelper.lib.items.database.details.enrichment import KodiDetailsEnrichment, KodiLibraryCache
 from tmdbhelper.lib.items.database.details.merge import ConfiguredItemMerger
 from tmdbhelper.lib.items.database.details.protocol import (
     DetailsLookupError, DetailsServiceError, DetailsServiceUnavailable,
@@ -126,15 +126,14 @@ class DetailsRequestHandler(BaseRequestHandler):
         except (AttributeError, KeyError, TypeError, ValueError) as exc:
             return (None, f'Unable to merge item details: {exc}')
 
-    @staticmethod
-    def get_kodi_results(entries, results):
+    def get_kodi_results(self, entries, results):
         """Merge Kodi library details into each item, including items whose details lookup
         failed. Entries without list item data are details-only requests and are not enriched."""
         items = [
             None if entry['item'] is None else (item or entry['item'])
             for entry, (item, error) in zip(entries, results)]
         try:
-            enriched = KodiDetailsEnrichment(items).enriched
+            enriched = KodiDetailsEnrichment(items, self.server.kodi_library_cache).enriched
         except Exception:
             # Library matching must not cost the batch its item details.
             kodi_log(f'Kodi library details failed:\n{traceback.format_exc()}', 1)
@@ -150,6 +149,7 @@ class DetailsServer(ThreadingMixIn, TCPServer):
         self.coordinator = coordinator
         self.monitor = monitor
         self.sync_refresher = DetailsSyncRefresher()
+        self.kodi_library_cache = KodiLibraryCache()  # Library indexes kept between lists
         self.token = token_hex(24)
         super().__init__(('127.0.0.1', 0), DetailsRequestHandler)
 
