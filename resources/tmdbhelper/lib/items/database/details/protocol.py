@@ -9,7 +9,8 @@ from xbmcvfs import translatePath
 
 # Items are {'request': DetailsRequest dict or None, 'item': list item merge data or None}.
 # 'kodi_details' permits merging Kodi library details into items with list item data.
-PROTOCOL_VERSION = 4
+# 'prepare' ({'info', 'tmdb_type'}) starts refreshing synced play data before a list's items are known.
+PROTOCOL_VERSION = 5
 MAX_MESSAGE_BYTES = 32 * 1024 * 1024
 MAX_REQUEST_ITEMS = 200
 PING_TIMEOUT = 5

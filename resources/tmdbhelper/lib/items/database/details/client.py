@@ -18,12 +18,12 @@ class DetailsClient:
         self.location = ServiceLocation()
         self.version = get_version()
 
-    def exchange(self, endpoint, items=None, kodi_details=False):
+    def exchange(self, endpoint, items=None, kodi_details=False, prepare=None):
         with socket.create_connection(('127.0.0.1', endpoint['port']), timeout=2) as connection:
             connection.settimeout(5)
             send_message(connection, {
                 'version': PROTOCOL_VERSION, 'token': endpoint['token'],
-                'items': items, 'kodi_details': kodi_details,
+                'items': items, 'kodi_details': kodi_details, 'prepare': prepare,
             })
             connection.settimeout(0.25)
             response = receive_message(
@@ -130,3 +130,15 @@ class DetailsClient:
 
     def get_item(self, request):
         return self.get_items([request])[0]
+
+    def prepare(self, info=None, tmdb_type=None):
+        """Ask a running service to start refreshing synced play data while the list is
+        retrieved. A stopped service is not started here so the list is not held up; the
+        item details request refreshes the data instead."""
+        endpoint = self.location.endpoint
+        if not self.is_current(endpoint):
+            return
+        try:
+            self.exchange(endpoint, prepare={'info': info, 'tmdb_type': tmdb_type})
+        except (OSError, DetailsServiceError) as exc:
+            kodi_log(f'Item detail sync refresh was not started early: {exc}', 1)

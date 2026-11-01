@@ -5,10 +5,16 @@ class SimpleCache(ItemDetailsList):
     """Read item metadata cached by the configured sync providers."""
     table = 'simplecache'
     conditions = 'id=? LIMIT 1'
+    sync_details = True  # Set False to read the item as if it had never been synced
 
     @property
     def values(self):  # WHERE conditions values for ?
         return (self.item_id, )
+
+    def get_cached_data(self):
+        if not self.sync_details:
+            return []
+        return super().get_cached_data()
 
 
 class PlayCount(SimpleCache):

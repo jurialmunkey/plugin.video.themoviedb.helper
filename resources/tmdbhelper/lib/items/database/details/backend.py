@@ -55,7 +55,7 @@ class DetailsConnection(DatabaseConnection):
 class DetailsLookup:
     """Configure a fresh factory before accessing any cached factory properties."""
 
-    def __init__(self, cache, request, common_apis, connection=None, parent_data=None):
+    def __init__(self, cache, request, common_apis, connection=None, parent_data=None, sync_enabled=True):
         self.request = request
         self.common_apis = common_apis
         self.owns_connection = connection is None
@@ -68,6 +68,7 @@ class DetailsLookup:
             setattr(self.factory, name, getattr(request, name))
         if request.tvshow_tmdb_id is not None:
             self.factory.tvshow_tmdb_id = request.tvshow_tmdb_id
+        self.factory.sync_details = bool(request.sync_details and sync_enabled)
         self.factory.parent_item_data = parent_data
 
     @property
@@ -106,10 +107,16 @@ class DetailsBackend:
     def connection(self):
         return DetailsConnection(self.cache)
 
+    @cached_property
+    def is_sync_enabled(self):
+        """Settings changes restart the service, so the setting is read once."""
+        from tmdbhelper.lib.sync.prepare import SyncPreparation
+        return SyncPreparation.is_enabled()
+
     def lookup(self, request, parent_data=None):
         return DetailsLookup(
             self.cache, request, self.apis.get(request.language),
-            self.connection, parent_data)
+            self.connection, parent_data, sync_enabled=self.is_sync_enabled)
 
     def read(self, request):
         lookup = self.lookup(request)
@@ -117,7 +124,8 @@ class DetailsBackend:
 
     def fetch(self, request, parent_data):
         lookup = DetailsLookup(
-            self.cache, request, self.apis.get(request.language), parent_data=parent_data)
+            self.cache, request, self.apis.get(request.language),
+            parent_data=parent_data, sync_enabled=self.is_sync_enabled)
         try:
             if not lookup.factory.data_cond:
                 return []

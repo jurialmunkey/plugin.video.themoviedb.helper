@@ -18,13 +18,13 @@ class DetailsRequest:
 
     fields = (
         'mediatype', 'tmdb_id', 'season', 'episode', 'tvshow_tmdb_id', 'cache_refresh',
-        'cache_translations', 'extendedinfo', 'language', 'clear_user_art',
+        'cache_translations', 'extendedinfo', 'language', 'clear_user_art', 'sync_details',
     )
 
     def __init__(
             self, mediatype, tmdb_id, season=None, episode=None, tvshow_tmdb_id=None,
             cache_refresh=None, cache_translations=False, extendedinfo=False, language='',
-            clear_user_art=False):
+            clear_user_art=False, sync_details=True):
         if mediatype not in ITEM_TYPES:
             raise ValueError(f'Unsupported item detail type: {mediatype}')
         if cache_refresh not in CACHE_REFRESH_LEVELS:
@@ -39,6 +39,7 @@ class DetailsRequest:
         self.set_field('extendedinfo', extendedinfo)
         self.set_field('language', language or get_language())
         self.set_field('clear_user_art', clear_user_art)
+        self.set_field('sync_details', sync_details)  # Permit synced play data; the service applies the user's setting
 
     def set_field(self, name, value):
         object.__setattr__(self, name, value)

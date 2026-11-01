@@ -17,8 +17,10 @@ from tmdbhelper.lib.items.database.details.protocol import (
     MAX_REQUEST_ITEMS, PROTOCOL_VERSION, RESPONSE_TIMEOUT, ServiceLocation,
     encode_message, receive_message,
 )
+from tmdbhelper.lib.items.database.details.refresh import DetailsSyncRefresher
 from tmdbhelper.lib.items.database.details.request import DetailsRequest
 from tmdbhelper.lib.items.database.details.settings import DetailsSettings
+from tmdbhelper.lib.sync.prepare import SyncPreparation
 
 
 class DetailsMonitor(Monitor):
@@ -60,6 +62,8 @@ class DetailsRequestHandler(BaseRequestHandler):
     def get_response(self, message):
         if message['version'] != PROTOCOL_VERSION or message['token'] != self.server.token:
             raise DetailsServiceUnavailable('Item detail service protocol/token mismatch')
+        if message.get('prepare') is not None:
+            return self.get_prepare_response(message['prepare'])
         entries = message['items']
         if entries is None:
             if not self.server.coordinator.is_alive() or self.server.coordinator.stopping:
@@ -77,14 +81,29 @@ class DetailsRequestHandler(BaseRequestHandler):
             'errors': {f'{x}': error for x, (item, error) in enumerate(results) if error},
         }
 
+    def get_prepare_response(self, prepare):
+        """Start refreshing synced play data while the list is retrieved, without waiting.
+        Lists send this only when they permit synced data."""
+        if SyncPreparation.is_enabled():
+            self.server.sync_refresher.refresh(SyncPreparation.get_hint_item_types(**prepare))
+        return {'items': []}
+
     def get_detail_results(self, entries):
         """Details for each entry. Entries sent only for Kodi library matching have no request."""
         requests = [DetailsRequest(**entry['request']) for entry in entries if entry['request'] is not None]
-        futures = iter(self.server.coordinator.submit(requests))
         deadline = monotonic() + RESPONSE_TIMEOUT
+        self.wait_for_sync(requests, deadline)
+        futures = iter(self.server.coordinator.submit(requests))
         return [
             self.get_result(next(futures), deadline) if entry['request'] is not None else (None, None)
             for entry in entries]
+
+    def wait_for_sync(self, requests, deadline):
+        """Read items only once their synced play data is fresh, as lists did before building items."""
+        if not SyncPreparation.is_enabled():
+            return
+        item_types = SyncPreparation.get_item_types(request.mediatype for request in requests if request.sync_details)
+        self.server.sync_refresher.wait(item_types, timeout=max(deadline - monotonic(), 0))
 
     @staticmethod
     def get_result(future, deadline):
@@ -130,8 +149,15 @@ class DetailsServer(ThreadingMixIn, TCPServer):
     def __init__(self, coordinator, monitor):
         self.coordinator = coordinator
         self.monitor = monitor
+        self.sync_refresher = DetailsSyncRefresher()
         self.token = token_hex(24)
         super().__init__(('127.0.0.1', 0), DetailsRequestHandler)
+
+    def server_close(self):
+        try:
+            super().server_close()
+        finally:
+            self.sync_refresher.close()
 
     def handle_error(self, request, client_address):
         kodi_log(f'Item detail transport error:\n{traceback.format_exc()}', 1)

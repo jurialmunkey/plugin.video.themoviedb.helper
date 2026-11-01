@@ -15,6 +15,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     container_refresh = False  # True call Container.Refresh at end of directory
     sort_by_dbid = False
     kodi_details = False  # Permit Kodi library details; the item detail service applies the user's setting
+    sync_details = True  # Permit synced play data; the item detail service applies the user's setting
     thumb_override = 0
     tmdb_id_lookup_params = ('imdb_id', 'tvdb_id', 'query', 'use_multisearch')  # Inputs that can resolve a tmdb_id
 
@@ -91,9 +92,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     @cached_property
     def sync_playdata(self):
         from tmdbhelper.lib.items.sync import SyncPlayData
-        return SyncPlayData(
-            watchedindicators=get_setting('trakt_watchedindicators'),
-            pauseplayprogress=get_setting('trakt_watchedindicators'))
+        return SyncPlayData()
 
     @cached_property
     def pagination(self):
@@ -238,6 +237,11 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def has_tmdb_id_lookup_params(self):
         return any(self.params.get(k) for k in self.tmdb_id_lookup_params)
 
+    def prepare_item_details(self):
+        """ Abstract method to prepare item details while the list is retrieved
+        """
+        return
+
     def get_items(self, **kwargs):
         """ Abstract method for getting items
         """
@@ -250,7 +254,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
     def get_directory(self, items_only=False, build_items=True):
 
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
-            self.sync_playdata.pre_sync_start(**self.params)
+            self.prepare_item_details()
 
             items = self.get_directory_items()
 
@@ -262,9 +266,6 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
             self.property_params.update(self.set_params_to_container())
             self.plugin_category = self.params.get('plugin_category') or self.plugin_category
-
-            with TimerList(self.timer_lists, '--sync', log_threshold=0.001, logging=self.log_timers):
-                self.sync_playdata.pre_sync_join()
 
             with TimerList(self.timer_lists, 'add_items', logging=self.log_timers):
                 items = self.build_items(items)
@@ -309,7 +310,11 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.timer_lists = self.timer_lists
         lidc.log_timers = self.log_timers
         lidc.kodi_details = self.kodi_details
+        lidc.sync_details = self.sync_details
         return lidc
+
+    def prepare_item_details(self):
+        self.lidc.prepare(**self.params)
 
     def build_ratings_item(self, li):
         if not li or not li.tmdb_id:

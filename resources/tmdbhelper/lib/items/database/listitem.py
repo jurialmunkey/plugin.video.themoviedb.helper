@@ -143,6 +143,7 @@ class ListItemDetails:
     cache_translations = False
     extendedinfo = False
     kodi_details = False  # Permit Kodi library details; the service applies the user's setting
+    sync_details = True  # Permit synced play data; the service applies the user's setting
     parent_params = {}
     timer_lists = {}
     log_timers = False
@@ -155,7 +156,14 @@ class ListItemDetails:
         return DetailsRequest.from_type(
             tmdb_type, tmdb_id, season, episode,
             cache_refresh=self.cache_refresh, cache_translations=self.cache_translations,
-            extendedinfo=self.extendedinfo, language=self.common_apis.tmdb_api.language)
+            extendedinfo=self.extendedinfo, language=self.common_apis.tmdb_api.language,
+            sync_details=self.sync_details)
+
+    def prepare(self, info=None, tmdb_type=None, **kwargs):
+        """Let the service start refreshing synced play data while the list is retrieved."""
+        if not self.sync_details:
+            return
+        self.client.prepare(info=info, tmdb_type=tmdb_type)
 
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None):
         if not tmdb_id:

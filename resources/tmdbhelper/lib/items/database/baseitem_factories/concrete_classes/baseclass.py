@@ -21,6 +21,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
     allowlist_infolabel_keys = _ListItemInfoTagVideo._tag_attr
     append_to_response_tmdbtype = 'movie'
     clear_user_art = False
+    sync_details = True  # Read synced play data such as play counts and progress
 
     def get_lookup_request(self):
         from tmdbhelper.lib.items.database.details.request import DetailsRequest
@@ -30,7 +31,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
             tvshow_tmdb_id=self.__dict__.get('tvshow_tmdb_id'),
             cache_refresh=self.cache_refresh, cache_translations=self.cache_translations,
             extendedinfo=self.extendedinfo, language=self.language,
-            clear_user_art=self.clear_user_art)
+            clear_user_art=self.clear_user_art, sync_details=self.sync_details)
 
     def get_lookup_dependencies(self, request):
         return ()
@@ -157,6 +158,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
         database_obj.parent_id = self.parent_id
         database_obj.common_apis = self.common_apis
         database_obj.connection = self.connection
+        database_obj.sync_details = self.sync_details
         return database_obj
 
     def return_basemeta_db(self, route, subtype=None):
