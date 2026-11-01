@@ -14,6 +14,18 @@ class SyncProviderRegistry:
         return SyncProviderDiscovery()
 
     @cached_property
+    def internal_providers(self):
+        return self.get_internal_providers()
+
+    def get_internal_providers(self):
+        from tmdbhelper.lib.sync.providers.tmdb import Provider
+        provider = Provider()
+        SyncProviderLoader({'addonid': provider.addon_id}).validate_provider(provider)
+        providers = {}
+        self.register_provider(providers, provider)
+        return providers
+
+    @cached_property
     def loaded_providers(self):
         """Providers loaded so far by addon ID, shared by single and full loading."""
         return {}
@@ -23,7 +35,7 @@ class SyncProviderRegistry:
         return self.get_providers()
 
     def get_providers(self):
-        providers = {}
+        providers = dict(self.internal_providers)
         for addon in self.discovery.addons:
             self.register_provider(providers, self.load_provider(addon))
         return providers
@@ -37,8 +49,13 @@ class SyncProviderRegistry:
         return provider
 
     def get_provider(self, provider_id):
-        """Load only the provider's own addon when its ID follows the addon naming convention.
+        """Return internal providers without addon discovery.
+        Load only the provider's own addon when its ID follows the addon naming convention.
         Other providers are found by loading every provider. Raises KeyError if unavailable."""
+        try:
+            return self.internal_providers[provider_id]
+        except KeyError:
+            pass
         addon = self.discovery.get_addon(provider_id)
         if addon is None:
             return self.providers[provider_id]

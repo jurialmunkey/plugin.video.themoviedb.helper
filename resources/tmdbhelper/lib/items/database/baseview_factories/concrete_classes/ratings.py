@@ -14,7 +14,6 @@ class RatingsDict(BaseList):
     rating_attribs = (
         'omdb_ratings',
         'provider_ratings',
-        'tmdb_ratings',
         'imdb_top250',
     )
 
@@ -116,19 +115,6 @@ class RatingsDict(BaseList):
             return {}
         try:
             return self.common_apis.omdb_api.get_ratings_awards(imdb_id=self.imdb_id) or {}
-        except (KeyError, TypeError, IndexError, ValueError):
-            return {}
-
-    @cached_property
-    def tmdb_ratings(self):
-        data = self.common_apis.tmdb_api.get_response_json(self.tmdb_type, self.tmdb_id)
-        if not data:
-            return {}
-        try:
-            return {
-                'tmdb_rating': int(data['vote_average'] * 10),
-                'tmdb_votes': data['vote_count']
-            }
         except (KeyError, TypeError, IndexError, ValueError):
             return {}
 

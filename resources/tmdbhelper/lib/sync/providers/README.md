@@ -10,6 +10,12 @@ The loader imports the package directly from its installed path without changing
 no built-in service names or provider imports. Relative and wildcard imports
 are not permitted.
 
+TMDb is an internal provider in `tmdbhelper.lib.sync.providers.tmdb`, registered
+directly by the registry and validated against the same provider interface.
+It is always available without addon discovery, installation, or account
+authorization. Its ratings contribution can be disabled and reordered separately.
+The external-addon catalogue and loader do not install or import this provider.
+
 Provider addons follow this layout:
 
 ```text
@@ -218,8 +224,8 @@ lists are not deleted by selection changes or disabled-feature cleanup.
 Directory watched/playback pre-sync reaches this cleanup even when the selected
 provider is unavailable; cached item-details reads remain free of provider queries.
 
-There are no built-in fallback providers, old setting aliases, or automatic
-selections. Opening an unconfigured provider sync list or a list with an unavailable
+There are no built-in fallback sync providers, old setting aliases, or automatic
+sync selections. Opening an unconfigured provider sync list or a list with an unavailable
 selected provider offers setup, including from widgets. Installation and enabling
 use Kodi's built-in
 `InstallAddon` and `EnableAddon` commands, followed by a fresh discovery check.
@@ -289,11 +295,12 @@ Discovery and provider imports are scoped to a Python invocation;
 setup refreshes discovery after installation or enabling. Updating already-loaded
 provider code still requires a new invocation.
 
-Provider addons are maintained separately from the plugin. Install each provider
+External provider addons are maintained separately from the plugin. Install each
+external provider
 in its own `script.module.tmdbhelper.sync.<service>` folder alongside
 `plugin.video.themoviedb.helper` in Kodi's addons directory. The plugin contains
-the shared interfaces and registry; provider implementations and artwork belong
-in the standalone modules.
+the shared interfaces, registry, and internal TMDb provider; external provider
+implementations and artwork belong in the standalone modules.
 
 Install the provider-enabled TMDbHelper build together with matching provider
 versions. The dependency version alone cannot distinguish a development checkout
@@ -360,8 +367,9 @@ In Sync settings, the Ratings group contains Providers and Priority. Providers
 uses a multiselect to enable/disable installed suppliers. Priority uses select
 dialogs to choose a provider and move it up/down. Save applies the order;
 Cancel leaves it unchanged. Each control preserves the other's configuration.
-Enabled Kodi modules with the ratings capability appear independently of
-sync-provider selections.
+Enabled Kodi modules with the ratings capability and the internal TMDb provider
+appear independently of sync-provider selections. TMDb supplies movie and TV-show
+ratings; season and episode suppliers are unchanged.
 New suppliers default to enabled and follow saved entries in alphabetical order;
 unavailable providers' saved order and disabled state are retained.
 
@@ -386,9 +394,11 @@ fields. `None` and empty strings are missing; zero ratings and vote counts are
 valid. Lower providers fill missing fields.
 
 Provider results occupy the former MDbList position in `rating_attribs`: after
-OMDb and before direct Trakt/TMDb sources. Existing built-in precedence and IMDb
-Top 250 output format remain unchanged. MDbList's module supplies all four media
-types using its module-owned API client's rating methods; no MDbList-specific
+OMDb and before IMDb Top 250. TMDb requests and vote mapping belong to its internal
+supplier, with no direct TMDb fallback in the ratings dictionaries. Configured
+provider priority determines overlapping TMDb fields just like other ratings.
+The IMDb Top 250 output format remains unchanged. MDbList's module supplies all
+four media types using its module-owned API client's rating methods; no MDbList-specific
 branch remains in the ratings dictionaries.
 
 ## Account stats
