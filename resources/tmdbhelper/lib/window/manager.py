@@ -253,13 +253,17 @@ class WindowManager(EventLoop):
         path = QueryConstructor(query, tmdb_type, season, episode, separator).path
         return self.add_path(path) if path else None
 
+    def wait_for_service_exit(self):
+        """Ask the running service to exit and wait until it has closed its windows"""
+        window.wait_for_property(PREFIX_COMMAND, 'exit', True, poll=0.3)
+        window.wait_for_property(PREFIX_INSTANCE, None, poll=0.1, timeout=30)
+
     def close_dialog(self):
         kodi_log(f'Window Manager [ACTION] close_dialog', 2)
         if not self.is_running:
             self._on_exit()
         else:
-            window.wait_for_property(PREFIX_COMMAND, 'exit', True, poll=0.3)
-        window.wait_until_active(self.window_id, invert=True, poll=0.1)
+            self.wait_for_service_exit()
         window.wait_until_active(ID_VIDEOINFO, invert=True, poll=0.1)
         self.call_window()
 
