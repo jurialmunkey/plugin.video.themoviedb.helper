@@ -1,4 +1,4 @@
-"""Read the addon's key definitions without importing its Kodi integration."""
+"""Read addon key definitions without importing their Kodi integration."""
 from pathlib import Path
 import ast
 
@@ -10,9 +10,9 @@ class AddonCredentials:
         source = ast.parse((self.directory / f'{provider}.py').read_text(encoding='utf-8'))
         # The first branch contains TMDbHelper's internal credentials. Read only
         # its API_KEY expression; never execute the permissions or token modules.
-        branch = next(node for node in source.body if isinstance(node, ast.If))
+        definitions = next((node.body for node in source.body if isinstance(node, ast.If)), source.body)
         assignment = next(
-            node for node in branch.body if isinstance(node, ast.Assign)
+            node for node in definitions if isinstance(node, ast.Assign)
             and any(isinstance(target, ast.Name) and target.id == 'API_KEY' for target in node.targets))
         return self.get_key_value(assignment.value)
 
@@ -33,3 +33,12 @@ class AddonCredentials:
             raise ValueError('Unsupported addon API key encoding')
         data, mask = (ast.literal_eval(argument) for argument in encoded.args)
         return bytes(value ^ mask[index % len(mask)] for index, value in enumerate(data)).decode()
+
+
+class TVDbModuleCredentials(AddonCredentials):
+    directory = (
+        Path(__file__).resolve().parents[5]
+        / 'script.module.tmdbhelper.sync.tvdb' / 'resources' / 'lib' / 'tmdbhelper_sync_tvdb')
+
+    def get_api_key(self):
+        return super().get_api_key('api_keys')

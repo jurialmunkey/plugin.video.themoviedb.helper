@@ -26,11 +26,6 @@ class CommonContainerAPIs():
         return FanartTV()
 
     @cached_property
-    def tvdb_api(self):
-        from tmdbhelper.lib.api.tvdb.api import TVDb
-        return TVDb()
-
-    @cached_property
     def omdb_api(self):
         from tmdbhelper.lib.api.omdb.api import OMDb
         from tmdbhelper.lib.addon.plugin import get_setting

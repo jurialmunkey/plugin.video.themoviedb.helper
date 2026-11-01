@@ -10,7 +10,7 @@ def log_request(**kwargs):
     from tmdbhelper.lib.addon.dialog import BusyDialog
     from tmdbhelper.lib.api.trakt.api import TraktAPI
     from tmdbhelper.lib.api.tmdb.api import TMDb
-    from tmdbhelper.lib.api.tvdb.api import TVDb
+    from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
     from tmdbhelper.lib.files.futils import validify_filename
     from tmdbhelper.lib.files.futils import dumps_to_file
     with BusyDialog():
@@ -22,7 +22,9 @@ def log_request(**kwargs):
         if kwargs.get('log_request').lower() == 'trakt':
             kwargs['response'] = TraktAPI().get_response_json(kwargs['url'])
         elif kwargs.get('log_request').lower() == 'tvdb':
-            kwargs['response'] = TVDb().get_response_json(kwargs['url'])
+            provider = SyncProviderRegistry().find_provider('tvdb')
+            if provider is not None:
+                kwargs['response'] = provider.api.get_response_json(kwargs['url'])
         else:
             kwargs['response'] = TMDb().get_response_json(kwargs['url'])
         if not kwargs['response']:

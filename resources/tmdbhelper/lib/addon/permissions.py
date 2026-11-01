@@ -49,14 +49,12 @@ class PermissionHandler:
         'omdb': 2 ** 3,
         'tmdb': 2 ** 4,
         'trakt': 2 ** 5,
-        'tvdb': 2 ** 6,
     }
 
     _PERMISSION_TYPES = {
         'fanarttv': 'fanarttv_clientkey_access',
         'omdb': 'omdb_apikey_access',
         'trakt': 'trakt_token_access',
-        'tvdb': 'tvdb_token_access',
     }
 
     def __init__(self):

@@ -497,3 +497,25 @@ destination to verify persistence, and then clears the core value. An existing
 module key takes precedence. An empty legacy value makes subsequent loads a
 no-op; failed writes preserve the source for retry. The hidden declaration is
 retained solely so Kodi can still retrieve values from older installations.
+
+## Browsing-only providers
+
+`script.module.tmdbhelper.sync.tvdb` and
+`script.module.tmdbhelper.sync.gemini` use interface version 3 with only the
+`lists` capability. They own their API clients, settings, artwork, root entries,
+directory properties and output mappers. Their script entry points use
+`open_sync_provider_settings` to open API settings without assigning sync
+features. Core has no reverse dependencies on these optional modules.
+
+TVDb supplies awards and genres through `tvdb_directory`, `tvdb_awards`,
+`tvdb_award_categories`, `tvdb_award_category`, `tvdb_genres` and `tvdb_genre`.
+Gemini supplies `gemini_recommendations`. Core redirects legacy `dir_tvdb*`
+and `gemini` routes to those names, preserving existing widget parameters and
+the normal missing-provider install/enable flow.
+
+Before creating API clients, Gemini migrates the legacy core API key and TVDb
+migrates the legacy bearer token into module-owned storage. Migration verifies
+the destination before clearing the legacy value and preserves existing module
+credentials. TVDb retains its bundled key and supports an optional personal key.
+The local awards database and its metadata consumers remain in core; browsing
+does not change item-details database ownership or the finalisation pipeline.

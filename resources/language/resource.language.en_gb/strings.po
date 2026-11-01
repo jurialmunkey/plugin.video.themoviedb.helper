@@ -3567,3 +3567,23 @@ msgstr ""
 msgctxt "#32735"
 msgid "Logging"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32736"
+msgid "Gemini settings"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32737"
+msgid "Install or enable the Gemini module and open its API settings."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32738"
+msgid "TVDb settings"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32739"
+msgid "Install or enable the TVDb module and open its API settings."
+msgstr ""

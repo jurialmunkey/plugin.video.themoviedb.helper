@@ -66,31 +66,6 @@ class BaseDirItemMainSync(BaseDirItemMainMovie):
     art_icon = 'resources/icons/sync/default.png'
 
 
-class BaseDirItemMainTVDb(BaseDirItemMainMovie):
-    priority = 190
-    label = 'TVDb'
-    params = {'info': 'dir_tvdb'}
-    art_icon = 'resources/icons/tvdb/tvdb.png'
-
-
-class BaseDirItemMainGemini(BaseDirItemMainMovie):
-    priority = 205
-    label_localized = 32149
-    label_type = 'suffixed'
-    params = {'info': 'gemini'}
-    art_icon = 'resources/icons/gemini/gemini.png'
-
-    @property
-    def label_suffix(self):
-        from tmdbhelper.lib.addon.plugin import get_localized
-        return get_localized(32223)
-
-    @property
-    def enabled(self):
-        from tmdbhelper.lib.api.gemini.api import Gemini
-        return bool(Gemini.api_key)
-
-
 class BaseDirItemMain(BaseDirItemMainMovie):
     priority = 210
     label = 'Nodes'

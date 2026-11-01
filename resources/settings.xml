@@ -764,14 +764,26 @@
                         <heading>32127</heading>
                     </control>
                 </setting>
-                <setting id="gemini_apikey" type="string" label="32148" help="32673">
+                <setting id="gemini_settings" type="action" label="32736" help="32737">
                     <level>0</level>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.gemini)</data>
+                    </control>
+                </setting>
+                <!-- Retained only so Kodi can read and clear pre-module keys. -->
+                <setting id="gemini_apikey" type="string" label="32148" help="32673">
+                    <level>4</level>
                     <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>32148</heading>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string"/>
+                    <visible>false</visible>
+                </setting>
+                <setting id="tvdb_settings" type="action" label="32738" help="32739">
+                    <level>0</level>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.tvdb)</data>
                     </control>
                 </setting>
                 <setting id="fanarttv_clientkey" type="string" label="32019" help="32674">
@@ -832,13 +844,6 @@
                     <control type="edit" format="string">
                         <heading>32011</heading>
                     </control>
-                </setting>
-                <setting id="tvdb_token_access" type="boolean" label="32483" help="32705" parent="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                    <enable>false</enable>
                 </setting>
                 <setting id="tmdb_user_token" type="string" label="32011" help="32701">
                     <level>0</level>

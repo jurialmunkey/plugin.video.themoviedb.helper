@@ -139,8 +139,11 @@ def test_func(test_func, dialog_output=False, **kwargs):
         return finalise(head, data)
 
     def test_func_gemini(prompt, **kwargs):
-        from tmdbhelper.lib.api.gemini.api import Gemini
-        data = Gemini().get_prompt_text_parsed(prompt)
+        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+        provider = SyncProviderRegistry().find_provider('gemini')
+        if provider is None:
+            return
+        data = provider.api.get_prompt_text_parsed(prompt)
         head = prompt
         return finalise(head, data)
 

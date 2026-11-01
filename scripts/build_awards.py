@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'resources'))
 
 from tmdbhelper.lib.awards.builder import AwardsBuilder, AwardsUpdater
 from tmdbhelper.lib.awards.client import AwardsAPIError, TMDbClient, TVDbClient
-from tmdbhelper.lib.awards.credentials import AddonCredentials
+from tmdbhelper.lib.awards.credentials import AddonCredentials, TVDbModuleCredentials
 from tmdbhelper.lib.awards.database import DATABASE_PATH
 
 
@@ -17,7 +17,7 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8')
     try:
         credentials = AddonCredentials()
-        tvdb_api = TVDbClient(credentials.get_api_key('tvdb'))
+        tvdb_api = TVDbClient(TVDbModuleCredentials().get_api_key())
         tmdb_api = TMDbClient(credentials.get_api_key('tmdb'))
         builder_class = AwardsUpdater if DATABASE_PATH.exists() else AwardsBuilder
         builder_class(tvdb_api, tmdb_api).run()
