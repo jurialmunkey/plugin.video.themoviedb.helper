@@ -82,8 +82,6 @@ class BuildURL:
 
     @property
     def safe_encoded_url(self):
-        if not self.params:
-            return encode_url(self.path)
         path, _, query = self.path.partition('?')
         params = dict(parse_qsl(query, keep_blank_values=True))
         params.update(self.params)
@@ -94,7 +92,9 @@ class BuildURL:
         self.params.update(self.params_reload)
         self.params.update(self.params_widget)
         self.params.update(self.params_path_x)
-        return self.safe_encoded_url
+        if self.params and self.path.startswith(PLUGINPATH):
+            return self.safe_encoded_url
+        return encode_url(self.path, **self.params)
 
 
 class _ListItem(object):
