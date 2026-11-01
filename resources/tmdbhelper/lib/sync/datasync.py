@@ -553,13 +553,23 @@ class SyncData(SyncDataGetters):
                 if not sync_item.sync(forced=forced):
                     succeeded = False
                 continue
-            if sync_type not in SERVICE_SYNC_FEATURES and sync_type not in self.disabled_sync_types:
+            if (
+                    sync_type not in SERVICE_SYNC_FEATURES
+                    and sync_type not in self.disabled_sync_types
+                    and not self.is_sync_provider_unavailable(sync_type)):
                 self.clear_disabled_sync_type(sync_type)
             # An authorized provider's unsupported fields are intentionally empty.
             # Missing or unauthorized providers cannot supply fresh prerequisites.
             if self.get_sync_provider(sync_type) is None:
                 succeeded = False
         return succeeded
+
+    def is_sync_provider_unavailable(self, sync_type):
+        """Whether the selected provider is installed but cannot load, such as during an update.
+        Its synced data is kept for when it loads again."""
+        from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES
+        provider_id = self.registry.get_selected_provider_id(SYNC_FEATURES[sync_type])
+        return bool(provider_id) and self.registry.is_provider_unavailable(provider_id)
 
     def clear_disabled_sync_type(self, sync_type):
         from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES

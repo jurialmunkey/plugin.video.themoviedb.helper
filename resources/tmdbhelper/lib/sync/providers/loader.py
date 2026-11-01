@@ -13,6 +13,10 @@ from tmdbhelper.lib.sync.datatype import DataType
 from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES, ServiceDataType
 
 
+class SyncProviderLoadError(RuntimeError):
+    """A provider addon is installed but cannot be loaded, such as while it updates."""
+
+
 class SyncProviderLoader:
     interface_version = 3
     module_lock = RLock()
@@ -193,4 +197,4 @@ class SyncProviderLoader:
                 provider.migrate_settings()
                 return provider
         except Exception as exc:
-            raise RuntimeError(f"Unable to load sync provider {self.addon['addonid']}: {exc}") from exc
+            raise SyncProviderLoadError(f"Unable to load sync provider {self.addon['addonid']}: {exc}") from exc
