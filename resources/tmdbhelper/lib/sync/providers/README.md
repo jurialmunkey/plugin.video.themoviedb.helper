@@ -1,4 +1,4 @@
-# Sync providers (interface version 3)
+# Sync providers (interface version 4)
 
 TMDbHelper discovers enabled, installed `script.module.tmdbhelper.sync.*` addons.
 Each addon exposes a named Python package inside `resources/lib`. Derive its
@@ -107,11 +107,13 @@ Package only the individual provider folder when distributing an addon.
 
 Providers declare:
 
-- `interface_version = 3` explicitly on the Provider class.
+- `interface_version = 4` explicitly on the Provider class. See
+  [Interface versions](#interface-versions) for the supported range and policy.
 - `sync_classes`: sync-type names from `SYNC_FEATURES` to DataType subclasses,
   including class factories derived from DataType. Each declares a non-empty
   `method` string so invalidation can identify its activity timestamps.
-- `action_classes`: action names from `ACTION_FEATURES` to action classes.
+- `action_classes`: action names from `ACTION_FEATURES` to action classes that
+  inherit `tmdbhelper.lib.script.sync.item.ItemSync`.
 - `service_sync_classes`: optional account-data sync registrations independent of
   provider selections. `SyncRatings` and `SyncFavorites` inherit ServiceDataType
   and declare a non-empty cache `method`, like other sync classes. They receive
@@ -119,7 +121,8 @@ Providers declare:
   `invalidate_cache(provider)` class method clears module-owned service caches.
   Registering these exposes `service_sync`, without adding provider selectors.
 - `service_action_classes`: optional independent service action names mapped to
-  callable action classes. Names start with the provider ID and must be unique
+  action classes that inherit `tmdbhelper.lib.script.sync.item.ItemSync`.
+  Names start with the provider ID and must be unique
   across providers and core service actions. This exposes `service_actions`.
   Every authorized provider contributes these actions regardless of sync selections.
   The dispatcher assigns `sync_provider` and the caller's `syncdata` before
@@ -129,21 +132,27 @@ Providers declare:
   client is constructed. The default is a no-op for existing providers.
 - `getter_classes`: `movies_to_watch`, `shows_to_watch`, and `shows_in_progress`
   getters for watched/progress list behaviour. All three are required when the
-  provider declares the watched capability; every getter must be callable.
+  provider declares the watched capability. Each getter inherits
+  `tmdbhelper.lib.sync.datasync.SyncDataGetter` and implements `get_items()` and
+  `get_sync_succeeded()`; inheriting `SyncDataGetterAll` or one of its subclasses
+  provides both. See [Synced data getters](#synced-data-getters).
 - `ratings_classes`: optional media-type names (`movie`, `tvshow`, `season`,
   `episode`) mapped to RatingsSupplier subclasses. Each implements
   `get_ratings()`; registering any supplies the independent `ratings` capability.
 - `imdb_top250_classes`: optional `movie` / `tvshow` names mapped to
   IMDbTop250Supplier subclasses implementing `get_items()`. Each media type must
   also have a ratings supplier. Registering any supplies the `imdb_top250`
-  capability; empty defaults preserve existing interface-version-3 providers.
+  capability; the empty default keeps providers without it valid.
 - `stats_class`: an optional StatsSupplier subclass implementing `get_items()`.
-  Registering it exposes the independently selected `stats` capability. Existing
-  providers inherit a `None` default and retain interface-version-3 compatibility.
+  Registering it exposes the independently selected `stats` capability. Providers
+  without it inherit a `None` default.
 - `monitor_lists_class`: an optional MonitorListsSupplier subclass implementing
   `get_lists()` and `get_list_items(list_slug)`. This supplies the independent
   `monitor_lists` capability for library monitoring and list retrieval.
 - `scrobbler_class`: an optional ScrobbleRequest subclass for the scrobbling feature.
+  Core calls `scrobble(method)`, which returns a `ScrobbleResult`. Scrobblers using
+  the inherited `scrobble()` implement `get_scrobbler_item()` and
+  `send_request(method, payload)`; scrobblers that override `scrobble()` do not.
 - `directory_item_class`: an optional BaseDirItem subclass contributing a root
   folder. Its `params['info']` must name one of the provider's `list_routes`.
 - `list_routes`: optional route names mapped to `module_name` / `import_attr`
@@ -151,7 +160,7 @@ Providers declare:
   starts with `<provider_id>_`; duplicate routes are rejected. The imported
   objects are directory container classes with the existing `(handle,
   paramstring, **params)` interface. Registering routes exposes the `lists`
-  capability. Empty defaults keep existing interface-version-3 providers valid.
+  capability. The empty default keeps providers without lists valid.
 - `is_authorized()` and `get_last_activities()`: provider authentication and activity
   timestamps grouped by plural item type and activity key.
 
@@ -165,7 +174,7 @@ failed or throttled refreshes do not report success. `SyncData.sync()` refreshes
 every requested sync type and returns whether all prerequisites are current.
 Unsupported fields of an authorized provider are intentionally empty; a missing
 or unauthorized provider cannot supply fresh prerequisites.
-`SyncDataGetterAll.sync_succeeded` caches this outcome for one configured getter.
+`SyncDataGetter.sync_succeeded` caches this outcome for one configured getter.
 Ordinary `.items` reads retain access to cached data after a failed refresh.
 Provider `shows_in_progress` wrappers expose their parent getter's outcome and
 check any required filter requests, such as Trakt's optional calendar lookup.
@@ -356,8 +365,13 @@ setting writes while the addon settings dialog is open. Settings reopen at the
 original provider control afterward, including when selection is cancelled.
 Provider setup launched from lists or other scripts does not reopen settings.
 
-Duplicate IDs, incompatible interfaces, and broken entry points produce explicit
-errors. Selected-provider lookups load only the provider's own addon when its
+Duplicate IDs produce explicit errors. A provider addon that fails to import or
+validate, such as one with an unsupported interface version or one partway
+through an update, is logged and treated as temporarily unavailable rather than
+raising into lists. Selected-provider lookups return no provider, full listings
+skip it, and its synced data is kept rather than cleared as for a removed
+provider. Each registry tries a failed addon once, so the next invocation loads
+it again. Selected-provider lookups load only the provider's own addon when its
 addon ID is `script.module.tmdbhelper.sync.<provider_id>`; other providers are
 found by loading every discovered provider. Listing all providers loads the rest
 and applies the duplicate checks. Each provider is loaded once per registry.
@@ -390,6 +404,44 @@ scrobbling another source writes to the matching library item only when Kodi is
 one of the selected scrobblers. See the standalone provider's README for identity
 matching, date limitations, and non-library tracking findings.
 
+
+## Synced data getters
+
+`SyncDataGetter` is the interface that core reads from every synced data getter,
+including those providers supply through `getter_classes`. Getters receive
+`(syncdata, provider)`. Callers set `additional_keys` before reading the cached
+`items` and `sync_succeeded` properties, which call `get_items()` and
+`get_sync_succeeded()`. Both methods raise `NotImplementedError` on the base class,
+and the loader rejects provider getters that do not override them.
+`SyncDataGetterAll` implements both through the sync database; wrappers that
+filter another getter, such as `shows_in_progress`, inherit `SyncDataGetter` and
+derive both values from their parent getter.
+
+## Interface versions
+
+`SyncProviderLoader` accepts providers whose `interface_version` lies between its
+`minimum_interface_version` and its current `interface_version`, inclusive.
+Each class that a provider supplies inherits a core base class that defines its
+interface, and the loader checks the inheritance and required overrides at load.
+Core reads only the attributes and methods that these base classes declare.
+
+When core starts relying on something new from provider-supplied classes:
+
+- Prefer adding it to the base class with a default that preserves the previous
+  behaviour. Existing providers keep working, so no version change is needed.
+- When no such default exists, add it to the base class as a method raising
+  `NotImplementedError`, add a loader check, and increase both the current and
+  minimum interface versions. Older providers are then rejected at load and are
+  unavailable until they update.
+- When a provider relies on new core behaviour, increase the minimum
+  `plugin.video.themoviedb.helper` version imported by its `addon.xml`. Kodi
+  enforces that direction, so the provider cannot run on an older core.
+- Record each interface version below.
+
+| Version | Changes |
+| --- | --- |
+| 4 | Getters inherit `SyncDataGetter` and implement `get_items()` and `get_sync_succeeded()`. Actions and service actions inherit `ItemSync`. Scrobblers inherit `ScrobbleRequest`; those using its `scrobble()` implement `get_scrobbler_item()` and `send_request()`. The loader accepts a version range. |
+| 3 | Previous interface: getters, actions and scrobblers only had to be callable. |
 
 ## Provider list directories
 
@@ -584,7 +636,7 @@ retained solely so Kodi can still retrieve values from older installations.
 ## Browsing-only providers
 
 `script.module.tmdbhelper.sync.tvdb` and
-`script.module.tmdbhelper.sync.gemini` use interface version 3 with only the
+`script.module.tmdbhelper.sync.gemini` use interface version 4 with only the
 `lists` capability. They own their API clients, settings, artwork, root entries,
 directory properties and output mappers. Their script entry points use
 `open_sync_provider_settings` to open API settings without assigning sync

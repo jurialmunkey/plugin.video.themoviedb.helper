@@ -7,7 +7,7 @@ from tmdbhelper.lib.sync.providers.tmdb.directories.routes import LIST_ROUTES
 
 
 class Provider(SyncProvider):
-    interface_version = 3
+    interface_version = 4
     provider_id = 'tmdb'
     display_name = 'TMDb'
     addon_id = 'plugin.video.themoviedb.helper'

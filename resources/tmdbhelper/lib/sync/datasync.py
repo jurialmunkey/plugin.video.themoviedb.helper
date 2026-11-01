@@ -34,18 +34,40 @@ class SyncItemDetailsDatabase(ItemDetailsDatabase):
         return result[0]
 
 
-class SyncDataGetterAll:
+class SyncDataGetter:
+    """Interface for synced data getters, including those providers supply as getter_classes.
+    Callers set additional_keys before reading items or sync_succeeded.
+    Subclasses implement get_items() and get_sync_succeeded()."""
+
+    additional_keys = ()  # Additional keys to retrieve values for
+
+    def __init__(self, instance_syncdata, provider=None):
+        self.instance_syncdata = instance_syncdata
+        self.provider = provider
+
+    @cached_property
+    def items(self):
+        return self.get_items()
+
+    def get_items(self):
+        raise NotImplementedError
+
+    @cached_property
+    def sync_succeeded(self):
+        """Whether the synced data that items are read from is current."""
+        return self.get_sync_succeeded()
+
+    def get_sync_succeeded(self):
+        raise NotImplementedError
+
+
+class SyncDataGetterAll(SyncDataGetter):
 
     operator = 'OR'
     query_clauses = ('item_type=?', )  # WHERE {query_clauses}
     query_values = ('', )  # WHERE {query_clauses}={query_values}
     clause_keys = ()  # WHERE {query_clauses} AND ({clause_key} IS NOT NULL {operator} {clause_key} IS NOT NULL)
-    additional_keys = ()  # Additional keys to retrieve values for
     query_value_item_argx = 0  # Query value to use as sync item_type (normally item_type query is first ie 0 index)
-
-    def __init__(self, instance_syncdata, provider=None):
-        self.instance_syncdata = instance_syncdata
-        self.provider = provider
 
     @cached_property
     def item_type(self):
@@ -82,14 +104,6 @@ class SyncDataGetterAll:
 
     def get_keys(self):
         return (*(self.base_keys or ()), *(self.clause_keys or ()), *(self.additional_keys or ()), )
-
-    @cached_property
-    def items(self):
-        return self.get_items()
-
-    @cached_property
-    def sync_succeeded(self):
-        return self.get_sync_succeeded()
 
     def get_sync_succeeded(self):
         return self.instance_syncdata.sync(self.item_type, self.keys)
@@ -321,14 +335,14 @@ class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHid
         return ('episode', self.tmdb_id, )
 
 
-class SyncDataGetterEmpty:
-    items = ()
+class SyncDataGetterEmpty(SyncDataGetter):
     keys = ()
-    additional_keys = ()
-    sync_succeeded = False
 
-    def __init__(self, instance_syncdata):
-        self.instance_syncdata = instance_syncdata
+    def get_items(self):
+        return ()
+
+    def get_sync_succeeded(self):
+        return False
 
 
 def get_provider_getter(instance_syncdata, name, fallback_class):

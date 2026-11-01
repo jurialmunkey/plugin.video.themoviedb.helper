@@ -18,11 +18,16 @@ class SyncProviderLoadError(RuntimeError):
 
 
 class SyncProviderLoader:
-    interface_version = 3
+    interface_version = 4  # The current provider interface.
+    minimum_interface_version = 4  # The oldest provider interface that is still supported.
     module_lock = RLock()
 
     def __init__(self, addon):
         self.addon = addon
+
+    @property
+    def supported_interface_versions(self):
+        return range(self.minimum_interface_version, self.interface_version + 1)
 
     @property
     def module_name(self):
@@ -72,30 +77,61 @@ class SyncProviderLoader:
                 raise ValueError(f'{name} must declare a non-empty method')
 
     @staticmethod
-    def validate_action_classes(provider):
+    def validate_subclass(subclass, base, label, methods=()):
+        """Check that a provider-supplied class inherits the interface base class
+        and overrides each of the base class methods that raise NotImplementedError."""
+        if not isinstance(subclass, type) or not issubclass(subclass, base):
+            raise TypeError(f'{label} must inherit {base.__name__}')
+        missing = [method for method in methods if getattr(subclass, method) is getattr(base, method)]
+        if missing:
+            raise TypeError(f'{label} must implement {", ".join(f"{method}()" for method in missing)}')
+
+    @classmethod
+    def validate_action_classes(cls, provider):
+        from tmdbhelper.lib.script.sync.item import ItemSync
         for name, action_class in provider.action_classes.items():
             if name not in ACTION_FEATURES:
                 raise ValueError(f'Unknown sync action: {name}')
-            if not callable(action_class):
-                raise TypeError(f'Action factory {name} must be callable')
+            cls.validate_subclass(action_class, ItemSync, f'Action {name}')
 
-    @staticmethod
-    def validate_service_action_classes(provider):
+    @classmethod
+    def validate_service_action_classes(cls, provider):
+        from tmdbhelper.lib.script.sync.item import ItemSync
         for name, action_class in provider.service_action_classes.items():
             if not isinstance(name, str) or not name.startswith(provider.provider_id):
                 raise ValueError('Service action names must start with the provider ID')
-            if not callable(action_class):
-                raise TypeError(f'Service action factory {name} must be callable')
+            cls.validate_subclass(action_class, ItemSync, f'Service action {name}')
 
-    @staticmethod
-    def validate_getter_classes(provider):
+    @classmethod
+    def validate_getter_classes(cls, provider):
+        from tmdbhelper.lib.sync.datasync import SyncDataGetter
         if 'watched' in provider.capabilities:
             missing = set(WATCHED_GETTERS).difference(provider.getter_classes)
             if missing:
                 raise ValueError(f'Watched providers must declare getters: {", ".join(sorted(missing))}')
         for name, getter_class in provider.getter_classes.items():
-            if not callable(getter_class):
-                raise TypeError(f'Getter factory {name} must be callable')
+            if name not in WATCHED_GETTERS:
+                raise ValueError(f'Unknown getter: {name}')
+            cls.validate_subclass(
+                getter_class, SyncDataGetter, f'Getter {name}', ('get_items', 'get_sync_succeeded'))
+
+    @staticmethod
+    def get_scrobbler_methods(scrobbler_class, base):
+        """Core calls scrobble(). The base implementation requires the request hooks;
+        scrobblers that override scrobble() do not use them."""
+        if getattr(scrobbler_class, 'scrobble', None) is not base.scrobble:
+            return ()
+        return ('get_scrobbler_item', 'send_request')
+
+    @classmethod
+    def validate_scrobbler_class(cls, provider):
+        from tmdbhelper.lib.monitor.scrobble import ScrobbleRequest
+        scrobbler_class = provider.scrobbler_class
+        if scrobbler_class is None:
+            return
+        cls.validate_subclass(
+            scrobbler_class, ScrobbleRequest, 'Provider scrobbler',
+            cls.get_scrobbler_methods(scrobbler_class, ScrobbleRequest))
 
     @staticmethod
     def validate_ratings_classes(provider):
@@ -161,7 +197,7 @@ class SyncProviderLoader:
     def validate_provider(self, provider):
         if not isinstance(provider, SyncProvider):
             raise TypeError('Provider must inherit SyncProvider')
-        if provider.interface_version != self.interface_version:
+        if provider.interface_version not in self.supported_interface_versions:
             raise ValueError(f'Unsupported sync interface version: {provider.interface_version}')
         if not isinstance(provider.provider_id, str) or not provider.provider_id:
             raise ValueError('Provider must declare a non-empty provider_id')
@@ -185,8 +221,7 @@ class SyncProviderLoader:
         self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')
-        if provider.scrobbler_class is not None and not callable(provider.scrobbler_class):
-            raise TypeError('Provider scrobbler must be callable')
+        self.validate_scrobbler_class(provider)
         return provider
 
     def load(self):

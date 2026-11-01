@@ -5,7 +5,7 @@ from tmdbhelper.lib.sync.providers.omdb.ratings import OMDbRatingsSupplier
 
 
 class Provider(SyncProvider):
-    interface_version = 3
+    interface_version = 4
     provider_id = 'omdb'
     display_name = 'OMDb'
     addon_id = 'plugin.video.themoviedb.helper'
