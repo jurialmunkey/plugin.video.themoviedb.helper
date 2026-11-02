@@ -527,9 +527,16 @@ TV, Random, and details menus no longer inject Trakt entries. Existing `trakt_*`
 browsing URLs remain registered by the module. The nine legacy `random_*`
 Trakt URLs redirect to their `trakt_random_*` counterparts; obsolete `dir_*`
 Trakt URLs have no reroutes. Directory routing and sorting use the registry.
-Shared Trakt API transport and calendar support remain in core for the local
-library calendar. Its concrete local subclass does not import the optional
-provider; the Trakt module subclasses the same calendar support.
+The Trakt module owns its standard directory bases, pagination-header handling,
+filters, list cache configuration, calendar requests, and calendar mappers.
+Containers configure their properties and retain core's list finalisation
+pipeline. Properties select their mapper through `item_mapper_class`; output
+still uses the shared mapper pipeline for extra properties and dictionary cleanup.
+Class names, route registrations, cache keys, and calendar date behavior are
+preserved. The shared `mapper_standard` classes and factory remain in core
+because MDbList also uses them. Core's `lists_calendar` retains episode stacking
+used by both Trakt and the local library calendar, with no provider import.
+Trakt API transport remains in core pending its separate migration.
 
 ## Ratings suppliers
 
