@@ -67,12 +67,15 @@ class SyncProviderRegistry:
             pass
         if addon_id in self.failed_providers:
             raise self.failed_providers[addon_id]
+        from tmdbhelper.lib.script.sync.provider_errors import SyncProviderLoadErrorDialog
         try:
             provider = self.loaded_providers[addon_id] = SyncProviderLoader(addon).load()
         except SyncProviderLoadError as exc:
             self.failed_providers[addon_id] = exc
             kodi_log(f'{exc}. The provider is unavailable until it loads.', 1)
+            SyncProviderLoadErrorDialog(addon_id).show()
             raise
+        SyncProviderLoadErrorDialog(addon_id).clear()
         return provider
 
     def get_provider(self, provider_id):

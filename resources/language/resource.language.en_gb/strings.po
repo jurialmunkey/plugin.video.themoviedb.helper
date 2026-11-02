@@ -3467,3 +3467,13 @@ msgstr ""
 msgctxt "#32746"
 msgid "Disabling this module will remove it from:\n{0}"
 msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32747"
+msgid "Provider module unavailable"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32748"
+msgid "The {0} module could not be loaded and its features are temporarily unavailable. Update the module to the latest version and try again. Your settings and synced data have been kept."
+msgstr ""

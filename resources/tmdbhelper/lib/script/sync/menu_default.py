@@ -53,6 +53,7 @@ class Menu(BasicMenu):
             'rating': 'traktrating',
             'favorites': 'traktfavorites',
             'comments': 'traktcomments',
+            'userlist': 'traktuserlist',
         }.get(sync_type, sync_type)
         if sync_type and sync_type not in self.items:
             return

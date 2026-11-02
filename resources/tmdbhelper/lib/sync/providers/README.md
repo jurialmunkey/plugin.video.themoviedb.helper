@@ -246,9 +246,16 @@ each provider as `addon_id`, so trust checks use catalogue addon IDs rather than
 provider-declared IDs or display names. List setup inherits the same confirmation.
 Item actions use the provider selected for
 the same feature. Unsupported synced-state actions are absent from Sync Options.
-Trakt registers `traktrating`, `traktfavorites`, and `traktcomments`; the existing
-`rating`, `favorites`, and `comments` script selectors remain compatibility aliases.
+Trakt registers `traktrating`, `traktfavorites`, `traktcomments`, and
+`traktuserlist`; the existing `rating`, `favorites`, `comments`, and `userlist`
+script selectors remain compatibility aliases.
 The comment dialog action belongs to the Trakt module and uses its provider API.
+The module also owns list creation and item membership actions, including list
+selection, removal detection, and the existing monitored-list library prompt.
+These actions use the supplied provider API and registry. Core discovers all
+service actions through provider registrations without constructing a Trakt API.
+The Trakt-specific action base belongs to the module; older module versions
+importing the removed core action base must be updated before they can load.
 MDbList retains its `mdblistuser` action.
 Personal ratings and favorites sync, record mapping, actions, and account rating
 snapshots belong to the Trakt module. They use `service_sync_classes` and
@@ -373,7 +380,13 @@ Provider setup launched from lists or other scripts does not reopen settings.
 Duplicate IDs produce explicit errors. A provider addon that fails to import or
 validate, such as one with an unsupported interface version or one partway
 through an update, is logged and treated as temporarily unavailable rather than
-raising into lists. Selected-provider lookups return no provider, full listings
+raising into lists. An OK dialog names the module and asks the user to update it,
+while confirming that settings and synced data have been kept. The dialog appears
+once per failed provider per Kodi session, including across separate registries
+and simultaneous lookups. A successful load resets that provider's notification
+so a later failure can be reported again. This does not change the addon's enabled
+flag or clear its feature selections. Technical error details remain in the log.
+Selected-provider lookups return no provider, full listings
 skip it, and its synced data is kept rather than cleared as for a removed
 provider. Each registry tries a failed addon once, so the next invocation loads
 it again. Selected-provider lookups load only the provider's own addon when its
