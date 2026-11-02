@@ -720,16 +720,6 @@
                         <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.mdblist)</data>
                     </control>
                 </setting>
-                <!-- Retained only so Kodi can read and clear pre-module keys. -->
-                <setting id="mdblist_apikey" type="string" label="32423" help="32670">
-                    <level>4</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string"/>
-                    <visible>false</visible>
-                </setting>
             </group>
             <group id="3" label="32727">
                 <setting id="omdb_apikey" type="string" label="32001" help="32671">

@@ -634,13 +634,14 @@ settings page opens the module's settings through `open_sync_provider_settings`,
 using the existing install/enable flow when needed. This does not select a sync
 provider. All MDBList requests require the module to be installed and enabled.
 
-The module's `migrate_settings()` hook checks core's hidden legacy
+The module's `migrate_settings()` hook checks core's saved legacy
 `mdblist_apikey` setting whenever the provider is loaded, including discovery and
 installation. It copies the key only if the module has no key, reads back the
 destination to verify persistence, and then clears the core value. An existing
 module key takes precedence. An empty legacy value makes subsequent loads a
-no-op; failed writes preserve the source for retry. The hidden declaration is
-retained solely so Kodi can still retrieve values from older installations.
+no-op; failed writes preserve the source for retry. Kodi loads saved values
+without definitions as hidden internal string settings, so the legacy key
+remains accessible through `getSetting()` without a core settings declaration.
 
 ## Browsing-only providers
 
