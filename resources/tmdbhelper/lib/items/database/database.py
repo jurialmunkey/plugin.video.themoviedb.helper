@@ -49,19 +49,7 @@ class ItemDetailsDatabase(Database):
 
     def create_database_execute(self, connection):
         with connection:
-            version = connection.execute('PRAGMA user_version').fetchone()[0]
-            result = super().create_database_execute(connection)
-            if version and version < 51:
-                self.migrate_next_episode_activities(connection)
-            return result
-
-    @staticmethod
-    def migrate_next_episode_activities(connection):
-        # Run after table creation: upgrades through version 50 rebuild lactivities.
-        connection.execute(
-            'DELETE FROM lactivities WHERE id IN (?, ?, ?)',
-            ('show.trakt.nextup', 'show.trakt.all_next_episodes', 'show.mdblist.all_next_episodes'),
-        ).close()
+            return super().create_database_execute(connection)
 
     # DB version must be max of table_version
     database_version = 51
@@ -135,7 +123,7 @@ class ItemDetailsDatabase(Database):
             'DROP TABLE IF EXISTS lactivities',
             'DROP TABLE IF EXISTS baseitem',
         ),
-        51: (),  # Activity migration runs after tables have been created.
+        51: (),
     }
 
     baseitem_columns = BASEITEM_COLUMNS
