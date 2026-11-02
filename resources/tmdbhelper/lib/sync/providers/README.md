@@ -241,9 +241,11 @@ each provider as `addon_id`, so trust checks use catalogue addon IDs rather than
 provider-declared IDs or display names. List setup inherits the same confirmation.
 Item actions use the provider selected for
 the same feature. Unsupported synced-state actions are absent from Sync Options.
-Trakt registers `traktrating` and `traktfavorites`; the existing `rating` and
-`favorites` script selectors remain compatibility aliases. MDbList retains its
-`mdblistuser` action. Personal ratings and favorites sync, record mapping, actions, and account rating
+Trakt registers `traktrating`, `traktfavorites`, and `traktcomments`; the existing
+`rating`, `favorites`, and `comments` script selectors remain compatibility aliases.
+The comment dialog action belongs to the Trakt module and uses its provider API.
+MDbList retains its `mdblistuser` action.
+Personal ratings and favorites sync, record mapping, actions, and account rating
 snapshots belong to the Trakt module. They use `service_sync_classes` and
 `service_action_classes`; they do not depend on which provider is selected for
 watched data, watchlists, collection, or scrobbling. Disabled or unauthorized

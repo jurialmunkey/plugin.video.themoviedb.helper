@@ -48,9 +48,7 @@ class ServiceActions(CommonContainerAPIs):
 
     def get_trakt_actions(self):
         from tmdbhelper.lib.script.actions.trakt.userlist import ItemUserList
-        from tmdbhelper.lib.script.actions.trakt.comments import ItemComments
-        return {name: ('trakt_api', self.trakt_api, action_class) for name, action_class in (
-            ('userlist', ItemUserList), ('comments', ItemComments))}
+        return {'userlist': ('trakt_api', self.trakt_api, ItemUserList)}
 
     def get_item(self, name, *args):
         api_attribute, api, action_class = self.actions[name]
