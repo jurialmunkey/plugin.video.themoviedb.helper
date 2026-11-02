@@ -352,11 +352,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Deseja actualizar a biblioteca da(s) lista(s) Trakt agora?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Selecionar lista(s)"
-
 
 
 #: /resources/lib/context.py
@@ -1298,22 +1293,6 @@ msgid "Premieres"
 msgstr "Ante-estreias"
 
 
-
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Melhores listas"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "MDbList API"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "Chave MDbList API"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"

@@ -192,8 +192,6 @@ sync factories to normalize activity identities, deduplicates them, and refreshe
 only dependencies assigned to the action's provider. It retains cached columns
 until successful responses replace them. Explicit maintenance and provider
 changes continue to use the broader feature invalidators.
-MDbList watched additions use a concrete invalidator that preserves the history
-timestamp for incremental requests; removals invalidate it for a full snapshot.
 Trakt rating actions invalidate only the affected media type's ratings snapshot.
 Shared action properties use `item_type` and `base_item_type` for media types;
 these are Python properties and do not rename database columns. Service browsing
@@ -467,8 +465,7 @@ route, which resolves provider sort methods through the registry. Ordinary
 browsing keeps the original route. Existing `is_sortable` values are preserved
 so these entries also work with older core versions.
 
-The MDbList module registers `mdblist_directory` and all existing `mdblist_*`
-list routes. Core resolves provider routes through the registry without
+Core resolves provider list routes through the registry without
 per-list forwarding entries. If no route is found, a `<provider_id>_` prefix
 matching a trusted catalogue provider with the lists capability offers
 installation/enabling through Kodi. The dialog names the requested route and
@@ -476,19 +473,12 @@ provider; successful setup retries that route without changing sync selections.
 An installed provider must declare the requested route or an invalid-route
 error is raised. Concurrent requests recheck provider availability and prompt
 generation under a mutex.
-Declining returns no directory items. The sorting script resolves the module's
-sorting container. Library monitoring uses its own supplier interface below,
-without constructing directory containers. The MDbList API client and
-rating-response mappings belong entirely to the module. Core does not construct
-or expose an MDbList API client.
-
-MDbList list like/unlike actions run through the module's existing Kodi script
-entry point: `RunScript(script.module.tmdbhelper.sync.mdblist,like_list=<id>)`,
-with `delete=true` for unlike. Its mapper builds these commands and its action
-class owns requests, result dialogs, and successful container refreshes. The
-script resolves the provider through the registry before accessing its API.
-Calling it without arguments retains provider setup. Core's `like_mdblist`
-script route has been removed; this does not add a provider interface.
+Declining returns no directory items. Sorting scripts resolve provider-owned
+sorting containers. Library monitoring uses its own supplier interface below,
+without constructing directory containers. Service-specific API clients and
+response mappings belong to their provider modules. MDbList setup, list URLs,
+script commands, localization, and implementation details are documented in the
+[module README](https://github.com/jurialmunkey/script.module.tmdbhelper.sync.mdblist/blob/main/README.md).
 
 Trakt registers a single `trakt_directory` root. Grouped browsing, genres,
 calendar period menus, Random, and Discover live under that root. Core Movie,
@@ -539,9 +529,8 @@ belong to their internal suppliers, with no direct fallback in the ratings
 dictionaries. Configured provider priority determines overlapping fields across
 all suppliers, including OMDb ratings and awards. Lower-priority providers fill
 missing fields.
-The IMDb Top 250 output format remains unchanged. MDbList's module supplies all
-four media types using its module-owned API client's rating methods; no MDbList-specific
-branch remains in the ratings dictionaries.
+The IMDb Top 250 output format remains unchanged. Service-specific rating
+retrieval belongs to provider suppliers rather than the ratings dictionaries.
 
 ## Account stats
 
@@ -608,16 +597,14 @@ independent of watched, watchlist, scrobbling, and ratings selections.
 
 `get_lists()` supplies the cached `.lists` result: entries with `label` and
 `params` containing string `list_slug` and `user_slug` values. The default
-`user_slug` is `__api_<provider_id>__`. MDbList therefore keeps the existing
-`__api_mdblist__` identifier and numeric list IDs stored in `monitor_userlist`
-and `monitor_userslug`. No migration or new setting is required. MDbList list
-labels remain `MDbList: <name>` and use a module-owned ItemMapper.
+`user_slug` is `__api_<provider_id>__`. Providers own their list labels and retain
+their saved identifiers for compatibility with `monitor_userlist` and
+`monitor_userslug`.
 
 `get_list_items(list_slug)` returns the normalized records expected by
 LibraryBuilderUserList: each has `type` (`movie` or `show`) and a matching
 `movie`/`show` dictionary containing `title` and `ids` (`tmdb` and `imdb`).
-The module owns API requests and normalization. MDbList retains its existing
-separate movies/shows response handling and incomplete-record filtering.
+The module owns API requests and normalization.
 Unauthorized suppliers return no available lists or contents. Suppliers must
 not open settings, prompt for installation, or perform library/database writes.
 
@@ -637,19 +624,13 @@ dispatch. No database table definitions or cache invalidation are changed.
 
 ## Provider credentials and migration
 
-MDbList stores its API key in its own addon settings as `apikey`. The core API
-settings page opens the module's settings through `open_sync_provider_settings`,
-using the existing install/enable flow when needed. This does not select a sync
-provider. All MDBList requests require the module to be installed and enabled.
-
-The module's `migrate_settings()` hook checks core's saved legacy
-`mdblist_apikey` setting whenever the provider is loaded, including discovery and
-installation. It copies the key only if the module has no key, reads back the
-destination to verify persistence, and then clears the core value. An existing
-module key takes precedence. An empty legacy value makes subsequent loads a
-no-op; failed writes preserve the source for retry. Kodi loads saved values
-without definitions as hidden internal string settings, so the legacy key
-remains accessible through `getSetting()` without a core settings declaration.
+Providers own their credentials and settings migrations. Core's API settings
+page opens a module's settings through `open_sync_provider_settings`, using the
+existing install/enable flow when needed. This does not select a sync provider.
+The loader invokes the provider's `migrate_settings()` hook before API clients
+are constructed. Credential migration must verify destination persistence before
+clearing a legacy source. Module-specific settings and migration details belong
+in the module's documentation.
 
 ## Browsing-only providers
 

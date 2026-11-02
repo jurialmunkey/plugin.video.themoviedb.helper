@@ -271,22 +271,6 @@ msgctxt "#32065"
 msgid "Watchers"
 msgstr "追更人数"
 
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr "预算"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr "票房"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr "最后播出日期"
-
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -296,11 +280,6 @@ msgstr "选择操作"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "下个播放"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
-msgstr "评分"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -331,11 +310,6 @@ msgstr "重试"
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "提供的网址无效或不可访问。"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
-msgstr "用户"
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
@@ -643,11 +617,6 @@ msgstr "添加另一项目？"
 msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "你想现在从 Trakt 列表中更新媒体库吗？"
-
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "选择列表"
 
 
 
@@ -1617,11 +1586,6 @@ msgid "Retrieving Artwork"
 msgstr "正在获取艺术图"
 
 #: /resources/settings.xml
-msgctxt "#32402"
-msgid "Scrobble items on MDbList while watching"
-msgstr "观看时向 MDbList 同步播放记录"
-
-#: /resources/settings.xml
 msgctxt "#32403"
 msgid "Sync"
 msgstr "同步"
@@ -1701,22 +1665,6 @@ msgid "Premieres"
 msgstr "首映"
 
 
-
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "热门列表"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "MDbList API"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "MDbList API 密钥"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
@@ -1991,32 +1939,6 @@ msgstr "将{}添加到节点"
 
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "添加到 MDbList 列表"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "未找到 MDbList API 凭据。"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "在 TMDbHelper 设置中添加你个人的 MDbList API 密钥。"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "未找到当前 MDbList 用户的静态列表。"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "从 MDbList 列表中删除"
 
 #: /resources/settings.xml
 msgctxt "#32520"

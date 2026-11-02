@@ -270,22 +270,6 @@ msgctxt "#32065"
 msgid "Watchers"
 msgstr "Oglądający"
 
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr "Budżet"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr "Dochód"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr "Data ostatniej emisji"
-
 #: /resources/lib/player.py
 msgctxt "#32042"
 msgid "Choose Action"
@@ -295,11 +279,6 @@ msgstr "Wybierz akcję"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "Następne"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
-msgstr "Punktacja"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -330,11 +309,6 @@ msgstr "Powtórz"
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "Podany adres URL jest nieprawidłowy lub niedostępny."
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
-msgstr "Użytkownik"
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
@@ -641,11 +615,6 @@ msgstr "Dodać kolejną pozycję?"
 msgctxt "#32132"
 msgid "Do you wish to update the library from the list(s) now?"
 msgstr "Czy chcesz teraz zaktualizować bibliotekę z list(y)?"
-
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Wybierz listę(y)"
 
 
 
@@ -1661,12 +1630,6 @@ msgid "Medium"
 msgstr "Średnia"
 
 
-#: /resources/settings.xml
-msgctxt "#32417"
-msgid "MDbList support is currently experimental"
-msgstr "Obsługa MDbList ma obecnie charakter eksperymentalny"
-
-
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
@@ -1697,22 +1660,6 @@ msgid "Premieres"
 msgstr "Premiery"
 
 
-
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Najlepsze listy"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "API MDbList"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "Klucz API dla serwisu MDbList"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
@@ -1987,32 +1934,6 @@ msgstr "Dodaj {} do węzła"
 
 
 
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "Dodaj do listy MDbList"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "Nie znaleziono danych uwierzytelniających API MDbList."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "Dodaj swój osobisty klucz API MDbList w ustawieniach TMDbHelper."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "Nie znaleziono list statycznych użytkownika MDbList."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "Usuń z listy MDbList"
-
 #: /resources/settings.xml
 msgctxt "#32520"
 msgid "TMDb"
@@ -2090,28 +2011,6 @@ msgstr "Wszystkie wydania cyfrowe"
 msgctxt "#32541"
 msgid "Groups"
 msgstr "Grupy"
-
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32543"
-msgid "Curated Lists"
-msgstr "Listy autorskie"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32544"
-msgid "Official Lists"
-msgstr "Listy oficjalne"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32545"
-msgid "Streaming Charts"
-msgstr "Trendy streamingu"
-
-#: /resources/settings.xml
-#: /resources/tmdbhelper/lib/items/context.py
-msgctxt "#32546"
-msgid "Trakt / MDbList options"
-msgstr "Opcje Trakt / MDbList"
 
 #: /resources/tmdbhelper/lib/script/discover/trakt.py
 msgctxt "#32547"

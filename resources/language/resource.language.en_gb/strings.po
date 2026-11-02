@@ -311,21 +311,6 @@ msgctxt "#32038"
 msgid "Kodi library details"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr ""
-
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -334,11 +319,6 @@ msgstr ""
 #: /resources/lib/container.py
 msgctxt "#32043"
 msgid "Up Next"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
 msgstr ""
 
 #: /resources/lib/container.py
@@ -369,11 +349,6 @@ msgstr ""
 #: /resources/lib/downloader.py
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
 msgstr ""
 
 #: /resources/lib/downloader.py
@@ -744,11 +719,6 @@ msgstr ""
 #: /resources/lib/script.py
 msgctxt "#32132"
 msgid "Do you wish to update the library from the list(s) now?"
-msgstr ""
-
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
 msgstr ""
 
 #: /resources/lib/context.py
@@ -1765,11 +1735,6 @@ msgid "Retrieving Artwork"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32402"
-msgid "Scrobble items on MDbList while watching"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32403"
 msgid "Sync"
 msgstr ""
@@ -1830,11 +1795,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local files"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32417"
-msgid "MDbList support is currently experimental"
 msgstr ""
 
 #: /resources/settings.xml
@@ -1900,21 +1860,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32420"
 msgid "Image quality"
-msgstr ""
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
 msgstr ""
 
 #: /resources/lib/player/configure.py
@@ -2278,31 +2223,6 @@ msgid "Alternate TMDb endpoint"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in the MDbList module settings."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32520"
 msgid "TMDb"
 msgstr ""
@@ -2390,26 +2310,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32542"
 msgid "Groups"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32543"
-msgid "Curated Lists"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32544"
-msgid "Official Lists"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32545"
-msgid "Streaming Charts"
-msgstr ""
-
-#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
-msgctxt "#32546"
-msgid "Trakt / MDbList options"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/discover/trakt.py
@@ -3236,11 +3136,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32669"
 msgid "Install MDbList support if needed, then open its provider settings."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32670"
-msgid "Retain the legacy MDbList key until it is migrated to the provider module."
 msgstr ""
 
 #: /resources/settings.xml

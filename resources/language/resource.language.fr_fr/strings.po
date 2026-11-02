@@ -270,22 +270,6 @@ msgctxt "#32065"
 msgid "Watchers"
 msgstr "Spectateurs"
 
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr "Budget"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr "Recettes"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr "Dernière date de diffusion"
-
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -295,11 +279,6 @@ msgstr "Choisir une action"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "À suivre"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
-msgstr "Score"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -330,11 +309,6 @@ msgstr "Réessayer"
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "L'URL fournie est soit invalide, soit inaccessible."
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
-msgstr "Utilisateur"
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
@@ -575,11 +549,6 @@ msgstr "Êtes-vous sûr de vouloir ajouter cette liste Trakt à votre médiathè
 msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Souhaitez-vous mettre à jour la médiathèque à partir de la (des) liste(s) Trakt maintenant ?"
-
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Sélectionner la ou les listes"
 
 
 
@@ -1537,22 +1506,6 @@ msgstr "Premières"
 
 
 
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Meilleures listes"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "API MDbList"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "Clé API MDbList"
-
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
@@ -1825,32 +1778,6 @@ msgstr "Ajouter {} au nœud"
 
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "Ajouter à la liste MDbList"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "Identifiants de l'API MDbList non trouvés."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "Ajoutez votre clé API MDbList personnelle dans les paramètres de TMDbHelper."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "Aucune liste statique trouvée pour l'utilisateur MDbList actuel."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "Supprimer de la liste MDbList"
 
 #: /resources/settings.xml
 msgctxt "#32520"
