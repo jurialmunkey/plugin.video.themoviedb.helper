@@ -1496,11 +1496,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Dina avsnitt som sänds nästa gång"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Utmärkelser"
-
 
 
 
@@ -1538,12 +1533,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Ändra standardspelare för tv-serie, säsong eller avsnitt"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "TVDb API"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"

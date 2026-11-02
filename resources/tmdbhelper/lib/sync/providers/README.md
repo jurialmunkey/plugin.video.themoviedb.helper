@@ -651,6 +651,10 @@ Before creating API clients, Gemini migrates the legacy core API key and TVDb
 migrates the legacy bearer token into module-owned storage. Migration verifies
 the destination before clearing the legacy value and preserves existing module
 credentials. TVDb retains its bundled key and supports an optional personal key.
+Legacy credential values remain available to these migrations in Kodi's saved
+settings without definitions in core's settings schema. Provider-only translations
+belong to the module catalogs; shared labels and core settings buttons remain in
+core.
 The local awards database and its metadata consumers remain in core; browsing
 does not change item-details database ownership or the finalisation pipeline.
 

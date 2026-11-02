@@ -1476,11 +1476,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Következő sugárzott saját epizódok"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Díjak"
-
 
 
 
@@ -1518,12 +1513,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Alapértelmezett lejátszó módosítása sorozathoz, évadhoz vagy epizódhoz"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "TVDb API kulcs"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"

@@ -756,14 +756,6 @@
                         <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.gemini)</data>
                     </control>
                 </setting>
-                <!-- Retained only so Kodi can read and clear pre-module keys. -->
-                <setting id="gemini_apikey" type="string" label="32148" help="32673">
-                    <level>4</level>
-                    <default/>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="edit" format="string"/>
-                    <visible>false</visible>
-                </setting>
                 <setting id="tvdb_settings" type="action" label="32738" help="32739">
                     <level>0</level>
                     <control type="button" format="action">
@@ -815,21 +807,6 @@
             </group>
             <group id="5" label="32728">
                 <visible>false</visible>
-                <setting id="tvdb_token" type="string" label="32011" help="32700">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition on="property" name="InfoBool">False</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="edit" format="string">
-                        <heading>32011</heading>
-                    </control>
-                </setting>
                 <setting id="tmdb_user_token" type="string" label="32011" help="32701">
                     <level>0</level>
                     <default/>

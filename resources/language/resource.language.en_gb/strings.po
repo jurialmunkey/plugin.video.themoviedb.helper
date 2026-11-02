@@ -626,31 +626,6 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32148"
-msgid "Gemini key"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
-msgstr ""
-
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
 msgctxt "#32152"
 msgid "Remove node"
@@ -2022,11 +1997,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr ""
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr ""
-
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache own lists for 24h"
@@ -2105,11 +2075,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32483"
 msgid "Share credentials"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync.py
@@ -3149,11 +3114,6 @@ msgid "Enter your RatingPosterDB API key for posters with ratings."
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32673"
-msgid "Enter your Gemini API key for AI-assisted features."
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32674"
 msgid "Enter your Fanart.tv client key for artwork lookups."
 msgstr ""
@@ -3284,11 +3244,6 @@ msgid "Run a Trakt request and write its response to the Kodi log."
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32700"
-msgid "Store the TVDb authentication token used by TMDbHelper."
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32701"
 msgid "Store the TMDb account authentication token used by TMDbHelper."
 msgstr ""
@@ -3306,11 +3261,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32704"
 msgid "Allow other plugins to access the saved Fanart.tv client key."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32705"
-msgid "Allow other plugins to access the saved TVDb token."
 msgstr ""
 
 #: /resources/settings.xml

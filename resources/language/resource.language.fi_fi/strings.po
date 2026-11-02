@@ -1451,11 +1451,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Seuraavaksi esitettävät jaksosi"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Palkinnot"
-
 
 
 
@@ -1493,12 +1488,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Valitse sarjan, kauden tai jakson oletussoitin"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "TVDb API"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"

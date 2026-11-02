@@ -533,27 +533,6 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr "Dane synchronizacji {} zostały pomyślnie odświeżone"
 
-#: /resources/settings.xml
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr "API Gemini"
-
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr "Gemini AI"
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr "Google Gemini AI wymaga do działania klucza API dewelopera."
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
-msgstr "Odwiedź [B]{}[/B], aby wygenerować swój klucz, a następnie wprowadź go w ustawieniach TMDbHelper w sekcji kluczy API."
-
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
 msgctxt "#32152"
 msgid "Remove node"
@@ -1808,11 +1787,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Twoje Odcinki następnie emitowane"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Nagrody"
-
 
 
 
@@ -1850,12 +1824,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Zmień domyślnego playera dla serialu, sezonu lub odcinka"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "API dla serwisu TVDb"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"

@@ -138,15 +138,6 @@ def test_func(test_func, dialog_output=False, **kwargs):
         head = path
         return finalise(head, data)
 
-    def test_func_gemini(prompt, **kwargs):
-        from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
-        provider = SyncProviderRegistry().find_provider('gemini')
-        if provider is None:
-            return
-        data = provider.api.get_prompt_text_parsed(prompt)
-        head = prompt
-        return finalise(head, data)
-
     def test_func_clear_lactivity(**kwargs):
         from jurialmunkey.window import get_property
         from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
@@ -168,7 +159,6 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'jrpc': test_func_jrpc,
         'jrpc_directory': test_func_jrpc_directory,
         'trakt_auth': test_func_trakt_auth,
-        'gemini': test_func_gemini,
         'clear_lactivity': test_func_clear_lactivity,
     }
 

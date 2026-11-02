@@ -535,27 +535,6 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr "成功刷新 {} 同步数据"
 
-#: /resources/settings.xml
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr "Gemini API"
-
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr "Gemini AI"
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr "使用 Google Gemini AI 需要开发者 API 密钥。"
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
-msgstr "访问 [B]{}[/B] 生成密钥，然后在 TMDbHelper 设置中的 “API 密钥” 板块输入该密钥。"
-
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
 msgctxt "#32152"
 msgid "Remove node"
@@ -1813,11 +1792,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "你的下一个播放分集"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "奖项"
-
 
 
 
@@ -1855,12 +1829,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "更改剧集默认播放器"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "TVDb API"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"

@@ -1653,11 +1653,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Vos prochains épisodes diffusés"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Récompenses"
-
 
 
 
@@ -1695,12 +1690,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Changer le lecteur par défaut pour une série, une saison ou un épisode"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "API TVDb"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
