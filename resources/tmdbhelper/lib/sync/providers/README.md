@@ -458,6 +458,15 @@ item builder for menus, and ListDefault/ListStandard with
 or appropriate database interfaces; mappers turn those entries into item
 dictionaries. Configure attributes before accessing cached properties.
 
+Sortable entries retain their `is_sortable` property and declare their sorting
+route in `infoproperties['sortby_info']`, such as `mdblist_sortby` or
+`trakt_sortby`. Provider mappers and menu item builders supply this route; core
+handles Skin Shortcuts detection and redirects to it with the original `info`
+in `parent_info`. Entries without `sortby_info` use the shared `sync_sortby`
+route, which resolves provider sort methods through the registry. Ordinary
+browsing keeps the original route. Existing `is_sortable` values are preserved
+so these entries also work with older core versions.
+
 The MDbList module registers `mdblist_directory` and all existing `mdblist_*`
 list routes. Core resolves provider routes through the registry without
 per-list forwarding entries. If no route is found, a `<provider_id>_` prefix
