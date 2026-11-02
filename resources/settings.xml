@@ -235,6 +235,7 @@
                 <setting id="nextepisodes_usecalendar" type="boolean" label="32413" help="32630">
                     <level>0</level>
                     <default>false</default>
+                    <visible>false</visible>
                     <control type="toggle"/>
                 </setting>
             </group>
@@ -312,13 +313,6 @@
                     </control>
                 </setting>
             </group>
-            <group id="8" label="32470">
-                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="32634">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle" />
-                </setting>
-            </group>
         </category>
         <category id="artwork" label="32080" help="">
             <group id="1" label="32520">
@@ -382,6 +376,7 @@
                 <setting id="trakt_genre_icon_location" type="path" label="32507" help="32640">
                     <level>0</level>
                     <default/>
+                    <visible>false</visible>
                     <constraints>
                         <sources>
                             <source>files</source>
@@ -666,6 +661,19 @@
         </category>
         <category id="services" label="32017" help="">
             <group id="1" label="32470">
+                <setting id="trakt_settings" type="action" label="32749" help="32750">
+                    <level>0</level>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.trakt)</data>
+                    </control>
+                </setting>
+                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="32634">
+                    <level>0</level>
+                    <default>true</default>
+                    <visible>false</visible>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="trakt_token" type="string" label="32011" help="32702">
                     <level>0</level>
                     <default/>

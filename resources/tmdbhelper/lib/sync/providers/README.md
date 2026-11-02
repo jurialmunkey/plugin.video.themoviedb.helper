@@ -538,6 +538,28 @@ because MDbList also uses them. Core's `lists_calendar` retains episode stacking
 used by both Trakt and the local library calendar, with no provider import.
 Trakt API transport remains in core pending its separate migration.
 
+### Trakt preferences
+
+The Trakt module owns `cache_own_lists`, `genre_icon_location`, and `use_calendar`
+in its settings. Core's API settings page opens them through **Trakt settings**
+and the existing `open_sync_provider_settings` route. The provider's
+`migrate_settings()` hook copies the legacy core preferences once, before API
+clients or settings-dependent getters are used. It preserves non-default module
+preferences already saved by the user, including false boolean values, verifies
+each write, and marks migration complete only after all writes succeed. A failed
+or partial migration can be retried without overwriting saved module values.
+
+Core keeps `trakt_cacheownlists`, `trakt_genre_icon_location`, and
+`nextepisodes_usecalendar` as hidden compatibility definitions so Kodi retains
+their values until the module can migrate them. Migration leaves those source
+values intact. Only the module's preferences control its behavior afterward.
+
+The page multiplier (`pagemulti_trakt`, labelled **Other page multiplier**),
+calendar flattening, next-episode sorting, recommendation seed, and watched
+indicators remain core preferences because they serve shared functionality.
+Legacy Trakt names do not make those settings provider-owned. Credentials and
+authentication controls remain in core pending their separate migration.
+
 ## Ratings suppliers
 
 In Sync settings, the Ratings group contains Providers and Priority. Providers
