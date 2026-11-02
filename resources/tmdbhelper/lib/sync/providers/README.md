@@ -482,6 +482,14 @@ without constructing directory containers. The MDbList API client and
 rating-response mappings belong entirely to the module. Core does not construct
 or expose an MDbList API client.
 
+MDbList list like/unlike actions run through the module's existing Kodi script
+entry point: `RunScript(script.module.tmdbhelper.sync.mdblist,like_list=<id>)`,
+with `delete=true` for unlike. Its mapper builds these commands and its action
+class owns requests, result dialogs, and successful container refreshes. The
+script resolves the provider through the registry before accessing its API.
+Calling it without arguments retains provider setup. Core's `like_mdblist`
+script route has been removed; this does not add a provider interface.
+
 Trakt registers a single `trakt_directory` root. Grouped browsing, genres,
 calendar period menus, Random, and Discover live under that root. Core Movie,
 TV, Random, and details menus no longer inject Trakt entries. Existing `trakt_*`
