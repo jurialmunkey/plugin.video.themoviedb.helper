@@ -653,8 +653,8 @@ msgstr "إضافة عنصر آخر؟"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
-msgid "Do you wish to update the library from the Trakt list(s) now?"
-msgstr "هل ترغب في تحديث المكتبة من قائمة/قوائم Trakt الآن؟"
+msgid "Do you wish to update the library from the list(s) now?"
+msgstr "هل ترغب في تحديث المكتبة من القائمة/القوائم الآن؟"
 
 #: /resources/lib/script.py
 msgctxt "#32133"
@@ -2029,8 +2029,8 @@ msgstr "لم يتم العثور على بيانات اعتماد MDbList API."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "أضف مفتاح MDbList API الشخصي الخاص بك في إعدادات TMDbHelper."
+msgid "Add your personal MDbList API key in the MDbList module settings."
+msgstr "أضف مفتاح MDbList API الشخصي الخاص بك في إعدادات وحدة MDbList."
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32518"
@@ -2297,3 +2297,1160 @@ msgstr "يجب عليك مصادقة حساب Trakt الخاص بك لاستخد
 msgctxt "#32014"
 msgid "Players"
 msgstr "المشغلات"
+
+#: Added translations
+msgctxt "#32013"
+msgid "Sync watched and resume"
+msgstr "مزامنة المشاهدة ونقاط الاستئناف"
+
+msgctxt "#32015"
+msgid "Up next"
+msgstr "التالي"
+
+msgctxt "#32018"
+msgid "Anticipated"
+msgstr "المرتقبة"
+
+msgctxt "#32020"
+msgid "Specials"
+msgstr "الحلقات الخاصة"
+
+msgctxt "#32039"
+msgid "Prefer Fanart.tv"
+msgstr "تفضيل Fanart.tv"
+
+msgctxt "#32049"
+msgid "Sort next episodes by airdate or recent viewing, optionally prioritising episodes airing today or in the past week."
+msgstr "رتّب الحلقات التالية حسب تاريخ العرض أو المشاهدة الأخيرة، مع إمكانية تقديم الحلقات المعروضة اليوم أو خلال الأسبوع الماضي."
+
+msgctxt "#32050"
+msgid "Prefer my language"
+msgstr "تفضيل لغتي"
+
+msgctxt "#32052"
+msgid "Delete item cache"
+msgstr "حذف ذاكرة العناصر المؤقتة"
+
+msgctxt "#32053"
+msgid "Delete cached TMDb item details for troubleshooting. Routine deletion slows lookups and increases API requests."
+msgstr "احذف تفاصيل عناصر TMDb المخزنة مؤقتًا لاستكشاف الأخطاء. الحذف المتكرر يبطئ عمليات البحث ويزيد طلبات API."
+
+msgctxt "#32038"
+msgid "Kodi library details"
+msgstr "تفاصيل مكتبة Kodi"
+
+msgctxt "#32082"
+msgid "Other page multiplier"
+msgstr "مضاعف الصفحات الأخرى"
+
+msgctxt "#32083"
+msgid "Sync page multiplier"
+msgstr "مضاعف صفحات المزامنة"
+
+msgctxt "#32075"
+msgid "TV shows folder"
+msgstr "مجلد المسلسلات"
+
+msgctxt "#32076"
+msgid "Scan after adding"
+msgstr "الفحص بعد الإضافة"
+
+msgctxt "#32077"
+msgid "Skip folder checks"
+msgstr "تخطي فحص المجلدات"
+
+msgctxt "#32080"
+msgid "Artwork"
+msgstr "الصور الفنية"
+
+msgctxt "#32081"
+msgid "Widget next page"
+msgstr "الصفحة التالية للأداة"
+
+msgctxt "#32086"
+msgid "Auto-update episodes"
+msgstr "التحديث التلقائي للحلقات"
+
+msgctxt "#32092"
+msgid "Lists"
+msgstr "القوائم"
+
+msgctxt "#32093"
+msgid "Sort order"
+msgstr "ترتيب الفرز"
+
+msgctxt "#32127"
+msgid "RatingPosterDB key"
+msgstr "مفتاح RatingPosterDB"
+
+msgctxt "#32129"
+msgid "Override playback clearlogo"
+msgstr "استبدال شعار التشغيل"
+
+msgctxt "#32139"
+msgid "Rate on TMDb"
+msgstr "التقييم على TMDb"
+
+msgctxt "#32148"
+msgid "Gemini key"
+msgstr "مفتاح Gemini"
+
+msgctxt "#32130"
+msgid "Update time"
+msgstr "وقت التحديث"
+
+msgctxt "#32131"
+msgid "Source lists"
+msgstr "قوائم المصدر"
+
+msgctxt "#32154"
+msgid "Update now"
+msgstr "التحديث الآن"
+
+msgctxt "#32156"
+msgid "Link to library shows"
+msgstr "ربط بمسلسلات المكتبة"
+
+msgctxt "#32169"
+msgid "Sign out"
+msgstr "تسجيل الخروج"
+
+msgctxt "#32347"
+msgid "Log Trakt request"
+msgstr "تسجيل طلب Trakt"
+
+msgctxt "#32348"
+msgid "Log TMDb request"
+msgstr "تسجيل طلب TMDb"
+
+msgctxt "#32349"
+msgid "English plot fallback"
+msgstr "الرجوع إلى الملخص الإنجليزي"
+
+msgctxt "#32350"
+msgid "Fetch English plots when your language has none. Increases lookup time and database size."
+msgstr "اجلب الملخصات الإنجليزية عند عدم توفرها بلغتك. يزيد ذلك من وقت البحث وحجم قاعدة البيانات."
+
+msgctxt "#32352"
+msgid "Dummy duration (s)"
+msgstr "المدة الوهمية (ث)"
+
+msgctxt "#32363"
+msgid "Resolve delay (s)"
+msgstr "تأخير الحل (ث)"
+
+msgctxt "#32377"
+msgid "Online monitor artwork"
+msgstr "صور المراقب عبر الإنترنت"
+
+msgctxt "#32371"
+msgid "Thumbnail artwork"
+msgstr "الصور المصغرة"
+
+msgctxt "#32386"
+msgid "Online monitor ratings"
+msgstr "تقييمات المراقب عبر الإنترنت"
+
+msgctxt "#32373"
+msgid "Resolve library STRM only"
+msgstr "حل ملفات STRM للمكتبة فقط"
+
+msgctxt "#32388"
+msgid "Genre fanart"
+msgstr "خلفيات التصنيفات"
+
+msgctxt "#32389"
+msgid "Provider fanart"
+msgstr "خلفيات المزودين"
+
+msgctxt "#32396"
+msgid "Delete list cache"
+msgstr "حذف ذاكرة القوائم المؤقتة"
+
+msgctxt "#32390"
+msgid "Alternative NFO name"
+msgstr "اسم NFO بديل"
+
+msgctxt "#32395"
+msgid "Directory timings"
+msgstr "توقيتات المجلدات"
+
+msgctxt "#32400"
+msgid "Play local files"
+msgstr "تشغيل الملفات المحلية"
+
+msgctxt "#32417"
+msgid "MDbList support is currently experimental"
+msgstr "دعم MDbList تجريبي حاليًا"
+
+msgctxt "#32404"
+msgid "Combine same-day episodes"
+msgstr "دمج حلقات اليوم الواحد"
+
+msgctxt "#32409"
+msgid "Database folder"
+msgstr "مجلد قاعدة البيانات"
+
+msgctxt "#32410"
+msgid "Thread limit"
+msgstr "حد الخيوط"
+
+msgctxt "#32413"
+msgid "Check calendar"
+msgstr "التحقق من التقويم"
+
+msgctxt "#32415"
+msgid "Combine plugin players"
+msgstr "دمج مشغلات الإضافات"
+
+msgctxt "#32418"
+msgid "Add text before the certification, such as Rated before PG. Refresh cached items to apply changes."
+msgstr "أضف نصًا قبل التصنيف العمري، مثل Rated قبل PG. حدّث العناصر المخزنة مؤقتًا لتطبيق التغييرات."
+
+msgctxt "#32419"
+msgid "Choose the language and country used for TMDb and Trakt lookups."
+msgstr "اختر اللغة والبلد المستخدمين في عمليات البحث في TMDb وTrakt."
+
+msgctxt "#32420"
+msgid "Image quality"
+msgstr "جودة الصور"
+
+msgctxt "#32437"
+msgid "Provider data allowlist"
+msgstr "قائمة السماح لبيانات المزودين"
+
+msgctxt "#32450"
+msgid "Prefer English fallbacks"
+msgstr "تفضيل البدائل الإنجليزية"
+
+msgctxt "#32449"
+msgid "Ignore release region"
+msgstr "تجاهل منطقة الإصدار"
+
+msgctxt "#32463"
+msgid "Cache own lists for 24h"
+msgstr "تخزين قوائمي مؤقتًا لمدة 24 ساعة"
+
+msgctxt "#32479"
+msgid "When regional artwork is missing, prefer English over artwork in your language from other regions."
+msgstr "عند غياب الصور الفنية الإقليمية، فضّل الإنجليزية على الصور بلغتك من مناطق أخرى."
+
+msgctxt "#32466"
+msgid "Auto-select provider"
+msgstr "الاختيار التلقائي للمزود"
+
+msgctxt "#32467"
+msgid "Refresh cached details"
+msgstr "تحديث التفاصيل المخزنة مؤقتًا"
+
+msgctxt "#32468"
+msgid "Startup notifications"
+msgstr "إشعارات بدء التشغيل"
+
+msgctxt "#32471"
+msgid "Connection errors"
+msgstr "أخطاء الاتصال"
+
+msgctxt "#32472"
+msgid "Image folder"
+msgstr "مجلد الصور"
+
+msgctxt "#32481"
+msgid "Set the number of recently watched items available as random seeds for Because You Watched recommendations."
+msgstr "حدد عدد العناصر المشاهدة مؤخرًا المتاحة كبذور عشوائية لتوصيات «لأنك شاهدت»."
+
+msgctxt "#32482"
+msgid "Seed pool size"
+msgstr "حجم مجموعة البذور"
+
+msgctxt "#32483"
+msgid "Share credentials"
+msgstr "مشاركة بيانات الاعتماد"
+
+msgctxt "#32497"
+msgid "Container type fallback"
+msgstr "الرجوع إلى نوع الحاوية"
+
+msgctxt "#32498"
+msgid "Use the container's content type when an item has no media type. May cause incorrect matches."
+msgstr "استخدم نوع محتوى الحاوية عندما لا يكون للعنصر نوع وسائط. قد يؤدي إلى مطابقات غير صحيحة."
+
+msgctxt "#32500"
+msgid "TMDb page multiplier"
+msgstr "مضاعف صفحات TMDb"
+
+msgctxt "#32505"
+msgid "TMDb genre folder"
+msgstr "مجلد تصنيفات TMDb"
+
+msgctxt "#32506"
+msgid "Provider folder"
+msgstr "مجلد المزودين"
+
+msgctxt "#32507"
+msgid "Trakt genre folder"
+msgstr "مجلد تصنيفات Trakt"
+
+msgctxt "#32508"
+msgid "Refresh local details for players"
+msgstr "تحديث التفاصيل المحلية للمشغلات"
+
+msgctxt "#32509"
+msgid "Alternate TMDb endpoint"
+msgstr "نقطة وصول TMDb البديلة"
+
+msgctxt "#32522"
+msgid "TMDb options"
+msgstr "خيارات TMDb"
+
+msgctxt "#32534"
+msgid "Sync progress"
+msgstr "مزامنة التقدم"
+
+msgctxt "#32541"
+msgid "Groups"
+msgstr "المجموعات"
+
+msgctxt "#32542"
+msgid "Groups"
+msgstr "المجموعات"
+
+msgctxt "#32543"
+msgid "Curated Lists"
+msgstr "القوائم المنتقاة"
+
+msgctxt "#32544"
+msgid "Official Lists"
+msgstr "القوائم الرسمية"
+
+msgctxt "#32545"
+msgid "Streaming Charts"
+msgstr "قوائم البث الأكثر رواجًا"
+
+msgctxt "#32546"
+msgid "Trakt / MDbList options"
+msgstr "خيارات Trakt / MDbList"
+
+msgctxt "#32547"
+msgid "Subgenres"
+msgstr "التصنيفات الفرعية"
+
+msgctxt "#32548"
+msgid "Choose a history provider, install one, or select None to disable history lists."
+msgstr "اختر مزود سجل المشاهدة، أو ثبّت واحدًا، أو اختر «لا شيء» لتعطيل قوائم السجل."
+
+msgctxt "#32001"
+msgid "OMDb key"
+msgstr "مفتاح OMDb"
+
+msgctxt "#32004"
+msgid "Certification prefix"
+msgstr "بادئة التصنيف العمري"
+
+msgctxt "#32010"
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
+msgctxt "#32016"
+msgid "Update from URL"
+msgstr "التحديث من رابط"
+
+msgctxt "#32017"
+msgid "Services"
+msgstr "الخدمات"
+
+msgctxt "#32019"
+msgid "Fanart.tv key"
+msgstr "مفتاح Fanart.tv"
+
+msgctxt "#32021"
+msgid "Enable artwork lookups"
+msgstr "تفعيل البحث عن الصور الفنية"
+
+msgctxt "#32024"
+msgid "Movie player"
+msgstr "مشغل الأفلام"
+
+msgctxt "#32025"
+msgid "Episode player"
+msgstr "مشغل الحلقات"
+
+msgctxt "#32549"
+msgid "Sync options"
+msgstr "خيارات المزامنة"
+
+msgctxt "#32550"
+msgid "TMDbHelper Sync Provider"
+msgstr "مزود المزامنة لـ TMDbHelper"
+
+msgctxt "#32551"
+msgid "Install {0}"
+msgstr "تثبيت {0}"
+
+msgctxt "#32552"
+msgid "Enable {0}"
+msgstr "تفعيل {0}"
+
+msgctxt "#32553"
+msgid "Choose features for {0}"
+msgstr "اختر الميزات لـ {0}"
+
+msgctxt "#32554"
+msgid "{0} does not support {1}. Choose another provider for this list."
+msgstr "لا يدعم {0} ميزة {1}. اختر مزودًا آخر لهذه القائمة."
+
+msgctxt "#32555"
+msgid "{0} requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
+msgstr "يتطلب {0} مزود مزامنة. اختر مزودًا لاستخدامه أو تثبيته أو تفعيله. يتم التثبيت عبر المستودعات المثبتة لديك."
+
+msgctxt "#32556"
+msgid "Later"
+msgstr "لاحقًا"
+
+msgctxt "#32557"
+msgid "Install provider"
+msgstr "تثبيت المزود"
+
+msgctxt "#32558"
+msgid "{0} (install)"
+msgstr "{0} (تثبيت)"
+
+msgctxt "#32559"
+msgid "{0} (enable)"
+msgstr "{0} (تفعيل)"
+
+msgctxt "#32560"
+msgid "Set {0} as the default sync provider? This clears all current provider selections and uses {0} for every feature it supports."
+msgstr "هل تريد تعيين {0} مزودَ المزامنة الافتراضي؟ سيؤدي ذلك إلى مسح جميع اختيارات المزودين الحالية واستخدام {0} لكل ميزة يدعمها."
+
+msgctxt "#32561"
+msgid "Default"
+msgstr "افتراضي"
+
+msgctxt "#32562"
+msgid "Custom"
+msgstr "مخصص"
+
+msgctxt "#32563"
+msgid "You are enabling {0}, a third-party sync service outside TMDbHelper's trusted list. Only continue if you trust this service and understand the risks, including sharing your viewing activity and account data."
+msgstr "أنت على وشك تفعيل {0}، وهي خدمة مزامنة من طرف ثالث خارج قائمة TMDbHelper الموثوقة. لا تتابع إلا إذا كنت تثق بهذه الخدمة وتدرك المخاطر، بما في ذلك مشاركة نشاط مشاهدتك وبيانات حسابك."
+
+msgctxt "#32564"
+msgid "Image cache limit"
+msgstr "حد ذاكرة الصور المؤقتة"
+
+msgctxt "#32565"
+msgid "Set the size limit per image-cache folder. Unlimited disables automatic cleanup."
+msgstr "حدد الحجم الأقصى لكل مجلد من مجلدات ذاكرة الصور المؤقتة. خيار «غير محدود» يعطّل التنظيف التلقائي."
+
+msgctxt "#32566"
+msgid "Unlimited"
+msgstr "غير محدود"
+
+msgctxt "#32567"
+msgid "Clean image cache"
+msgstr "تنظيف ذاكرة الصور المؤقتة"
+
+msgctxt "#32568"
+msgid "Scanning {0}: {1} of {2} files"
+msgstr "جارٍ فحص {0}: {1} من {2} ملف"
+
+msgctxt "#32569"
+msgid "Cleaning {0}"
+msgstr "جارٍ تنظيف {0}"
+
+msgctxt "#32570"
+msgid "Space reclaimed: {0}"
+msgstr "المساحة المستعادة: {0}"
+
+msgctxt "#32571"
+msgid "Image cache cleanup finished. Space reclaimed: {0}."
+msgstr "اكتمل تنظيف ذاكرة الصور المؤقتة. المساحة المستعادة: {0}."
+
+msgctxt "#32572"
+msgid "Image cache cleanup cancelled. Space reclaimed: {0}."
+msgstr "أُلغي تنظيف ذاكرة الصور المؤقتة. المساحة المستعادة: {0}."
+
+msgctxt "#32573"
+msgid "Image cache cleanup is disabled while the target size is Unlimited."
+msgstr "تنظيف ذاكرة الصور المؤقتة معطّل ما دام الحجم المستهدف «غير محدود»."
+
+msgctxt "#32574"
+msgid "Save settings and clean the image cache to the selected size limit."
+msgstr "احفظ الإعدادات ونظّف ذاكرة الصور المؤقتة وفق الحد المحدد."
+
+msgctxt "#32575"
+msgid "32 MB"
+msgstr "32 ميغابايت"
+
+msgctxt "#32576"
+msgid "64 MB"
+msgstr "64 ميغابايت"
+
+msgctxt "#32577"
+msgid "128 MB"
+msgstr "128 ميغابايت"
+
+msgctxt "#32578"
+msgid "256 MB"
+msgstr "256 ميغابايت"
+
+msgctxt "#32579"
+msgid "512 MB"
+msgstr "512 ميغابايت"
+
+msgctxt "#32580"
+msgid "The route \"{0}\" is not available in TMDbHelper. It may be available in the {1} sync module. Install or enable this module?"
+msgstr "المسار \"{0}\" غير متاح في TMDbHelper. قد يكون متاحًا في وحدة المزامنة {1}. هل تريد تثبيت هذه الوحدة أو تفعيلها؟"
+
+msgctxt "#32581"
+msgid "Ratings providers"
+msgstr "مزودو التقييمات"
+
+msgctxt "#32582"
+msgid "Choose which installed ratings providers to use. Existing cached ratings are retained."
+msgstr "اختر مزودي التقييمات المثبتين الذين تريد استخدامهم. يُحتفظ بالتقييمات المخزنة مؤقتًا حاليًا."
+
+msgctxt "#32583"
+msgid "{0}. {1} ({2})"
+msgstr "{0}. {1} ({2})"
+
+msgctxt "#32584"
+msgid "Enabled"
+msgstr "مفعّل"
+
+msgctxt "#32585"
+msgid "Disabled"
+msgstr "معطّل"
+
+msgctxt "#32586"
+msgid "Move up"
+msgstr "نقل للأعلى"
+
+msgctxt "#32587"
+msgid "Move down"
+msgstr "نقل للأسفل"
+
+msgctxt "#32588"
+msgid "No ratings providers are installed."
+msgstr "لا يوجد مزودو تقييمات مثبتون."
+
+msgctxt "#32591"
+msgid "Provider priority"
+msgstr "أولوية المزودين"
+
+msgctxt "#32592"
+msgid "Order ratings providers from highest to lowest priority. Existing cached ratings are retained."
+msgstr "رتّب مزودي التقييمات من الأعلى أولوية إلى الأدنى. يُحتفظ بالتقييمات المخزنة مؤقتًا حاليًا."
+
+msgctxt "#32593"
+msgid "Episode numbering"
+msgstr "ترقيم الحلقات"
+
+msgctxt "#32594"
+msgid "Default"
+msgstr "افتراضي"
+
+msgctxt "#32595"
+msgid "Select"
+msgstr "اختيار"
+
+msgctxt "#32596"
+msgid "Group"
+msgstr "مجموعة"
+
+msgctxt "#32597"
+msgid "Use TMDb numbers, ask for a group, or use the current group. Individual players can override this choice."
+msgstr "استخدم أرقام TMDb، أو اطلب اختيار مجموعة، أو استخدم المجموعة الحالية. يمكن لكل مشغل تجاوز هذا الاختيار."
+
+msgctxt "#32598"
+msgid "Statistics"
+msgstr "الإحصاءات"
+
+msgctxt "#32599"
+msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
+msgstr "اختر المزودين الذين يتلقون نشاط التشغيل. امسح جميع الاختيارات لتعطيل التسجيل التلقائي للمشاهدة."
+
+msgctxt "#32600"
+msgid "Currently Watching"
+msgstr "قيد المشاهدة حاليًا"
+
+msgctxt "#32602"
+msgid "Your Next Movies"
+msgstr "أفلامك التالية"
+
+msgctxt "#32603"
+msgid "Update collections"
+msgstr "تحديث السلاسل"
+
+msgctxt "#32604"
+msgid "Discover new movie collections daily and refresh older ones for Your Next Movies after its first use."
+msgstr "اكتشف سلاسل أفلام جديدة يوميًا وحدّث السلاسل القديمة لقائمة «أفلامك التالية» بعد أول استخدام لها."
+
+msgctxt "#32605"
+msgid "Daily request limit"
+msgstr "حد الطلبات اليومي"
+
+msgctxt "#32606"
+msgid "Limit daily movie collection requests, including retries. New collections take priority over overdue refreshes."
+msgstr "حدّد عدد طلبات سلاسل الأفلام اليومية، بما في ذلك إعادة المحاولات. تُعطى الأولوية للسلاسل الجديدة على التحديثات المتأخرة."
+
+msgctxt "#32607"
+msgid "Drop collection"
+msgstr "إسقاط السلسلة"
+
+msgctxt "#32608"
+msgid "Advanced"
+msgstr "متقدم"
+
+msgctxt "#32609"
+msgid "Include movie releases outside your selected country when filtering TMDb lists."
+msgstr "تضمين إصدارات الأفلام خارج بلدك المحدد عند تصفية قوائم TMDb."
+
+msgctxt "#32610"
+msgid "Show authorisation and sync notifications when Kodi starts."
+msgstr "اعرض إشعارات التفويض والمزامنة عند بدء تشغيل Kodi."
+
+msgctxt "#32611"
+msgid "Show notifications while user data is synchronising."
+msgstr "اعرض الإشعارات أثناء مزامنة بيانات المستخدم."
+
+msgctxt "#32612"
+msgid "Show a notification when a service connection fails."
+msgstr "اعرض إشعارًا عند فشل الاتصال بإحدى الخدمات."
+
+msgctxt "#32613"
+msgid "Show Browse lists in the item context menu."
+msgstr "اعرض قوائم التصفح في القائمة السياقية للعنصر."
+
+msgctxt "#32614"
+msgid "Show sync actions in the item context menu."
+msgstr "اعرض إجراءات المزامنة في القائمة السياقية للعنصر."
+
+msgctxt "#32615"
+msgid "Show TMDb account actions in the item context menu."
+msgstr "اعرض إجراءات حساب TMDb في القائمة السياقية للعنصر."
+
+msgctxt "#32616"
+msgid "Show Refresh details in the item context menu."
+msgstr "اعرض «تحديث التفاصيل» في القائمة السياقية للعنصر."
+
+msgctxt "#32617"
+msgid "Show Modify artwork in the item context menu."
+msgstr "اعرض «تعديل الصور الفنية» في القائمة السياقية للعنصر."
+
+msgctxt "#32618"
+msgid "Add to library"
+msgstr "إضافة إلى المكتبة"
+
+msgctxt "#32619"
+msgid "Show Add to library in the item context menu."
+msgstr "اعرض «إضافة إلى المكتبة» في القائمة السياقية للعنصر."
+
+msgctxt "#32620"
+msgid "Show Add node in the item context menu."
+msgstr "اعرض «إضافة عقدة» في القائمة السياقية للعنصر."
+
+msgctxt "#32621"
+msgid "Show a next-page item in widgets when more results are available."
+msgstr "اعرض عنصر الصفحة التالية في الأدوات عند توفر مزيد من النتائج."
+
+msgctxt "#32622"
+msgid "Open the episode list directly instead of showing seasons."
+msgstr "افتح قائمة الحلقات مباشرة بدلًا من عرض المواسم."
+
+msgctxt "#32623"
+msgid "Show the additional Specials season entry."
+msgstr "اعرض إدخال موسم «الحلقات الخاصة» الإضافي."
+
+msgctxt "#32624"
+msgid "Show the additional Anticipated season entry."
+msgstr "اعرض إدخال موسم «المرتقبة» الإضافي."
+
+msgctxt "#32625"
+msgid "Show the additional episode Groups entry."
+msgstr "اعرض إدخال «مجموعات» الحلقات الإضافي."
+
+msgctxt "#32626"
+msgid "Show the additional Up next season entry when signed in to Trakt."
+msgstr "اعرض إدخال موسم «التالي» الإضافي عند تسجيل الدخول إلى Trakt."
+
+msgctxt "#32627"
+msgid "Combine episodes from the same show airing on the same day into one calendar entry."
+msgstr "ادمج حلقات المسلسل نفسه المعروضة في اليوم نفسه في إدخال واحد في التقويم."
+
+msgctxt "#32628"
+msgid "Open the local TV show from entries in the next-aired library calendar."
+msgstr "افتح المسلسل المحلي من إدخالات تقويم الحلقات القادمة في المكتبة."
+
+msgctxt "#32629"
+msgid "Choose the artwork used for next-episode thumbnails."
+msgstr "اختر الصور الفنية المستخدمة للصور المصغرة للحلقات التالية."
+
+msgctxt "#32630"
+msgid "Check the calendar for next episodes. Slower, but more accurate."
+msgstr "تحقّق من التقويم للحلقات التالية. أبطأ، لكنه أكثر دقة."
+
+msgctxt "#32631"
+msgid "Load this many pages per request for basic TMDb lists. Higher values are slower."
+msgstr "حمّل هذا العدد من الصفحات في كل طلب لقوائم TMDb الأساسية. القيم الأعلى أبطأ."
+
+msgctxt "#32632"
+msgid "Load this many pages per request for other basic lists. Higher values are slower."
+msgstr "حمّل هذا العدد من الصفحات في كل طلب للقوائم الأساسية الأخرى. القيم الأعلى أبطأ."
+
+msgctxt "#32633"
+msgid "Load this many pages per request for synced database lists. Higher values are slower."
+msgstr "حمّل هذا العدد من الصفحات في كل طلب لقوائم قاعدة البيانات المتزامنة. القيم الأعلى أبطأ."
+
+msgctxt "#32634"
+msgid "Cache the items in Trakt custom lists you own for 24 hours."
+msgstr "خزّن عناصر قوائم Trakt المخصصة التي تملكها مؤقتًا لمدة 24 ساعة."
+
+msgctxt "#32635"
+msgid "Choose the resolution of artwork downloaded from TMDb."
+msgstr "اختر دقة الصور الفنية المنزّلة من TMDb."
+
+msgctxt "#32636"
+msgid "Fetch Fanart.tv artwork for plugin items. Additional lookups are slower."
+msgstr "اجلب صور Fanart.tv الفنية لعناصر الإضافات. عمليات البحث الإضافية أبطأ."
+
+msgctxt "#32637"
+msgid "Prefer Fanart.tv artwork over TMDb artwork when both are available."
+msgstr "فضّل صور Fanart.tv على صور TMDb عند توفر كليهما."
+
+msgctxt "#32638"
+msgid "Prefer artwork in your selected language when choosing images."
+msgstr "فضّل الصور الفنية بلغتك المحددة عند اختيار الصور."
+
+msgctxt "#32639"
+msgid "Choose the folder containing custom icons for TMDb genres."
+msgstr "اختر المجلد الذي يحتوي على الأيقونات المخصصة لتصنيفات TMDb."
+
+msgctxt "#32640"
+msgid "Choose the folder containing custom icons for Trakt genres."
+msgstr "اختر المجلد الذي يحتوي على الأيقونات المخصصة لتصنيفات Trakt."
+
+msgctxt "#32641"
+msgid "Choose the folder containing custom TMDb watch-provider icons."
+msgstr "اختر المجلد الذي يحتوي على الأيقونات المخصصة لمزودي المشاهدة في TMDb."
+
+msgctxt "#32642"
+msgid "Retrieve background artwork for genre entries."
+msgstr "اجلب صور الخلفية لإدخالات التصنيفات."
+
+msgctxt "#32643"
+msgid "Retrieve background artwork for watch-provider entries."
+msgstr "اجلب صور الخلفية لإدخالات مزودي المشاهدة."
+
+msgctxt "#32644"
+msgid "Choose the default player used for movies."
+msgstr "اختر المشغل الافتراضي المستخدم للأفلام."
+
+msgctxt "#32645"
+msgid "Choose the default player used for TV episodes."
+msgstr "اختر المشغل الافتراضي المستخدم لحلقات المسلسلات."
+
+msgctxt "#32646"
+msgid "Automatically play using available providers instead of asking for a player."
+msgstr "شغّل تلقائيًا باستخدام المزودين المتاحين بدلًا من السؤال عن المشغل."
+
+msgctxt "#32647"
+msgid "Choose how playback uses files already in the Kodi library."
+msgstr "اختر كيفية استخدام التشغيل للملفات الموجودة مسبقًا في مكتبة Kodi."
+
+msgctxt "#32648"
+msgid "Show one player entry per plugin instead of separate entries for each player."
+msgstr "اعرض إدخال مشغل واحدًا لكل إضافة بدلًا من إدخالات منفصلة لكل مشغل."
+
+msgctxt "#32649"
+msgid "Include player definitions supplied with the add-on."
+msgstr "تضمين تعريفات المشغلات المرفقة مع الإضافة."
+
+msgctxt "#32650"
+msgid "Download player definitions from the URL you provide."
+msgstr "نزّل تعريفات المشغلات من الرابط الذي تحدده."
+
+msgctxt "#32651"
+msgid "Choose and customise the available player definitions."
+msgstr "اختر تعريفات المشغلات المتاحة وخصّصها."
+
+msgctxt "#32652"
+msgid "Ask for a TMDb rating after watching an item when signed in to TMDb."
+msgstr "اطلب تقييمًا على TMDb بعد مشاهدة العنصر عند تسجيل الدخول إلى TMDb."
+
+msgctxt "#32653"
+msgid "Movies folder"
+msgstr "مجلد الأفلام"
+
+msgctxt "#32654"
+msgid "Choose where movie STRM and NFO files are created for the Kodi library."
+msgstr "اختر مكان إنشاء ملفات STRM وNFO للأفلام في مكتبة Kodi."
+
+msgctxt "#32655"
+msgid "Choose where TV show STRM and NFO files are created for the Kodi library."
+msgstr "اختر مكان إنشاء ملفات STRM وNFO للمسلسلات في مكتبة Kodi."
+
+msgctxt "#32656"
+msgid "Scan the Kodi library after adding items through TMDbHelper."
+msgstr "افحص مكتبة Kodi بعد إضافة العناصر عبر TMDbHelper."
+
+msgctxt "#32657"
+msgid "Automatically update library exports and add new or missing episodes."
+msgstr "حدّث صادرات المكتبة تلقائيًا وأضف الحلقات الجديدة أو المفقودة."
+
+msgctxt "#32658"
+msgid "Choose the hour for the daily library update."
+msgstr "اختر الساعة التي يجري فيها التحديث اليومي للمكتبة."
+
+msgctxt "#32659"
+msgid "Choose the lists used to add items during automatic library updates."
+msgstr "اختر القوائم المستخدمة لإضافة العناصر أثناء التحديثات التلقائية للمكتبة."
+
+msgctxt "#32660"
+msgid "Store the source-list identifiers used by automatic library updates."
+msgstr "خزّن معرّفات قوائم المصدر المستخدمة في التحديثات التلقائية للمكتبة."
+
+msgctxt "#32661"
+msgid "Choose which library exports to update now."
+msgstr "اختر صادرات المكتبة التي تريد تحديثها الآن."
+
+msgctxt "#32662"
+msgid "Choose whether to add local Kodi library details to items."
+msgstr "اختر ما إذا كانت تفاصيل مكتبة Kodi المحلية تُضاف إلى العناصر."
+
+msgctxt "#32663"
+msgid "Refresh TMDbHelper's cached details from the local Kodi library."
+msgstr "حدّث تفاصيل TMDbHelper المخزنة مؤقتًا من مكتبة Kodi المحلية."
+
+msgctxt "#32664"
+msgid "Skip checks after creating library folders on systems that report new folders slowly."
+msgstr "تخطَّ الفحص بعد إنشاء مجلدات المكتبة على الأنظمة التي تُبلغ عن المجلدات الجديدة ببطء."
+
+msgctxt "#32665"
+msgid "Use movie-tmdbhelper.nfo or tvshow-tmdbhelper.nfo instead of the standard NFO filename."
+msgstr "استخدم movie-tmdbhelper.nfo أو tvshow-tmdbhelper.nfo بدلًا من اسم ملف NFO القياسي."
+
+msgctxt "#32666"
+msgid "Connect your Trakt account to TMDbHelper."
+msgstr "اربط حساب Trakt الخاص بك بـ TMDbHelper."
+
+msgctxt "#32667"
+msgid "Disconnect your Trakt account from TMDbHelper."
+msgstr "افصل حساب Trakt الخاص بك عن TMDbHelper."
+
+msgctxt "#32668"
+msgid "Open settings"
+msgstr "فتح الإعدادات"
+
+msgctxt "#32669"
+msgid "Install MDbList support if needed, then open its provider settings."
+msgstr "ثبّت دعم MDbList إن لزم الأمر، ثم افتح إعدادات المزود الخاصة به."
+
+msgctxt "#32670"
+msgid "Retain the legacy MDbList key until it is migrated to the provider module."
+msgstr "احتفظ بمفتاح MDbList القديم إلى أن يُنقل إلى وحدة المزود."
+
+msgctxt "#32671"
+msgid "Enter your OMDb API key for additional ratings and metadata."
+msgstr "أدخل مفتاح OMDb API الخاص بك للحصول على تقييمات وبيانات وصفية إضافية."
+
+msgctxt "#32672"
+msgid "Enter your RatingPosterDB API key for posters with ratings."
+msgstr "أدخل مفتاح RatingPosterDB API الخاص بك للحصول على ملصقات تتضمن التقييمات."
+
+msgctxt "#32673"
+msgid "Enter your Gemini API key for AI-assisted features."
+msgstr "أدخل مفتاح Gemini API الخاص بك لميزات الذكاء الاصطناعي."
+
+msgctxt "#32674"
+msgid "Enter your Fanart.tv client key for artwork lookups."
+msgstr "أدخل مفتاح عميل Fanart.tv الخاص بك للبحث عن الصور الفنية."
+
+msgctxt "#32675"
+msgid "Configure providers"
+msgstr "إعداد المزودين"
+
+msgctxt "#32676"
+msgid "Store the selected ratings providers and their priority order."
+msgstr "خزّن مزودي التقييمات المحددين وترتيب أولويتهم."
+
+msgctxt "#32677"
+msgid "Choose a watchlist provider, install one, or select None to disable watchlist lists."
+msgstr "اختر مزود قائمة المشاهدة، أو ثبّت واحدًا، أو اختر «لا شيء» لتعطيل قوائم المشاهدة."
+
+msgctxt "#32678"
+msgid "Choose a collection provider, install one, or select None to disable collection lists."
+msgstr "اختر مزود المجموعة، أو ثبّت واحدًا، أو اختر «لا شيء» لتعطيل قوائم المجموعة."
+
+msgctxt "#32679"
+msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
+msgstr "اختر مزود الإحصاءات، أو ثبّت واحدًا، أو اختر «لا شيء» لتعطيل قوائم الإحصاءات."
+
+msgctxt "#32680"
+msgid "Choose a supported sync provider to install or enable."
+msgstr "اختر مزود مزامنة مدعومًا لتثبيته أو تفعيله."
+
+msgctxt "#32681"
+msgid "Synchronise watched status and resume points with the selected history provider."
+msgstr "زامن حالة المشاهدة ونقاط الاستئناف مع مزود السجل المحدد."
+
+msgctxt "#32682"
+msgid "Clear cached synced user data so it can be downloaded again."
+msgstr "امسح بيانات المستخدم المتزامنة المخزنة مؤقتًا ليُعاد تنزيلها."
+
+msgctxt "#32683"
+msgid "Choose which watch providers are included in provider data lookups."
+msgstr "اختر مزودي المشاهدة المضمّنين في عمليات البحث عن بيانات المزودين."
+
+msgctxt "#32684"
+msgid "Allow the image monitor to fetch artwork from online sources."
+msgstr "اسمح لمراقب الصور بجلب الصور الفنية من المصادر عبر الإنترنت."
+
+msgctxt "#32685"
+msgid "Allow the details monitor to fetch ratings from online sources."
+msgstr "اسمح لمراقب التفاصيل بجلب التقييمات من المصادر عبر الإنترنت."
+
+msgctxt "#32686"
+msgid "Use TMDbHelper artwork instead of the clearlogo supplied by the playback monitor."
+msgstr "استخدم صور TMDbHelper الفنية بدلًا من الشعار الذي يوفّره مراقب التشغيل."
+
+msgctxt "#32687"
+msgid "Set how long the dummy video plays when resolving playback, in seconds."
+msgstr "حدد مدة تشغيل الفيديو الوهمي عند حل التشغيل، بالثواني."
+
+msgctxt "#32688"
+msgid "Set the delay after the dummy video stops before playback continues, in seconds."
+msgstr "حدد مدة التأخير بعد توقف الفيديو الوهمي وقبل متابعة التشغيل، بالثواني."
+
+msgctxt "#32689"
+msgid "Restrict URL resolving to library STRM playback."
+msgstr "اقصر حل الروابط على تشغيل ملفات STRM في المكتبة."
+
+msgctxt "#32690"
+msgid "Refresh cached Kodi library details when building the player list."
+msgstr "حدّث تفاصيل مكتبة Kodi المخزنة مؤقتًا عند إنشاء قائمة المشغلات."
+
+msgctxt "#32691"
+msgid "Use the alternative TMDb API address for network compatibility."
+msgstr "استخدم عنوان TMDb API البديل لتحسين التوافق مع الشبكة."
+
+msgctxt "#32692"
+msgid "Set the maximum number of concurrent threads. Zero means unlimited."
+msgstr "حدد الحد الأقصى لعدد الخيوط المتزامنة. القيمة صفر تعني بلا حد."
+
+msgctxt "#32693"
+msgid "Choose a custom location for TMDbHelper cache databases."
+msgstr "اختر موقعًا مخصصًا لقواعد بيانات ذاكرة TMDbHelper المؤقتة."
+
+msgctxt "#32694"
+msgid "Choose a custom location for cached images."
+msgstr "اختر موقعًا مخصصًا للصور المخزنة مؤقتًا."
+
+msgctxt "#32695"
+msgid "Delete cached TMDb list details for troubleshooting. Lists will be downloaded again when needed."
+msgstr "احذف تفاصيل قوائم TMDb المخزنة مؤقتًا لاستكشاف الأخطاء. ستُنزَّل القوائم مجددًا عند الحاجة."
+
+msgctxt "#32696"
+msgid "Write additional diagnostic information to the Kodi log."
+msgstr "اكتب معلومات تشخيصية إضافية في سجل Kodi."
+
+msgctxt "#32697"
+msgid "Log the time taken to build directories."
+msgstr "سجّل الوقت المستغرق في إنشاء المجلدات."
+
+msgctxt "#32698"
+msgid "Run a TMDb request and write its response to the Kodi log."
+msgstr "نفّذ طلب TMDb واكتب استجابته في سجل Kodi."
+
+msgctxt "#32699"
+msgid "Run a Trakt request and write its response to the Kodi log."
+msgstr "نفّذ طلب Trakt واكتب استجابته في سجل Kodi."
+
+msgctxt "#32700"
+msgid "Store the TVDb authentication token used by TMDbHelper."
+msgstr "خزّن رمز مصادقة TVDb الذي يستخدمه TMDbHelper."
+
+msgctxt "#32701"
+msgid "Store the TMDb account authentication token used by TMDbHelper."
+msgstr "خزّن رمز مصادقة حساب TMDb الذي يستخدمه TMDbHelper."
+
+msgctxt "#32702"
+msgid "Store the Trakt account authentication token used by TMDbHelper."
+msgstr "خزّن رمز مصادقة حساب Trakt الذي يستخدمه TMDbHelper."
+
+msgctxt "#32703"
+msgid "Allow other plugins to access the saved OMDb API key."
+msgstr "اسمح للإضافات الأخرى بالوصول إلى مفتاح OMDb API المحفوظ."
+
+msgctxt "#32704"
+msgid "Allow other plugins to access the saved Fanart.tv client key."
+msgstr "اسمح للإضافات الأخرى بالوصول إلى مفتاح عميل Fanart.tv المحفوظ."
+
+msgctxt "#32705"
+msgid "Allow other plugins to access the saved TVDb token."
+msgstr "اسمح للإضافات الأخرى بالوصول إلى رمز TVDb المحفوظ."
+
+msgctxt "#32706"
+msgid "Allow other plugins to access the saved TMDb account token."
+msgstr "اسمح للإضافات الأخرى بالوصول إلى رمز حساب TMDb المحفوظ."
+
+msgctxt "#32707"
+msgid "Allow other plugins to access the saved Trakt account token."
+msgstr "اسمح للإضافات الأخرى بالوصول إلى رمز حساب Trakt المحفوظ."
+
+msgctxt "#32708"
+msgid "Regional"
+msgstr "الإعدادات الإقليمية"
+
+msgctxt "#32709"
+msgid "Notifications"
+msgstr "الإشعارات"
+
+msgctxt "#32710"
+msgid "Context menu"
+msgstr "القائمة السياقية"
+
+msgctxt "#32711"
+msgid "Navigation"
+msgstr "التنقل"
+
+msgctxt "#32712"
+msgid "Extra seasons"
+msgstr "مواسم إضافية"
+
+msgctxt "#32713"
+msgid "Next episodes"
+msgstr "الحلقات التالية"
+
+msgctxt "#32714"
+msgid "Next movies"
+msgstr "الأفلام التالية"
+
+msgctxt "#32715"
+msgid "Recommendations"
+msgstr "التوصيات"
+
+msgctxt "#32716"
+msgid "Pagination"
+msgstr "ترقيم الصفحات"
+
+msgctxt "#32717"
+msgid "Fanart.tv"
+msgstr "Fanart.tv"
+
+msgctxt "#32718"
+msgid "Icons"
+msgstr "الأيقونات"
+
+msgctxt "#32719"
+msgid "Backgrounds"
+msgstr "الخلفيات"
+
+msgctxt "#32720"
+msgid "Defaults"
+msgstr "الإعدادات الافتراضية"
+
+msgctxt "#32721"
+msgid "Configuration"
+msgstr "الإعداد"
+
+msgctxt "#32722"
+msgid "After playback"
+msgstr "بعد التشغيل"
+
+msgctxt "#32723"
+msgid "Folders"
+msgstr "المجلدات"
+
+msgctxt "#32724"
+msgid "Updates"
+msgstr "التحديثات"
+
+msgctxt "#32725"
+msgid "Local details"
+msgstr "التفاصيل المحلية"
+
+msgctxt "#32726"
+msgid "MDbList"
+msgstr "MDbList"
+
+msgctxt "#32727"
+msgid "API keys"
+msgstr "مفاتيح API"
+
+msgctxt "#32728"
+msgid "Credentials"
+msgstr "بيانات الاعتماد"
+
+msgctxt "#32729"
+msgid "Status"
+msgstr "الحالة"
+
+msgctxt "#32730"
+msgid "Maintenance"
+msgstr "الصيانة"
+
+msgctxt "#32731"
+msgid "Skin integration"
+msgstr "التكامل مع الواجهة"
+
+msgctxt "#32732"
+msgid "Playback"
+msgstr "التشغيل"
+
+msgctxt "#32733"
+msgid "Network"
+msgstr "الشبكة"
+
+msgctxt "#32734"
+msgid "Cache"
+msgstr "الذاكرة المؤقتة"
+
+msgctxt "#32735"
+msgid "Logging"
+msgstr "السجل"
+
+msgctxt "#32736"
+msgid "Gemini settings"
+msgstr "إعدادات Gemini"
+
+msgctxt "#32737"
+msgid "Install or enable the Gemini module and open its API settings."
+msgstr "ثبّت وحدة Gemini أو فعّلها وافتح إعدادات API الخاصة بها."
+
+msgctxt "#32738"
+msgid "TVDb settings"
+msgstr "إعدادات TVDb"
+
+msgctxt "#32739"
+msgid "Install or enable the TVDb module and open its API settings."
+msgstr "ثبّت وحدة TVDb أو فعّلها وافتح إعدادات API الخاصة بها."
+
+msgctxt "#32740"
+msgid "Provider modules"
+msgstr "وحدات المزودين"
+
+msgctxt "#32741"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+msgctxt "#32742"
+msgid "Set {0} as the default sync provider? This replaces the current sync selections and clears features it does not support. Ratings and scrobbling are configured separately."
+msgstr "هل تريد تعيين {0} مزودَ المزامنة الافتراضي؟ سيحل ذلك محل اختيارات المزامنة الحالية ويمسح الميزات التي لا يدعمها. تُضبط التقييمات والتسجيل التلقائي للمشاهدة بشكل منفصل."
+
+msgctxt "#32743"
+msgid "Enable {0} as a ratings provider?"
+msgstr "هل تريد تفعيل {0} مزودًا للتقييمات؟"
+
+msgctxt "#32744"
+msgid "Enable scrobbling with {0}?"
+msgstr "هل تريد تفعيل التسجيل التلقائي للمشاهدة مع {0}؟"
+
+msgctxt "#32745"
+msgid "Are you sure you want to disable {0}? The module and its features will be unavailable."
+msgstr "هل أنت متأكد من رغبتك في تعطيل {0}؟ ستصبح الوحدة وميزاتها غير متاحة."
+
+msgctxt "#32746"
+msgid "Disabling this module will remove it from:\n{0}"
+msgstr "سيؤدي تعطيل هذه الوحدة إلى إزالتها من:\n{0}"
