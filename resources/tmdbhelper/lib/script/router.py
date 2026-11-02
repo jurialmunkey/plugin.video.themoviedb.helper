@@ -72,8 +72,6 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'sync_item')(**kwargs),
         'sort_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.lists', 'sort_list')(**kwargs),
-        'sort_mdblist':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.mdblist', 'sort_mdblist')(**kwargs),
         'invalidate_sync':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'invalidate_sync')(**kwargs),
         'invalidate_trakt_sync':
