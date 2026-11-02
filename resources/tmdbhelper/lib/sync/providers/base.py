@@ -14,6 +14,7 @@ class SyncProvider:
     imdb_top250_classes = {}
     stats_class = None
     monitor_lists_class = None
+    list_actions_class = None
     scrobbler_class = None
     directory_item_class = None
     list_routes = {}
@@ -36,6 +37,8 @@ class SyncProvider:
             features.add('stats')
         if self.monitor_lists_class is not None:
             features.add('monitor_lists')
+        if self.list_actions_class is not None:
+            features.add('list_actions')
         if self.service_action_classes:
             features.add('service_actions')
         return tuple(sorted(features))

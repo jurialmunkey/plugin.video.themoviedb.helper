@@ -8,6 +8,7 @@ from tmdbhelper.lib.sync.providers.features import ACTION_FEATURES, SYNC_FEATURE
 from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSupplier
 from tmdbhelper.lib.sync.providers.imdb_top250 import IMDB_TOP250_MEDIATYPES, IMDbTop250Supplier
 from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
+from tmdbhelper.lib.sync.providers.list_actions import ListActions
 from tmdbhelper.lib.sync.providers.stats import StatsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
 from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES, ServiceDataType
@@ -178,6 +179,18 @@ class SyncProviderLoader:
                 raise TypeError(f'Monitor lists supplier must implement {method}()')
 
     @staticmethod
+    def validate_list_actions_class(provider):
+        actions_class = provider.list_actions_class
+        if actions_class is None:
+            return
+        if not isinstance(actions_class, type) or not issubclass(actions_class, ListActions):
+            raise TypeError('List actions must inherit ListActions')
+        for method in ('like_list', 'rename_list', 'delete_list'):
+            implementation = getattr(actions_class, method)
+            if not callable(implementation) or implementation is getattr(ListActions, method):
+                raise TypeError(f'List actions must implement {method}()')
+
+    @staticmethod
     def validate_directory(provider):
         if provider.directory_item_class is not None:
             from tmdbhelper.lib.items.directories.base.basedir_item import BaseDirItem
@@ -218,6 +231,7 @@ class SyncProviderLoader:
         self.validate_imdb_top250_classes(provider)
         self.validate_stats_class(provider)
         self.validate_monitor_lists_class(provider)
+        self.validate_list_actions_class(provider)
         self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')

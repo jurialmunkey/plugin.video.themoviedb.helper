@@ -149,6 +149,11 @@ Providers declare:
 - `monitor_lists_class`: an optional MonitorListsSupplier subclass implementing
   `get_lists()` and `get_list_items(list_slug)`. This supplies the independent
   `monitor_lists` capability for library monitoring and list retrieval.
+- `list_actions_class`: an optional ListActions subclass implementing
+  `like_list(list_slug, user_slug='me', delete=False)`, `rename_list(list_slug)`,
+  and `delete_list(list_slug)`. It receives the provider in its constructor and
+  supplies the independent `list_actions` capability. The `None` default keeps
+  providers without list actions valid. See [List actions](#list-actions).
 - `scrobbler_class`: an optional ScrobbleRequest subclass for the scrobbling feature.
   Core calls `scrobble(method)`, which returns a `ScrobbleResult`. Scrobblers using
   the inherited `scrobble()` implement `get_scrobbler_item()` and
@@ -442,6 +447,27 @@ When core starts relying on something new from provider-supplied classes:
 | --- | --- |
 | 4 | Getters inherit `SyncDataGetter` and implement `get_items()` and `get_sync_succeeded()`. Actions and service actions inherit `ItemSync`. Scrobblers inherit `ScrobbleRequest`; those using its `scrobble()` implement `get_scrobbler_item()` and `send_request()`. The loader accepts a version range. |
 | 3 | Previous interface: getters, actions and scrobblers only had to be callable. |
+
+## List actions
+
+`tmdbhelper.lib.sync.providers.list_actions.ListActions` defines operations on
+lists rather than movie, show, or episode items. Registered classes inherit this
+base and implement all three methods; the loader validates both inheritance and
+method overrides. `get_provider_list_actions(provider_id, registry=None)` resolves
+an enabled, authorized provider and constructs its actions with that same
+provider context. Missing, unavailable, unauthorized, or unsupported providers
+supply no list actions. This does not depend on sync provider selections.
+
+The Trakt module registers `TraktListActions` and owns list like/unlike, rename,
+and delete requests, prompts, feedback, and container refresh behavior. Core keeps
+the legacy `like_list`, `rename_list`, and `delete_list` script commands as thin
+delegates to this interface. The `like_list` command retains `user_slug` and the
+`delete` flag for unliking. Directory mappers continue to emit the existing script
+commands and perform no writes themselves. List creation and item membership
+actions are separate from this interface.
+
+List actions require core 6.20.3 or later. They are an optional addition to
+interface version 4; existing providers inherit the empty default.
 
 ## Provider list directories
 
