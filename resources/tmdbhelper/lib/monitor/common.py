@@ -170,10 +170,17 @@ class CommonMonitorItem:
 
             self.set_property(k, v)
 
+    def set_rating_property(self):
+        rating = self.infolabels.get('rating')
+        if rating is None:
+            return
+        self.set_property('rating', f'{rating:.1f}')
+
     def set_properties(self):
         self.set_info_properties(self.art)
         self.set_info_properties(self.unique_ids, affix='id')
         self.set_single_property('premiered', self.infoproperties)  # Set Premiered first from infoproperties to ensure correct formatting for shortdate
+        self.set_rating_property()
         self.set_info_properties(self.infolabels)
         self.set_info_properties(self.infoproperties)
 
