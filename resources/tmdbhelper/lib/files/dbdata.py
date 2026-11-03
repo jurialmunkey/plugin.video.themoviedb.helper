@@ -4,6 +4,7 @@ from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.plugin import get_setting, get_version
 from tmdbhelper.lib.files.futils import FileUtils
 import sqlite3
+import struct
 
 
 DEFAULT_TABLE = 'simplecache'
@@ -15,6 +16,8 @@ class DatabaseCore:
     _fileutils = FileUtils()  # Import to use plugin addon_data folder not the module one
     _db_timeout = 60.0
     _db_read_timeout = 1.0
+    # Large SQLite mappings can exhaust the address space on 32-bit Kodi.
+    _db_mmap_size = 0 if struct.calcsize('P') == 4 else 256 * 1024 * 1024
     database_version = 1
     database_changes = {}
 
@@ -71,7 +74,7 @@ class DatabaseCore:
         cursor.execute("PRAGMA synchronous=NORMAL")
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.execute("PRAGMA mmap_size=268435456")
+        cursor.execute(f"PRAGMA mmap_size={self._db_mmap_size}")
         return connection
 
     def init_database(self):
