@@ -97,23 +97,6 @@ def ItemMappingBasicFactory(item, item_type=None, params_def=None):
     return route(item, item_type=item_type, params_def=params_def)
 
 
-class ItemMappingTrakt(ItemMapping):
-    """ Conversion to Trakt style metadata """
-
-    def get_item(self):
-        base_item = {}
-        base_item['rank'] = self.item.get('rank') or ''
-        base_item['type'] = self.item_type
-        main_item = base_item.setdefault(self.item_type, {})
-        main_item['title'] = self.item.get('title') or ''
-        main_item['year'] = self.item.get('release_year') or ''
-        uids_item = main_item.setdefault('ids', {})
-        uids_item['imdb'] = self.item.get('imdb_id') or ''
-        uids_item['tvdb'] = self.item.get('tvdb_id') or ''
-        uids_item['tmdb'] = self.item.get('id') or ''
-        return base_item
-
-
 class ItemListPaginationBasic():
     """ Paginates and configures items in a list. Base class for inheritance """
 
@@ -142,14 +125,12 @@ class ItemListPagination(ItemListPaginationBasic):
             limit: int = None,
             permitted_types: tuple = None,
             params_def: dict = None,
-            filters: dict = None,
-            trakt_style: bool = False):
+            filters: dict = None):
         super(ItemListPagination, self).__init__(meta, page=page, limit=limit)
         self.meta = [i for k, v in meta.items() for i in v if i]  # Join all content types together to mimic Trakt style combined lists TODO: Add a filter
         self.permitted_types = permitted_types or ('movie', 'show', 'season', 'episode')
         self.params_def = params_def
         self.filters = filters
-        self.trakt_style = trakt_style
 
     @property
     def items(self):
@@ -173,8 +154,6 @@ class ItemListPagination(ItemListPaginationBasic):
 
     @property
     def item_maker(self):
-        if self.trakt_style:
-            return ItemMappingTrakt
         return ItemMappingBasicFactory
 
     @cached_property
