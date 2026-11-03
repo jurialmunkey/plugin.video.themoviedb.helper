@@ -545,7 +545,19 @@ Class names, route registrations, cache keys, and calendar date behavior are
 preserved. The shared `mapper_standard` classes and factory remain in core
 because MDbList also uses them. Core's `lists_calendar` retains episode stacking
 used by both Trakt and the local library calendar, with no provider import.
-Trakt API transport remains in core pending its separate migration.
+The Trakt module owns its API/authentication package in
+`tmdbhelper_sync_trakt.api`, including client ID configuration and its pagination
+limit. Its provider factory, discover dialog, and directory authorization helper
+use the module-owned classes. The client continues to inherit core's generic
+`NoCacheRequestAPI`.
+
+This is a staged migration: core retains its existing Trakt implementation for
+startup, account actions, diagnostics, and inherited directory client wiring
+until those callers are migrated. Both implementations use the same core
+`trakt_token` setting, session properties, and refresh mutex names. No credential
+copy or provider-interface change is involved in this stage. Core must remain
+usable when the optional Trakt module is absent; removing its remaining client
+wiring and implementation is a later stage.
 
 ### Trakt preferences
 
