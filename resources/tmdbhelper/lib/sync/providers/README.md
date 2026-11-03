@@ -551,13 +551,18 @@ limit. Its provider factory, discover dialog, and directory authorization helper
 use the module-owned classes. The client continues to inherit core's generic
 `NoCacheRequestAPI`.
 
-This is a staged migration: core retains its existing Trakt implementation for
-startup, account actions, diagnostics, and inherited directory client wiring
-until those callers are migrated. Both implementations use the same core
-`trakt_token` setting, session properties, and refresh mutex names. No credential
-copy or provider-interface change is involved in this stage. Core must remain
-usable when the optional Trakt module is absent; removing its remaining client
-wiring and implementation is a later stage.
+Trakt containers configure their client through the module's `TraktList` mixin.
+Its `TraktContainerAPIs` resolves a provider lazily through the registry and
+reuses that provider's API. Nested list enumeration, directory authorization,
+and Discover receive the same provider context before cached properties are
+accessed. Shared core lists and the shared Discover base have no Trakt client.
+Core no longer performs a Trakt-specific startup authorization request; the
+module validates and refreshes credentials when its API is needed.
+
+Core account entry points launch the module's account actions. Remaining core
+request diagnostics resolve the module API through the registry and return
+without a request when the module is unavailable. The old core API package is
+retained temporarily for final cleanup, but has no active core callers.
 
 ### Trakt preferences
 
@@ -578,8 +583,36 @@ values intact. Only the module's preferences control its behavior afterward.
 The page multiplier (`pagemulti_trakt`, labelled **Other page multiplier**),
 calendar flattening, next-episode sorting, recommendation seed, and watched
 indicators remain core preferences because they serve shared functionality.
-Legacy Trakt names do not make those settings provider-owned. Credentials and
-authentication controls remain in core pending their separate migration.
+Legacy Trakt names do not make those settings provider-owned. The shared
+`seasons_upnext` preference no longer depends on the legacy Trakt token.
+
+### Trakt credentials
+
+The module owns the hidden `token` setting and its sign-in/sign-out controls.
+Account dialogs use module-local translations, while built-in Kodi labels
+continue to use the shared localization helper. Running the module without
+arguments retains the provider configuration flow; `action=authenticate` and
+`action=revoke` run its account actions and reuse core's invalidation interfaces.
+
+`TraktSettings.migrate_credentials()` has its own `credentials_migrated` marker,
+independent of preference migration. It copies the legacy core `trakt_token`
+once, preserving both non-empty module credentials and an explicitly configured
+empty token. Each setting write is verified before migration is marked complete.
+Failed writes can be retried; the legacy source is retained unchanged. Completion
+clears the old session authorization properties so they cannot override a
+preconfigured module account. Logout clears the module token without resetting
+the migration marker, so later loads do not import the legacy token again.
+
+Migration uses the same named mutex as token refresh. It runs through the loader
+hook and, for direct client construction, before authorization or refresh locks
+are acquired. `TraktTokenHandler` subclasses the generic `TokenHandler` and
+overrides only its settings access hooks. Core's shared token handler is unchanged.
+Core retains the hidden legacy credential setting as a migration source; its
+visible account controls are removed.
+
+These coordinated changes require TMDbHelper 6.20.5 and Trakt module 1.2.4 to be
+updated together. The provider interface remains version 4; no new shared
+provider contract is introduced.
 
 ## Ratings suppliers
 

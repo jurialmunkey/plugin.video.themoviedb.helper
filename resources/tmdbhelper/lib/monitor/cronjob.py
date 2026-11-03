@@ -17,7 +17,6 @@ class CronJobMonitor(SafeThread):
 
     def _on_startup(self):
         self._do_recache_kodidb()
-        self._do_trakt_authorization()
         from tmdbhelper.lib.script.stats import get_stats
         get_stats()
         self._do_collection_update()
@@ -38,11 +37,6 @@ class CronJobMonitor(SafeThread):
             target=update_collection_index,
             kwargs={'abort': lambda: self.exit or self.update_monitor.abortRequested()})
         self.collection_thread.start()
-
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
 
     @cached_property
     def database_maintenance(self):
@@ -75,10 +69,6 @@ class CronJobMonitor(SafeThread):
             ('timer_report', r".*\.txt$"),
         ):
             self._do_delete_old_log_files_in_folder(folder, regex)
-
-    def _do_trakt_authorization(self):
-        self.trakt_api.authorize()
-        self.update_monitor.waitForAbort(1)
 
     def _do_library_update(self):
         from tmdbhelper.lib.addon.plugin import executebuiltin

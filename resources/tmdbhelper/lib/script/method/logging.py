@@ -8,7 +8,7 @@ def log_request(**kwargs):
     from json import dumps
     from xbmcgui import Dialog
     from tmdbhelper.lib.addon.dialog import BusyDialog
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    from tmdbhelper.lib.script.method.trakt import get_trakt_api
     from tmdbhelper.lib.api.tmdb.api import TMDb
     from tmdbhelper.lib.files.futils import validify_filename
     from tmdbhelper.lib.files.futils import dumps_to_file
@@ -19,7 +19,10 @@ def log_request(**kwargs):
         if not kwargs['url']:
             return
         if kwargs.get('log_request').lower() == 'trakt':
-            kwargs['response'] = TraktAPI().get_response_json(kwargs['url'])
+            api = get_trakt_api()
+            if api is None:
+                return
+            kwargs['response'] = api.get_response_json(kwargs['url'])
         else:
             kwargs['response'] = TMDb().get_response_json(kwargs['url'])
         if not kwargs['response']:

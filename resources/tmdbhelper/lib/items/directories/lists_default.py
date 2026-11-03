@@ -240,7 +240,6 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.filters = self.filters
         list_properties.pagination = self.pagination
         list_properties.tmdb_api = self.tmdb_api
-        list_properties.trakt_api = self.trakt_api
         list_properties.is_cacheonly = self.is_cacheonly
         list_properties.class_name = f'{self.__class__.__name__}'
         return list_properties

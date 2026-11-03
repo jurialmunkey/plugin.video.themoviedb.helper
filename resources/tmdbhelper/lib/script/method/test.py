@@ -35,15 +35,20 @@ def test_func(test_func, dialog_output=False, **kwargs):
         return finalise(head, data)
 
     def test_func_trakt_response(path, **kwargs):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        from tmdbhelper.lib.script.method.trakt import get_trakt_api
         head = path
-        data = TraktAPI().get_response(path, **kwargs)
+        api = get_trakt_api()
+        if api is None:
+            return
+        data = api.get_response(path, **kwargs)
         data = {'headers': dict(data.headers), 'request': data.json()}
         return finalise(head, data)
 
     def test_func_trakt_auth(**kwargs):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        tapi = TraktAPI()
+        from tmdbhelper.lib.script.method.trakt import get_trakt_api
+        tapi = get_trakt_api()
+        if tapi is None:
+            return
         head = ''
         data = {'authorization': tapi.authenticator.authorization}
         return finalise(head, data)
@@ -103,8 +108,10 @@ def test_func(test_func, dialog_output=False, **kwargs):
         return finalise(head, data, affix=import_attr)
 
     def test_func_get_response_sync(path, **kwargs):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        trakt_api = TraktAPI()
+        from tmdbhelper.lib.script.method.trakt import get_trakt_api
+        trakt_api = get_trakt_api()
+        if trakt_api is None:
+            return
         path = trakt_api.get_request_url(path, **kwargs)
         data = trakt_api.get_api_request(path, headers=trakt_api.headers)
         data = data.json()

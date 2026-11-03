@@ -13,11 +13,6 @@ class CommonContainerAPIs():
         return TMDbImagePath()
 
     @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
-
-    @cached_property
     def ftv_api(self):
         from tmdbhelper.lib.api.fanarttv.api import FanartTV
         from tmdbhelper.lib.addon.plugin import get_setting

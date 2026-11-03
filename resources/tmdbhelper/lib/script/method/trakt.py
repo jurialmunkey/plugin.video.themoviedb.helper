@@ -2,7 +2,6 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from tmdbhelper.lib.script.method.decorators import is_in_kwargs
-from tmdbhelper.lib.script.method.sync import invalidate_sync
 from tmdbhelper.lib.sync.providers.list_actions import get_provider_list_actions
 
 
@@ -27,17 +26,32 @@ def rename_list(rename_list=None, **kwargs):
         return actions.rename_list(rename_list)
 
 
+def get_trakt_provider(install=False):
+    if install:
+        from tmdbhelper.lib.script.sync.provider_install import SyncProviderInstall
+        return SyncProviderInstall('script.module.tmdbhelper.sync.trakt').install()
+    from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
+    return SyncProviderRegistry().find_provider('trakt')
+
+
+def get_trakt_api():
+    provider = get_trakt_provider()
+    return provider.api if provider is not None else None
+
+
 def authenticate_trakt(**kwargs):
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    TraktAPI(force=True)
-    invalidate_sync('all', notification=False, sync=False)
+    provider = get_trakt_provider(install=True)
+    if provider is None:
+        return
+    from tmdbhelper.lib.addon.plugin import executebuiltin
+    executebuiltin('RunScript(script.module.tmdbhelper.sync.trakt,action=authenticate)')
 
 
 def revoke_trakt(**kwargs):
-    from tmdbhelper.lib.api.trakt.api import TraktAPI
-    if not TraktAPI().logout():
+    if get_trakt_provider() is None:
         return
-    invalidate_sync('all', notification=False, sync=False)
+    from tmdbhelper.lib.addon.plugin import executebuiltin
+    executebuiltin('RunScript(script.module.tmdbhelper.sync.trakt,action=revoke)')
 
 
 def get_stats(forced=False, **kwargs):
