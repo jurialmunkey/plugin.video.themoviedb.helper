@@ -3499,11 +3499,6 @@ msgid "Fanart image quality"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32753"
-msgid "Default"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32754"
 msgid "Choose the resolution of TMDb posters and actor portraits, or use the default image quality setting."
 msgstr ""
