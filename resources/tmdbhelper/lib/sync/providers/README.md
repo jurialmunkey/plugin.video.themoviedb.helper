@@ -312,9 +312,13 @@ Directory watched/playback pre-sync reaches this cleanup even when the selected
 provider is unavailable; cached item-details reads remain free of provider queries.
 
 There are no built-in fallback sync providers, old setting aliases, or automatic
-sync selections. Opening an unconfigured provider sync list or a list with an unavailable
-selected provider offers setup, including from widgets. Installation and enabling
-use Kodi's built-in
+sync selections. Opening an unconfigured provider sync list offers setup, including
+from widgets. A list with a saved provider selection does not offer replacement
+setup when that provider is unavailable; its data is unavailable until the provider
+returns or the user changes the selection in settings. Combined lists can still use
+their other available selected providers. Provider-specific lists also skip
+installation prompts after the registry reports a provider load failure.
+Installation and enabling use Kodi's built-in
 `InstallAddon` and `EnableAddon` commands, followed by a fresh discovery check.
 Installations use the user's installed repositories; core does not download
 provider packages or add repositories.

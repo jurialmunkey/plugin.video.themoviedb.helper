@@ -17,6 +17,8 @@ def get_provider_list_container(info, provider_id=None, prompt=True):
     addon_id = next(candidates, None)
     if not prompt or addon_id is None:
         return
+    if addon_id in registry.failed_providers:
+        return  # The registry has already reported this provider's load failure.
     from tmdbhelper.lib.script.sync.provider_directory import SyncProviderDirectorySetup
     provider = SyncProviderDirectorySetup(addon_id, info).ensure_provider()
     if provider is None:
