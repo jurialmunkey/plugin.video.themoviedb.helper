@@ -31,3 +31,9 @@ class SyncProviderLoadErrorDialog:
     @mutexlock
     def clear(self):
         get_property(self.notification_property, clear_property=True)
+
+
+class SyncProviderIdentifierErrorDialog(SyncProviderLoadErrorDialog):
+    @property
+    def notification_property(self):
+        return f'{super().notification_property}.Identifiers'

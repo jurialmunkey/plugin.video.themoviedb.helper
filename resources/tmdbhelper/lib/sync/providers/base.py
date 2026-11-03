@@ -15,6 +15,7 @@ class SyncProvider:
     stats_class = None
     monitor_lists_class = None
     list_actions_class = None
+    identifier_resolver_class = None
     scrobbler_class = None
     directory_item_class = None
     list_routes = {}
@@ -39,6 +40,8 @@ class SyncProvider:
             features.add('monitor_lists')
         if self.list_actions_class is not None:
             features.add('list_actions')
+        if self.identifier_resolver_class is not None:
+            features.add('identifiers')
         if self.service_action_classes:
             features.add('service_actions')
         return tuple(sorted(features))

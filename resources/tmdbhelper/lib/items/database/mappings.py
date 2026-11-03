@@ -740,7 +740,7 @@ class ItemMapperMethods:
         return [
             {
                 'key': get_blanks_none(('tmdb_id' if k == 'id' else k).replace('_id', '')),
-                'value': get_blanks_none(f'{v}')
+                'value': get_blanks_none(f'{v}') if v is not None else None
             }
             for k, v in results.items()
         ]

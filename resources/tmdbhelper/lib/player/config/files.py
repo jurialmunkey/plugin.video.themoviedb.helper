@@ -57,6 +57,13 @@ class PlayerFiles:
         ))
 
     @cached_property
+    def requires_provider_ids(self):
+        return self.get_requires_provider_ids()
+
+    def get_requires_provider_ids(self):
+        return any(item.requires_provider_ids for item in self.player_file_metadata_list if item.is_enabled)
+
+    @cached_property
     def dictionary(self):
         return {
             i.filename: i.metadata

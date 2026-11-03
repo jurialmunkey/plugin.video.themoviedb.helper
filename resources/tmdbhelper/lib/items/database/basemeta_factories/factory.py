@@ -147,6 +147,16 @@ def import_unique_id():
     return UniqueId
 
 
+def import_external_ids():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.identifiers import ExternalIds
+    return ExternalIds
+
+
+def import_episode_parent():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.identifiers import EpisodeParent
+    return EpisodeParent
+
+
 def import_imdbnumber():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import IMDbNumber
     return IMDbNumber
@@ -536,6 +546,8 @@ FACTORY_ROUTES = {
     'belongs': import_belongs,
     'collection': import_collection,
     'unique_id': import_unique_id,
+    'external_ids': import_external_ids,
+    'episode_parent': import_episode_parent,
     'imdbnumber': import_imdbnumber,
     'custom': import_custom,
     'genre': import_genre,

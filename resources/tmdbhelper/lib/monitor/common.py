@@ -37,14 +37,15 @@ class CommonMonitorDetails(CommonContainerAPIs):
         )
 
     @kodi_try_except('lib.monitor.common get_tmdb_id_parent')
-    def get_tmdb_id_parent(self, tmdb_id, item_type, season=None, episode=None):
-        return self.query_database.get_trakt_id(
-            id_value=tmdb_id,
-            id_type='tmdb',
-            item_type=item_type,
-            output_type='tmdb',
+    def get_tmdb_id_parent(self, tmdb_id, item_type, season=None, episode=None, imdb_id=None, tvdb_id=None):
+        if item_type != 'episode':
+            return tmdb_id
+        return self.query_database.get_episode_parent_id(
+            tmdb_id=tmdb_id,
             season=season,
-            episode=episode
+            episode=episode,
+            imdb_id=imdb_id,
+            tvdb_id=tvdb_id,
         )
 
     @kodi_try_except('lib.monitor.common get_identifier_details')
@@ -78,7 +79,6 @@ class CommonMonitorDetails(CommonContainerAPIs):
         # Reuse some APIs to avoid reinit
         ratings_api.tmdb_api = self.tmdb_api
         ratings_api.tmdb_imagepath = self.tmdb_imagepath
-        ratings_api.trakt_api = self.trakt_api
         ratings_api.ftv_api = self.ftv_api
         ratings_api.query_database = self.query_database
 

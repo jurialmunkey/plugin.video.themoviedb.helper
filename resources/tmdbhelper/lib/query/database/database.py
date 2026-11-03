@@ -17,6 +17,8 @@ from tmdbhelper.lib.query.database.people import FindQueriesDatabasePeople
 from tmdbhelper.lib.query.database.movies import FindQueriesDatabaseMovies
 from tmdbhelper.lib.query.database.tvshows import FindQueriesDatabaseTvshows
 from tmdbhelper.lib.query.database.imdb_top250 import FindQueriesDatabaseIMDbTop250
+from tmdbhelper.lib.query.database.external_ids import FindQueriesDatabaseExternalIds
+from tmdbhelper.lib.query.database.episode_parent import FindQueriesDatabaseEpisodeParent
 from tmdbhelper.lib.query.database.trakt_id import FindQueriesDatabaseTraktID
 from tmdbhelper.lib.query.database.trakt_stats import FindQueriesDatabaseTraktStats
 from tmdbhelper.lib.query.database.identifier import FindQueriesDatabaseIdentifier
@@ -39,6 +41,8 @@ class FindQueriesDatabase(
     FindQueriesDatabaseMovies,
     FindQueriesDatabaseTvshows,
     FindQueriesDatabaseIMDbTop250,
+    FindQueriesDatabaseExternalIds,
+    FindQueriesDatabaseEpisodeParent,
     FindQueriesDatabaseTraktID,
     FindQueriesDatabaseTraktStats,
     FindQueriesDatabaseIdentifier,
@@ -56,7 +60,7 @@ class FindQueriesDatabase(
         },
     }
 
-    database_version = 4
+    database_version = 5
 
     database_changes = {
         2: (
@@ -65,7 +69,8 @@ class FindQueriesDatabase(
         3: (),
         4: (
             'DROP TABLE IF EXISTS trakt_id',
-        )
+        ),
+        5: (),
     }
 
     @property
@@ -87,7 +92,7 @@ class FindQueriesDatabase(
             'movies': self.movies_columns,
             'tvshows': self.tvshows_columns,
             'imdb_top250': self.imdb_top250_columns,
-            'trakt_id': self.trakt_id_columns,
+            'external_ids': self.external_ids_columns,
             'trakt_stats': self.trakt_stats_columns,
             'identifier': self.identifier_columns,
             'user_ratings': self.user_ratings_columns,
@@ -100,11 +105,6 @@ class FindQueriesDatabase(
     def tmdb_api(self):
         from tmdbhelper.lib.api.tmdb.api import TMDb
         return TMDb()
-
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
 
     @cached_property
     def tmdb_user_api(self):

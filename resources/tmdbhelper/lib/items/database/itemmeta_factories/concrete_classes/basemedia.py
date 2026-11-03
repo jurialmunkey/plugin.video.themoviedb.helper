@@ -470,8 +470,10 @@ class MediaItem(BaseItem):
         return infoproperties
 
     def get_unique_ids(self, unique_ids, subtype=None):
-        for i in (self.return_basemeta_db('unique_id', subtype).cached_data or ()):
-            unique_ids[self.get_subtype_key(i['key'], subtype)] = i['value']
+        unique_ids.update({
+            self.get_subtype_key(i['key'], subtype): i['value']
+            for i in self.return_basemeta_db('unique_id', subtype).cached_data or ()
+            if i['value'] not in (None, '', 'None')})
         unique_ids[self.get_subtype_key('tmdb', subtype)] = self.parent_db_cache.tmdb_id
         return unique_ids
 

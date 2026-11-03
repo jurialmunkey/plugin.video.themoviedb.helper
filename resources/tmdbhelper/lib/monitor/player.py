@@ -161,6 +161,7 @@ class PlayerItem():
                 item_type='episode',
                 season=self.season,
                 episode=self.episode,
+                imdb_id=self.imdb_id,
             )
         return self.infolabel_uniqueid_tmdb
 

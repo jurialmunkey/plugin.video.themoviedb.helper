@@ -154,6 +154,11 @@ Providers declare:
   and `delete_list(list_slug)`. It receives the provider in its constructor and
   supplies the independent `list_actions` capability. The `None` default keeps
   providers without list actions valid. See [List actions](#list-actions).
+- `identifier_resolver_class`: an optional IdentifierResolver subclass implementing
+  `get_ids(tmdb_type, tmdb_id, season=None, episode=None)`. It receives the provider
+  and supplies the `identifiers` capability. The `None` default preserves existing
+  providers. This optional interface requires core 6.20.4; interface version 4
+  remains valid. See [External identifiers](#external-identifiers).
 - `scrobbler_class`: an optional ScrobbleRequest subclass for the scrobbling feature.
   Core calls `scrobble(method)`, which returns a `ScrobbleResult`. Scrobblers using
   the inherited `scrobble()` implement `get_scrobbler_item()` and
@@ -751,3 +756,41 @@ ratings, and scrobbling assignments. After Kodi confirms the module is disabled,
 those assignments are removed through the existing settings interfaces. Cancelling
 leaves the module and its configuration unchanged. Ratings cache contents retain
 their normal expiry behaviour, as with the ratings-provider selector.
+
+## External identifiers
+
+Core obtains TMDb, IMDb, and TVDb IDs through
+`FindQueriesDatabase.get_external_ids()`. It reads the item-details `unique_id`
+metadata first and caches TMDb external-ID responses in `ItemQueries.db`.
+Ratings use the parent show's IMDb ID for seasons and episodes. These readers
+never request full item details from the detail service.
+
+Episode-parent lookup reads cached episode relationships, then previously cached
+TMDb external-ID responses, then TMDb's find endpoint using an IMDb or TVDb ID.
+A bare TMDb episode ID with no cached relationship or external ID cannot be
+reversed; monitor callers retain their title/external-ID fallback.
+
+`tmdbhelper.lib.sync.providers.identifiers.IdentifierResolver` defines optional
+provider enrichment. `IdentifierResolvers` gathers IDs from enabled, loadable
+providers declaring `identifier_resolver_class`; the first nonempty value for a
+key wins. The resolver returns a dictionary of unique-ID keys and values, using
+`tvshow.` prefixes for parent-show IDs when enriching TV items. Public lookups
+need not require an authorized account. Providers retain ownership of requests,
+source mappings, and identifier caches. Network failures return no enrichment.
+
+Player configuration checks enabled templates for `{trakt}`, `{slug}`,
+`{eptrakt}`, or `{epslug}` before requesting provider enrichment. Existing item
+IDs and TMDb IDs take precedence; missing/disabled providers leave generic IDs
+available. Templates requiring provider-specific IDs need that provider.
+
+The Trakt module owns `TraktIdentifiers.db`, including per-record expiry and
+successful-query timestamps. A failed request leaves both unchanged; a successful
+empty response records its query expiry. On first use it copies unexpired legacy
+`trakt_id` rows from `ItemQueries.db`, preserving the source and recording a
+one-time migration marker. Episode and show slugs are stored separately. Core no
+longer owns the Trakt lookup or its cache. Updated provider callers use their own
+identifier client. A temporary `get_trakt_id()` compatibility method delegates to
+Trakt's resolver through its optional `get_id()` hook. When an enabled older
+module lacks that resolver, the method shows the existing update warning once
+per session and returns no result. It does not construct a Trakt API or cache.
+Other provider features and the interface version remain unchanged.

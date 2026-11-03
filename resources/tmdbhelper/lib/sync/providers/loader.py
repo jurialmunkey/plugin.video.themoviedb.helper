@@ -9,6 +9,7 @@ from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSup
 from tmdbhelper.lib.sync.providers.imdb_top250 import IMDB_TOP250_MEDIATYPES, IMDbTop250Supplier
 from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
 from tmdbhelper.lib.sync.providers.list_actions import ListActions
+from tmdbhelper.lib.sync.providers.identifiers import IdentifierResolver
 from tmdbhelper.lib.sync.providers.stats import StatsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
 from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES, ServiceDataType
@@ -190,6 +191,15 @@ class SyncProviderLoader:
             if not callable(implementation) or implementation is getattr(ListActions, method):
                 raise TypeError(f'List actions must implement {method}()')
 
+    @classmethod
+    def validate_identifier_resolver_class(cls, provider):
+        if provider.identifier_resolver_class is not None:
+            cls.validate_subclass(
+                provider.identifier_resolver_class, IdentifierResolver,
+                'Identifier resolver', ('get_ids',))
+            if not callable(provider.identifier_resolver_class.get_ids):
+                raise TypeError('Identifier resolver must implement get_ids()')
+
     @staticmethod
     def validate_directory(provider):
         if provider.directory_item_class is not None:
@@ -232,6 +242,7 @@ class SyncProviderLoader:
         self.validate_stats_class(provider)
         self.validate_monitor_lists_class(provider)
         self.validate_list_actions_class(provider)
+        self.validate_identifier_resolver_class(provider)
         self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')

@@ -216,7 +216,8 @@ class Player:
             tmdb_id=self.tmdb_id,
             season=self.season,
             episode=self.episode,
-            translation=self.translation
+            translation=self.translation,
+            provider_ids=self.player_files_data.requires_provider_ids,
         )
 
     @cached_property

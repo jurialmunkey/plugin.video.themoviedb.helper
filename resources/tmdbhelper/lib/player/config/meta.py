@@ -8,6 +8,8 @@ from tmdbhelper.lib.addon.consts import PLAYERS_PRIORITY
 
 class PlayerMeta:
 
+    provider_ids = ('{trakt}', '{slug}', '{eptrakt}', '{epslug}')
+
     required_ids = (
         '{imdb}',
         '{tvdb}',
@@ -73,6 +75,13 @@ class PlayerMeta:
             bool(i in self.data)
             for i in self.required_ids
         ))
+
+    @cached_property
+    def requires_provider_ids(self):
+        return self.get_requires_provider_ids()
+
+    def get_requires_provider_ids(self):
+        return any(token in self.data for token in self.provider_ids)
 
     @cached_property
     def priority_provider(self):

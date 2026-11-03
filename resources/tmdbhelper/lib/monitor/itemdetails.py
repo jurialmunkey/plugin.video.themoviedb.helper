@@ -209,6 +209,7 @@ class MonitorItemDetails(ImageManipulations):
             item_type='episode',
             season=self.season,
             episode=self.episode,
+            imdb_id=self.imdb_id,
         )
 
     @cached_property
