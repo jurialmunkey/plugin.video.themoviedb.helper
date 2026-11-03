@@ -4,6 +4,10 @@
 
 
 def test_func(test_func, dialog_output=False, **kwargs):
+    if test_func in ('trakt_response', 'trakt_auth', 'get_response_sync'):
+        from tmdbhelper.lib.script.method.trakt import run_trakt_diagnostic
+        return run_trakt_diagnostic(
+            'test_func', test_func=test_func, dialog_output=dialog_output, **kwargs)
 
     from timeit import default_timer as timer
     start_time = timer()
@@ -32,25 +36,6 @@ def test_func(test_func, dialog_output=False, **kwargs):
         from tmdbhelper.lib.api.tmdb.users import TMDbUser
         head = path
         data = TMDbUser().get_authorised_response_json(path, **kwargs)
-        return finalise(head, data)
-
-    def test_func_trakt_response(path, **kwargs):
-        from tmdbhelper.lib.script.method.trakt import get_trakt_api
-        head = path
-        api = get_trakt_api()
-        if api is None:
-            return
-        data = api.get_response(path, **kwargs)
-        data = {'headers': dict(data.headers), 'request': data.json()}
-        return finalise(head, data)
-
-    def test_func_trakt_auth(**kwargs):
-        from tmdbhelper.lib.script.method.trakt import get_trakt_api
-        tapi = get_trakt_api()
-        if tapi is None:
-            return
-        head = ''
-        data = {'authorization': tapi.authenticator.authorization}
         return finalise(head, data)
 
     def test_func_fanarttv(ftv_type, ftv_id, **kwargs):
@@ -107,17 +92,6 @@ def test_func(test_func, dialog_output=False, **kwargs):
         data = func(**kwargs)
         return finalise(head, data, affix=import_attr)
 
-    def test_func_get_response_sync(path, **kwargs):
-        from tmdbhelper.lib.script.method.trakt import get_trakt_api
-        trakt_api = get_trakt_api()
-        if trakt_api is None:
-            return
-        path = trakt_api.get_request_url(path, **kwargs)
-        data = trakt_api.get_api_request(path, headers=trakt_api.headers)
-        data = data.json()
-        head = path
-        return finalise(head, data)
-
     def test_func_write_user_art(aspect, icon, parent_id, **kwargs):
         from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
         iddb = ItemDetailsDatabase()
@@ -153,7 +127,6 @@ def test_func(test_func, dialog_output=False, **kwargs):
 
     routes = {
         'response': test_func_response,
-        'trakt_response': test_func_trakt_response,
         'tmdbuser_response': test_func_tmdbuser_response,
         'baseitem_factory': test_func_baseitem_factory,
         'baseview_factory': test_func_baseview_factory,
@@ -161,11 +134,9 @@ def test_func(test_func, dialog_output=False, **kwargs):
         'fanarttv': test_func_fanarttv,
         'get_next_episodes': test_func_get_next_episodes,
         'sync_next_episodes': test_func_sync_next_episodes,
-        'get_response_sync': test_func_get_response_sync,
         'write_user_art': test_func_write_user_art,
         'jrpc': test_func_jrpc,
         'jrpc_directory': test_func_jrpc_directory,
-        'trakt_auth': test_func_trakt_auth,
         'clear_lactivity': test_func_clear_lactivity,
     }
 

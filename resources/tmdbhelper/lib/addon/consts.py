@@ -12,9 +12,6 @@ DATALEVEL_MAX = 5
 SQLITE_FALSE = 0
 SQLITE_TRUE = 1
 
-TRAKT_MAX_ITEMS_PER_PAGE = 250
-
-
 NODE_BASEDIR = 'special://profile/addon_data/plugin.video.themoviedb.helper/nodes/'
 RUNSCRIPT = 'Runscript(plugin.video.themoviedb.helper,{})'
 

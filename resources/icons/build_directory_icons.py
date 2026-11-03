@@ -100,13 +100,11 @@ class IconComposer:
                 color = tuple(round(a + (b - a) * t) for a, b in zip((106, 194, 197), (11, 181, 224)))
                 draw.line((x, 0, x, size[1]), fill=(*color, 255))
             return fill
-        color = {'trakt': (159, 66, 198), 'tvdb': (108, 213, 145)}[family]
+        color = {'tvdb': (108, 213, 145)}[family]
         return Image.new('RGBA', size, (*color, 255))
 
     def add_footer(self, canvas, family, label):
-        if family == 'trakt':
-            canvas.alpha_composite(self.xcf.get('trakt-text-logo-dark.svg'), (172, 336))
-        elif family == 'tvdb':
+        if family == 'tvdb':
             source = Image.open(ICON_ROOT / family / 'tvdb.png').convert('RGBA')
             logo = source.crop((108, 170, 405, 340))
             logo.thumbnail((150, 80), Image.Resampling.LANCZOS)
@@ -167,13 +165,6 @@ ICONS = (
     ('themoviedb', 'groupings', 'layer-21', ''),
     ('themoviedb', 'calendar', 'calendar-4', ''),
     ('themoviedb', 'airingnext', 'calendar-2', ''),
-    ('trakt', 'favorites', 'heart-filled', ''),
-    ('trakt', 'viewers', 'user-29', ''),
-    ('trakt', 'related', 'link-1', ''),
-    ('trakt', 'comments', 'speech-bubble-2', ''),
-    ('trakt', 'searchlists', 'magnifier-text-lined', ''),
-    ('trakt', 'up-next', 'arrow-right-alt-filled', ''),
-    ('trakt', 'groupings', 'layer-21', ''),
     ('tvdb', 'awards', 'award-5', ''),
     ('tvdb', 'genres', 'layer-21', ''),
 )

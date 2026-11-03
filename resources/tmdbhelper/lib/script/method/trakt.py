@@ -34,9 +34,15 @@ def get_trakt_provider(install=False):
     return SyncProviderRegistry().find_provider('trakt')
 
 
-def get_trakt_api():
-    provider = get_trakt_provider()
-    return provider.api if provider is not None else None
+def run_trakt_diagnostic(action, **kwargs):
+    if get_trakt_provider() is None:
+        return
+    from json import dumps
+    from urllib.parse import quote
+    from tmdbhelper.lib.addon.plugin import executebuiltin
+    payload = quote(dumps(kwargs), safe='')
+    executebuiltin(
+        f'RunScript(script.module.tmdbhelper.sync.trakt,action={action},payload={payload})')
 
 
 def authenticate_trakt(**kwargs):

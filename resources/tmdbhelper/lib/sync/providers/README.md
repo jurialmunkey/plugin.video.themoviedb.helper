@@ -559,10 +559,11 @@ accessed. Shared core lists and the shared Discover base have no Trakt client.
 Core no longer performs a Trakt-specific startup authorization request; the
 module validates and refreshes credentials when its API is needed.
 
-Core account entry points launch the module's account actions. Remaining core
-request diagnostics resolve the module API through the registry and return
-without a request when the module is unavailable. The old core API package is
-retained temporarily for final cleanup, but has no active core callers.
+Core account entry points launch the module's account actions. The core Trakt
+API package, API-key configuration, pagination constant, and obsolete token
+permissions are removed. Service requests, credentials, and account behavior
+belong entirely to the module. Shared request and token-handler infrastructure
+remains in core.
 
 ### Trakt preferences
 
@@ -610,9 +611,35 @@ overrides only its settings access hooks. Core's shared token handler is unchang
 Core retains the hidden legacy credential setting as a migration source; its
 visible account controls are removed.
 
-These coordinated changes require TMDbHelper 6.20.5 and Trakt module 1.2.4 to be
-updated together. The provider interface remains version 4; no new shared
-provider contract is introduced.
+Credential migration requires TMDbHelper 6.20.5 and Trakt module 1.2.4 or later
+to be updated together. TMDbHelper 6.20.6 and Trakt module 1.2.5 complete the
+diagnostics migration and core cleanup. The module's minimum core dependency
+remains 6.20.5, which provides all required interfaces. The provider interface
+remains version 4; no new shared provider contract is introduced.
+
+### Trakt diagnostics and artwork
+
+The module's Diagnostics settings expose request logging and authorization
+status. Its `diagnostics.py` owns request execution, response mapping, dialogs,
+and report files. Small diagnostic subclasses share report handling and vary
+the request or output mapping. `TraktDiagnosticFiles` inherits core's generic
+`FileUtils` with the module's profile as its output directory. A successful empty
+response is logged; failed or invalid responses do not produce a report.
+Authorization diagnostics report authorization, refresh-token presence and
+expiry without including access or refresh token values.
+
+The existing core `log_request=trakt`, `test_func=trakt_response`,
+`test_func=trakt_auth`, and `test_func=get_response_sync` commands remain forwarding
+entry points. Arguments are JSON-encoded and URL-quoted before being passed to
+the module script, so commas, Unicode and URL query strings remain intact.
+Unavailable modules cause no request, setup prompt or fallback to a core client.
+Core's TMDb logging and unrelated diagnostics retain their existing pipeline.
+
+Trakt artwork, including type variants, is shipped only in the module. Core's
+duplicate PNGs and its Trakt-only normal/type export definitions are removed;
+shared icon generation and the remaining core icon families retain their
+existing behavior. Shared directory mappers, calendar stacking, stats caching,
+library tagging and persisted compatibility names remain core responsibilities.
 
 ## Ratings suppliers
 

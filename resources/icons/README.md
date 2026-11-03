@@ -2,8 +2,8 @@
 
 `build_directory_icons.py` composites the directory replacements from original
 [iconmonstr](https://iconmonstr.com/) SVGs, the named layers in `icon.xcf`, and
-existing provider footers. The XCF supplies the background, sync gradient and
-Trakt wordmark. All replacement glyphs come from iconmonstr; their geometry is
+existing provider footers. The XCF supplies the background and sync gradient.
+All replacement glyphs come from iconmonstr; their geometry is
 preserved when rasterizing them.
 
 `iconmonstr/` contains the original SVGs used by the exported assets.
@@ -31,16 +31,17 @@ single iconmonstr source name and footer. Outputs are 512px RGBA PNGs, or 720px 
 TMDb to match that existing family. Rebuilding preserves the source SVGs, XCF,
 existing provider logos and reference artwork.
 
-Sync icons use the XCF's blue-to-purple gradient and a function label. Trakt icons
-use the purple glyph fill and XCF wordmark. TMDb icons retain the existing cyan
+Sync icons use the XCF's blue-to-purple gradient and a function label.
+TMDb icons retain the existing cyan
 palette and TMDb footer. TVDb category icons retain their background and
-provider footer. MDbList artwork, including type variants, is shipped in
-`script.module.tmdbhelper.sync.mdblist/resources/icons/mdblist/` and is no longer
-part of these core build manifests. Shared calendar period selectors use the
+provider footer. Trakt and MDbList artwork, including type variants, is shipped in
+`script.module.tmdbhelper.sync.trakt/resources/icons/trakt/` and
+`script.module.tmdbhelper.sync.mdblist/resources/icons/mdblist/` respectively and
+is no longer part of these core build manifests. Shared calendar period selectors use the
 neutral `common/calendar.png` because both library and Trakt routes use them.
 
-The normal icons retain their single centred glyph. Trakt Discover uses the
-existing `trakt/trakt.png` provider logo directly.
+The normal icons retain their single centred glyph. Provider modules resolve
+their own logos and artwork paths.
 
 ## Type variants in mixed menus
 
