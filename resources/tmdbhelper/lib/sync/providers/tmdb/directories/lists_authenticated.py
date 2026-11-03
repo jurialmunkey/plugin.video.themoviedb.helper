@@ -1,6 +1,7 @@
 from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
 from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
 from tmdbhelper.lib.sync.providers.tmdb.directories.mapper import TMDbUserListMapper
+from tmdbhelper.lib.sync.providers.tmdb.directories.mapper_watchlist import TMDbWatchlistMapper
 from jurialmunkey.ftools import cached_property
 
 
@@ -30,6 +31,19 @@ class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
 
 class ListAuthenticatedNoCacheListListsProperties(ListAuthenticatedNoCacheProperties):
     item_mapper_class = TMDbUserListMapper
+
+    def get_uncached_items(self):
+        if not self.provider.is_user_authorized:
+            return {'items': []}
+        items = super().get_uncached_items()
+        if self.page == 1:
+            items['items'].insert(0, self.get_watchlist_item())
+        items['count'] += 1
+        items['pages'] = max(items['pages'], 1)
+        return items
+
+    def get_watchlist_item(self):
+        return TMDbWatchlistMapper({}, None).item
 
     def get_mapped_item(self, item, add_infoproperties=None):
         mapper = self.item_mapper_class(item, add_infoproperties)

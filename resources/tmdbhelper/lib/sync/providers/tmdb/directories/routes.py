@@ -5,6 +5,9 @@ LIST_ROUTES = {
     'tmdb_recommendations': {
         'module_name': 'tmdbhelper.lib.sync.providers.tmdb.directories.lists_authenticated',
         'import_attr': 'ListRecommendations'},
+    'tmdb_v4_watchlist': {
+        'module_name': 'tmdbhelper.lib.sync.providers.tmdb.directories.lists_watchlist',
+        'import_attr': 'ListWatchlist'},
     'tmdb_favorites': {
         'module_name': 'tmdbhelper.lib.sync.providers.tmdb.directories.lists_authenticated',
         'import_attr': 'ListFavourites'},

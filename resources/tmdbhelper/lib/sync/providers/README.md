@@ -30,9 +30,16 @@ Provider-owned mapping stores source order in `watchlist_rank` and uses local
 first-seen UTC dates for `watchlist_listed_at`, since TMDb does not return added-at
 timestamps. Retained entries keep their first-seen dates; observed removals clear
 them. These dates do not represent the original dates added on TMDb.
-Saved `tmdb_v4_watchlist` directories resolve to `sync_watchlist`, and explicit
+The `tmdb_v4_watchlist` directory browses the TMDb account watchlist directly,
+independently of the selected sync source, without syncing membership. Explicit
 `sync_tmdb,sync_type=watchlist` calls delegate to the selected sync watchlist action.
 Successful watchlist actions use the standard provider invalidator before refreshing lists.
+
+Your Lists Combined includes one Watchlist entry before the account's custom lists
+on its first page. This opens a combined movie/TV watchlist, using complete account
+API snapshots and local list pagination. Movie entries precede TV entries, with
+each type retaining TMDb's newest-first order. Typed `tmdb_v4_watchlist` links
+continue to browse only movies or TV. Logged-out accounts return no entries.
 
 TMDb registers its account browsing routes through `list_routes`. Its root folder
 is contributed through `directory_item_class` only when logged in, replacing the
