@@ -26,7 +26,7 @@ class FTVFanartMediaList(FanartMediaList):
         return (self.item_id, self.cached_data_value_type, self.current_time, DATALEVEL_MIN, SQLITE_TRUE)
 
     def image_path_func(self, v):
-        return v
+        return v.replace(' ', '%20')  # Escape unencoded spaces returned by the API
 
     @staticmethod
     def map_label2(i):
