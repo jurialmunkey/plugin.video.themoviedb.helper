@@ -83,11 +83,11 @@ class PlayerNextEpisodes:
         return True
 
     def finalise_item(self, li):
+        li.params['allow_playlist'] = 'false'
         if self.player:
             li.params['player'] = self.player
             li.params['mode'] = 'play'
             li.params['ignore_default'] = 'true'
-            li.params['allow_playlist'] = 'false'
         li.finalise()
         return li
 
