@@ -1834,7 +1834,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32420"
-msgid "Image quality"
+msgid "Default image quality"
 msgstr ""
 
 #: /resources/lib/player/configure.py
@@ -2930,7 +2930,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32635"
-msgid "Choose the resolution of artwork downloaded from TMDb."
+msgid "Choose the default resolution of artwork downloaded from TMDb. Poster and fanart settings can override this default."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3486,4 +3486,29 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32750"
 msgid "Configure Trakt list caching, genre icons, and next-episode calendar checks."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32751"
+msgid "Poster image quality"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32752"
+msgid "Fanart image quality"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32753"
+msgid "Default"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32754"
+msgid "Choose the resolution of TMDb posters and actor portraits, or use the default image quality setting."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32755"
+msgid "Choose the resolution of TMDb fanart, landscape, and extra fanart, or use the default image quality setting."
 msgstr ""

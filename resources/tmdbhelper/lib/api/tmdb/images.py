@@ -8,15 +8,20 @@ class TMDbImagePath:
         from tmdbhelper.lib.addon.plugin import get_setting
         return get_setting('artwork_quality', 'int')
 
+    def get_artwork_quality(self, artwork_type):
+        from tmdbhelper.lib.addon.plugin import get_setting
+        quality = get_setting(f'artwork_quality_{artwork_type}', 'int')
+        return self.artwork_quality if quality == -1 else quality
+
     @cached_property
     def artwork_quality_poster(self):
         from tmdbhelper.lib.addon.consts import IMAGEPATH_QUALITY_POSTER
-        return IMAGEPATH_QUALITY_POSTER[self.artwork_quality]
+        return IMAGEPATH_QUALITY_POSTER[self.get_artwork_quality('poster')]
 
     @cached_property
     def artwork_quality_fanart(self):
         from tmdbhelper.lib.addon.consts import IMAGEPATH_QUALITY_FANART
-        return IMAGEPATH_QUALITY_FANART[self.artwork_quality]
+        return IMAGEPATH_QUALITY_FANART[self.get_artwork_quality('fanart')]
 
     @cached_property
     def artwork_quality_thumbs(self):
