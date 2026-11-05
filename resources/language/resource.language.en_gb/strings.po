@@ -3507,3 +3507,18 @@ msgstr ""
 msgctxt "#32755"
 msgid "Choose the resolution of TMDb fanart, landscape, and extra fanart, or use the default image quality setting."
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32756"
+msgid "TMDb account"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32757"
+msgid "Sign in to your TMDb account using a web browser or QR code."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32758"
+msgid "Sign out of your TMDb account and remove the saved authentication token."
+msgstr ""

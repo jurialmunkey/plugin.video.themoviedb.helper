@@ -806,8 +806,27 @@
                     <enable>false</enable>
                 </setting>
             </group>
-            <group id="5" label="32728">
-                <visible>false</visible>
+            <group id="5" label="32756">
+                <setting id="authenticate_tmdb" type="action" label="32010" help="32757">
+                    <level>0</level>
+                    <dependencies>
+                        <dependency type="visible" operator="is" setting="tmdb_user_token"></dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,authenticate_tmdb,return_settings=true)</data>
+                    </control>
+                </setting>
+                <setting id="revoke_tmdb" type="action" label="32169" help="32758">
+                    <level>0</level>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="tmdb_user_token"></dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,revoke_tmdb,return_settings=true)</data>
+                    </control>
+                </setting>
                 <setting id="tmdb_user_token" type="string" label="32011" help="32701">
                     <level>0</level>
                     <default/>

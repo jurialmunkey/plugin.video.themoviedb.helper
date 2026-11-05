@@ -5,6 +5,35 @@ from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 from tmdbhelper.lib.addon.plugin import get_localized
 
 
+def get_tmdb_authenticator():
+    from tmdbhelper.lib.api.tmdb.api import TMDb
+    from tmdbhelper.lib.api.tmdb.users import TMDbUser
+    return TMDbUser(api_key=TMDb.api_key).authenticator
+
+
+def reopen_tmdb_settings():
+    from tmdbhelper.lib.addon.plugin import get_setting
+    from tmdbhelper.lib.addon.settings import AddonSettingsDialog
+    label = 32169 if get_setting('tmdb_user_token', 'str') else 32010
+    AddonSettingsDialog(32017, label).reopen()
+
+
+def authenticate_tmdb(return_settings=False, **kwargs):
+    try:
+        return get_tmdb_authenticator().authorised_access
+    finally:
+        if return_settings:
+            reopen_tmdb_settings()
+
+
+def revoke_tmdb(return_settings=False, **kwargs):
+    try:
+        return get_tmdb_authenticator().revoke_login()
+    finally:
+        if return_settings:
+            reopen_tmdb_settings()
+
+
 @is_in_kwargs({'tmdb_type': ['movie', 'tv']})
 @get_tmdb_id
 def sync_tmdb(tmdb_type=None, tmdb_id=None, season=None, episode=None, sync_type=None, **kwargs):

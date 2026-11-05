@@ -50,6 +50,10 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.collectiondrops', 'drop_collection')(**kwargs),
 
         # TMDb Utils
+        'authenticate_tmdb':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'authenticate_tmdb')(**kwargs),
+        'revoke_tmdb':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'revoke_tmdb')(**kwargs),
         'sync_tmdb':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'sync_tmdb')(**kwargs),
         'refresh_details':
