@@ -16,22 +16,16 @@ class SyncItemDetailsDatabase(ItemDetailsDatabase):
         return tuple(item['id'] for item in items)
 
     def set_activity(self, item_type, method, value, expiry):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.insert_or_replace('lactivities', keys=('id', 'data', 'expiry')),
             (f'{item_type}.{method}', value, expiry))
-        cursor.close() if cursor else None
 
     def get_activity(self, item_type, method, expiry=0):
-        cursor = self.execute_sql(
+        results = self.execute_sql(
             DatabaseStatements.select_limit('lactivities', keys=('data', ), conditions='id=? and expiry>=?'),
-            (f'{item_type}.{method}', expiry))
-        if not cursor:
-            return
-        result = cursor.fetchone()
-        cursor.close()
-        if not result:
-            return
-        return result[0]
+            (f'{item_type}.{method}', expiry),
+            fetch_rows=True)
+        return results[0][0] if results else None
 
 
 class SyncDataGetter:
