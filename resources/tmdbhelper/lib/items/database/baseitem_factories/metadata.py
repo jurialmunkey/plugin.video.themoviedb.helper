@@ -4,6 +4,60 @@ from collections import OrderedDict, deque
 from copy import deepcopy
 from itertools import chain
 from sys import getsizeof
+from jurialmunkey.ftools import cached_property
+
+
+class MetadataSizeEstimator:
+    """Estimate retained metadata containers, counting shared values once."""
+
+    def __init__(self, value):
+        self.value = value
+        self.current_value = None
+        self.seen = set()
+        self.total_size = 0
+
+    @cached_property
+    def pending(self):
+        return self.get_pending()
+
+    def get_pending(self):
+        return deque([self.value])
+
+    @property
+    def current_identity(self):
+        return id(self.current_value)
+
+    @property
+    def current_size(self):
+        return getsizeof(self.current_value)
+
+    @property
+    def children(self):
+        return self.get_children()
+
+    def get_children(self):
+        if isinstance(self.current_value, dict):
+            return chain.from_iterable(self.current_value.items())
+        if isinstance(self.current_value, (list, tuple)):
+            return self.current_value
+        return ()
+
+    @cached_property
+    def size(self):
+        return self.get_size()
+
+    def get_size(self):
+        while self.pending:
+            self.process_next()
+        return self.total_size
+
+    def process_next(self):
+        self.current_value = self.pending.pop()
+        if self.current_identity in self.seen:
+            return
+        self.seen.add(self.current_identity)
+        self.total_size += self.current_size
+        self.pending.extend(self.children)
 
 
 class ItemMetadataCache:
@@ -16,6 +70,10 @@ class ItemMetadataCache:
         self.version = None
         self.entries = OrderedDict()
         self.size = 0
+
+    @property
+    def is_full(self):
+        return len(self.entries) >= self.max_entries
 
     def get_version(self):
         # data_version is comparable only on the same connection. Keep this
@@ -40,47 +98,44 @@ class ItemMetadataCache:
     def get_key(mapper):
         factory = mapper.parent_db_cache
         return (
-            type(mapper), factory.item_id, factory.language, mapper.extendedinfo,
-            factory.datalevel, factory.translation,
+            type(mapper),
+            factory.item_id,
+            factory.language,
+            mapper.extendedinfo,
+            factory.datalevel,
+            factory.translation,
             tuple(tuple(row) for row in mapper.data),
         )
 
     def get_entry(self, key):
         try:
-            entry = self.entries.pop(key)
+            item, _ = self.entries[key]
         except KeyError:
             return
-        self.entries[key] = entry
-        return entry[0]
+        self.entries.move_to_end(key)
+        return item
 
     @staticmethod
     def get_size(value):
         # Count shared values once within an entry. Counting them again across
         # entries conservatively bounds retained memory, including cache keys.
-        seen = set()
-        pending = deque([value])
-        size = 0
-        while pending:
-            value = pending.pop()
-            identity = id(value)
-            if identity in seen:
-                continue
-            seen.add(identity)
-            size += getsizeof(value)
-            if isinstance(value, dict):
-                pending.extend(chain.from_iterable(value.items()))
-            elif isinstance(value, (list, tuple)):
-                pending.extend(value)
-        return size
+        return MetadataSizeEstimator(value).size
+
+    def evict_oldest(self):
+        _, (_, size) = self.entries.popitem(last=False)
+        self.size -= size
+
+    def make_room(self, size):
+        while self.entries and (
+            self.is_full or self.size + size > self.max_bytes
+        ):
+            self.evict_oldest()
 
     def set_entry(self, key, item):
         size = self.get_size((key, item))
         if size > self.max_bytes:
             return False
-        while self.entries and (
-                len(self.entries) >= self.max_entries or self.size + size > self.max_bytes):
-            _, (_, old_size) = self.entries.popitem(last=False)
-            self.size -= old_size
+        self.make_room(size)
         self.entries[key] = (item, size)
         self.size += size
         return True
@@ -95,9 +150,14 @@ class ItemMetadataCache:
         item = self.get_entry(key)
         if item is not None:
             return self.copy_item(item)
+        return self.get_uncached_item(mapper, key, version)
+
+    def get_uncached_item(self, mapper, key, version):
         item = mapper.get_stable_item()
-        # Never retain a fragment assembled across a concurrent database update.
-        if self.synchronise() != version or not self.set_entry(key, item):
+        # Retain the fragment only if its database revision is unchanged.
+        if self.synchronise() != version:
+            return item
+        if not self.set_entry(key, item):
             return item
         return self.copy_item(item)
 
