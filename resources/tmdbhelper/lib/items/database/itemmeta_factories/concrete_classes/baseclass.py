@@ -120,6 +120,11 @@ class BaseItem:
     def get_art_dbclist(self, art):
         for instance, dkey in self.art_dbclist_routes:
             attr, subtype = instance
+            # A parent route can still fill its prefixed field after the main field is set.
+            if (
+                    attr != 'art_extrafanart' and art.get(dkey)
+                    and (not subtype or art.get(f'{subtype}.{dkey}'))):
+                continue
             instance = self.return_basemeta_db(attr, subtype)
 
             try:
