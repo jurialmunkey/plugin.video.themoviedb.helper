@@ -3,12 +3,21 @@
 from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.plugin import get_setting, get_version
 from tmdbhelper.lib.files.futils import FileUtils
+from contextlib import closing, contextmanager
 import sqlite3
 import struct
 
 
 DEFAULT_TABLE = 'simplecache'
 DATABASE_NAME = 'database_07'
+
+
+class _SQLResourceError(Exception):
+    """Keep fetch and cleanup errors from being swallowed by the cache wrapper."""
+
+    def __init__(self, original):
+        self.original = original
+        super().__init__(str(original))
 
 
 class DatabaseCore:
@@ -70,34 +79,35 @@ class DatabaseCore:
             return
 
     def set_pragmas(self, connection):
-        cursor = connection.cursor()
-        cursor.execute("PRAGMA synchronous=NORMAL")
-        cursor.execute("PRAGMA journal_mode=WAL")
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.execute(f"PRAGMA mmap_size={self._db_mmap_size}")
+        for pragma in (
+            "PRAGMA synchronous=NORMAL",
+            "PRAGMA journal_mode=WAL",
+            "PRAGMA foreign_keys=ON",
+            f"PRAGMA mmap_size={self._db_mmap_size}",
+        ):
+            connection.execute(pragma).close()
         return connection
 
     def init_database(self):
-        # import xbmcvfs
         from jurialmunkey.locker import MutexPropLock
         with MutexPropLock(f'{self._db_file}.lockfile', kodi_log=self.kodi_log):
-            # if xbmcvfs.exists(self._db_file):
-            #     self.set_database_init()
-            #     return
-            database = self.create_database()
-            self.set_database_init()
-        return database
+            if self.create_database():
+                self.set_database_init()
+                return True
+        return False
 
     def create_database(self):
         try:
             with TimerFunc(f'CACHE: Initialisation {self._db_file} took:'):
                 self.kodi_log(f'CACHE: Initialising...\n{self._db_file}\n{self._sc_name}', 1)
-                connection = sqlite3.connect(self._db_file, timeout=self._db_timeout)
-                connection = self.set_pragmas(connection)
-                connection = self.create_database_execute(connection)
-            return connection
+                with closing(sqlite3.connect(self._db_file, timeout=self._db_timeout)) as connection:
+                    self.set_pragmas(connection)
+                    with connection:
+                        self.create_database_execute(connection)
+            return True
         except Exception as error:
             self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name}', 1)
+            return False
 
     def get_database(self, read_only=False, log_level=1):
         timeout = self._db_read_timeout if read_only else self._db_timeout
@@ -106,8 +116,45 @@ class DatabaseCore:
         except Exception as error:
             self.kodi_log(f'CACHE: ERROR while retrieving _database: {error}\n{self._sc_name}', log_level)
             return
-        connection.row_factory = sqlite3.Row
-        return self.set_pragmas(connection)
+        try:
+            connection.row_factory = sqlite3.Row
+            return self.set_pragmas(connection)
+        except Exception:
+            # Keep the setup error if closing the connection also fails.
+            try:
+                connection.close()
+            except Exception as close_error:
+                self._log_cleanup_error(
+                    close_error, prefix='CACHE: ERROR while closing failed _database setup')
+            raise
+
+    @contextmanager
+    def database_session(self, read_only=False, wrap_resource_errors=False):
+        connection = self.get_database(read_only=read_only)
+        if connection is None:
+            raise sqlite3.OperationalError('Database connection unavailable')
+        try:
+            with connection:
+                yield connection
+        except BaseException:
+            try:
+                connection.close()
+            except BaseException as error:
+                self._log_cleanup_error(error)
+            raise
+        else:
+            try:
+                connection.close()
+            except Exception as error:
+                if wrap_resource_errors:
+                    raise _SQLResourceError(error) from error
+                raise
+
+    def _log_cleanup_error(self, error, prefix='CACHE: ERROR closing _database'):
+        try:
+            self.kodi_log(f'{prefix}: {error}\n{self._sc_name}', 2)
+        except Exception:
+            pass
 
     def database_execute(self, connection, query, data=None):
         try:
@@ -121,12 +168,53 @@ class DatabaseCore:
         except Exception as other_exception:
             self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
 
-    def execute_sql(self, query, data=None, read_only=False, connection=None):
+    def _execute_sql(
+            self, query, data=None, read_only=False, connection=None,
+            fetch_rows=None, wrap_resource_errors=False):
+        """Fetch results before closing connections opened here.
+
+        Callers providing their own connection keep control of the cursor.
+        """
+        if connection is not None:
+            return self.database_execute(connection, query, data=data)
+        with self.database_session(
+                read_only=read_only, wrap_resource_errors=wrap_resource_errors) as database:
+            cursor = self.database_execute(database, query, data=data)
+            if cursor is None:
+                return
+            failed = False
+            try:
+                should_fetch = read_only if fetch_rows is None else fetch_rows
+                if should_fetch:
+                    try:
+                        return cursor.fetchall()
+                    except Exception as error:
+                        if wrap_resource_errors:
+                            raise _SQLResourceError(error) from error
+                        raise
+            except BaseException:
+                failed = True
+                raise
+            finally:
+                try:
+                    cursor.close()
+                except Exception as close_error:
+                    if failed:
+                        # Don't replace a fetch error if closing the cursor also fails.
+                        self._log_cleanup_error(
+                            close_error, prefix='CACHE: cursor close error after failed query')
+                    elif wrap_resource_errors:
+                        raise _SQLResourceError(close_error) from close_error
+                    else:
+                        raise
+
+    def execute_sql(self, query, data=None, read_only=False, connection=None, fetch_rows=None):
         try:
-            if connection:
-                return self.database_execute(connection, query, data=data)
-            with self.get_database(read_only=read_only) as connection:
-                return self.database_execute(connection, query, data=data)
+            return self._execute_sql(
+                query, data=data, read_only=read_only, connection=connection,
+                fetch_rows=fetch_rows, wrap_resource_errors=True)
+        except _SQLResourceError as error:
+            raise error.original from error
         except Exception as database_exception:
             self.kodi_log(f'CACHE: database GET DATABASE ERROR! -- {database_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
 
@@ -280,63 +368,45 @@ class DatabaseMethod:
             if not overwrite else
             DatabaseStatements.insert_or_replace
         )
-        cursor = self.execute_sql(
+        self.execute_sql(
             statement(table, keys),
             values,
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def get_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conditions=None, connection=None):
-        cursor = self.execute_sql(
+        result = self.execute_sql(
             DatabaseStatements.select(table, keys, conditions),
             data=values,
             read_only=True,
             connection=connection)
-
-        if not cursor:
-            return
-
-        data = cursor.fetchall()
-        if not connection and cursor:
-            cursor.close()
-
-        return data
+        if connection is None:
+            return result
+        return result.fetchall() if result is not None else None
 
     def del_list_values(self, table=DEFAULT_TABLE, values=(), conditions=None, connection=None):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.delete_item(table, conditions),
             data=values,
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def set_or_update_null_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conflict_constraint='id', connection=None):
         if not values:
             return
         statement = DatabaseStatements.insert_or_update_if_null
-        cursor = self.execute_sql(
+        self.execute_sql(
             statement(table, keys, conflict_constraint=conflict_constraint),
             values,
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def get_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), connection=None):
-        cursor = self.execute_sql(
+        result = self.execute_sql(
             DatabaseStatements.select_limit(table, keys),
             data=(item_id, ),
             read_only=True,
             connection=connection)
-
-        if not cursor:
-            return
-
-        data = cursor.fetchone()
-        if not connection and cursor:
-            cursor.close()
-
-        return data
+        if connection is None:
+            return result[0] if result else None
+        return result.fetchone() if result is not None else None
 
     def set_item_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), values=(), connection=None):
         """ Create a new row at id=item_id (or update if it exists) and then update null values with new data """
@@ -345,12 +415,10 @@ class DatabaseMethod:
             item_id=item_id,
             connection=connection)
 
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.update_if_null(table, keys),
             data=(*values, item_id, ),
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def set_many_values(self, table=DEFAULT_TABLE, keys=(), data=None, connection=None):
         """ data={item_id: ((key, value), (key, value))} """
@@ -361,54 +429,42 @@ class DatabaseMethod:
             item_ids=[item_id for item_id in data.keys()],
             connection=connection)
 
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.update_if_null(table, keys),
             data=[(*values, item_id, ) for item_id, values in data.items()],
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None, connection=None):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.delete_keys(
                 table, keys,
                 conditions=None if item_type is None else 'item_type=?'),
             data=None if item_type is None else (item_type, ),
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def del_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.delete_item(table),
             data=(item_id, ),
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def del_item_like(self, table=DEFAULT_TABLE, item_id=None, connection=None):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.delete_item(table, conditions='id LIKE ?'),
             data=(item_id, ),
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def create_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.insert_or_ignore(table),
             data=(item_id,),
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
     def create_many_items(self, table=DEFAULT_TABLE, item_ids=(), connection=None):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.insert_or_ignore(table),
             data=[(item_id,) for item_id in item_ids],
             connection=connection)
-        if not connection and cursor:
-            cursor.close()
 
 
 class Database(DatabaseCore, DatabaseMethod):

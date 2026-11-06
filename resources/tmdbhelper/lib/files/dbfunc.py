@@ -2,30 +2,76 @@
 # -*- coding: utf-8 -*-
 from jurialmunkey.ftools import cached_property
 from contextlib import contextmanager
+from tmdbhelper.lib.addon.logger import kodi_log
 
 
 class DatabaseConnection:
-    open_connection = None
-
     def __init__(self, cache):
         self.cache = cache
+        self.open_connection = None
+        self._pending_close = None
+
+    @staticmethod
+    def _log_cleanup_error(error):
+        try:
+            kodi_log(f'CACHE: ERROR closing shared _database: {error}', 2)
+        except Exception:
+            pass
+
+    def _close_pending(self):
+        database = self._pending_close
+        if database is None:
+            return
+        database.close()
+        self._pending_close = None
 
     def close(self):
-        if not self.open_connection:
-            return
-        self.open_connection.close()
-        self.open_connection = None
+        cursor = self.open_connection
+        if cursor is not None:
+            # Keep the connection until it has been closed.
+            database = cursor.connection
+            self.open_connection = None
+            self._pending_close = database
+            try:
+                cursor.close()
+            except BaseException:
+                try:
+                    self._close_pending()
+                except BaseException as close_error:
+                    self._log_cleanup_error(close_error)
+                raise
+        self._close_pending()
 
     @contextmanager
     def open(self):
-        existing_connection = bool(self.open_connection)
+        if self.open_connection is not None:
+            yield self.open_connection
+            return
 
-        if not existing_connection:
-            self.open_connection = self.cache.get_database().cursor()
-
-        yield self.open_connection
-
-        if not existing_connection:
+        # Finish cleaning up the previous connection before opening another.
+        self._close_pending()
+        database = self.cache.get_database()
+        if database is None:
+            raise RuntimeError('Database connection unavailable')
+        self._pending_close = database
+        try:
+            self.open_connection = database.cursor()
+        except BaseException:
+            try:
+                self._close_pending()
+            except BaseException as error:
+                self._log_cleanup_error(error)
+            raise
+        self._pending_close = None
+        try:
+            yield self.open_connection
+        except BaseException:
+            try:
+                self.close()
+            except BaseException as error:
+                self._log_cleanup_error(error)
+            raise
+        else:
             self.close()
 
 
