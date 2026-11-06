@@ -67,6 +67,7 @@ class CronJobMonitor(SafeThread):
             ('log_tagger', r".*\.json$"),
             ('log_library', r".*\.json$"),
             ('timer_report', r".*\.txt$"),
+            ('timer_report/item_details', r".*\.txt$"),
         ):
             self._do_delete_old_log_files_in_folder(folder, regex)
 

@@ -1100,10 +1100,17 @@
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="timer_reports" type="boolean" label="32395" help="32697">
+                <setting id="timer_reports" type="integer" label="32395" help="32697">
                     <level>0</level>
-                    <default>False</default>
-                    <control type="toggle"/>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="32585">0</option>
+                            <option label="32759">1</option>
+                            <option label="32760">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
                 </setting>
                 <setting id="log_request_tmdb" type="action" label="32348" help="32698">
                     <level>0</level>
