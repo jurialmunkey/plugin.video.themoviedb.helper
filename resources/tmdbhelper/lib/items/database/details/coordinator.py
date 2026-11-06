@@ -32,11 +32,16 @@ class LookupJob:
 
 
 class DetailsCoordinator(Thread):
-    """One cache/commit owner with separate cached, online and fast-track lanes."""
+    """One scheduling/commit owner with separate cached, online and fast-track lanes.
+
+    Cached reads run on reader threads with their own connections. Commits run only
+    while no reads are in flight, so reads never overlap the service's own writes.
+    """
 
     batch_size = 20
     reserved_workers = 1
-    admission_cap = 12
+    read_workers = 4
+    admission_cap = 12  # Reads started between commit rounds while commits wait
     priority_cap = 2
     commit_cap = 2
 
@@ -52,6 +57,8 @@ class DetailsCoordinator(Thread):
         self.fast_track = DetailsFastTrackQueue()
         self.active = 0
         self.active_regular = 0
+        self.reading = 0
+        self.reads_since_commit = 0
         self.priority_admissions = 0
         self.priority_dispatches = 0
         self.failure = None
@@ -87,12 +94,31 @@ class DetailsCoordinator(Thread):
     @property
     def has_work(self):
         return bool(
-            self.admissions
-            or self.fast_track.admissions
-            or self.completed
-            or self.fast_track.completed
+            self.can_admit
+            or (self.has_commits and self.can_commit)
             or self.can_dispatch
         )
+
+    @property
+    def has_commits(self):
+        return bool(self.completed or self.fast_track.completed)
+
+    @property
+    def can_commit(self):
+        return not self.reading
+
+    @property
+    def is_read_paused(self):
+        """Let waiting commits run once admission_cap reads have started since the last commit."""
+        return self.has_commits and self.reads_since_commit >= self.admission_cap
+
+    @property
+    def can_read(self):
+        return self.reading < self.read_workers and not self.is_read_paused
+
+    @property
+    def can_admit(self):
+        return self.can_read and bool(self.admissions or self.fast_track.admissions)
 
     def get_batch(self):
         # Clear before draining so that a request submitted meanwhile is not missed.
@@ -108,11 +134,16 @@ class DetailsCoordinator(Thread):
     def run(self):
         self.backend = None
         self.executor = None
+        self.reader = None
         try:
             self.backend = self.backend_class()
             self.executor = ThreadPoolExecutor(
                 max_workers=self.batch_size,
                 thread_name_prefix='TMDbHelper lookup',
+            )
+            self.reader = ThreadPoolExecutor(
+                max_workers=self.read_workers,
+                thread_name_prefix='TMDbHelper read',
             )
             while not self.stopping:
                 batch = self.get_batch()
@@ -129,14 +160,17 @@ class DetailsCoordinator(Thread):
                 # A hung online lookup must not delay the restart. Late results
                 # are discarded because nothing reads the event queue any more.
                 self.executor.shutdown(wait=False)
+            if self.reader is not None:
+                # Local reads are short; finish them before their connections close.
+                self.reader.shutdown(wait=True)
             if self.backend is not None:
                 self.backend.close()
 
     def process_batch(self, batch):
-        """Reuse the owner connection until all immediately runnable work yields."""
+        """Reuse the owner connection until all immediately runnable work and reads yield."""
         self.process_events(batch)
         self.run_turn()
-        while not self.stopping and (self.has_work or not self.events.empty()):
+        while not self.stopping and (self.has_work or self.reading or not self.events.empty()):
             self.process_events(self.get_batch())
             self.run_turn()
 
@@ -161,6 +195,8 @@ class DetailsCoordinator(Thread):
             self.dependency_finished(*args)
         elif kind == 'fetched':
             self.fetch_completed(*args)
+        elif kind == 'read':
+            self.read_completed(*args)
 
     def process_submit(self, items, group):
         for request, future in items:
@@ -177,24 +213,38 @@ class DetailsCoordinator(Thread):
         return self.admissions
 
     def admit(self):
-        for _ in range(self.admission_cap):
-            if not self.can_continue or not self.admission_queue:
-                return
-            admission = self.admission_queue.pop()
-            admission.future.admission = None
-            self.priority_admissions = self.priority_admissions + 1 if admission.fast_track else 0
+        while self.can_continue and self.can_admit:
+            self.start_read(self.admission_queue.pop())
+
+    def start_read(self, admission):
+        admission.future.admission = None
+        self.priority_admissions = self.priority_admissions + 1 if admission.fast_track else 0
+        self.reads_since_commit += 1
+        if admission.future.done():
+            return
+        if admission.request.cache_refresh == 'force':
             self.lookup(admission.request, admission.future, admission.group, admission.fast_track)
-            if admission.fast_track and not admission.future.done():
-                return  # Dispatch a priority miss before scanning more cached items.
+            return
+        self.reading += 1
+        future = self.reader.submit(self.backend.read_worker, admission.request)
+        future.add_done_callback(
+            lambda future, admission=admission: self.post_event('read', admission, future),
+        )
+
+    def read_completed(self, admission, future):
+        """Answer a cached item, or look up a miss. A failed read restarts the service as before."""
+        self.reading -= 1
+        data = future.result()
+        if admission.future.done():
+            return
+        if data is not None or admission.request.cache_refresh == 'never':
+            admission.future.set_result(data)
+            return
+        # A priority promotion during the read is carried by the future's fast_track flag.
+        self.lookup(admission.request, admission.future, admission.group, admission.fast_track)
 
     def lookup(self, request, future, group, fast_track=False):
-        if future.done():
-            return
-        if request.cache_refresh != 'force':
-            data = self.backend.read(request)
-            if data is not None or request.cache_refresh == 'never':
-                future.set_result(data)
-                return
+        """Share or queue an online lookup for a request that the cache did not answer."""
         lookup = self.backend.lookup(request)
         key = lookup.key
         if key in self.pending:
@@ -333,7 +383,7 @@ class DetailsCoordinator(Thread):
         queue.add(job)
 
     def is_commit_permitted(self, committed):
-        return committed < self.commit_cap and self.can_continue
+        return committed < self.commit_cap and self.can_commit and self.can_continue
 
     def commit_pending(self):
         self.commit_queue(self.completed)
@@ -344,6 +394,8 @@ class DetailsCoordinator(Thread):
             job = queue.pop()
             self.commit_completed(job, job.fetch_future)
             committed += 1
+        if committed:
+            self.reads_since_commit = 0
 
     def commit_completed(self, job, future):
         try:

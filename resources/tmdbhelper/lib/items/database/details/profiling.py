@@ -7,7 +7,7 @@ from secrets import token_hex
 from threading import RLock, current_thread
 from time import perf_counter
 from traceback import format_exc
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.tmdate import get_datetime_now
 from tmdbhelper.lib.files.futils import write_to_file
@@ -193,7 +193,7 @@ class DetailsBatchReport(DetailsTimings):
             f'details_python_bytes_estimate={self.details_python_bytes}',
             f'assembled_metadata_cache={metadata_cache}',
             'profiling=targeted_stage_timers function_capture=disabled',
-            'scheduling=cache_online_fast_track',
+            'scheduling=parallel_cache_reads_online_fast_track',
             f'dependencies={sum(item["dependency"] for item in items)} '
             f'outcomes={dict(Counter(item["outcome"] for item in items))} '
             f'resolutions={dict(Counter(item["resolution"] for item in items))}',
@@ -236,13 +236,19 @@ class DetailsBatchReport(DetailsTimings):
             'fetch includes worker factory setup, provider/cache requests, source mapping and write-queue generation.',
             'commit includes the richer-cache recheck and transaction; '
             'write_operations counts queued callbacks, not SQL statements.',
-            'admission_queue is submit to admission; dependency_wait ends when dependencies permit readiness.',
+            'admission_queue is submit to read start. admission is read start until the coordinator observes '
+            'the result, including reader time and event waiting; cache_read is the read on its reader thread. '
+            'read_completion is coordinator handling of the result; miss_lookup covers sharing or queuing a miss. '
+            'dependency_wait ends when dependencies permit readiness.',
             'Single-item submissions use the fast_track lane for cache checks, online dispatch and commits. '
             'Parent dependencies inherit the lane; shared jobs are promoted without another fetch. '
             'priority_promotions counts promoted jobs and fetches_<lane> counts actual worker dispatches.',
+            'Cached reads run on read_workers reader threads, each with its own connection; a read starts '
+            'when a reader is free. Commits run only while no reads are in flight; while commits wait, '
+            'reads pause after admission_cap reads since the last commit. '
             'One online worker slot is reserved for fast_track work. Standard admissions retain batch order; '
             'online misses rotate between batches. After two priority admissions/dispatches, '
-            'eligible standard work gets a turn. Cache checks yield to new events between items.',
+            'eligible standard work gets a turn. Starting reads yields to new events.',
             'worker_queue is readiness to fetch start, including dispatch cache rechecks and worker availability.',
             'commit_queue is fetch completion to commit processing, including completion_event_queue.',
             'Shared jobs are charged to their original batch/item; shared_job links the waiting item to that work.',
@@ -294,7 +300,7 @@ class ProfiledDetailsBackend(DetailsBackend):
     def cache(self):
         return ProfiledDetailsDatabase(self.work_profiler)
 
-    @cached_property
+    @threaded_cached_property
     def metadata_cache(self):
         return ProfiledItemMetadataCache(self.cache, self.work_profiler)
 
@@ -304,17 +310,17 @@ class ProfiledDetailsBackend(DetailsBackend):
             return func(request, *args)
         return self.work_profiler.call(record, record.call, stage, func, request, *args)
 
-    def lookup(self, request, parent_data=None):
-        lookup = self.call(request, 'factory_configuration', super().lookup, parent_data)
+    def lookup(self, request, parent_data=None, connection=None):
+        lookup = self.call(request, 'factory_configuration', super().lookup, parent_data, connection)
         record = self.profiles.get(request)
         if record is not None:
             record.last_lookup = lookup
         return lookup
 
-    def read(self, request):
+    def read(self, request, connection=None):
         record = self.profiles.get(request)
         before = record.get_total('db_read') if record is not None else 0
-        data = self.call(request, 'cache_read', super().read)
+        data = self.call(request, 'cache_read', super().read, connection)
         if record is not None:
             database_time = record.get_total('db_read') - before
             record.add_time('cache_read_other', max(record.timings['cache_read'][-1] - database_time, 0))
@@ -389,6 +395,9 @@ class ProfiledDetailsCoordinator(DetailsCoordinator):
     @property
     def scheduler_snapshot(self):
         return {
+            'active_reads': self.reading,
+            'read_workers': self.read_workers,
+            'reads_since_commit': self.reads_since_commit,
             'active_workers': self.active,
             'active_standard_workers': self.active_regular,
             'worker_limit': self.batch_size,
@@ -404,34 +413,56 @@ class ProfiledDetailsCoordinator(DetailsCoordinator):
             'commit_backlogged': self.is_commit_backlogged,
         }
 
+    def start_read(self, admission):
+        record = self.profiles.get(admission.request)
+        if record is not None:
+            record.priority = 'fast_track' if admission.fast_track else 'standard'
+            record.count(f'admissions_{record.priority}')
+            record.mark('admitted')
+            record.interval('admission_queue', 'submitted', 'admitted')
+        return super().start_read(admission)
+
+    def read_completed(self, admission, future):
+        record = self.profiles.get(admission.request)
+        if record is None:
+            return super().read_completed(admission, future)
+        record.mark('read_observed')
+        record.interval('admission', 'admitted', 'read_observed')
+        try:
+            record.call('read_completion', super().read_completed, admission, future)
+            self.set_resolution(record, admission.request, admission.future)
+        finally:
+            with record.lock:
+                record.marks.setdefault('admission_finished', perf_counter())
+            record.last_lookup = None
+
     def lookup(self, request, future, group, fast_track=False):
         record = self.profiles.get(request)
         if record is None:
             return super().lookup(request, future, group, fast_track)
-        record.priority = 'fast_track' if fast_track else 'standard'
-        record.count(f'admissions_{record.priority}')
-        record.mark('admitted')
-        record.interval('admission_queue', 'submitted', 'admitted')
         try:
-            record.call('admission', super().lookup, request, future, group, fast_track)
-            with record.lock:
-                if future.done():
-                    if request.cache_refresh == 'never':
-                        record.resolution = 'cache_only'
-                    else:
-                        record.resolution = 'cache' if record.counts['cache_hits'] else 'no_fetch'
-                elif record.last_lookup is not None:
-                    job = self.pending[record.last_lookup.key]
-                    if job.request is not request:
-                        record.resolution = 'shared'
-                        owner = self.profiles.get(job.request)
-                        record.shared = owner.reference if owner is not None else 'unprofiled job'
-                    else:
-                        record.resolution = 'lookup'
-                        record.count('dependencies', len(job.dependencies))
+            record.call('miss_lookup', super().lookup, request, future, group, fast_track)
+            self.set_resolution(record, request, future)
         finally:
             record.mark('admission_finished')
             record.last_lookup = None
+
+    def set_resolution(self, record, request, future):
+        with record.lock:
+            if future.done():
+                if request.cache_refresh == 'never':
+                    record.resolution = 'cache_only'
+                else:
+                    record.resolution = 'cache' if record.counts['cache_hits'] else 'no_fetch'
+            elif record.last_lookup is not None:
+                job = self.pending[record.last_lookup.key]
+                if job.request is not request:
+                    record.resolution = 'shared'
+                    owner = self.profiles.get(job.request)
+                    record.shared = owner.reference if owner is not None else 'unprofiled job'
+                else:
+                    record.resolution = 'lookup'
+                    record.count('dependencies', len(job.dependencies))
 
     def promote(self, job):
         record = self.profiles.get(job.request)
