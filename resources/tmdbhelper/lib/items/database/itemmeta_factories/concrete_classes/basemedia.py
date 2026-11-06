@@ -394,7 +394,7 @@ class MediaItem(BaseItem):
         if not duration:
             return infoproperties
 
-        progress = self.get_instance_cached_data_value(self.return_basemeta_db('playprogress'), 'playback_progress')
+        progress = self.get_instance_cached_data_value(self.return_basemeta_db('item_sync_state'), 'playback_progress')
         if not progress or progress < 4 or progress > 96:
             progress = 0
 
@@ -405,7 +405,7 @@ class MediaItem(BaseItem):
     def get_infoproperties_lastplayed(self, infoproperties):
         func_get = self.get_instance_cached_data_value
         func_dbc = self.return_basemeta_db
-        lastplayed_timestamp = func_get(func_dbc('lastplayed'), 'lastplayed')
+        lastplayed_timestamp = func_get(func_dbc('item_sync_state'), 'lastplayed')
         if not lastplayed_timestamp:
             return infoproperties
         infoproperties.update(ItemMapperMethods.get_custom_date(
@@ -417,12 +417,12 @@ class MediaItem(BaseItem):
         func_get = self.get_instance_cached_data_value
         func_dbc = self.return_basemeta_db
 
-        for database, column, name, func in (
-            ('favorites_rank', 'favorites_rank', 'favorites_rank', None),
-            ('watchlist_rank', 'watchlist_rank', 'watchlist_rank', None),
-            ('collected_date', 'collection_last_collected_at', 'collected_date', lambda i: i[:10]),
+        for column, name, func in (
+            ('favorites_rank', 'favorites_rank', None),
+            ('watchlist_rank', 'watchlist_rank', None),
+            ('collection_last_collected_at', 'collected_date', lambda i: i[:10]),
         ):
-            rank = func_get(func_dbc(database), column)
+            rank = func_get(func_dbc('item_sync_state'), column)
             if not rank:
                 continue
             infoproperties[name] = func(rank) if func else rank

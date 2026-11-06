@@ -48,3 +48,13 @@ class CollectedDate(SimpleCache):
 class LastPlayed(SimpleCache):
     keys = ('last_watched_at', 'playback_paused_at')
     cached_data_keys = ('MAX(ifnull(last_watched_at, ""), ifnull(playback_paused_at, "")) as lastplayed', )
+
+
+class ItemSyncState(SimpleCache):
+    """One synced-state row shared by an item's detail mappings."""
+
+    keys = (
+        *PlayCount.keys, *WatchedCount.keys, *AiredCount.keys, *PlayProgress.keys,
+        *FavoritesRank.keys, *WatchlistRank.keys, *CollectedDate.keys, *LastPlayed.keys,
+    )
+    cached_data_keys = (*keys, *LastPlayed.cached_data_keys)
