@@ -1770,8 +1770,8 @@ msgstr "快速更新"
 
 #: /resources/settings.xml
 msgctxt "#32395"
-msgid "Directory timings"
-msgstr "目录计时"
+msgid "Timer reports"
+msgstr "计时报告"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -3250,8 +3250,8 @@ msgstr "将额外的诊断信息写入 Kodi 日志。"
 
 #: /resources/settings.xml
 msgctxt "#32697"
-msgid "Log the time taken to build directories."
-msgstr "记录构建目录所耗时间。"
+msgid "Disabled collects no timer reports. Basic collects directory timer reports. Detailed also collects item detail timer reports."
+msgstr "「已禁用」不收集计时报告。「基础」收集目录计时报告。「详细」还会收集条目详情计时报告。"
 
 #: /resources/settings.xml
 msgctxt "#32698"
@@ -3542,3 +3542,13 @@ msgstr "使用网页浏览器或二维码登录你的 TMDb 账户。"
 msgctxt "#32758"
 msgid "Sign out of your TMDb account and remove the saved authentication token."
 msgstr "退出你的 TMDb 账户并移除已保存的认证令牌。"
+
+#: /resources/settings.xml
+msgctxt "#32759"
+msgid "Basic"
+msgstr "基础"
+
+#: /resources/settings.xml
+msgctxt "#32760"
+msgid "Detailed"
+msgstr "详细"
