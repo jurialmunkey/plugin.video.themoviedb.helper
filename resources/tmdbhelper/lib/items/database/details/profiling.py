@@ -67,6 +67,7 @@ class DetailsItemProfile(DetailsTimings):
         self.error = ''
         self.last_lookup = None
         self.future = None
+        self.priority = 'standard'
 
     @property
     def reference(self):
@@ -104,6 +105,7 @@ class DetailsItemProfile(DetailsTimings):
                 'number': self.number, 'request': self.request.as_dict(),
                 'identity': self.request.identity, 'dependency': self.dependency,
                 'resolution': self.resolution, 'shared': self.shared,
+                'priority': self.priority,
                 'outcome': self.outcome, 'error': self.error,
                 'elapsed': self.marks.get('finished', now) - self.submitted,
                 'offset': self.submitted - self.report.started,
@@ -157,7 +159,7 @@ class DetailsBatchReport(DetailsTimings):
     def item_rows(item):
         header = (
             f"#{item['number']} {'dependency' if item['dependency'] else 'requested'} {item['identity']} "
-            f"resolution={item['resolution']} outcome={item['outcome']} "
+            f"priority={item['priority']} resolution={item['resolution']} outcome={item['outcome']} "
             f"elapsed_ms={item['elapsed'] * 1000:.3f} submitted_at_ms={item['offset'] * 1000:.3f}")
         rows = [header, f"  options={item['request']}", f"  counts={dict(item['counts'])}"]
         if item['shared']:
@@ -191,6 +193,7 @@ class DetailsBatchReport(DetailsTimings):
             f'details_python_bytes_estimate={self.details_python_bytes}',
             f'assembled_metadata_cache={metadata_cache}',
             'profiling=targeted_stage_timers function_capture=disabled',
+            'scheduling=cache_online_fast_track',
             f'dependencies={sum(item["dependency"] for item in items)} '
             f'outcomes={dict(Counter(item["outcome"] for item in items))} '
             f'resolutions={dict(Counter(item["resolution"] for item in items))}',
@@ -234,6 +237,12 @@ class DetailsBatchReport(DetailsTimings):
             'commit includes the richer-cache recheck and transaction; '
             'write_operations counts queued callbacks, not SQL statements.',
             'admission_queue is submit to admission; dependency_wait ends when dependencies permit readiness.',
+            'Single-item submissions use the fast_track lane for cache checks, online dispatch and commits. '
+            'Parent dependencies inherit the lane; shared jobs are promoted without another fetch. '
+            'priority_promotions counts promoted jobs and fetches_<lane> counts actual worker dispatches.',
+            'One online worker slot is reserved for fast_track work. Standard admissions retain batch order; '
+            'online misses rotate between batches. After two priority admissions/dispatches, '
+            'eligible standard work gets a turn. Cache checks yield to new events between items.',
             'worker_queue is readiness to fetch start, including dispatch cache rechecks and worker availability.',
             'commit_queue is fetch completion to commit processing, including completion_event_queue.',
             'Shared jobs are charged to their original batch/item; shared_job links the waiting item to that work.',
@@ -352,14 +361,17 @@ class ProfiledDetailsCoordinator(DetailsCoordinator):
         self.profiles = DetailsProfileRegistry()
         super().__init__(backend_class=lambda: ProfiledDetailsBackend(self.profiles))
 
-    def submit(self, requests, group=None):
+    def submit(self, requests, group=None, fast_track=None):
         if not isinstance(group, DetailsBatchReport):
-            return super().submit(requests, group)
+            return super().submit(requests, group, fast_track)
         # Each occurrence needs its own profile even if a caller repeats the same
         # immutable request object. Values and the coordinator's dedup keys are unchanged.
         requests = [request.__class__(**request.as_dict()) for request in requests]
         records = [self.profiles.add(request, group, current_thread() is self) for request in requests]
-        futures = super().submit(requests, group)
+        fast_track = len(requests) == 1 if fast_track is None else fast_track
+        for record in records:
+            record.priority = 'fast_track' if fast_track else 'standard'
+        futures = super().submit(requests, group, fast_track)
         for request, record, future in zip(requests, records, futures):
             record.future = future
             future.add_done_callback(
@@ -371,23 +383,37 @@ class ProfiledDetailsCoordinator(DetailsCoordinator):
             items, group = args
             if isinstance(group, DetailsBatchReport) and not group.scheduler:
                 with group.lock:
-                    group.scheduler = {
-                        'active_workers': self.active, 'worker_limit': self.batch_size,
-                        'pending_jobs': len(self.pending),
-                        'ready_jobs': sum(len(jobs) for jobs in self.ready.values()),
-                        'completed_jobs': len(self.completed), 'admission_groups': len(self.admissions),
-                        'commit_backlogged': self.is_commit_backlogged,
-                    }
+                    group.scheduler = self.scheduler_snapshot
         return super().process_event(kind, *args)
 
-    def lookup(self, request, future, group):
+    @property
+    def scheduler_snapshot(self):
+        return {
+            'active_workers': self.active,
+            'active_standard_workers': self.active_regular,
+            'worker_limit': self.batch_size,
+            'reserved_fast_track_workers': self.reserved_workers,
+            'pending_jobs': len(self.pending),
+            'ready_jobs': len(self.ready),
+            'completed_jobs': len(self.completed),
+            'admission_groups': self.admissions.group_count,
+            'admission_items': len(self.admissions),
+            'fast_track_admission_items': len(self.fast_track.admissions),
+            'fast_track_ready_jobs': len(self.fast_track.ready),
+            'fast_track_completed_jobs': len(self.fast_track.completed),
+            'commit_backlogged': self.is_commit_backlogged,
+        }
+
+    def lookup(self, request, future, group, fast_track=False):
         record = self.profiles.get(request)
         if record is None:
-            return super().lookup(request, future, group)
+            return super().lookup(request, future, group, fast_track)
+        record.priority = 'fast_track' if fast_track else 'standard'
+        record.count(f'admissions_{record.priority}')
         record.mark('admitted')
         record.interval('admission_queue', 'submitted', 'admitted')
         try:
-            record.call('admission', super().lookup, request, future, group)
+            record.call('admission', super().lookup, request, future, group, fast_track)
             with record.lock:
                 if future.done():
                     if request.cache_refresh == 'never':
@@ -406,6 +432,21 @@ class ProfiledDetailsCoordinator(DetailsCoordinator):
         finally:
             record.mark('admission_finished')
             record.last_lookup = None
+
+    def promote(self, job):
+        record = self.profiles.get(job.request)
+        if record is not None and not job.fast_track:
+            with record.lock:
+                record.priority = 'fast_track'
+                record.count('priority_promotions')
+                record.mark('promoted')
+        return super().promote(job)
+
+    def start_fetch(self, job):
+        record = self.profiles.get(job.request)
+        if record is not None:
+            record.count('fetches_fast_track' if job.fast_track else 'fetches_standard')
+        return super().start_fetch(job)
 
     def make_ready(self, job):
         record = self.profiles.get(job.request)
