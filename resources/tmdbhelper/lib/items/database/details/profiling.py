@@ -15,8 +15,9 @@ from tmdbhelper.lib.items.database.details.backend import DetailsBackend
 from tmdbhelper.lib.items.database.details.coordinator import DetailsCoordinator
 from tmdbhelper.lib.items.database.details.protocol import DetailsServiceError, encode_message
 from tmdbhelper.lib.items.database.details.profiling_details import (
-    DetailsMemoryEstimate, DetailsWorkProfiler, ProfiledDetailsDatabase,
+    DetailsMemoryEstimate, DetailsWorkProfiler, ProfiledDetailsDatabase, ProfiledItemMetadataCache,
 )
+from tmdbhelper.lib.items.database.details.profiling_factories import ProfiledDetailsLookup
 from tmdbhelper.lib.items.database.details.service import DetailsRequestHandler
 
 
@@ -66,13 +67,6 @@ class DetailsItemProfile(DetailsTimings):
         self.error = ''
         self.last_lookup = None
         self.future = None
-        self.functions = {}
-
-    def add_functions(self, functions):
-        with self.lock:
-            for name, values in functions.items():
-                previous = self.functions.get(name, (0, 0, 0))
-                self.functions[name] = tuple(a + b for a, b in zip(previous, values))
 
     @property
     def reference(self):
@@ -115,7 +109,6 @@ class DetailsItemProfile(DetailsTimings):
                 'offset': self.submitted - self.report.started,
                 'timings': {name: list(values) for name, values in self.timings.items()},
                 'counts': self.counts.copy(),
-                'functions': self.functions.copy(),
             }
 
 
@@ -138,15 +131,7 @@ class DetailsBatchReport(DetailsTimings):
         self.scheduler = {}
         self.item_errors = {}
         self.details_python_bytes = 0
-
-    @staticmethod
-    def function_rows(functions, sort_by=1, limit=25):
-        rows = ['function | calls | cumulative ms | self ms']
-        rows.extend(
-            f'{name} | {calls} | {total * 1000:.3f} | {own * 1000:.3f}'
-            for name, (calls, total, own) in sorted(
-                functions.items(), key=lambda item: item[1][sort_by], reverse=True)[:limit])
-        return rows
+        self.metadata_cache = {}
 
     def add_request(self, request, dependency):
         with self.lock:
@@ -180,8 +165,6 @@ class DetailsBatchReport(DetailsTimings):
         if item['error']:
             rows.append(f"  error={item['error']}")
         rows.extend(f'  {row}' for row in DetailsBatchReport.timing_rows(item['timings']))
-        rows.append('  function hotspots (cumulative)')
-        rows.extend(f'  {row}' for row in DetailsBatchReport.function_rows(item['functions'], limit=5))
         return rows
 
     def get_report(self):
@@ -190,14 +173,11 @@ class DetailsBatchReport(DetailsTimings):
             items = [record.snapshot(now) for record in self.records]
             timings = {name: list(values) for name, values in self.timings.items()}
             counts = self.counts.copy()
+            metadata_cache = self.metadata_cache.copy()
         work = defaultdict(list)
         work_counts = Counter()
-        functions = {}
         for item in items:
             work_counts.update(item['counts'])
-            for name, values in item['functions'].items():
-                previous = functions.get(name, (0, 0, 0))
-                functions[name] = tuple(a + b for a, b in zip(previous, values))
             for stage, values in item['timings'].items():
                 work[stage].extend(values)
         elapsed = now - self.started
@@ -208,8 +188,9 @@ class DetailsBatchReport(DetailsTimings):
             f'kodi_only={self.entries - self.lookups} kodi_details={self.kodi_details}',
             f'wall_ms={elapsed * 1000:.3f} entries_per_second={self.entries / elapsed:.3f} '
             f'response_bytes={self.response_bytes}',
-            f'details_python_bytes_estimate={self.details_python_bytes} '
-            'assembled_metadata_cache=not_implemented cache_hits_and_invalidations=unavailable',
+            f'details_python_bytes_estimate={self.details_python_bytes}',
+            f'assembled_metadata_cache={metadata_cache}',
+            'profiling=targeted_stage_timers function_capture=disabled',
             f'dependencies={sum(item["dependency"] for item in items)} '
             f'outcomes={dict(Counter(item["outcome"] for item in items))} '
             f'resolutions={dict(Counter(item["resolution"] for item in items))}',
@@ -218,8 +199,6 @@ class DetailsBatchReport(DetailsTimings):
             f'scheduler_at_admission={self.scheduler}',
             '', 'BATCH STAGES', *self.timing_rows(timings),
             '', 'ITEM WORK (requested items and dependencies)', *self.timing_rows(work),
-            '', 'FUNCTION HOTSPOTS (cumulative time)', *self.function_rows(functions),
-            '', 'FUNCTION HOTSPOTS (self time)', *self.function_rows(functions, sort_by=2),
             '', 'INTERPRETATION',
             'All durations use a high-resolution monotonic clock. Report writing is excluded from wall time.',
             'Batch details includes sync_wait, submit and result waiting; send_response includes encoding.',
@@ -228,20 +207,29 @@ class DetailsBatchReport(DetailsTimings):
             'db_read includes item-details SELECT construction, execute, fetch and row materialisation; '
             'db_read.<table> groups by the first FROM table, including its joins/subqueries.',
             'sql_execute counts database-interface execute/executemany calls; parameter_sets counts their input rows. '
-            'Direct transaction-control/setup statements and other databases are excluded from these counters; '
-            'native SQLite function hotspots can include them.',
+            'Direct transaction-control/setup statements and other databases are excluded from these counters.',
             'cache_read_other is cache_read minus its measured db_read time; '
             'it includes mapping, host calls, other work and instrumentation overhead.',
             'item_mapping includes related database reads. '
-            'synced_state_read measures the existing sync metadata getter; '
-            'fresh_state_mapping and date_mapping cover existing helper methods, including nested work.',
-            'Function cumulative times include callees; self times exclude them. Do not add inclusive rows together. '
-            'Helper-stage call counts are in item_work_counts; their timing samples are per function per capture.',
-            'Function capture is per outer backend operation and thread; nested commit/read calls are captured once. '
-            'Capture aggregation is reported separately as profile_collect.',
+            'metadata_assembly measures reusable non-artwork mapping on misses; '
+            'label_mapping, extended_mapping, related_properties_mapping, cast_mapping and unique_ids_mapping '
+            'break down metadata assembly. artwork_mapping measures the existing artwork route pipeline.',
+            'synced_state_read measures simplecache row retrieval. fresh_labels_mapping and '
+            'fresh_properties_mapping apply current sync routes; fresh_state_mapping covers the remaining '
+            'current-state calculations, including their date formatting. airdate_mapping covers the final '
+            'premiered/duration formatting. These scopes differ from older function-derived helper totals.',
+            'Stage timers are explicit factory/mapper/database scopes on each operation\'s thread. '
+            'No interpreter function hooks are installed. Stage call counts are in item_work_counts. '
+            'Do not add nested stage rows together. Instrumentation overhead differs from older '
+            'cProfile/profile.Profile reports, so their absolute durations are not directly comparable.',
             'details_python_bytes_estimate counts unique Python objects in returned details '
             'before entry/Kodi merging; '
             'it excludes native memory, service caches and process RSS. profile_details_size times the estimate.',
+            'assembled_metadata_cache is retained state after this batch\'s last cache read, '
+            'not incremental process memory. Its byte estimate includes keys and conservatively counts '
+            'values shared across entries again. metadata_hits/misses/invalidations/evictions are per-item counts; '
+            'any observed database commit invalidates reuse. metadata_validation covers the observer checks; '
+            'metadata_store includes sizing/eviction, and metadata_copy isolates returned containers.',
             'fetch includes worker factory setup, provider/cache requests, source mapping and write-queue generation.',
             'commit includes the richer-cache recheck and transaction; '
             'write_operations counts queued callbacks, not SQL statements.',
@@ -286,6 +274,8 @@ class DetailsProfileRegistry:
 
 
 class ProfiledDetailsBackend(DetailsBackend):
+    lookup_class = ProfiledDetailsLookup
+
     def __init__(self, profiles):
         super().__init__()
         self.profiles = profiles
@@ -295,12 +285,15 @@ class ProfiledDetailsBackend(DetailsBackend):
     def cache(self):
         return ProfiledDetailsDatabase(self.work_profiler)
 
+    @cached_property
+    def metadata_cache(self):
+        return ProfiledItemMetadataCache(self.cache, self.work_profiler)
+
     def call(self, request, stage, func, *args):
         record = self.profiles.get(request)
         if record is None:
             return func(request, *args)
-        with self.work_profiler.scope(record):
-            return record.call(stage, func, request, *args)
+        return self.work_profiler.call(record, record.call, stage, func, request, *args)
 
     def lookup(self, request, parent_data=None):
         lookup = self.call(request, 'factory_configuration', super().lookup, parent_data)
@@ -317,6 +310,13 @@ class ProfiledDetailsBackend(DetailsBackend):
             database_time = record.get_total('db_read') - before
             record.add_time('cache_read_other', max(record.timings['cache_read'][-1] - database_time, 0))
             record.count('cache_hits' if data is not None else 'cache_misses')
+            with record.report.lock:
+                record.report.metadata_cache = {
+                    'entries': len(self.metadata_cache.entries),
+                    'python_bytes_estimate': self.metadata_cache.size,
+                    'entry_limit': self.metadata_cache.max_entries,
+                    'byte_limit': self.metadata_cache.max_bytes,
+                }
             record.last_lookup = None
         return data
 

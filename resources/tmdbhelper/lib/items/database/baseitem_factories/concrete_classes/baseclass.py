@@ -11,6 +11,7 @@ from tmdbhelper.lib.addon.plugin import get_setting
 
 
 class BaseItem(ItemDetailsDatabaseAccess):
+    item_meta_factory = staticmethod(ItemMetaFactory)
     cache_refresh = None  # Set to "never" for cache only, or "force" for forced refresh
     cache_translations = False
     item_info = 'item'
@@ -176,7 +177,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
 
     def get_item_meta(self, data):
         """ configurator class to transform db cache data into a format usable for Kodi ListItem """
-        imc = ItemMetaFactory(self, data)
+        imc = self.item_meta_factory(self, data)
         imc.extendedinfo = self.extendedinfo
         if self.metadata_cache is not None:
             imc.stable_item = self.metadata_cache.get_item(imc)

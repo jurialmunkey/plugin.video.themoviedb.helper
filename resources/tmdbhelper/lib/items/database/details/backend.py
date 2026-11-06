@@ -56,13 +56,15 @@ class DetailsConnection(DatabaseConnection):
 class DetailsLookup:
     """Configure a fresh factory before accessing any cached factory properties."""
 
+    item_factory = staticmethod(BaseItemFactory)
+
     def __init__(
             self, cache, request, common_apis, connection=None, parent_data=None,
             sync_enabled=True, metadata_cache=None):
         self.request = request
         self.common_apis = common_apis
         self.owns_connection = connection is None
-        self.factory = BaseItemFactory(request.mediatype, common_apis=self.common_apis)
+        self.factory = self.item_factory(request.mediatype, common_apis=self.common_apis)
         self.factory.cache = cache
         self.factory.connection = connection or DetailsConnection(cache)
         for name in (
@@ -100,6 +102,8 @@ class DetailsLookup:
 
 
 class DetailsBackend:
+    lookup_class = DetailsLookup
+
     def __init__(self):
         self.apis = DetailsAPIs()
 
@@ -122,7 +126,7 @@ class DetailsBackend:
         return SyncPreparation.is_enabled()
 
     def lookup(self, request, parent_data=None):
-        return DetailsLookup(
+        return self.lookup_class(
             self.cache, request, self.apis.get(request.language),
             self.connection, parent_data, sync_enabled=self.is_sync_enabled,
             metadata_cache=self.metadata_cache)
@@ -132,7 +136,7 @@ class DetailsBackend:
         return lookup.get_cached_data()
 
     def fetch(self, request, parent_data):
-        lookup = DetailsLookup(
+        lookup = self.lookup_class(
             self.cache, request, self.apis.get(request.language),
             parent_data=parent_data, sync_enabled=self.is_sync_enabled)
         try:

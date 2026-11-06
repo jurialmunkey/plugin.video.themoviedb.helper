@@ -1,22 +1,15 @@
 """Detailed measurements used only by the opt-in item detail profiler."""
 
 from collections import deque
-from contextlib import contextmanager
-from cProfile import Profile
 from itertools import chain
 from sys import getsizeof
 from threading import local
+from tmdbhelper.lib.items.database.baseitem_factories.metadata import ItemMetadataCache
 from tmdbhelper.lib.items.database.details.backend import DetailsDatabase
 
 
 class DetailsWorkProfiler:
-    """Profile one backend operation on its owning thread, without global factory patches."""
-
-    fresh_methods = (
-        'get_infoproperties_progress', 'get_infoproperties_lastplayed',
-        'get_infoproperties_ranks', 'get_infoproperties_aired_episodes',
-        'get_infoproperties_episode_type', 'get_age',
-    )
+    """Attach explicit database/factory/mapper timers to the owning thread's item."""
 
     def __init__(self):
         self.local = local()
@@ -25,65 +18,65 @@ class DetailsWorkProfiler:
     def record(self):
         return getattr(self.local, 'record', None)
 
-    @contextmanager
-    def scope(self, record):
+    def call(self, record, func, *args):
         if self.record is not None:
-            yield
-            return  # A commit can call read(); collect its function calls only once.
-        profiler = Profile()
+            # A commit can call read(); both use the same item's timing record.
+            return func(*args)
         self.local.record = record
-        profiler.enable()
         try:
-            yield
+            return func(*args)
         finally:
-            profiler.disable()
             self.local.record = None
-            with record.measure('profile_collect'):
-                self.collect(record, profiler.getstats())
 
-    @staticmethod
-    def get_function_name(code):
-        if isinstance(code, str):
-            return code if any(name in code for name in ('sqlite3.', '_sqlite3.', 'xbmc')) else None
-        filename = code.co_filename.replace('\\', '/')
-        if '/tmdbhelper/lib/' in filename:
-            filename = filename.rsplit('/tmdbhelper/lib/', 1)[1]
-            if filename.startswith('items/database/details/profiling'):
-                return
-        elif '/jurialmunkey/' in filename:
-            filename = 'jurialmunkey/' + filename.rsplit('/jurialmunkey/', 1)[1]
-        else:
-            return
-        return f'{filename}:{code.co_firstlineno}:{code.co_name}'
+    def call_stage(self, stage, func, *args):
+        record = self.record
+        if record is None:
+            return func(*args)
+        record.count(f'{stage}_calls')
+        return record.call(stage, func, *args)
 
-    @classmethod
-    def get_stage(cls, code):
-        if isinstance(code, str):
-            return
-        filename = code.co_filename.replace('\\', '/')
-        name = code.co_name
-        if '/baseitem_factories/' in filename and name == 'get_item_meta':
-            return 'item_mapping'
-        if filename.endswith('/basemeta_factories/concrete_classes/sync.py') and name == 'get_cached_data':
-            return 'synced_state_read'
-        if '/itemmeta_factories/' in filename and name in cls.fresh_methods:
-            return 'fresh_state_mapping'
-        if filename.endswith('/items/database/mappings.py') and name == 'get_custom_date':
-            return 'date_mapping'
 
-    def collect(self, record, entries):
-        functions = {}
-        for entry in entries:
-            name = self.get_function_name(entry.code)
-            if name is not None:
-                previous = functions.get(name, (0, 0, 0))
-                values = (entry.callcount, entry.totaltime, entry.inlinetime)
-                functions[name] = tuple(a + b for a, b in zip(previous, values))
-            stage = self.get_stage(entry.code)
-            if stage is not None:
-                record.add_time(stage, entry.totaltime)
-                record.count(f'{stage}_calls', entry.callcount)
-        record.add_functions(functions)
+class ProfiledItemMetadataCache(ItemMetadataCache):
+    def __init__(self, database, profiler):
+        super().__init__(database)
+        self.profiler = profiler
+
+    def get_version(self):
+        record = self.profiler.record
+        if record is None:
+            return super().get_version()
+        return record.call('metadata_validation', super().get_version)
+
+    def get_entry(self, key):
+        record = self.profiler.record
+        if record is None:
+            return super().get_entry(key)
+        item = record.call('metadata_lookup', super().get_entry, key)
+        record.count('metadata_hits' if item is not None else 'metadata_misses')
+        return item
+
+    def set_entry(self, key, item):
+        record = self.profiler.record
+        if record is None:
+            return super().set_entry(key, item)
+        before = len(self.entries)
+        stored = record.call('metadata_store', super().set_entry, key, item)
+        record.count('metadata_stores' if stored else 'metadata_oversized')
+        record.count('metadata_evictions', before + int(stored) - len(self.entries))
+        return stored
+
+    def invalidate(self):
+        record = self.profiler.record
+        if record is not None:
+            record.count('metadata_invalidations')
+            record.count('metadata_invalidated_entries', len(self.entries))
+        super().invalidate()
+
+    def copy_item(self, item):
+        record = self.profiler.record
+        if record is None:
+            return super().copy_item(item)
+        return record.call('metadata_copy', super().copy_item, item)
 
 
 class ProfiledDetailsDatabase(DetailsDatabase):
@@ -124,7 +117,11 @@ class ProfiledDetailsDatabase(DetailsDatabase):
         record.count('db_read_calls')
         record.count(f'db_read.{table_name}.calls')
         with record.measure('db_read'):
-            rows = record.call(f'db_read.{table_name}', func, *args)
+            if table_name == 'simplecache':
+                rows = self.profiler.call_stage(
+                    'synced_state_read', record.call, f'db_read.{table_name}', func, *args)
+            else:
+                rows = record.call(f'db_read.{table_name}', func, *args)
         row_count = (1 if single_row else len(rows)) if rows is not None else 0
         record.count('db_rows', row_count)
         record.count(f'db_read.{table_name}.rows', row_count)
