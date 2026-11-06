@@ -13,7 +13,7 @@ class EpisodeGroup(BaseItem):
 
 class EpisodeGroupSeason(EpisodeGroup):
 
-    def get_infoproperties_special(self, infoproperties):
+    def get_infoproperties_fresh(self, infoproperties):
         infoproperties['group_season'] = self.get_data_value('ordering')
         infoproperties.update({
             key: self.get_data_value(key)

@@ -3,6 +3,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.files.dbfunc import DatabaseConnection
 from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
+from tmdbhelper.lib.items.database.baseitem_factories.metadata import ItemMetadataCache
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.items.database.details.apis import DetailsAPIs
 
@@ -55,11 +56,15 @@ class DetailsConnection(DatabaseConnection):
 class DetailsLookup:
     """Configure a fresh factory before accessing any cached factory properties."""
 
-    def __init__(self, cache, request, common_apis, connection=None, parent_data=None, sync_enabled=True):
+    item_factory = staticmethod(BaseItemFactory)
+
+    def __init__(
+            self, cache, request, common_apis, connection=None, parent_data=None,
+            sync_enabled=True, metadata_cache=None):
         self.request = request
         self.common_apis = common_apis
         self.owns_connection = connection is None
-        self.factory = BaseItemFactory(request.mediatype, common_apis=self.common_apis)
+        self.factory = self.item_factory(request.mediatype, common_apis=self.common_apis)
         self.factory.cache = cache
         self.factory.connection = connection or DetailsConnection(cache)
         for name in (
@@ -70,6 +75,7 @@ class DetailsLookup:
             self.factory.tvshow_tmdb_id = request.tvshow_tmdb_id
         self.factory.sync_details = bool(request.sync_details and sync_enabled)
         self.factory.parent_item_data = parent_data
+        self.factory.metadata_cache = metadata_cache
 
     @property
     def key(self):
@@ -96,6 +102,8 @@ class DetailsLookup:
 
 
 class DetailsBackend:
+    lookup_class = DetailsLookup
+
     def __init__(self):
         self.apis = DetailsAPIs()
 
@@ -108,22 +116,27 @@ class DetailsBackend:
         return DetailsConnection(self.cache)
 
     @cached_property
+    def metadata_cache(self):
+        return ItemMetadataCache(self.cache)
+
+    @cached_property
     def is_sync_enabled(self):
         """Settings changes restart the service, so the setting is read once."""
         from tmdbhelper.lib.sync.prepare import SyncPreparation
         return SyncPreparation.is_enabled()
 
     def lookup(self, request, parent_data=None):
-        return DetailsLookup(
+        return self.lookup_class(
             self.cache, request, self.apis.get(request.language),
-            self.connection, parent_data, sync_enabled=self.is_sync_enabled)
+            self.connection, parent_data, sync_enabled=self.is_sync_enabled,
+            metadata_cache=self.metadata_cache)
 
     def read(self, request):
         lookup = self.lookup(request)
         return lookup.get_cached_data()
 
     def fetch(self, request, parent_data):
-        lookup = DetailsLookup(
+        lookup = self.lookup_class(
             self.cache, request, self.apis.get(request.language),
             parent_data=parent_data, sync_enabled=self.is_sync_enabled)
         try:
@@ -168,4 +181,8 @@ class DetailsBackend:
         try:
             self.connection.close()
         finally:
-            self.apis.close()
+            try:
+                if 'metadata_cache' in self.__dict__:
+                    self.metadata_cache.close()
+            finally:
+                self.apis.close()

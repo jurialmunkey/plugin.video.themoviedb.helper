@@ -502,6 +502,11 @@ def import_lastplayed():
     return LastPlayed
 
 
+def import_item_sync_state():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.sync import ItemSyncState
+    return ItemSyncState
+
+
 def import_series_genre():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.series import SeriesGenre
     return SeriesGenre
@@ -617,6 +622,7 @@ FACTORY_ROUTES = {
     'watchlist_rank': import_watchlist_rank,
     'collected_date': import_collected_date,
     'lastplayed': import_lastplayed,
+    'item_sync_state': import_item_sync_state,
     'series_genre': import_series_genre,
     'series_movie': import_series_movie,
     'series_stats': import_series_stats,

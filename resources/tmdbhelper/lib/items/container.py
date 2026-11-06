@@ -28,7 +28,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
     @cached_property
     def log_timers(self):
-        return get_setting('timer_reports')
+        return get_setting('timer_reports', 'int') > 0
 
     @cached_property
     def timer_lists(self):

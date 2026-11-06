@@ -1754,7 +1754,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32395"
-msgid "Directory timings"
+msgid "Timer reports"
 msgstr ""
 
 #: /resources/settings.xml
@@ -3230,7 +3230,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32697"
-msgid "Log the time taken to build directories."
+msgid "Disabled collects no timer reports. Basic collects directory timer reports. Detailed also collects item detail timer reports."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3521,4 +3521,14 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32758"
 msgid "Sign out of your TMDb account and remove the saved authentication token."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32759"
+msgid "Basic"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32760"
+msgid "Detailed"
 msgstr ""

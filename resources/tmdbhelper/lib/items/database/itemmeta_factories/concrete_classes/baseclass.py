@@ -6,6 +6,7 @@ class BaseItem:
     art_dbclist_routes = ()
     infolabels_dbclist_routes = ()
     infolabels_dbcitem_routes = ()
+    infolabels_freshitem_routes = ()
     infoproperties_dbcitem_routes = ()
     infoproperties_dbclist_routes = ()
     extendedinfo = False
@@ -55,8 +56,9 @@ class BaseItem:
                 pass
         return infolabels
 
-    def get_infolabels_dbcitem(self, infolabels):
-        for instance, ikey, dkey in self.infolabels_dbcitem_routes:
+    def get_infolabels_dbcitem(self, infolabels, routes=None):
+        routes = self.infolabels_dbcitem_routes if routes is None else routes
+        for instance, ikey, dkey in routes:
             instance = self.return_basemeta_db(*instance)
             try:
                 data = ikey(instance.cached_data[0]) if callable(ikey) else instance.cached_data[0][ikey]
@@ -117,9 +119,17 @@ class BaseItem:
     def get_infoproperties_special(self, infoproperties):
         return infoproperties
 
+    def get_infoproperties_fresh(self, infoproperties):
+        return infoproperties
+
     def get_art_dbclist(self, art):
         for instance, dkey in self.art_dbclist_routes:
             attr, subtype = instance
+            # A parent route can still fill its prefixed field after the main field is set.
+            if (
+                    attr != 'art_extrafanart' and art.get(dkey)
+                    and (not subtype or art.get(f'{subtype}.{dkey}'))):
+                continue
             instance = self.return_basemeta_db(attr, subtype)
 
             try:
@@ -154,19 +164,37 @@ class BaseItem:
     def get_unique_ids(self, unique_ids):
         return unique_ids
 
-    @cached_property
-    def infolabels(self):
+    def get_stable_infolabels(self):
         infolabels = self.get_infolabels_details()
         infolabels = self.get_infolabels_dbclist(infolabels)
         infolabels = self.get_infolabels_dbcitem(infolabels)
         infolabels = self.get_infolabels_special(infolabels)
         return infolabels
 
+    def get_stable_item(self):
+        return {
+            'infolabels': self.get_stable_infolabels(),
+            'infoproperties': self.get_infoproperties_dbclist({}) if self.extendedinfo else {},
+            'special_properties': self.get_infoproperties_special({}),
+            'cast': self.cast,
+            'unique_ids': self.unique_ids,
+        }
+
+    @cached_property
+    def stable_item(self):
+        return self.get_stable_item()
+
+    @cached_property
+    def infolabels(self):
+        return self.get_infolabels_dbcitem(
+            self.stable_item['infolabels'], self.infolabels_freshitem_routes)
+
     @cached_property
     def infoproperties(self):
-        infoproperties = self.get_infoproperties_dbclist({}) if self.extendedinfo else {}
+        infoproperties = self.stable_item['infoproperties']
         infoproperties = self.get_infoproperties_dbcitem(infoproperties)
-        infoproperties = self.get_infoproperties_special(infoproperties)
+        infoproperties.update(self.stable_item['special_properties'])
+        infoproperties = self.get_infoproperties_fresh(infoproperties)
         infoproperties = self.get_infoproperties_airdate(infoproperties)
         return infoproperties
 
@@ -192,7 +220,7 @@ class BaseItem:
             'mediatype': self.mediatype,
             'infolabels': self.infolabels,
             'infoproperties': self.infoproperties,
-            'cast': self.cast,
+            'cast': self.stable_item['cast'],
             'art': self.art,
-            'unique_ids': self.unique_ids,
+            'unique_ids': self.stable_item['unique_ids'],
         }

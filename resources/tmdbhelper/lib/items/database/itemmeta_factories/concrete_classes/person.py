@@ -91,6 +91,6 @@ class Person(BaseItem):
         infoproperties['tmdb_type'] = 'person'
         return infoproperties
 
-    def get_infoproperties_special(self, infoproperties):
+    def get_infoproperties_fresh(self, infoproperties):
         infoproperties = self.get_infoproperties_person(infoproperties)
         return infoproperties

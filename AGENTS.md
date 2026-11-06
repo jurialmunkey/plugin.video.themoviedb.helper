@@ -65,11 +65,17 @@ several layers, each retaining its own responsibility.
 
 ## Organization and reuse
 
-- Prefer hanging indents for continuation lines over vertical alignment with
-  the opening delimiter. Follow PEP 8's hanging-indent guidance:
-  put no arguments on the first line and indent continuation lines to clearly
-  distinguish them from the surrounding code. Use an extra indentation level
-  to distinguish continued function parameters from the body.
+- Use hanging indents only when the single-line form exceeds the applicable
+  line-length limit. Leave the opening delimiter's line empty of arguments or
+  entries, then put one argument, parameter, collection element, or dictionary
+  key-value pair per line. Use four-space continuation indents, with an extra
+  level for function parameters to distinguish them from the body. Put closing
+  parentheses, brackets, and braces on separate lines aligned with the opening
+  line's indentation. Use trailing commas where valid. Apply the same rules to
+  nested collections that require wrapping.
+- In wrapped comprehensions and generator expressions, put the result
+  expression and each `for` or `if` clause on separate lines at the same
+  hanging-indent level.
 - Always use explicitly named absolute imports. Relative imports and wildcard
   (`from ... import *`) imports are not permitted.
 - Keep a distinct feature in its own appropriately named modules.

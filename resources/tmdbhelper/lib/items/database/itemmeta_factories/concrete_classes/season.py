@@ -60,6 +60,9 @@ class Season(MediaItem):
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_translation(infoproperties)
+        return infoproperties
+
+    def get_infoproperties_fresh(self, infoproperties):
         try:
             infoproperties['totalepisodes'] = self.get_data_value('totalepisodes')
             infoproperties['airedepisodes'] = self.get_data_value('airedepisodes')

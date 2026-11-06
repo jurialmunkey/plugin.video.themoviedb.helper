@@ -86,6 +86,9 @@ class Tvshow(MediaItem):
             infoproperties['totalepisodes'] = self.get_data_value('totalepisodes')
         except (TypeError, KeyError, IndexError):
             pass
+        return infoproperties
+
+    def get_infoproperties_fresh(self, infoproperties):
         infoproperties = self.get_infoproperties_ranks(infoproperties)
         infoproperties = self.get_infoproperties_next_ep(infoproperties)
         infoproperties = self.get_infoproperties_aired_episodes(infoproperties)

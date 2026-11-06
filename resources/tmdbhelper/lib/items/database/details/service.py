@@ -7,7 +7,7 @@ from time import monotonic
 from xbmc import Monitor
 from xbmcaddon import Addon
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.addon.plugin import get_version
+from tmdbhelper.lib.addon.plugin import get_setting, get_version
 from tmdbhelper.lib.files.sqlite_mutex import SQLiteMutex
 from tmdbhelper.lib.items.database.details.coordinator import DetailsCoordinator
 from tmdbhelper.lib.items.database.details.enrichment import KodiDetailsEnrichment, KodiLibraryCache
@@ -46,9 +46,12 @@ class DetailsRequestHandler(BaseRequestHandler):
             return
         self.request.settimeout(5)
         try:
-            self.request.sendall(self.get_encoded_response(response))
+            self.send_response(response)
         except OSError:
             return  # The requesting widget may have been closed.
+
+    def send_response(self, response):
+        self.request.sendall(self.get_encoded_response(response))
 
     @staticmethod
     def get_encoded_response(response):
@@ -71,6 +74,9 @@ class DetailsRequestHandler(BaseRequestHandler):
             return {'items': []}
         if not isinstance(entries, list) or len(entries) > MAX_REQUEST_ITEMS:
             raise DetailsServiceError('Invalid item detail batch')
+        return self.get_batch_response(entries, message)
+
+    def get_batch_response(self, entries, message):
         results = [
             self.get_entry_result(entry, result)
             for entry, result in zip(entries, self.get_detail_results(entries))]
@@ -93,10 +99,13 @@ class DetailsRequestHandler(BaseRequestHandler):
         requests = [DetailsRequest(**entry['request']) for entry in entries if entry['request'] is not None]
         deadline = monotonic() + RESPONSE_TIMEOUT
         self.wait_for_sync(requests, deadline)
-        futures = iter(self.server.coordinator.submit(requests))
+        futures = iter(self.submit_requests(requests))
         return [
             self.get_result(next(futures), deadline) if entry['request'] is not None else (None, None)
             for entry in entries]
+
+    def submit_requests(self, requests):
+        return self.server.coordinator.submit(requests)
 
     def wait_for_sync(self, requests, deadline):
         """Read items only once their synced play data is fresh, as lists did before building items."""
@@ -145,13 +154,13 @@ class DetailsServer(ThreadingMixIn, TCPServer):
     request_queue_size = 128
     allow_reuse_address = True
 
-    def __init__(self, coordinator, monitor):
+    def __init__(self, coordinator, monitor, handler_class=DetailsRequestHandler):
         self.coordinator = coordinator
         self.monitor = monitor
         self.sync_refresher = DetailsSyncRefresher()
         self.kodi_library_cache = KodiLibraryCache()  # Library indexes kept between lists
         self.token = token_hex(24)
-        super().__init__(('127.0.0.1', 0), DetailsRequestHandler)
+        super().__init__(('127.0.0.1', 0), handler_class)
 
     def server_close(self):
         try:
@@ -190,8 +199,9 @@ class DetailsService:
                     break
 
     def run_instance(self):
-        coordinator = DetailsCoordinator()
-        server = DetailsServer(coordinator, self.monitor)
+        coordinator_class, handler_class = self.get_service_classes()
+        coordinator = coordinator_class()
+        server = DetailsServer(coordinator, self.monitor, handler_class)
         listener = Thread(target=server.serve_forever, name='TMDbHelper detail listener')
         try:
             self.monitor.settings_changed.clear()
@@ -218,6 +228,15 @@ class DetailsService:
             if coordinator.ident is not None:
                 coordinator.stop()
             server.server_close()
+
+    @staticmethod
+    def get_service_classes():
+        if get_setting('timer_reports', 'int') == 2:
+            from tmdbhelper.lib.items.database.details.profiling import (
+                ProfiledDetailsCoordinator, ProfiledDetailsRequestHandler,
+            )
+            return ProfiledDetailsCoordinator, ProfiledDetailsRequestHandler
+        return DetailsCoordinator, DetailsRequestHandler
 
     def is_settings_changed(self, settings):
         if not self.monitor.settings_changed.is_set():
