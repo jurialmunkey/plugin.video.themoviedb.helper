@@ -22,6 +22,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
     append_to_response_tmdbtype = 'movie'
     clear_user_art = False
     sync_details = True  # Read synced play data such as play counts and progress
+    metadata_cache = None
 
     def get_lookup_request(self):
         from tmdbhelper.lib.items.database.details.request import DetailsRequest
@@ -177,6 +178,8 @@ class BaseItem(ItemDetailsDatabaseAccess):
         """ configurator class to transform db cache data into a format usable for Kodi ListItem """
         imc = ItemMetaFactory(self, data)
         imc.extendedinfo = self.extendedinfo
+        if self.metadata_cache is not None:
+            imc.stable_item = self.metadata_cache.get_item(imc)
         return imc.item
 
     def set_unaired_expiry(self, premiered=None, next_episode_to_air_id=None):
