@@ -196,12 +196,14 @@ class RatingsSeasonsDict(RatingsDict):
     def get_mediatype(self):
         return 'season'
 
-    def get_online_data_mapped(self):
-        if self.season is None:
-            return
+    @property
+    def data_cond(self):
+        """ Season ratings only apply to a TV item with a season """
         if self.tmdb_type != 'tv':
-            return
-        return super().get_online_data_mapped()
+            return False
+        if self.season is None:
+            return False
+        return super().data_cond
 
     @property
     def item_id(self):
@@ -212,10 +214,12 @@ class RatingsEpisodesDict(RatingsSeasonsDict):
     def get_mediatype(self):
         return 'episode'
 
-    def get_online_data_mapped(self):
+    @property
+    def data_cond(self):
+        """ Episode ratings only apply to a TV item with a season and an episode """
         if self.episode is None:
-            return
-        return super().get_online_data_mapped()
+            return False
+        return super().data_cond
 
     @property
     def item_id(self):
