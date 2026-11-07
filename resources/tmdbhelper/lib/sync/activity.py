@@ -12,16 +12,33 @@ class SyncLastActivities(SyncDataParentProperties):
         super().__init__(instance_syncdata)
         self.provider = provider
 
+    @staticmethod
+    def get_property_name(provider_id):
+        return f'{LASTACTIVITIES_DATA}.{provider_id}'
+
     @property
     def json_property_name(self):
-        return f'{LASTACTIVITIES_DATA}.{self.provider.provider_id}'
+        return self.get_property_name(self.provider.provider_id)
 
     def clear(self):
         self.clear_provider(self.window, self.provider.provider_id)
 
+    @classmethod
+    def clear_provider(cls, window, provider_id):
+        window.get_property(cls.get_property_name(provider_id), clear_property=True)
+
     @staticmethod
-    def clear_provider(window, provider_id):
-        window.get_property(f'{LASTACTIVITIES_DATA}.{provider_id}', clear_property=True)
+    def is_current_data(data):
+        return bool(data and get_timestamp(data.get('expiry') or 0))
+
+    @classmethod
+    def get_provider_marker(cls, window, provider_id):
+        """The provider's stored last activities while they are current, otherwise None.
+        Changes that need a new sync clear them, so an unchanged marker means synced data is fresh."""
+        marker = window.get_property(cls.get_property_name(provider_id))
+        if not cls.is_current_data(data_loads(marker)):
+            return
+        return marker
 
     @property
     def mutex_lockname(self):
@@ -53,7 +70,7 @@ class SyncLastActivities(SyncDataParentProperties):
 
     def get_json_prop(self):
         data = data_loads(self.window.get_property(self.json_property_name))
-        if not data or not get_timestamp(data.get('expiry') or 0):
+        if not self.is_current_data(data):
             return
         return data
 

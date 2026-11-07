@@ -49,5 +49,29 @@ class SyncPreparation:
         return SyncDataFactory()
 
     def sync(self):
-        for keys in self.sync_keys[self.item_type]:
-            self.syncdata.sync(self.item_type, keys)
+        """Refresh every key group, returning whether all of them are current."""
+        return all([self.syncdata.sync(self.item_type, keys) for keys in self.sync_keys[self.item_type]])
+
+    @cached_property
+    def provider_ids(self):
+        return self.get_provider_ids()
+
+    def get_provider_ids(self):
+        """The selected providers that sync this item type's keys."""
+        from tmdbhelper.lib.sync.providers.features import SYNC_FEATURES
+        from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
+        sync_types = {
+            self.syncdata.routes[key]
+            for keys in self.sync_keys[self.item_type]
+            for key in keys
+        }
+        return tuple(sorted({SyncProviderSetting(SYNC_FEATURES[sync_type]).provider_id for sync_type in sync_types}))
+
+    @property
+    def activity_markers(self):
+        """Each provider's current last activities; None where missing or expired."""
+        from tmdbhelper.lib.sync.activity import SyncLastActivities
+        return tuple(
+            SyncLastActivities.get_provider_marker(self.syncdata.window, provider_id)
+            for provider_id in self.provider_ids
+        )
