@@ -38,6 +38,8 @@ from tmdbhelper.lib.items.database.tabledef import (
     TRANSLATION_COLUMNS,
     SIMPLECACHE_COLUMNS,
     LACTIVITIES_COLUMNS,
+    STORED_METADATA_COLUMNS,
+    STORED_METADATA_STATE_COLUMNS,
 )
 
 
@@ -52,7 +54,7 @@ class ItemDetailsDatabase(Database):
             return super().create_database_execute(connection)
 
     # DB version must be max of table_version
-    database_version = 51
+    database_version = 52
 
     database_changes = {
         21: (),
@@ -124,6 +126,7 @@ class ItemDetailsDatabase(Database):
             'DROP TABLE IF EXISTS baseitem',
         ),
         51: (),
+        52: (),  # Add stored assembled metadata
     }
 
     baseitem_columns = BASEITEM_COLUMNS
@@ -162,6 +165,8 @@ class ItemDetailsDatabase(Database):
     translation_columns = TRANSLATION_COLUMNS
     simplecache_columns = SIMPLECACHE_COLUMNS
     lactivities_columns = LACTIVITIES_COLUMNS
+    stored_metadata_columns = STORED_METADATA_COLUMNS
+    stored_metadata_state_columns = STORED_METADATA_STATE_COLUMNS
 
     @property
     def database_tables(self):
@@ -202,4 +207,6 @@ class ItemDetailsDatabase(Database):
             'translation': self.translation_columns,
             'simplecache': self.simplecache_columns,
             'lactivities': self.lactivities_columns,
+            'stored_metadata': self.stored_metadata_columns,
+            'stored_metadata_state': self.stored_metadata_state_columns,
         }

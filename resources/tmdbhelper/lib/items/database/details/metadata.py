@@ -46,6 +46,9 @@ class DetailsMetadataCache(ItemMetadataCache):
     Service saves discard the entries they can change through discard_saved().
     Code outside the service that changes cached details, including user artwork,
     must call DetailsClient().invalidate().
+
+    Entries missing from memory are read from stored_metadata (a DetailsStoredMetadata)
+    before they are assembled, and newly assembled entries are queued for storage.
     """
 
     # Hold every home screen widget's items alongside items browsed in dialogs and lists.
@@ -53,8 +56,9 @@ class DetailsMetadataCache(ItemMetadataCache):
     max_entries = 2048
     max_bytes = 32 * 1024 * 1024
 
-    def __init__(self, database):
+    def __init__(self, database, stored_metadata):
         super().__init__(database)
+        self.stored_metadata = stored_metadata
         self.lock = RLock()
         self.revision = 0
 
@@ -66,6 +70,7 @@ class DetailsMetadataCache(ItemMetadataCache):
     def invalidate(self):
         with self.lock:
             super().invalidate()
+            self.stored_metadata.discard_all()
             self.revision += 1
 
     def get_entry(self, key):
@@ -76,11 +81,37 @@ class DetailsMetadataCache(ItemMetadataCache):
         with self.lock:
             return super().set_entry(key, item)
 
+    def get_stored_item(self, mapper, key):
+        """Read a stored copy on the reading thread's own connection."""
+        return self.stored_metadata.read(key, mapper.parent_db_cache.connection.open_connection)
+
+    def get_assembled_item(self, mapper, key):
+        """Assemble an item and prepare its stored copy outside the lock."""
+        from tmdbhelper.lib.items.database.details.storedmetadata import DetailsStoredMetadataCopy
+        stored = DetailsStoredMetadataCopy(key, mapper.get_stable_item())
+        stored.hash, stored.text  # Hash and encode before taking the lock
+        return stored
+
+    def get_new_item(self, mapper, key):
+        """Return the item and, when it was assembled rather than read, its stored copy."""
+        item = self.get_stored_item(mapper, key)
+        if item is not None:
+            return item, None
+        stored = self.get_assembled_item(mapper, key)
+        return stored.item, stored
+
+    def queue_stored_copy(self, stored):
+        self.stored_metadata.queue(stored)
+
     def get_uncached_item(self, mapper, key, version):
-        item = mapper.get_stable_item()
+        item, stored = self.get_new_item(mapper, key)
         # Check and store together so that another reader cannot invalidate in between.
         with self.lock:
-            if self.synchronise() != version or not self.set_entry(key, item):
+            if self.synchronise() != version:
+                return item
+            if stored is not None:
+                self.queue_stored_copy(stored)
+            if not self.set_entry(key, item):
                 return item
         return self.copy_item(item)
 
@@ -90,6 +121,7 @@ class DetailsMetadataCache(ItemMetadataCache):
             if factory.metadata_save_scope != 'family':
                 self.invalidate()
                 return
+            self.stored_metadata.discard_saved(factory)
             scope = DetailsSavedItemScope(factory.item_id, tuple(self.entries))
             for key in scope.discarded_keys:
                 self.discard_entry(key)

@@ -1202,3 +1202,39 @@ LACTIVITIES_COLUMNS = {
         'indexed': True
     },
 }
+
+STORED_METADATA_COLUMNS = {
+    'id': {
+        'data': 'TEXT PRIMARY KEY',
+        'indexed': True
+    },
+    'item_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True
+    },
+    'family_id': {
+        'data': 'TEXT',
+        'indexed': True
+    },
+    'reads_other_items': {
+        'data': 'INTEGER DEFAULT 0 NOT NULL',
+        'indexed': True
+    },
+    'data': {
+        'data': 'TEXT',
+    },
+    'used': {
+        'data': 'INTEGER',
+        'indexed': True
+    },
+}
+
+STORED_METADATA_STATE_COLUMNS = {
+    'id': {
+        'data': 'TEXT PRIMARY KEY',
+    },
+    'data': {
+        'data': 'TEXT',
+    },
+}

@@ -145,12 +145,24 @@ class DetailsClient:
             kodi_log(f'Item detail sync refresh was not started early: {exc}', 1)
 
     def invalidate(self):
-        """Ask a running service to clear assembled metadata after item details were changed
-        outside it. A stopped service is not started: it has no assembled metadata to clear."""
+        """Clear assembled metadata after item details were changed outside the service.
+        A running service clears its memory and stored copies. Otherwise the stored copies
+        are cleared here, without starting the service, so that no later start reuses them."""
         endpoint = self.location.endpoint
-        if not self.is_current(endpoint):
+        if self.is_current(endpoint) and self.request_invalidate(endpoint):
             return
+        self.clear_stored_metadata()
+
+    def request_invalidate(self, endpoint):
         try:
             self.exchange(endpoint, invalidate=True)
         except (OSError, DetailsServiceError) as exc:
-            kodi_log(f'Item detail metadata was not cleared: {exc}', 1)
+            kodi_log(f'Item detail service did not clear metadata, clearing stored copies: {exc}', 1)
+            return False
+        return True
+
+    @staticmethod
+    def clear_stored_metadata():
+        from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+        from tmdbhelper.lib.items.database.details.storedmetadata import DetailsStoredMetadata
+        DetailsStoredMetadata(ItemDetailsDatabase()).clear()

@@ -7,7 +7,7 @@ from secrets import token_hex
 from threading import RLock, current_thread
 from time import perf_counter
 from traceback import format_exc
-from jurialmunkey.ftools import cached_property, threaded_cached_property
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.tmdate import get_datetime_now
 from tmdbhelper.lib.files.futils import write_to_file
@@ -236,6 +236,8 @@ class DetailsBatchReport(DetailsTimings):
             'and metadata_save_scope_all saves invalidate every entry. Writes outside the service, such as ratings '
             'and synced play data, do not invalidate reuse; changes to item details outside it request invalidation. '
             'metadata_store includes sizing/eviction, and metadata_copy isolates returned containers.',
+            'stored_read times reading and decoding a stored copy after a memory miss; '
+            'stored_hits skip metadata_assembly, and stored_queued counts assembled copies queued for storage.',
             'fetch includes worker factory setup, provider/cache requests, source mapping and write-queue generation.',
             'commit includes the richer-cache recheck and transaction; '
             'write_operations counts queued callbacks, not SQL statements.',
@@ -303,9 +305,8 @@ class ProfiledDetailsBackend(DetailsBackend):
     def cache(self):
         return ProfiledDetailsDatabase(self.work_profiler)
 
-    @threaded_cached_property
-    def metadata_cache(self):
-        return ProfiledItemMetadataCache(self.cache, self.work_profiler)
+    def get_metadata_cache(self):
+        return ProfiledItemMetadataCache(self.cache, self.stored_metadata, self.work_profiler)
 
     def call(self, request, stage, func, *args):
         record = self.profiles.get(request)

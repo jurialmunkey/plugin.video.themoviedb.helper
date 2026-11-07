@@ -37,9 +37,23 @@ class DetailsWorkProfiler:
 
 
 class ProfiledItemMetadataCache(DetailsMetadataCache):
-    def __init__(self, database, profiler):
-        super().__init__(database)
+    def __init__(self, database, stored_metadata, profiler):
+        super().__init__(database, stored_metadata)
         self.profiler = profiler
+
+    def get_stored_item(self, mapper, key):
+        record = self.profiler.record
+        if record is None:
+            return super().get_stored_item(mapper, key)
+        item = record.call('stored_read', super().get_stored_item, mapper, key)
+        record.count('stored_hits' if item is not None else 'stored_misses')
+        return item
+
+    def queue_stored_copy(self, stored):
+        record = self.profiler.record
+        if record is not None:
+            record.count('stored_queued')
+        super().queue_stored_copy(stored)
 
     def get_entry(self, key):
         record = self.profiler.record

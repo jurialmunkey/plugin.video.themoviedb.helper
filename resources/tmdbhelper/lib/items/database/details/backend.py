@@ -8,6 +8,7 @@ from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFac
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.items.database.details.apis import DetailsAPIs
 from tmdbhelper.lib.items.database.details.metadata import DetailsMetadataCache
+from tmdbhelper.lib.items.database.details.storedmetadata import DetailsStoredMetadata
 
 
 class DetailsDatabase(ItemDetailsDatabase):
@@ -166,8 +167,27 @@ class DetailsBackend:
         return DetailsReaderConnections(self.cache)
 
     @threaded_cached_property
+    def stored_metadata(self):
+        return DetailsStoredMetadata(self.cache)
+
+    @threaded_cached_property
     def metadata_cache(self):
-        return DetailsMetadataCache(self.cache)
+        return self.get_metadata_cache()
+
+    def get_metadata_cache(self):
+        return DetailsMetadataCache(self.cache, self.stored_metadata)
+
+    def prepare_stored_metadata(self):
+        """Clear stored metadata from another add-on version or settings before reads start."""
+        with self.connection.open() as cursor:
+            self.stored_metadata.prepare(cursor)
+
+    def flush_stored_metadata(self):
+        """Write queued stored metadata; the coordinator calls this while no reads are in flight."""
+        if not self.stored_metadata.has_work:
+            return
+        with self.connection.open() as cursor:
+            self.stored_metadata.flush(cursor)
 
     @threaded_cached_property
     def is_sync_enabled(self):
@@ -206,6 +226,7 @@ class DetailsBackend:
         # Keep the richer records rather than replacing them with the basic response.
         if request.cache_refresh != 'force' and self.read(request) is not None:
             return
+        factory = self.lookup(request).factory
         with self.connection.open() as cursor:
             cursor.execute('BEGIN')
             try:
@@ -215,11 +236,13 @@ class DetailsBackend:
                     func.__self__.connection = self.connection
                 for func, args, kwargs in queue:
                     func(*args, **kwargs)
+                # Stored copies change with the item, so a crash cannot leave a stale copy.
+                self.stored_metadata.delete_saved(factory, cursor)
                 cursor.execute('COMMIT')
             except BaseException:
                 cursor.execute('ROLLBACK')
                 raise
-        self.metadata_cache.discard_saved(self.lookup(request).factory)
+        self.metadata_cache.discard_saved(factory)
 
     def clear_user_art(self, request):
         lookup = self.lookup(request)

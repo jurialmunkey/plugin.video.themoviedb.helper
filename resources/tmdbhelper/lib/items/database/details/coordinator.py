@@ -149,12 +149,15 @@ class DetailsCoordinator(Thread):
                 max_workers=self.read_workers,
                 thread_name_prefix='TMDbHelper read',
             )
+            self.backend.prepare_stored_metadata()
             while not self.stopping:
                 batch = self.get_batch()
                 if self.stopping:
                     break
                 with self.backend.connection.open():
                     self.process_batch(batch)
+            # Keep copies assembled since the last flush for the next start.
+            self.flush_stored_metadata()
         except BaseException as exc:
             self.failure = exc
             kodi_log(f'Item detail lookup failed:\n{format_exc()}', 1)
@@ -187,6 +190,13 @@ class DetailsCoordinator(Thread):
         self.admit()
         self.dispatch()
         self.commit_pending()
+        self.flush_stored_metadata()
+
+    def flush_stored_metadata(self):
+        """Write stored metadata only while no reads are in flight, as commits do."""
+        if not self.can_commit:
+            return
+        self.backend.flush_stored_metadata()
 
     @property
     def can_continue(self):
