@@ -58,6 +58,11 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return boolean(self.params.get('widget', False))
 
     @cached_property
+    def is_plugin_widget(self):
+        # Internal callers, such as the recommendations window, build lists without a plugin handle.
+        return self.is_widget and self.handle != -1
+
+    @cached_property
     def is_cacheonly(self):
         return boolean(self.params.get('cacheonly', self.default_cacheonly))
 
@@ -247,6 +252,11 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         """
         return
 
+    def refresh_after_finish(self):
+        """ Abstract method to refresh data after the directory is returned to Kodi
+        """
+        return
+
     def get_directory_items(self):
         with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
             return self.get_items(**self.params)
@@ -286,6 +296,8 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
         if self.container_refresh:
             executebuiltin('Container.Refresh')
+
+        self.refresh_after_finish()
 
 
 class ContainerDirectory(ContainerDirectoryCommon):

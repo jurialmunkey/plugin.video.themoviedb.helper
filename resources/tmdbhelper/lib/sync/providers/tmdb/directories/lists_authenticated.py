@@ -8,6 +8,7 @@ from jurialmunkey.ftools import cached_property
 class ListAuthenticatedProperties(ListStandardProperties):
 
     request_kwgs = {}
+    stale_hours = 0  # Account lists change when the user edits them, so always wait for new data
 
     @cached_property
     def url(self):

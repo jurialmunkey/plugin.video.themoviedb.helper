@@ -161,6 +161,19 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="widgets_stale_hours" type="integer" label="32761" help="32762">
+                    <level>0</level>
+                    <default>24</default>
+                    <constraints>
+                        <options>
+                            <option label="32763">0</option>
+                            <option label="32764">24</option>
+                            <option label="32765">48</option>
+                            <option label="32766">72</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
                 <setting id="flatten_seasons" type="boolean" label="32085" help="32622">
                     <level>0</level>
                     <default>false</default>
