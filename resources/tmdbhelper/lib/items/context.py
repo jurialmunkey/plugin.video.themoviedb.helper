@@ -1,6 +1,7 @@
 # Module: default
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
 
 
@@ -50,14 +51,51 @@ CONTEXT_MENU_ITEMS = {
 }
 
 
+class ContextMenuConfig:
+    """The context menu items that are switched on, worked out once for a list of items.
+
+    discovery_source provides action_discovery, which is only loaded when sync options
+    are switched on and no shared answer about sync actions is stored.
+    """
+
+    def __init__(self, discovery_source, context=None):
+        self.discovery_source = discovery_source
+        self.context = context or CONTEXT_MENU_ITEMS
+
+    @cached_property
+    def has_sync_actions(self):
+        from tmdbhelper.lib.script.actions.availability import SyncActionsAvailability
+        return SyncActionsAvailability(self.discovery_source).is_available
+
+    def is_enabled(self, mediatypes):
+        if not get_setting(mediatypes['setting']):
+            return False
+        if mediatypes['setting'] == 'contextmenu_sync_options':
+            return self.has_sync_actions
+        return True
+
+    @cached_property
+    def items(self):
+        return self.get_items()
+
+    def get_items(self):
+        return {
+            name: mediatypes
+            for name, mediatypes in self.context.items()
+            if self.is_enabled(mediatypes)
+        }
+
+
 class ContextMenu():
     """ Builds a context menu for a listitem based upon a definition of formattable keys
     If context params have format key in self.info but it is empty then item isn't built
     Context menu builds only for specified mediatypes (use other for all others)
+    A shared ContextMenuConfig avoids reading the same settings for every item in a list.
     """
 
-    def __init__(self, listitem):
+    def __init__(self, listitem, config=None):
         self._li = listitem
+        self.config = config or ContextMenuConfig(listitem)
         self.info = {
             'ftv_id': self._li.ftv_id,
             'tmdb_id': self._li.tmdb_id,
@@ -68,25 +106,15 @@ class ContextMenu():
         }
         self.mediatype = self._li.infolabels.get('mediatype')
 
-    def get(self, context=None):
-        context = context or CONTEXT_MENU_ITEMS
+    def get(self):
         return [(name, str(item)) for name, item in (
             (name, self._build_item(mediatypes))
-            for name, mediatypes in context.items()) if item]
-
-    @property
-    def has_sync_actions(self):
-        return self._li.action_discovery.is_available
+            for name, mediatypes in self.config.items.items()) if item]
 
     def _build_item(self, mediatypes):
         params_def = mediatypes.get(self.mediatype, mediatypes.get('other'))
         router_def = mediatypes.get('command')
         if not params_def or not router_def:
-            return
-
-        if not get_setting(mediatypes['setting']):
-            return
-        if mediatypes['setting'] == 'contextmenu_sync_options' and not self.has_sync_actions:
             return
 
         item = {}
