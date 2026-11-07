@@ -73,13 +73,13 @@ class DetailsStoredMetadata:
         return self.get_fingerprint()
 
     def get_fingerprint(self):
-        """Settings changes restart the service; include them all, as the restart does."""
+        """Only the settings read while assembling items change what stored copies contain."""
         from tmdbhelper.lib.addon.plugin import get_version
         from tmdbhelper.lib.items.database.details.settings import DetailsSettings
         state = {
             'version': get_version(),
             'format_version': self.format_version,
-            'settings': DetailsSettings().get_snapshot(),
+            'settings': DetailsSettings().get_stored_metadata_snapshot(),
         }
         return sha1(json.dumps(state, sort_keys=True).encode('utf-8')).hexdigest()
 
