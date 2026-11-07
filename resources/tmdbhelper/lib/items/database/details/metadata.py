@@ -48,8 +48,9 @@ class DetailsMetadataCache(ItemMetadataCache):
     must call DetailsClient().invalidate().
     """
 
-    # Hold every home screen widget's items plus focused items; a full cache is about 21 MB.
-    max_entries = 1024
+    # Hold every home screen widget's items alongside items browsed in dialogs and lists.
+    # Entries average about 15 KB, so the byte limit is usually reached first.
+    max_entries = 2048
     max_bytes = 32 * 1024 * 1024
 
     def __init__(self, database):
