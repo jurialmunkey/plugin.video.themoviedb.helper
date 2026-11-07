@@ -231,7 +231,9 @@ class DetailsBatchReport(DetailsTimings):
             'assembled_metadata_cache is retained state after this batch\'s last cache read, '
             'not incremental process memory. Its byte estimate includes keys and conservatively counts '
             'values shared across entries again. metadata_hits/misses/invalidations/evictions are per-item counts; '
-            'any observed database commit invalidates reuse. metadata_validation covers the observer checks; '
+            'service saves discard only entries they can change (metadata_discard, metadata_discarded_entries) '
+            'and metadata_save_scope_all saves invalidate every entry. Writes outside the service, such as ratings '
+            'and synced play data, do not invalidate reuse; changes to item details outside it request invalidation. '
             'metadata_store includes sizing/eviction, and metadata_copy isolates returned containers.',
             'fetch includes worker factory setup, provider/cache requests, source mapping and write-queue generation.',
             'commit includes the richer-cache recheck and transaction; '

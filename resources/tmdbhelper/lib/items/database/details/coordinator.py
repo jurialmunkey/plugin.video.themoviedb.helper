@@ -86,6 +86,10 @@ class DetailsCoordinator(Thread):
         self.events.put((kind, *args))
         self.events_waiting.set()
 
+    def invalidate(self):
+        """Clear assembled metadata on the coordinator thread, which owns the backend."""
+        self.post_event('invalidate')
+
     def remove_waiter(self, future):
         with self.lock:
             self.waiters.discard(future)
@@ -197,6 +201,8 @@ class DetailsCoordinator(Thread):
             self.fetch_completed(*args)
         elif kind == 'read':
             self.read_completed(*args)
+        elif kind == 'invalidate':
+            self.backend.metadata_cache.invalidate()
 
     def process_submit(self, items, group):
         for request, future in items:

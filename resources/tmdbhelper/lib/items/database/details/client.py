@@ -18,12 +18,13 @@ class DetailsClient:
         self.location = ServiceLocation()
         self.version = get_version()
 
-    def exchange(self, endpoint, items=None, kodi_details=False, prepare=None):
+    def exchange(self, endpoint, items=None, kodi_details=False, prepare=None, invalidate=False):
         with socket.create_connection(('127.0.0.1', endpoint['port']), timeout=2) as connection:
             connection.settimeout(5)
             send_message(connection, {
                 'version': PROTOCOL_VERSION, 'token': endpoint['token'],
                 'items': items, 'kodi_details': kodi_details, 'prepare': prepare,
+                'invalidate': invalidate,
             })
             connection.settimeout(0.25)
             response = receive_message(
@@ -142,3 +143,14 @@ class DetailsClient:
             self.exchange(endpoint, prepare={'info': info, 'tmdb_type': tmdb_type})
         except (OSError, DetailsServiceError) as exc:
             kodi_log(f'Item detail sync refresh was not started early: {exc}', 1)
+
+    def invalidate(self):
+        """Ask a running service to clear assembled metadata after item details were changed
+        outside it. A stopped service is not started: it has no assembled metadata to clear."""
+        endpoint = self.location.endpoint
+        if not self.is_current(endpoint):
+            return
+        try:
+            self.exchange(endpoint, invalidate=True)
+        except (OSError, DetailsServiceError) as exc:
+            kodi_log(f'Item detail metadata was not cleared: {exc}', 1)

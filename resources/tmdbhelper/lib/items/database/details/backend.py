@@ -41,6 +41,13 @@ class DetailsDatabase(ItemDetailsDatabase):
 class DetailsConnection(DatabaseConnection):
     """Own both the cursor and connection, including rollback on failed batches."""
 
+    @classmethod
+    def get_shared(cls, cache):
+        """Keep a connection open that one thread uses at a time and another thread may close."""
+        connection = cls(cache)
+        connection.open_connection = cache.get_shared_database().cursor()
+        return connection
+
     def close(self):
         if self.open_connection is None:
             return
@@ -82,9 +89,7 @@ class DetailsReaderConnections:
         return connection
 
     def get_connection(self):
-        connection = DetailsConnection(self.cache)
-        connection.open_connection = self.cache.get_shared_database().cursor()
-        return connection
+        return DetailsConnection.get_shared(self.cache)
 
     def close(self):
         """Close after the reader threads have stopped."""
@@ -214,6 +219,7 @@ class DetailsBackend:
             except BaseException:
                 cursor.execute('ROLLBACK')
                 raise
+        self.metadata_cache.discard_saved(self.lookup(request).factory)
 
     def clear_user_art(self, request):
         lookup = self.lookup(request)
@@ -228,15 +234,15 @@ class DetailsBackend:
         return lookup.factory.get_lookup_fallback()
 
     def close(self):
+        # Reader threads have stopped before the backend closes.
+        self.close_created(('connection', 'reader_connections', 'metadata_cache', 'apis'))
+
+    def close_created(self, names):
+        """Close each created resource in order, even when an earlier close fails."""
+        if not names:
+            return
         try:
-            self.connection.close()
+            if names[0] in self.__dict__:
+                self.__dict__[names[0]].close()
         finally:
-            try:
-                if 'reader_connections' in self.__dict__:
-                    self.reader_connections.close()
-            finally:
-                try:
-                    if 'metadata_cache' in self.__dict__:
-                        self.metadata_cache.close()
-                finally:
-                    self.apis.close()
+            self.close_created(names[1:])

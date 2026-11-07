@@ -12,6 +12,7 @@ class BaseItem:
     extendedinfo = False
     parent_db_cache = None
     data = None
+    reads_other_items = False  # True when stable metadata is assembled from other items' rows
 
     def __init__(self, parent_db_cache):
         self.parent_db_cache = parent_db_cache

@@ -67,6 +67,8 @@ class DetailsRequestHandler(BaseRequestHandler):
             raise DetailsServiceUnavailable('Item detail service protocol/token mismatch')
         if message.get('prepare') is not None:
             return self.get_prepare_response(message['prepare'])
+        if message.get('invalidate'):
+            return self.get_invalidate_response()
         entries = message['items']
         if entries is None:
             if not self.server.coordinator.is_alive() or self.server.coordinator.stopping:
@@ -92,6 +94,11 @@ class DetailsRequestHandler(BaseRequestHandler):
         Lists send this only when they permit synced data."""
         if SyncPreparation.is_enabled():
             self.server.sync_refresher.refresh(SyncPreparation.get_hint_item_types(**prepare))
+        return {'items': []}
+
+    def get_invalidate_response(self):
+        """Clear assembled metadata after item details were changed outside the service."""
+        self.server.coordinator.invalidate()
         return {'items': []}
 
     def get_detail_results(self, entries):

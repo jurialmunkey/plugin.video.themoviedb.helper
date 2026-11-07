@@ -24,6 +24,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
     clear_user_art = False
     sync_details = True  # Read synced play data such as play counts and progress
     metadata_cache = None
+    metadata_save_scope = 'all'  # Assembled metadata a save can change: 'all', or only its show/movie 'family'
 
     def get_lookup_request(self):
         from tmdbhelper.lib.items.database.details.request import DetailsRequest
