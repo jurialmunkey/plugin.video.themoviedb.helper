@@ -41,11 +41,11 @@ class EpisodeMediaList(MediaList):
 
     @cached_property
     def parent_precache_tvshow(self):
-        return self.get_parent_data('tvshow')
+        return self.get_parent_precache('tvshow')
 
     @cached_property
     def parent_precache_season(self):
-        return self.get_parent_data('season', season=self.season)
+        return self.get_parent_precache('season', season=self.season)
 
     @property
     def data_cond(self):
