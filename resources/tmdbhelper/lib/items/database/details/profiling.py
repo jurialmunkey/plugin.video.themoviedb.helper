@@ -214,9 +214,9 @@ class DetailsBatchReport(DetailsTimings):
             'cache_read_other is cache_read minus its measured db_read time; '
             'it includes mapping, host calls, other work and instrumentation overhead.',
             'item_mapping includes related database reads. '
-            'metadata_assembly measures reusable non-artwork mapping on misses; '
-            'label_mapping, extended_mapping, related_properties_mapping, cast_mapping and unique_ids_mapping '
-            'break down metadata assembly. artwork_mapping measures the existing artwork route pipeline.',
+            'metadata_assembly measures reusable mapping, including artwork, on misses; '
+            'label_mapping, extended_mapping, related_properties_mapping, cast_mapping, artwork_mapping '
+            'and unique_ids_mapping break down metadata assembly.',
             'synced_state_read measures simplecache row retrieval. fresh_labels_mapping and '
             'fresh_properties_mapping apply current sync routes; fresh_state_mapping covers the remaining '
             'current-state calculations, including their date formatting. airdate_mapping covers the final '

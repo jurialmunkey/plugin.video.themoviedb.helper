@@ -178,6 +178,7 @@ class BaseItem:
             'infoproperties': self.get_infoproperties_dbclist({}) if self.extendedinfo else {},
             'special_properties': self.get_infoproperties_special({}),
             'cast': self.cast,
+            'art': self.art,
             'unique_ids': self.unique_ids,
         }
 
@@ -222,6 +223,6 @@ class BaseItem:
             'infolabels': self.infolabels,
             'infoproperties': self.infoproperties,
             'cast': self.stable_item['cast'],
-            'art': self.art,
+            'art': self.stable_item['art'],
             'unique_ids': self.stable_item['unique_ids'],
         }

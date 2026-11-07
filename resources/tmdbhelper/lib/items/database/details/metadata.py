@@ -42,9 +42,10 @@ class DetailsMetadataCache(ItemMetadataCache):
     """Guard shared entries; assemble items outside the lock.
 
     Item details are only saved by this service, so entries are not checked against
-    database-wide changes: writes to ratings, synced play data and user artwork do not
-    affect them. Service saves discard the entries they can change through discard_saved().
-    Code outside the service that changes cached details must call DetailsClient().invalidate().
+    database-wide changes: writes to ratings and synced play data do not affect them.
+    Service saves discard the entries they can change through discard_saved().
+    Code outside the service that changes cached details, including user artwork,
+    must call DetailsClient().invalidate().
     """
 
     # Hold every home screen widget's items plus focused items; a full cache is about 21 MB.
