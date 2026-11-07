@@ -229,7 +229,8 @@ class DetailsBatchReport(DetailsTimings):
             'before entry/Kodi merging; '
             'it excludes native memory, service caches and process RSS. profile_details_size times the estimate.',
             'assembled_metadata_cache is retained state after this batch\'s last cache read, '
-            'not incremental process memory. Its byte estimate includes keys and conservatively counts '
+            'not incremental process memory. protected counts entries found again since they were stored; '
+            'entries seen once are evicted first. The byte estimate includes keys and conservatively counts '
             'values shared across entries again. metadata_hits/misses/invalidations/evictions are per-item counts; '
             'service saves discard only entries they can change (metadata_discard, metadata_discarded_entries) '
             'and metadata_save_scope_all saves invalidate every entry. Writes outside the service, such as ratings '
@@ -330,6 +331,7 @@ class ProfiledDetailsBackend(DetailsBackend):
             with record.report.lock:
                 record.report.metadata_cache = {
                     'entries': len(self.metadata_cache.entries),
+                    'protected': len(self.metadata_cache.entries.protected),
                     'python_bytes_estimate': self.metadata_cache.size,
                     'entry_limit': self.metadata_cache.max_entries,
                     'byte_limit': self.metadata_cache.max_bytes,
