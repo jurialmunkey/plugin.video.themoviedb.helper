@@ -54,7 +54,7 @@ class ItemDetailsDatabase(Database):
             return super().create_database_execute(connection)
 
     # DB version must be max of table_version
-    database_version = 52
+    database_version = 53
 
     database_changes = {
         21: (),
@@ -127,6 +127,10 @@ class ItemDetailsDatabase(Database):
         ),
         51: (),
         52: (),  # Add stored assembled metadata
+        53: (
+            # Rebuild ratings with the enabled-provider fingerprint.
+            'DROP TABLE IF EXISTS ratings',
+        ),
     }
 
     baseitem_columns = BASEITEM_COLUMNS

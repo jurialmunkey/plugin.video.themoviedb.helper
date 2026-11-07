@@ -382,6 +382,9 @@ RATINGS_COLUMNS = {
         'data': 'TEXT PRIMARY KEY',
         'foreign_key': 'baseitem(id)',
     },
+    'provider_fingerprint': {
+        'data': 'TEXT',
+    },
     'top250': {
         'data': 'INTEGER',
     },
