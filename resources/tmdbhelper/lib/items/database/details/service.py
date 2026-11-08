@@ -238,11 +238,18 @@ class DetailsService:
 
     @staticmethod
     def get_service_classes():
-        if get_setting('timer_reports', 'int') == 2:
+        timer_reports = get_setting('timer_reports', 'int')
+        if timer_reports == 2:
             from tmdbhelper.lib.items.database.details.profiling import (
                 ProfiledDetailsCoordinator, ProfiledDetailsRequestHandler,
             )
             return ProfiledDetailsCoordinator, ProfiledDetailsRequestHandler
+        if timer_reports == 1:
+            from tmdbhelper.lib.items.database.details.timing import (
+                TimedDetailsCoordinator,
+                TimedDetailsRequestHandler,
+            )
+            return TimedDetailsCoordinator, TimedDetailsRequestHandler
         return DetailsCoordinator, DetailsRequestHandler
 
     def is_settings_changed(self, settings):

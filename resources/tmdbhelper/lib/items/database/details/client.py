@@ -17,6 +17,7 @@ class DetailsClient:
         self.monitor = Monitor()
         self.location = ServiceLocation()
         self.version = get_version()
+        self.timings = {}  # Stage seconds summed over batches when the service reports timings
 
     def exchange(self, endpoint, items=None, kodi_details=False, prepare=None, invalidate=False):
         with socket.create_connection(('127.0.0.1', endpoint['port']), timeout=2) as connection:
@@ -38,12 +39,17 @@ class DetailsClient:
         if not isinstance(result, list) or (items is not None and len(result) != len(items)):
             raise DetailsServiceUnavailable('Incomplete item detail service response')
         self.log_item_errors(response.get('errors') or {})
+        self.add_timings(response.get('timings') or {})
         return result
 
     @staticmethod
     def log_item_errors(errors):
         for error in errors.values():
             kodi_log(f'Item detail lookup failed: {error}', 1)
+
+    def add_timings(self, timings):
+        for name, seconds in timings.items():
+            self.timings[name] = self.timings.get(name, 0) + seconds
 
     def is_current(self, endpoint):
         return bool(endpoint) and endpoint.get('version') == self.version

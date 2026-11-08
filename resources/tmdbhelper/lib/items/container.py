@@ -373,9 +373,15 @@ class ContainerDirectory(ContainerDirectoryCommon):
 
     def build_detailed_items(self, items):
         with TimerList(self.timer_lists, '--lidc', log_threshold=0.001, logging=self.log_timers):
-            items = self.lidc.configure_listitems_threaded(items)
+            items = self.get_configured_listitems(items)
             items = self.build_ratings_items(items)
             return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
+
+    def get_configured_listitems(self, items):
+        items = self.lidc.configure_listitems_threaded(items)
+        for name, seconds in self.lidc.client.timings.items():
+            self.timer_lists[f' --{name}'] = [seconds]
+        return items
 
 
 class ContainerDefaultCacheDirectory(ContainerDirectory):
