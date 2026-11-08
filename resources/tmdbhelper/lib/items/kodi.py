@@ -86,6 +86,14 @@ class KodiDb():
             details['infoproperties']['tvshow.dbid'] = dbid
             return details
 
+        def _get_season_details():
+            """ Kodi clears the artwork of a season with a DBID when opening its info dialog """
+            details = _get_child_details()
+            if not details:
+                return
+            details['infoproperties']['dbid'] = details['infolabels'].pop('dbid')
+            return details
+
         if not self.kodi_db:
             return
 
@@ -98,7 +106,7 @@ class KodiDb():
                 'get_details': self.get_tvshow_details},
             'season': {
                 'get_dbid': _get_tvshow_dbid,
-                'get_details': lambda x: set_show(_get_child_details() or get_empty_item(), get_tvshow_details(x))},
+                'get_details': lambda x: set_show(_get_season_details() or get_empty_item(), get_tvshow_details(x))},
             'episode': {
                 'get_dbid': _get_tvshow_dbid,
                 'get_details': lambda x: set_show(_get_child_details() or get_empty_item(), get_tvshow_details(x))}}
