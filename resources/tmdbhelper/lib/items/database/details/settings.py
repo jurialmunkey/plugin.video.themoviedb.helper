@@ -18,6 +18,19 @@ class DetailsSettings:
         'tmdb_user_token', 'trakt_token',
     )
 
+    # Settings read while assembling stable item metadata (get_stable_item()), so stored
+    # copies built with other values must not be reused. Add any setting that changes it.
+    # Settings that only change online lookups are not needed: saves replace stored copies.
+    stored_metadata_settings = (
+        'language',
+        'artwork_quality', 'artwork_quality_poster', 'artwork_quality_fanart',
+        'fanarttv_lookup', 'fanarttv_prefer',
+        'language_lookup', 'regional_prefer',
+        'mpaa_prefix',
+        'provider_allowlist',
+        'ratingposterdb_apikey',
+    )
+
     @cached_property
     def names(self):
         return self.get_names()
@@ -28,6 +41,9 @@ class DetailsSettings:
             name for name in (i.get('id') for i in tree.iter('setting'))
             if name and name not in self.state_settings)
 
-    def get_snapshot(self):
+    def get_snapshot(self, names=None):
         addon = Addon()
-        return {name: addon.getSetting(name) for name in self.names}
+        return {name: addon.getSetting(name) for name in (names or self.names)}
+
+    def get_stored_metadata_snapshot(self):
+        return self.get_snapshot(self.stored_metadata_settings)

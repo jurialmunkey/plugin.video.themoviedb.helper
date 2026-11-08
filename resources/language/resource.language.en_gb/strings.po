@@ -3532,3 +3532,33 @@ msgstr ""
 msgctxt "#32760"
 msgid "Detailed"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32761"
+msgid "Show expired widget lists for up to"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32762"
+msgid "When a widget's TMDb list is older than its normal 6 hour cache, show the saved list straight away and download the new list after the widget has loaded. The new list appears the next time Kodi reloads the widget. Lists for today, such as Airing Today, always wait for new data. Off waits for new data every time."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32763"
+msgid "Off"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32764"
+msgid "24 hours"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32765"
+msgid "48 hours"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32766"
+msgid "72 hours"
+msgstr ""

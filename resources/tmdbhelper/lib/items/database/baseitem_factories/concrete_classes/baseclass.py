@@ -24,6 +24,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
     clear_user_art = False
     sync_details = True  # Read synced play data such as play counts and progress
     metadata_cache = None
+    metadata_save_scope = 'all'  # Assembled metadata a save can change: 'all', or only its show/movie 'family'
 
     def get_lookup_request(self):
         from tmdbhelper.lib.items.database.details.request import DetailsRequest
@@ -53,6 +54,23 @@ class BaseItem(ItemDetailsDatabaseAccess):
     @property
     def parent_id(self):
         return self.get_base_id(self.tmdb_type, self.tmdb_id)
+
+    @property
+    def lease_parent_ids(self):
+        """ Structural parents whose deletion would cascade to this item """
+        return ()
+
+    @cached_property
+    def lease_ids(self):
+        return self.get_lease_ids()
+
+    def get_lease_ids(self):
+        """ This item, its structural parents, and every item its mapped data relies on """
+        return (
+            self.item_id,
+            *self.lease_parent_ids,
+            *(i['id'] for i in self.online_data_mapped['baseitem']),
+        )
 
     @cached_property
     def item_mapper(self):
@@ -210,16 +228,23 @@ class BaseItem(ItemDetailsDatabaseAccess):
                 return
             return self.get_item_meta(data)
 
+    def del_cached_data(self, item_id):
+        """ Delete the item for a forced refresh and return the deletion lease other items gave it """
+        deletion = self.get_cached('baseitem', item_id, 'deletion')
+        self.del_cached('baseitem', item_id)
+        return deletion
+
     def set_cached_data(self, item_id, mediatype, expiry, datalevel, fanart_tv, translation, language, table, keys, mapped_data, delete_cascade=False):
         baseitem_keys = ('mediatype', 'expiry', 'datalevel', 'fanart_tv', 'language')
         baseitem_values = (mediatype, expiry, datalevel, fanart_tv, language)
-        self.del_cached('baseitem', item_id) if delete_cascade else None
+        deletion = self.del_cached_data(item_id) if delete_cascade else None
         self.set_cached_values(
             table='baseitem',
             item_id=item_id,
             keys=baseitem_keys if not translation else (*baseitem_keys, 'translation'),
             values=baseitem_values if not translation else (*baseitem_values, translation)
         )
+        self.set_cached_deletion((item_id, ), deletion) if deletion else None
         self.set_cached_many(table, keys, mapped_data)
 
     def try_cached_data(self, return_data=False, return_queue=False):
@@ -246,6 +271,9 @@ class BaseItem(ItemDetailsDatabaseAccess):
             with contextlib.suppress(AttributeError):
                 qitem = db_cache.try_cached_data(online_data_mapped)
                 queue.append(qitem)
+
+        # Lease last so that the placeholder rows written above already exist
+        queue.append((self.set_cached_deletion, (self.lease_ids, self.deletion), {}))
 
         if return_queue:
             return queue

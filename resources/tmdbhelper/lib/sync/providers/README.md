@@ -664,9 +664,13 @@ unavailable providers' saved order and disabled state are retained.
 
 The hidden `ratings_provider_configuration` setting stores a JSON object with
 `order` and `disabled` lists of provider IDs. It is separate from the
-single-provider sync selectors and does not invalidate any caches. Existing
-cached results remain until their normal
-expiry or manual deletion.
+single-provider sync selectors. Each ratings-cache row stores a fingerprint of
+the effective enabled provider IDs in priority order. Cached ratings require both
+a matching fingerprint and an unexpired timestamp. Installing, removing, enabling,
+disabling, or reordering suppliers changes the fingerprint when it changes that
+effective list. The next lookup refreshes the row, replacing all fields so values
+from removed suppliers are cleared. Database version 53 rebuilds only the ratings
+table once to add the fingerprint; other cached item details are retained.
 
 Subclasses of `tmdbhelper.lib.sync.providers.ratings.RatingsSupplier` receive
 `provider`, `tmdb_type`, `tmdb_id`, `imdb_id`, `season`, and `episode` before the
@@ -674,7 +678,8 @@ cached `.ratings` property is accessed. They return a dictionary using existing
 ratings-table fields and their existing raw formats (for example, integer
 ratings on a 0-100 scale). The supplier owns authorization, API calls, and source
 mapping; it must return `{}` for an unavailable API. It must not read or write
-the item-details database. No new table fields or migrations are required.
+the item-details database. Adding a supplier does not require new table fields or
+migrations.
 
 RatingsDict and its season/episode subclasses instantiate only enabled suppliers
 registered for their media type. Retrieval runs in parallel, while merging uses
@@ -833,8 +838,9 @@ Providers offering only browsing do not receive these feature prompts.
 Disabling requires OK/Cancel confirmation showing the module's active sync,
 ratings, and scrobbling assignments. After Kodi confirms the module is disabled,
 those assignments are removed through the existing settings interfaces. Cancelling
-leaves the module and its configuration unchanged. Ratings cache contents retain
-their normal expiry behaviour, as with the ratings-provider selector.
+leaves the module and its configuration unchanged. Ratings-cache rows built with
+a different effective provider list are refreshed on their next lookup, as with
+the ratings-provider selector.
 
 ## External identifiers
 

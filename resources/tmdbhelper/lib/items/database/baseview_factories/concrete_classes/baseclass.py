@@ -38,7 +38,15 @@ class BaseList(ItemDetailsDatabaseAccess):
     def parent_item_data(self):
         return self.get_parent_data(self.mediatype, self.season, self.episode)
 
-    def get_parent_data(self, mediatype, season=None, episode=None, cache_refresh=None, cache_translations=False):
+    def get_parent_data(
+        self,
+        mediatype,
+        season=None,
+        episode=None,
+        cache_refresh=None,
+        cache_translations=False,
+        sync_details=True,
+    ):
         from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
         base_dbc = BaseItemFactory(mediatype)
         base_dbc.tmdb_id = self.tmdb_id
@@ -46,8 +54,14 @@ class BaseList(ItemDetailsDatabaseAccess):
         base_dbc.episode = episode
         base_dbc.cache_refresh = cache_refresh
         base_dbc.cache_translations = cache_translations
+        base_dbc.sync_details = sync_details
         base_dbc.common_apis = self.common_apis
         return base_dbc.data
+
+    def get_parent_precache(self, mediatype, season=None, cache_refresh=None):
+        """Ensure a parent's rows exist for joins. Synced play data is not read, so the
+        item detail service does not wait for a sync check."""
+        return self.get_parent_data(mediatype, season, cache_refresh=cache_refresh, sync_details=False)
 
     def get_unmapped_data(self):
         with self.connection.open():

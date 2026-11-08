@@ -12,6 +12,7 @@ class BaseItem:
     extendedinfo = False
     parent_db_cache = None
     data = None
+    reads_other_items = False  # True when stable metadata is assembled from other items' rows
 
     def __init__(self, parent_db_cache):
         self.parent_db_cache = parent_db_cache
@@ -177,6 +178,7 @@ class BaseItem:
             'infoproperties': self.get_infoproperties_dbclist({}) if self.extendedinfo else {},
             'special_properties': self.get_infoproperties_special({}),
             'cast': self.cast,
+            'art': self.art,
             'unique_ids': self.unique_ids,
         }
 
@@ -221,6 +223,6 @@ class BaseItem:
             'infolabels': self.infolabels,
             'infoproperties': self.infoproperties,
             'cast': self.stable_item['cast'],
-            'art': self.art,
+            'art': self.stable_item['art'],
             'unique_ids': self.stable_item['unique_ids'],
         }

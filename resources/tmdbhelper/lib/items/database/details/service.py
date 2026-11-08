@@ -67,6 +67,8 @@ class DetailsRequestHandler(BaseRequestHandler):
             raise DetailsServiceUnavailable('Item detail service protocol/token mismatch')
         if message.get('prepare') is not None:
             return self.get_prepare_response(message['prepare'])
+        if message.get('invalidate'):
+            return self.get_invalidate_response()
         entries = message['items']
         if entries is None:
             if not self.server.coordinator.is_alive() or self.server.coordinator.stopping:
@@ -92,6 +94,11 @@ class DetailsRequestHandler(BaseRequestHandler):
         Lists send this only when they permit synced data."""
         if SyncPreparation.is_enabled():
             self.server.sync_refresher.refresh(SyncPreparation.get_hint_item_types(**prepare))
+        return {'items': []}
+
+    def get_invalidate_response(self):
+        """Clear assembled metadata after item details were changed outside the service."""
+        self.server.coordinator.invalidate()
         return {'items': []}
 
     def get_detail_results(self, entries):
@@ -231,11 +238,18 @@ class DetailsService:
 
     @staticmethod
     def get_service_classes():
-        if get_setting('timer_reports', 'int') == 2:
+        timer_reports = get_setting('timer_reports', 'int')
+        if timer_reports == 2:
             from tmdbhelper.lib.items.database.details.profiling import (
                 ProfiledDetailsCoordinator, ProfiledDetailsRequestHandler,
             )
             return ProfiledDetailsCoordinator, ProfiledDetailsRequestHandler
+        if timer_reports == 1:
+            from tmdbhelper.lib.items.database.details.timing import (
+                TimedDetailsCoordinator,
+                TimedDetailsRequestHandler,
+            )
+            return TimedDetailsCoordinator, TimedDetailsRequestHandler
         return DetailsCoordinator, DetailsRequestHandler
 
     def is_settings_changed(self, settings):

@@ -10,6 +10,10 @@ class ListStandardProperties(ListProperties):
     total_items = 0
     class_pages = UncachedItemsPage
 
+    @cached_property
+    def stale_hours(self):
+        return get_setting('widgets_stale_hours', 'int')
+
     @property
     def next_page(self):
         return self.page + self.pmax
@@ -165,6 +169,7 @@ class ListTrendingDay(ListStandard):
         list_properties.request_url = 'trending/{tmdb_type}/day'
         list_properties.plugin_name = '{plural} {localized}'
         list_properties.localize = 32178
+        list_properties.stale_hours = 0  # A list for today always waits for new data
         return list_properties
 
 
@@ -192,6 +197,7 @@ class ListAiringToday(ListStandard):
         list_properties.request_url = '{tmdb_type}/airing_today'
         list_properties.plugin_name = '{localized}'
         list_properties.localize = 32181
+        list_properties.stale_hours = 0  # A list for today always waits for new data
         return list_properties
 
 

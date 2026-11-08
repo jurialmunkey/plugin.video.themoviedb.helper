@@ -38,6 +38,8 @@ from tmdbhelper.lib.items.database.tabledef import (
     TRANSLATION_COLUMNS,
     SIMPLECACHE_COLUMNS,
     LACTIVITIES_COLUMNS,
+    STORED_METADATA_COLUMNS,
+    STORED_METADATA_STATE_COLUMNS,
 )
 
 
@@ -52,7 +54,7 @@ class ItemDetailsDatabase(Database):
             return super().create_database_execute(connection)
 
     # DB version must be max of table_version
-    database_version = 51
+    database_version = 54
 
     database_changes = {
         21: (),
@@ -86,6 +88,23 @@ class ItemDetailsDatabase(Database):
         49: (),
         50: (
             # Rebuild cached details with episode counts and independent user artwork.
+            # Item tables are dropped in 54; drop the tables 54 keeps.
+            'DROP TABLE IF EXISTS languages',
+            'DROP TABLE IF EXISTS countries',
+            'DROP TABLE IF EXISTS company',
+            'DROP TABLE IF EXISTS broadcaster',
+            'DROP TABLE IF EXISTS service',
+            'DROP TABLE IF EXISTS user_art',
+            'DROP TABLE IF EXISTS simplecache',
+            'DROP TABLE IF EXISTS lactivities',
+        ),
+        51: (),
+        52: (),  # Add stored assembled metadata
+        53: (),  # Rebuild ratings with the enabled-provider fingerprint (ratings are dropped in 54)
+        54: (
+            # Rebuild cached details so every item has a deletion lease for cleanup.
+            # User artwork, synced data and lookup tables do not reference items so are kept.
+            'DROP TABLE IF EXISTS stored_metadata',
             'DROP TABLE IF EXISTS episode_group_season_episodes',
             'DROP TABLE IF EXISTS episode_group_seasons',
             'DROP TABLE IF EXISTS episode_groups',
@@ -99,31 +118,22 @@ class ItemDetailsDatabase(Database):
             'DROP TABLE IF EXISTS person',
             'DROP TABLE IF EXISTS genre',
             'DROP TABLE IF EXISTS language',
-            'DROP TABLE IF EXISTS languages',
             'DROP TABLE IF EXISTS country',
-            'DROP TABLE IF EXISTS countries',
             'DROP TABLE IF EXISTS studio',
-            'DROP TABLE IF EXISTS company',
             'DROP TABLE IF EXISTS network',
-            'DROP TABLE IF EXISTS broadcaster',
             'DROP TABLE IF EXISTS video',
             'DROP TABLE IF EXISTS certification',
             'DROP TABLE IF EXISTS crewmember',
             'DROP TABLE IF EXISTS castmember',
             'DROP TABLE IF EXISTS provider',
-            'DROP TABLE IF EXISTS service',
             'DROP TABLE IF EXISTS custom',
             'DROP TABLE IF EXISTS art',
             'DROP TABLE IF EXISTS fanart_tv',
             'DROP TABLE IF EXISTS default_art',
-            'DROP TABLE IF EXISTS user_art',
             'DROP TABLE IF EXISTS unique_id',
             'DROP TABLE IF EXISTS translation',
-            'DROP TABLE IF EXISTS simplecache',
-            'DROP TABLE IF EXISTS lactivities',
             'DROP TABLE IF EXISTS baseitem',
         ),
-        51: (),
     }
 
     baseitem_columns = BASEITEM_COLUMNS
@@ -162,6 +172,8 @@ class ItemDetailsDatabase(Database):
     translation_columns = TRANSLATION_COLUMNS
     simplecache_columns = SIMPLECACHE_COLUMNS
     lactivities_columns = LACTIVITIES_COLUMNS
+    stored_metadata_columns = STORED_METADATA_COLUMNS
+    stored_metadata_state_columns = STORED_METADATA_STATE_COLUMNS
 
     @property
     def database_tables(self):
@@ -202,4 +214,6 @@ class ItemDetailsDatabase(Database):
             'translation': self.translation_columns,
             'simplecache': self.simplecache_columns,
             'lactivities': self.lactivities_columns,
+            'stored_metadata': self.stored_metadata_columns,
+            'stored_metadata_state': self.stored_metadata_state_columns,
         }

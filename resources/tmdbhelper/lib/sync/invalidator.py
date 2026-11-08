@@ -11,6 +11,7 @@ class SyncInvalidatorAll:
     notification = True
     features = tuple(FEATURE_LABELS)
     localized_id = 593
+    cache_tables = {'ratings': 'ratings'}
     sync_table = {
         'plays': ('movie', 'show'),
         'aired_episodes': ('show',),
@@ -79,11 +80,18 @@ class SyncInvalidatorAll:
             item_id = f'{item_type}.{provider_id}.{method}'
             self.syncdata.invalidate_activity(item_id)
 
+    def invalidate_cached_tables(self):
+        for feature, table in self.cache_tables.items():
+            if feature in self.features:
+                self.syncdata.cache.del_list_values(table=table, conditions='1=1')
+
     def invalidate(self, clear_data=True):
         if clear_data and self.database_keys:
             self.syncdata.cache.del_column_values(keys=self.database_keys)
         for provider in self.providers:
             self.invalidate_provider(provider)
+        # Public caches refresh on demand, independently of account data resync.
+        self.invalidate_cached_tables()
 
     def sync(self):
         for item_type in ('movie', 'show', 'season', 'episode'):

@@ -142,6 +142,10 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
             progress_dialog.update('Vacuuming database...')
             database.execute_sql('VACUUM')
 
+    # Deleted rows can feed other items' assembled metadata, such as a person's appearances.
+    from tmdbhelper.lib.items.database.details.client import DetailsClient
+    DetailsClient().invalidate()
+
     if confirmation:
         head = get_localized(32387).format(mediatype.capitalize())
         data = get_localized(32051).format(mediatype)

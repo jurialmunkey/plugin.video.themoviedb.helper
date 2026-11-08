@@ -9,7 +9,7 @@ from jurialmunkey.parser import try_int
 class RatingsDict(BaseList):
     expiry_time = 7 * 86400
     cached_data_table = table = 'ratings'
-    cached_data_conditions = 'id=? AND expiry>=?'
+    cached_data_conditions = 'id=? AND expiry>=? AND provider_fingerprint=?'
 
     rating_attribs = (
         'provider_ratings',
@@ -29,7 +29,14 @@ class RatingsDict(BaseList):
     @property
     def cached_data_values(self):
         """ WHERE condition ? ? ? ? = value, value, value, value """
-        return (self.item_id, self.current_time, )
+        return (self.item_id, self.current_time, self.ratings_settings.fingerprint)
+
+    @cached_property
+    def ratings_settings(self):
+        return self.get_ratings_settings()
+
+    def get_ratings_settings(self):
+        return RatingsProviderSettings()
 
     @cached_property
     def mediatype(self):
@@ -62,7 +69,7 @@ class RatingsDict(BaseList):
         return self.get_ratings_suppliers()
 
     def get_ratings_suppliers(self):
-        providers = RatingsProviderSettings().get_enabled_providers(self.mediatype)
+        providers = self.ratings_settings.get_enabled_providers(self.mediatype)
         return tuple(
             provider.ratings_classes[self.mediatype](
                 provider=provider, tmdb_type=self.tmdb_type, tmdb_id=self.tmdb_id,
@@ -126,6 +133,8 @@ class RatingsDict(BaseList):
                 return self.item_id
             if k == 'expiry':
                 return self.expiry
+            if k == 'provider_fingerprint':
+                return self.ratings_settings.fingerprint
             try:
                 return data[k]
             except (TypeError, KeyError, IndexError, ValueError):
@@ -140,7 +149,7 @@ class RatingsDict(BaseList):
         mapped_data = {}
 
         for k in data[0].keys():
-            if k in ('id', 'expiry'):
+            if k in ('id', 'expiry', 'provider_fingerprint'):
                 continue
 
             v = data[0][k]
@@ -171,16 +180,12 @@ class RatingsDict(BaseList):
     def try_cached_data(self, return_data=False):
         if not self.parent_item_data:
             return
-        if not self.online_data_mapped:
-            return
-
-        func = self.set_cached_values
-        args = (self.table, self.item_id, self.keys)
-        kwgs = {'values': self.configure_mapped_data(self.online_data_mapped)}
+        values = tuple(self.configure_mapped_data(self.online_data_mapped))
 
         with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
-            func(*args, **kwgs)
+            self.set_cached_list_values(self.table, self.keys, values, overwrite=True)
+            self.set_cached_deletion((self.item_id, ), self.deletion)  # Keep the item until its ratings expire
             self.connection.open_connection.execute('COMMIT')
 
         if not return_data:
@@ -196,12 +201,14 @@ class RatingsSeasonsDict(RatingsDict):
     def get_mediatype(self):
         return 'season'
 
-    def get_online_data_mapped(self):
-        if self.season is None:
-            return
+    @property
+    def data_cond(self):
+        """ Season ratings only apply to a TV item with a season """
         if self.tmdb_type != 'tv':
-            return
-        return super().get_online_data_mapped()
+            return False
+        if self.season is None:
+            return False
+        return super().data_cond
 
     @property
     def item_id(self):
@@ -212,10 +219,12 @@ class RatingsEpisodesDict(RatingsSeasonsDict):
     def get_mediatype(self):
         return 'episode'
 
-    def get_online_data_mapped(self):
+    @property
+    def data_cond(self):
+        """ Episode ratings only apply to a TV item with a season and an episode """
         if self.episode is None:
-            return
-        return super().get_online_data_mapped()
+            return False
+        return super().data_cond
 
     @property
     def item_id(self):

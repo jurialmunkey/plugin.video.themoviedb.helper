@@ -7,7 +7,7 @@ from jurialmunkey.ftools import cached_property
 class FlatSeasonMediaListMixin:
     @cached_property
     def parent_precache_tvshow(self):
-        return self.get_parent_data('tvshow')
+        return self.get_parent_precache('tvshow')
 
     @cached_property
     def parent_season_media_list(self):
@@ -44,7 +44,7 @@ class FlatSeasonMediaList(FlatSeasonMediaListMixin, MediaList):
         if not self.parent_season_media_list:
             return []
         return [
-            self.get_parent_data('season', season['infolabels']['season'], cache_refresh='basic')
+            self.get_parent_precache('season', season['infolabels']['season'], cache_refresh='basic')
             for season in self.parent_season_media_list
             if season and 'infolabels' in season and season['infolabels'].get('season')
         ]

@@ -99,6 +99,5 @@ class CronJobMonitor(SafeThread):
     def run(self):
         self._on_startup()
 
-        while not self.update_monitor.abortRequested() and not self.exit:
-            self.update_monitor.waitForAbort(self._poll_time)
+        while not self.update_monitor.waitForAbort(self._poll_time) and not self.exit:
             self._on_poll()

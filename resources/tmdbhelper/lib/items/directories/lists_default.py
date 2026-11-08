@@ -1,7 +1,10 @@
 from tmdbhelper.lib.items.container import ContainerDefaultCacheDirectory
+from tmdbhelper.lib.items.directories.lists_stale import StaleListRefresh
+from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.addon.plugin import convert_type, get_localized, get_language
 from jurialmunkey.ftools import cached_property
 from jurialmunkey.parser import try_int
+from jurialmunkey.plugin import format_name
 
 
 class ItemCache:
@@ -11,11 +14,30 @@ class ItemCache:
 
     def __call__(self, function):
         def wrapper(instance, *args, **kwargs):
-            kwargs['cache_days'] = instance.cache_days
-            kwargs['cache_name'] = instance.cache_name
-            kwargs['cache_combine_name'] = True
-            return self.cache.use_cache(function, instance, *args, **kwargs)
+            if instance.is_stale_allowed:
+                return self.use_stale_cache(function, instance, *args, **kwargs)
+            return self.use_cache(function, instance, *args, **kwargs)
         return wrapper
+
+    def use_cache(self, function, instance, *args, **kwargs):
+        kwargs['cache_days'] = instance.cache_days
+        kwargs['cache_name'] = instance.cache_name
+        kwargs['cache_combine_name'] = True
+        return self.cache.use_cache(function, instance, *args, **kwargs)
+
+    def use_stale_cache(self, function, instance, *args, **kwargs):
+        """Return an expired list straight away and refresh it after the directory is returned."""
+        cache_name = format_name(instance.cache_name, *args, **kwargs)  # As use_cache() names it
+        items = self.cache.get_cache(cache_name)
+        if items:
+            return items
+        items = self.cache.get_stale_cache(cache_name, instance.stale_hours)
+        if not items:
+            return self.use_cache(function, instance, *args, **kwargs)
+        instance.stale_refresh = StaleListRefresh(
+            self.cache, cache_name, instance.cache_days, function, instance, args, kwargs)
+        kodi_log(f'Showing expired widget list {cache_name} until it refreshes', 1)
+        return items
 
 
 class UncachedItemsPage:
@@ -83,6 +105,18 @@ class ListProperties:
     dbid_sorted = False
     pagination = False
     is_cacheonly = True
+    allow_stale = False  # Set by the container for widgets returned to Kodi
+    stale_hours = 0  # Hours past expiry that a widget may show an expired list
+    stale_refresh = None  # StaleListRefresh for an expired list that was returned
+
+    @property
+    def is_stale_allowed(self):
+        return bool(self.allow_stale and self.stale_hours)
+
+    def refresh_stale_items(self):
+        if self.stale_refresh is None:
+            return
+        self.stale_refresh.run()
 
     @cached_property
     def query_database(self):
@@ -242,7 +276,11 @@ class ListDefault(ContainerDefaultCacheDirectory):
         list_properties.tmdb_api = self.tmdb_api
         list_properties.is_cacheonly = self.is_cacheonly
         list_properties.class_name = f'{self.__class__.__name__}'
+        list_properties.allow_stale = self.is_plugin_widget
         return list_properties
+
+    def refresh_after_finish(self):
+        self.list_properties.refresh_stale_items()
 
     @cached_property
     def sort_by_dbid(self):

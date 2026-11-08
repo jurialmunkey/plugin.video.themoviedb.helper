@@ -1,5 +1,6 @@
 import socket
-from time import monotonic
+from contextlib import contextmanager
+from time import monotonic, perf_counter
 from xbmc import Monitor
 from tmdbhelper.lib.addon.consts import RUNSCRIPT
 from tmdbhelper.lib.addon.logger import kodi_log
@@ -17,13 +18,15 @@ class DetailsClient:
         self.monitor = Monitor()
         self.location = ServiceLocation()
         self.version = get_version()
+        self.timings = {}  # Stage seconds summed over batches when the service reports timings
 
-    def exchange(self, endpoint, items=None, kodi_details=False, prepare=None):
+    def exchange(self, endpoint, items=None, kodi_details=False, prepare=None, invalidate=False):
         with socket.create_connection(('127.0.0.1', endpoint['port']), timeout=2) as connection:
             connection.settimeout(5)
             send_message(connection, {
                 'version': PROTOCOL_VERSION, 'token': endpoint['token'],
                 'items': items, 'kodi_details': kodi_details, 'prepare': prepare,
+                'invalidate': invalidate,
             })
             connection.settimeout(0.25)
             response = receive_message(
@@ -37,12 +40,25 @@ class DetailsClient:
         if not isinstance(result, list) or (items is not None and len(result) != len(items)):
             raise DetailsServiceUnavailable('Incomplete item detail service response')
         self.log_item_errors(response.get('errors') or {})
+        self.add_timings(response.get('timings') or {})
         return result
 
     @staticmethod
     def log_item_errors(errors):
         for error in errors.values():
             kodi_log(f'Item detail lookup failed: {error}', 1)
+
+    def add_timings(self, timings):
+        for name, seconds in timings.items():
+            self.timings[name] = self.timings.get(name, 0) + seconds
+
+    @contextmanager
+    def measure(self, name):
+        started = perf_counter()
+        try:
+            yield
+        finally:
+            self.add_timings({name: perf_counter() - started})
 
     def is_current(self, endpoint):
         return bool(endpoint) and endpoint.get('version') == self.version
@@ -94,13 +110,17 @@ class DetailsClient:
         return self.get_endpoint(failed_endpoint=endpoint)
 
     def get_batch_items(self, entries, kodi_details=False):
-        endpoint = self.get_current_endpoint()
+        # Waiting for the service to start or answer is timed as boot.
+        with self.measure('boot'):
+            endpoint = self.get_current_endpoint()
         try:
             return self.exchange(endpoint, entries, kodi_details)
         except (OSError, DetailsServiceUnavailable):
             if self.monitor.abortRequested():
                 raise
-        return self.exchange(self.get_retry_endpoint(endpoint), entries, kodi_details)
+        with self.measure('boot'):
+            endpoint = self.get_retry_endpoint(endpoint)
+        return self.exchange(endpoint, entries, kodi_details)
 
     def get_batch(self, entries, kodi_details=False):
         try:
@@ -142,3 +162,26 @@ class DetailsClient:
             self.exchange(endpoint, prepare={'info': info, 'tmdb_type': tmdb_type})
         except (OSError, DetailsServiceError) as exc:
             kodi_log(f'Item detail sync refresh was not started early: {exc}', 1)
+
+    def invalidate(self):
+        """Clear assembled metadata after item details were changed outside the service.
+        A running service clears its memory and stored copies. Otherwise the stored copies
+        are cleared here, without starting the service, so that no later start reuses them."""
+        endpoint = self.location.endpoint
+        if self.is_current(endpoint) and self.request_invalidate(endpoint):
+            return
+        self.clear_stored_metadata()
+
+    def request_invalidate(self, endpoint):
+        try:
+            self.exchange(endpoint, invalidate=True)
+        except (OSError, DetailsServiceError) as exc:
+            kodi_log(f'Item detail service did not clear metadata, clearing stored copies: {exc}', 1)
+            return False
+        return True
+
+    @staticmethod
+    def clear_stored_metadata():
+        from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+        from tmdbhelper.lib.items.database.details.storedmetadata import DetailsStoredMetadata
+        DetailsStoredMetadata(ItemDetailsDatabase()).clear()

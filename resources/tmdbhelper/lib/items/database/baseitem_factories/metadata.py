@@ -60,16 +60,86 @@ class MetadataSizeEstimator:
         self.pending.extend(self.children)
 
 
+class SegmentedMetadataEntries:
+    """Keep reused entries apart from entries seen once (segmented LRU).
+
+    New entries start in the trial segment and move to the protected segment when found
+    again, so items seen once, such as a browsed filmography, cannot push out reused items,
+    such as widget items. Values are (item, size) pairs.
+    """
+
+    def __init__(self, protected_limit):
+        self.protected_limit = protected_limit
+        self.trial = OrderedDict()
+        self.protected = OrderedDict()
+
+    def __len__(self):
+        return len(self.trial) + len(self.protected)
+
+    def __iter__(self):
+        return chain(self.trial, self.protected)
+
+    def __contains__(self, key):
+        return key in self.trial or key in self.protected
+
+    def touch(self, key):
+        """Return an entry's value, making it the newest protected entry."""
+        if key in self.protected:
+            self.protected.move_to_end(key)
+            return self.protected[key]
+        value = self.trial.pop(key)
+        self.protected[key] = value
+        self.demote_excess()
+        return value
+
+    def demote_excess(self):
+        """Return the oldest protected entries to the trial segment rather than evicting them."""
+        while len(self.protected) > self.protected_limit:
+            key, value = self.protected.popitem(last=False)
+            self.trial[key] = value
+
+    def add(self, key, value, protected=False):
+        if not protected:
+            self.trial[key] = value
+            return
+        self.protected[key] = value
+        self.demote_excess()
+
+    def remove(self, key):
+        """Remove an entry, returning its value and whether it was protected."""
+        if key in self.protected:
+            return self.protected.pop(key), True
+        return self.trial.pop(key), False
+
+    def pop(self, key):
+        value, _ = self.remove(key)
+        return value
+
+    def pop_oldest(self):
+        """Remove the oldest trial entry, or the oldest protected entry once trial is empty."""
+        segment = self.trial or self.protected
+        return segment.popitem(last=False)
+
+    def clear(self):
+        self.trial.clear()
+        self.protected.clear()
+
+
 class ItemMetadataCache:
     max_entries = 512
     max_bytes = 16 * 1024 * 1024
+    protected_share = 0.8  # Share of entries kept for items found again
 
     def __init__(self, database):
         self.database = database
         self.connection = None
         self.version = None
-        self.entries = OrderedDict()
+        self.entries = SegmentedMetadataEntries(self.protected_entries)
         self.size = 0
+
+    @property
+    def protected_entries(self):
+        return int(self.max_entries * self.protected_share)
 
     @property
     def is_full(self):
@@ -109,10 +179,9 @@ class ItemMetadataCache:
 
     def get_entry(self, key):
         try:
-            item, _ = self.entries[key]
+            item, _ = self.entries.touch(key)
         except KeyError:
             return
-        self.entries.move_to_end(key)
         return item
 
     @staticmethod
@@ -122,8 +191,17 @@ class ItemMetadataCache:
         return MetadataSizeEstimator(value).size
 
     def evict_oldest(self):
-        _, (_, size) = self.entries.popitem(last=False)
+        _, (_, size) = self.entries.pop_oldest()
         self.size -= size
+
+    def release_entry(self, key):
+        """Remove an entry that is about to be replaced; return whether it was protected."""
+        try:
+            (_, size), is_protected = self.entries.remove(key)
+        except KeyError:
+            return False
+        self.size -= size
+        return is_protected
 
     def make_room(self, size):
         while self.entries and (
@@ -135,8 +213,11 @@ class ItemMetadataCache:
         size = self.get_size((key, item))
         if size > self.max_bytes:
             return False
+        # Two readers can assemble the same item. Replace the one stored first in its
+        # segment, and count only the replacement's size.
+        is_protected = self.release_entry(key)
         self.make_room(size)
-        self.entries[key] = (item, size)
+        self.entries.add(key, (item, size), protected=is_protected)
         self.size += size
         return True
 

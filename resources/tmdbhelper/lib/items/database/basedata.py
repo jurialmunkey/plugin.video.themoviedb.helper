@@ -2,6 +2,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.files.dbfunc import DatabaseAccess
 from tmdbhelper.lib.addon.tmdate import set_timestamp
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from tmdbhelper.lib.addon.consts import DELETION_GRACE
 
 
 class ItemDetailsDatabaseAccess(DatabaseAccess):
@@ -33,8 +34,21 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
         return self.current_time + self.expiry_time
 
     @property
+    def deletion(self):
+        """ Lease given to rows this write relies on; cleanup keeps them until it passes """
+        return self.expiry + DELETION_GRACE
+
+    @property
     def current_time(self):
         return set_timestamp(0, set_int=True)
+
+    def set_cached_deletion(self, item_ids, deletion):
+        """ Extend the deletion lease of each baseitem row; a lease is never shortened """
+        self.cache.execute_sql(
+            'UPDATE baseitem SET deletion=MAX(deletion, ?) WHERE id=?',
+            data=[(deletion, item_id) for item_id in item_ids],
+            connection=self.open_connection,
+        )
 
     @cached_property
     def keys(self):
