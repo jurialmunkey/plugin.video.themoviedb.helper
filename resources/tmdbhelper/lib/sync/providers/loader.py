@@ -10,7 +10,6 @@ from tmdbhelper.lib.sync.providers.imdb_top250 import IMDB_TOP250_MEDIATYPES, IM
 from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
 from tmdbhelper.lib.sync.providers.list_actions import ListActions
 from tmdbhelper.lib.sync.providers.identifiers import IdentifierResolver
-from tmdbhelper.lib.sync.providers.stats import StatsSupplier
 from tmdbhelper.lib.sync.datatype import DataType
 from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES, ServiceDataType
 
@@ -158,16 +157,6 @@ class SyncProviderLoader:
                 raise TypeError(f'IMDb Top 250 supplier for {mediatype} must implement get_items()')
 
     @staticmethod
-    def validate_stats_class(provider):
-        supplier_class = provider.stats_class
-        if supplier_class is None:
-            return
-        if not isinstance(supplier_class, type) or not issubclass(supplier_class, StatsSupplier):
-            raise TypeError('Stats supplier must inherit StatsSupplier')
-        if not callable(supplier_class.get_items) or supplier_class.get_items is StatsSupplier.get_items:
-            raise TypeError('Stats supplier must implement get_items()')
-
-    @staticmethod
     def validate_monitor_lists_class(provider):
         supplier_class = provider.monitor_lists_class
         if supplier_class is None:
@@ -239,7 +228,6 @@ class SyncProviderLoader:
         self.validate_getter_classes(provider)
         self.validate_ratings_classes(provider)
         self.validate_imdb_top250_classes(provider)
-        self.validate_stats_class(provider)
         self.validate_monitor_lists_class(provider)
         self.validate_list_actions_class(provider)
         self.validate_identifier_resolver_class(provider)

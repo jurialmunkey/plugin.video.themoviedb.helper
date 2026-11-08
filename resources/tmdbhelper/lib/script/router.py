@@ -80,8 +80,6 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'invalidate_sync')(**kwargs),
         'invalidate_trakt_sync':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'invalidate_sync')(**kwargs),
-        'get_trakt_stats':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.stats', 'get_stats')(**kwargs),
         'authenticate_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'authenticate_trakt')(**kwargs),
         'revoke_trakt':

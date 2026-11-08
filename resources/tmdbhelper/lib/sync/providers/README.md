@@ -150,9 +150,6 @@ Providers declare:
   IMDbTop250Supplier subclasses implementing `get_items()`. Each media type must
   also have a ratings supplier. Registering any supplies the `imdb_top250`
   capability; the empty default keeps providers without it valid.
-- `stats_class`: an optional StatsSupplier subclass implementing `get_items()`.
-  Registering it exposes the independently selected `stats` capability. Providers
-  without it inherit a `None` default.
 - `monitor_lists_class`: an optional MonitorListsSupplier subclass implementing
   `get_lists()` and `get_list_items(list_slug)`. This supplies the independent
   `monitor_lists` capability for library monitoring and list retrieval.
@@ -225,7 +222,7 @@ Action discovery is shared by Sync Options and context-menu availability. Each
 container configures one discovery context for its list items before finalisation.
 
 The available feature selectors are history/progress, watchlist, collection,
-scrobbling, and stats. Single-provider selectors offer
+and scrobbling. Single-provider selectors offer
 None, enabled providers declaring that feature, and installation/enabling options
 from `catalog.py`. The catalogue records trusted addon IDs, display names, and
 supported capabilities so missing or disabled modules are offered only for
@@ -298,11 +295,7 @@ authorized scrobbler. Watched writes belong exclusively to the selected scrobbli
 providers; core does not also increment the Kodi library playcount. Provider modules
 own payloads, service requests,
 authentication, and interpretation of scrobble results. Core coordinates sync-cache
-refreshes after successful stop requests. A reported history change also forces
-stats refresh when the playback provider is the selected stats source, independently
-of the watched source. Stats persistence, scheduling, totals, and skin properties
-remain in core; API retrieval and source mapping belong to the selected supplier.
-Core playback refresh does not construct a service API client for stats.
+refreshes after successful stop requests.
 
 TMDbHelper retains database infrastructure, common sync/mapping base classes,
 list-item construction, directory configuration, and invalidation. Provider modules
@@ -477,6 +470,13 @@ When core starts relying on something new from provider-supplied classes:
 | 4 | Getters inherit `SyncDataGetter` and implement `get_items()` and `get_sync_succeeded()`. Actions and service actions inherit `ItemSync`. Scrobblers inherit `ScrobbleRequest`; those using its `scrobble()` implement `get_scrobbler_item()` and `send_request()`. The loader accepts a version range. |
 | 3 | Previous interface: getters, actions and scrobblers only had to be callable. |
 
+Account stats have been removed. The empty
+`tmdbhelper.lib.sync.providers.stats.StatsSupplier` class remains temporarily for
+import compatibility with older Trakt modules during the update window. Core
+ignores their `stats_class` registration and never constructs these suppliers.
+Remove this shim once users have updated their Trakt module. The provider
+interface remains version 4; the remaining capabilities are unchanged.
+
 ## List actions
 
 `tmdbhelper.lib.sync.providers.list_actions.ListActions` defines operations on
@@ -645,7 +645,7 @@ Core's TMDb logging and unrelated diagnostics retain their existing pipeline.
 Trakt artwork, including type variants, is shipped only in the module. Core's
 duplicate PNGs and its Trakt-only normal/type export definitions are removed;
 shared icon generation and the remaining core icon families retain their
-existing behavior. Shared directory mappers, calendar stacking, stats caching,
+existing behavior. Shared directory mappers, calendar stacking,
 library tagging and persisted compatibility names remain core responsibilities.
 
 ## Ratings suppliers
@@ -694,36 +694,6 @@ all suppliers, including OMDb ratings and awards. Lower-priority providers fill
 missing fields.
 The IMDb Top 250 output format remains unchanged. Service-specific rating
 retrieval belongs to provider suppliers rather than the ratings dictionaries.
-
-## Account stats
-
-The Stats source uses `sync_provider_stats` and the same selector, None option,
-and Default/Custom onboarding flow as watchlist and collection. Selection is
-independent of watched, scrobbling, and ratings sources. There is no automatic
-first-capable fallback. Existing installations must select a source or configure
-one through provider onboarding; no Trakt source is silently assigned.
-
-`tmdbhelper.lib.sync.providers.stats.StatsSupplier` receives `provider` before its
-cached `.items` property is accessed. `get_items()` returns dictionaries containing
-`name`, `type`, and integer `stat`. `name` is the metric (for example `minutes`),
-while `type` is the category (for example `movies` or `shows`). Providers use these
-common names for comparable metrics and may supply additional categories. Suppliers
-own requests and mapping, and do not access the query database. The Stats helper
-checks the selected provider's authorization before constructing its supplier.
-`None` means unavailable or failed: retain the previous snapshot without extending
-its expiry. An empty list is a successful empty snapshot. Zero values are valid.
-Malformed source data and programming errors must not be hidden.
-
-Core retains `trakt_stats`, `get_trakt_stats()`, the `get_trakt_stats` script route,
-and `TraktStats.*` skin properties as legacy names for generic selected-source
-stats. Complete successful snapshots replace the previous rows and expire after
-twenty minutes; empty snapshots are cached too. Core calculates combined totals
-and minute conversions. Source changes clear the stats rows, expiry, and previously
-published skin properties through the dedicated stats invalidator. Missing or
-disabled sources supply no stats, without falling back to direct Trakt requests.
-Startup requests stats independently of Trakt authorization. Manual stats
-invalidation optionally refreshes the selected source. The Trakt module supplies
-`users/me/stats` and owns its recursive source-to-record mapping.
 
 ## IMDb Top 250
 
@@ -830,7 +800,7 @@ or disables it; the dialog refreshes after each action. The internal TMDb provid
 is not an external module and is not listed.
 
 Installing or enabling a module offers to make it the default sync provider.
-Accepting replaces watched, watchlist, collection, and stats selections, clearing
+Accepting replaces watched, watchlist, and collection selections, clearing
 unsupported selections. Ratings and scrobbling have separate prompts when
 supported. Ratings priority and other scrobbling providers are preserved.
 Providers offering only browsing do not receive these feature prompts.
