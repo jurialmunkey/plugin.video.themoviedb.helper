@@ -77,7 +77,7 @@ class KodiDb():
             if episode is not None:
                 library, func = 'episode', get_episode_details
 
-            kodi_db_tv = self.kodi_db_tv.setdefault(dbid, get_kodi_library(library, dbid, cache=self.cache))
+            kodi_db_tv = self.kodi_db_tv.setdefault((library, dbid), get_kodi_library(library, dbid, cache=self.cache))
             child_dbid = kodi_db_tv.get_info('dbid', season=season, episode=episode)
             if not child_dbid:
                 return
