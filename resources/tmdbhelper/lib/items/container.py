@@ -314,9 +314,9 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
         if self.log_timers:
             from tmdbhelper.lib.files.futils import write_to_file
-            from tmdbhelper.lib.addon.logger import log_timer_report
+            from tmdbhelper.lib.addon.logger import log_timer_report, TimerReportLists
             from tmdbhelper.lib.addon.tmdate import get_todays_date
-            report_data = log_timer_report(self.timer_lists, self.timer_report_name, logging=False)
+            report_data = log_timer_report(TimerReportLists(self.timer_lists).timer_lists, self.timer_report_name, logging=False)
             write_to_file(''.join(report_data), 'timer_report', f'{get_todays_date()}.txt', join_addon_data=True, append_to_file=True)
 
         if self.container_update:
