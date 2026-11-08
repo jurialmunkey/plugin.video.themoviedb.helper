@@ -390,13 +390,20 @@ class ContainerDirectory(ContainerDirectoryCommon):
         with TimerList(self.timer_lists, '--lidc', log_threshold=0.001, logging=self.log_timers):
             items = self.get_configured_listitems(items)
             items = self.build_ratings_items(items)
-            return [i for i in (self.build_detailed_item(li) for li in items if li) if i]
+            items = [i for i in (self.build_detailed_item(li) for li in items if li) if i]
+        self.add_details_rest_timer()
+        return items
 
     def get_configured_listitems(self, items):
         items = self.lidc.configure_listitems_threaded(items)
         for name, seconds in self.lidc.client.timings.items():
             self.timer_lists[f' --{name}'] = [seconds]
         return items
+
+    def add_details_rest_timer(self):
+        """Report the --lidc time that the item detail timings do not account for, never below 0."""
+        lidc_time = sum(self.timer_lists['--lidc'])
+        self.timer_lists[' --rest'] = [max(lidc_time - sum(self.lidc.client.timings.values()), 0)]
 
 
 class ContainerDefaultCacheDirectory(ContainerDirectory):

@@ -26,15 +26,33 @@ class DetailsStageTimer:
             self.total += perf_counter() - self.started
 
 
-class DetailsBatchTimings:
-    """Stage timings for one batch. Stages overlap, so their totals are not cumulative.
+class DetailsWaitTimer:
+    """Item stage time not spent reading, calling or saving, never below 0.
 
-    The handler thread times sync before submitting the batch. The coordinator thread
-    times cached reads, online calls and saves, including the batch's dependencies.
-    Work shared with an earlier batch is timed in that batch.
+    Work stages can overlap each other, so the wait is a lower bound.
     """
 
-    stage_names = ('sync', 'read', 'call', 'save')
+    def __init__(self, item_timer, work_timers):
+        self.item_timer = item_timer
+        self.work_timers = work_timers
+
+    @property
+    def total(self):
+        return max(self.item_timer.total - sum(timer.total for timer in self.work_timers), 0)
+
+
+class DetailsBatchTimings:
+    """Stage timings for one batch. Work stages overlap, so their totals are not cumulative.
+
+    The handler thread times sync, the item stage from submitting the batch until every
+    result is ready, and Kodi library matching. The coordinator thread times cached reads,
+    online calls and saves, including the batch's dependencies. Work shared with an earlier
+    batch is timed in that batch.
+    """
+
+    stage_names = ('sync', 'item', 'read', 'call', 'save', 'kodi')
+    work_stage_names = ('read', 'call', 'save')
+    summary_names = ('sync', 'read', 'call', 'save', 'wait', 'kodi')
 
     @cached_property
     def stage_timers(self):
@@ -42,6 +60,20 @@ class DetailsBatchTimings:
 
     def get_stage_timers(self):
         return {name: DetailsStageTimer() for name in self.stage_names}
+
+    @cached_property
+    def summary_timers(self):
+        return self.get_summary_timers()
+
+    def get_summary_timers(self):
+        timers = {**self.stage_timers, 'wait': self.get_wait_timer()}
+        return {name: timers[name] for name in self.summary_names}
+
+    def get_wait_timer(self):
+        return DetailsWaitTimer(
+            self.stage_timers['item'],
+            [self.stage_timers[name] for name in self.work_stage_names],
+        )
 
     def start_stage(self, name):
         self.stage_timers[name].start()
@@ -59,7 +91,7 @@ class DetailsBatchTimings:
 
     @property
     def summary(self):
-        return {name: timer.total for name, timer in self.stage_timers.items()}
+        return {name: timer.total for name, timer in self.summary_timers.items()}
 
 
 class TimedDetailsCoordinator(DetailsCoordinator):
@@ -106,4 +138,14 @@ class TimedDetailsRequestHandler(DetailsRequestHandler):
             return super().wait_for_sync(requests, deadline)
 
     def submit_requests(self, requests):
+        self.batch_timings.start_stage('item')
         return self.server.coordinator.submit(requests, group=self.batch_timings)
+
+    def get_detail_results(self, entries):
+        results = super().get_detail_results(entries)
+        self.batch_timings.stop_stage('item')
+        return results
+
+    def get_kodi_results(self, entries, results):
+        with self.batch_timings.measure_stage('kodi'):
+            return super().get_kodi_results(entries, results)

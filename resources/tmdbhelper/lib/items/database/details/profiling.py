@@ -566,7 +566,7 @@ class ProfiledDetailsRequestHandler(TimedDetailsRequestHandler):
         return self.report.call('sync_wait', super().wait_for_sync, requests, deadline)
 
     def submit_requests(self, requests):
-        return self.report.call('submit', self.server.coordinator.submit, requests, group=self.report)
+        return self.report.call('submit', super().submit_requests, requests)
 
     def get_result(self, future, deadline):
         return self.report.call('result_wait', super().get_result, future, deadline)

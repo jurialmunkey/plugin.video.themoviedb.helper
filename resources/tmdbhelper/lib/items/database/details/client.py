@@ -1,5 +1,6 @@
 import socket
-from time import monotonic
+from contextlib import contextmanager
+from time import monotonic, perf_counter
 from xbmc import Monitor
 from tmdbhelper.lib.addon.consts import RUNSCRIPT
 from tmdbhelper.lib.addon.logger import kodi_log
@@ -51,6 +52,14 @@ class DetailsClient:
         for name, seconds in timings.items():
             self.timings[name] = self.timings.get(name, 0) + seconds
 
+    @contextmanager
+    def measure(self, name):
+        started = perf_counter()
+        try:
+            yield
+        finally:
+            self.add_timings({name: perf_counter() - started})
+
     def is_current(self, endpoint):
         return bool(endpoint) and endpoint.get('version') == self.version
 
@@ -101,13 +110,17 @@ class DetailsClient:
         return self.get_endpoint(failed_endpoint=endpoint)
 
     def get_batch_items(self, entries, kodi_details=False):
-        endpoint = self.get_current_endpoint()
+        # Waiting for the service to start or answer is timed as boot.
+        with self.measure('boot'):
+            endpoint = self.get_current_endpoint()
         try:
             return self.exchange(endpoint, entries, kodi_details)
         except (OSError, DetailsServiceUnavailable):
             if self.monitor.abortRequested():
                 raise
-        return self.exchange(self.get_retry_endpoint(endpoint), entries, kodi_details)
+        with self.measure('boot'):
+            endpoint = self.get_retry_endpoint(endpoint)
+        return self.exchange(endpoint, entries, kodi_details)
 
     def get_batch(self, entries, kodi_details=False):
         try:
