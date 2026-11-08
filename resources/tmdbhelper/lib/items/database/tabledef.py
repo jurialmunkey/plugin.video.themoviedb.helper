@@ -29,6 +29,10 @@ BASEITEM_COLUMNS = {
     'language': {
         'data': 'TEXT',
     },
+    'deletion': {
+        'data': 'INTEGER DEFAULT 0 NOT NULL',
+        'indexed': True
+    },
 }
 
 MOVIE_COLUMNS = {

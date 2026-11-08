@@ -185,6 +185,7 @@ class RatingsDict(BaseList):
         with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
             self.set_cached_list_values(self.table, self.keys, values, overwrite=True)
+            self.set_cached_deletion((self.item_id, ), self.deletion)  # Keep the item until its ratings expire
             self.connection.open_connection.execute('COMMIT')
 
         if not return_data:
