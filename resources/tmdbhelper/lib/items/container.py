@@ -35,6 +35,18 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return {}
 
     @cached_property
+    def timer_report_time(self):
+        return self.get_timer_report_time()
+
+    def get_timer_report_time(self):
+        from tmdbhelper.lib.addon.tmdate import get_current_date_time
+        return get_current_date_time('%H:%M')
+
+    @property
+    def timer_report_name(self):
+        return f'[{self.timer_report_time}] {self.paramstring}'
+
+    @cached_property
     def sort_methods(self):
         return []  # List of kwargs dictionaries [{'sortMethod': SORT_METHOD_UNSORTED}]
 
@@ -276,6 +288,9 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
 
     def get_directory(self, items_only=False, build_items=True):
 
+        if self.log_timers:
+            self.timer_report_time  # Record when the directory began its work
+
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
             self.prepare_item_details()
 
@@ -301,7 +316,7 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
             from tmdbhelper.lib.files.futils import write_to_file
             from tmdbhelper.lib.addon.logger import log_timer_report
             from tmdbhelper.lib.addon.tmdate import get_todays_date
-            report_data = log_timer_report(self.timer_lists, self.paramstring, logging=False)
+            report_data = log_timer_report(self.timer_lists, self.timer_report_name, logging=False)
             write_to_file(''.join(report_data), 'timer_report', f'{get_todays_date()}.txt', join_addon_data=True, append_to_file=True)
 
         if self.container_update:
