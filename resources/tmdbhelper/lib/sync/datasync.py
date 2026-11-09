@@ -234,6 +234,39 @@ class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
     clause_keys = ('last_watched_at', )
 
 
+class SyncDataGetterStats(SyncDataGetterAllItems):
+    """Count synced items while refreshing source columns rather than SQL aggregates."""
+
+    def get_keys(self):
+        return ('COUNT(*) AS item_count', )
+
+    def get_sync_succeeded(self):
+        return self.instance_syncdata.sync(self.item_type, self.clause_keys)
+
+
+class SyncDataGetterWatchedStats(SyncDataGetterStats):
+    clause_keys = ('last_watched_at', )
+
+
+class SyncDataGetterWatchedShowsStats(SyncDataGetterStats):
+    operator = 'AND'
+    clause_keys = ('watched_episodes', 'aired_episodes')
+    query_clauses = ('item_type=?', 'aired_episodes > 0', 'watched_episodes >= aired_episodes')
+
+
+class SyncDataGetterCollectedStats(SyncDataGetterStats):
+    clause_keys = ('collection_last_collected_at', )
+
+
+class SyncDataGetterCollectedShowsStats(SyncDataGetterCollectedStats):
+    @property
+    def query_values(self):
+        return ('episode', )
+
+    def get_keys(self):
+        return ('COUNT(DISTINCT tmdb_id) AS item_count', )
+
+
 class SyncDataGetterWatchedOn(SyncDataGetterAllItemsWatched):
     query_clauses = (
         'item_type=?',
@@ -413,6 +446,14 @@ class SyncDataGetters:
 
     def get_all_watched_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllItemsWatched, item_type)
+
+    def get_watched_stats_getter(self, item_type):
+        getter_class = SyncDataGetterWatchedShowsStats if item_type == 'show' else SyncDataGetterWatchedStats
+        return self.get_item_type_getter(getter_class, item_type)
+
+    def get_collected_stats_getter(self, item_type):
+        getter_class = SyncDataGetterCollectedShowsStats if item_type == 'show' else SyncDataGetterCollectedStats
+        return self.get_item_type_getter(getter_class, item_type)
 
     def get_watched_on_getter(self, item_type, watched_on):
         sd = self.get_item_type_getter(SyncDataGetterWatchedOn, item_type)

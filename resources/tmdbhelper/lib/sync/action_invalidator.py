@@ -1,5 +1,6 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.sync.activity import SyncLastActivities
+from tmdbhelper.lib.sync.stats import SyncStats
 
 
 class SyncActionInvalidator:
@@ -33,3 +34,4 @@ class SyncActionInvalidator:
             self.invalidate_sync_item(item)
         for item in self.sync_items:
             item.sync(forced=True)
+        SyncStats(self.syncdata).update_sync_types(name for name, item_type in self.dependencies)

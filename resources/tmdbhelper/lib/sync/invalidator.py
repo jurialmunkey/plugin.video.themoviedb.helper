@@ -4,6 +4,7 @@ from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.sync.features import FEATURE_LABELS, SYNC_FEATURES
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 from tmdbhelper.lib.sync.activity import SyncLastActivities
+from tmdbhelper.lib.sync.stats import SyncStats
 
 
 class SyncInvalidatorAll:
@@ -91,11 +92,14 @@ class SyncInvalidatorAll:
             self.invalidate_provider(provider)
         # Public caches refresh on demand, independently of account data resync.
         self.invalidate_cached_tables()
+        if clear_data:
+            SyncStats(self.syncdata).clear(self.features)
 
     def sync(self):
         for item_type in ('movie', 'show', 'season', 'episode'):
             keys = tuple(key for key in self.database_keys if item_type in self.sync_table[key])
             self.syncdata.sync(item_type, keys)
+        SyncStats(self.syncdata).update(self.features)
 
     def run(self, sync=False):
         # Resync replaces columns after a successful response; keep them available until then.
