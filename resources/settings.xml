@@ -122,6 +122,11 @@
                 </setting>
             </group>
             <group id="3" label="32710">
+                <setting id="contextmenu_play_random" type="boolean" label="32767" help="32768">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="contextmenu_related_lists" type="boolean" label="32235" help="32613">
                     <level>0</level>
                     <default>true</default>

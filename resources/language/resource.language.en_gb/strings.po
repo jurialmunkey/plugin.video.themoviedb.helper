@@ -3552,3 +3552,19 @@ msgstr ""
 msgctxt "#32766"
 msgid "72 hours"
 msgstr ""
+
+#: /resources/settings.xml
+#: /resources/tmdbhelper/lib/items/context_random.py
+msgctxt "#32767"
+msgid "Play random"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/play_random.py
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr ""

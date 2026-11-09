@@ -44,6 +44,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.kodi_utils', 'kodi_setting')(**kwargs),
 
         # Context Menu
+        'play_random':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.play_random', 'play_random')(**kwargs),
         'related_lists':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.related_lists', 'related_lists')(**kwargs),
         'drop_collection':
