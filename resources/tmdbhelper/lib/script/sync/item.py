@@ -221,7 +221,7 @@ class ItemSync:
         return self.get_item_id()
 
     def get_item_id(self):
-        return '.'.join([i for i in (self.tmdb_id, self.season, self.episode) if i])
+        return '.'.join([str(i) for i in (self.tmdb_id, self.season, self.episode) if i])
 
     """
     status_code
