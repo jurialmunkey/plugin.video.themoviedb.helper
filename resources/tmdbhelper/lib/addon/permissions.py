@@ -13,6 +13,7 @@ class PermissionHandler:
     # Overrides _DENY_ALL
     _ALLOW = (
         'api.tmdb.api',
+        'sync.providers.interface',
     )
 
     # Any module name (relative to tmdbhelper.lib.) that starts with an item in

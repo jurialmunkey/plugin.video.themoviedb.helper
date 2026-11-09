@@ -112,6 +112,30 @@ until the user confirms. Providers using this route require TMDbHelper 6.19.3
 or later. Artwork is declared in the metadata extension's `assets` element.
 Package only the individual provider folder when distributing an addon.
 
+Standalone provider scripts that need core access import the explicitly exposed
+interfaces through `tmdbhelper_lib.sync.providers.interface` (TMDbHelper 6.21.3
+or later):
+
+```python
+from tmdbhelper_lib.sync.providers.interface import SyncProviderRegistry
+```
+
+This module exports `SyncProviderRegistry`, `SyncProviderLoader`, and
+`SyncInvalidatorAll` as the original core classes. Registry-based actions use
+`find_provider()` before importing provider-owned actions. Scripts that need to
+load a provider before authorization can use `SyncProviderLoader`, and account
+changes can use `SyncInvalidatorAll.invalidate_provider()`. Provider scripts must
+not inject TMDbHelper's `resources` directory into `sys.path`.
+
+`PermissionHandler._ALLOW` exposes only this interface module and its parent
+packages; the remaining sync modules are not public `tmdbhelper_lib` imports.
+Provider implementation packages loaded by core continue to import their base
+classes and helpers from `tmdbhelper.lib`. The interface re-exports those same
+classes rather than loading separate copies under public module names, preserving
+class identity and provider validation. This is an additive entry point and does
+not change provider interface version 4. Providers using it must require
+TMDbHelper 6.21.3 or later in `addon.xml`.
+
 Providers declare:
 
 - `interface_version = 4` explicitly on the Provider class. See
