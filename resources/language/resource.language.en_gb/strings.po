@@ -3568,3 +3568,8 @@ msgstr ""
 msgctxt "#32769"
 msgid "No playable items found."
 msgstr ""
+
+#: /resources/tmdbhelper/lib/items/context_nextepisodes.py
+msgctxt "#32770"
+msgid "Browse next episodes"
+msgstr ""

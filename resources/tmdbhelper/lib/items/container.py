@@ -286,9 +286,24 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         """
         return
 
+    @cached_property
+    def directory_items_properties_class(self):
+        return self.get_directory_items_properties_class()
+
+    def get_directory_items_properties_class(self):
+        if not boolean(self.params.get('nextepisodes', False)):
+            return
+        from tmdbhelper.lib.items.directories.lists_nextepisodes import ListNextEpisodesProperties
+        return ListNextEpisodesProperties
+
     def get_directory_items(self):
         with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
-            return self.get_items(**self.params)
+            items = self.get_items(**self.params)
+            if self.directory_items_properties_class is None:
+                return items
+            list_properties = self.directory_items_properties_class(items, self.container_content)
+            self.container_content = list_properties.container_content
+            return list_properties.finalised_items
 
     def get_directory(self, items_only=False, build_items=True):
 

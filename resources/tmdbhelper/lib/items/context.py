@@ -126,6 +126,8 @@ class ContextMenu():
         if self.config.play_random_enabled:
             from tmdbhelper.lib.items.context_random import PlayRandomContextMenu
             items += PlayRandomContextMenu(self._li).items
+        from tmdbhelper.lib.items.context_nextepisodes import BrowseNextEpisodesContextMenu
+        items += BrowseNextEpisodesContextMenu(self._li).items
         return items
 
     def _build_item(self, mediatypes):
