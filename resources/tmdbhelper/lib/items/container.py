@@ -120,6 +120,10 @@ class ContainerDirectoryCommon(CommonContainerAPIs):
         return True
 
     @cached_property
+    def is_labelformatting(self):
+        return boolean(self.params.get('labelformatting', True))
+
+    @cached_property
     def format_unaired_labels(self):
         return self.parent_params.get('info') not in NO_UNAIRED_LABEL
 
