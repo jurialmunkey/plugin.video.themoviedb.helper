@@ -235,8 +235,8 @@ msgstr "Serie TV abbandonate"
 
 #: /resources/settings.xml
 msgctxt "#32049"
-msgid "Sort order of Your Next Episodes list. By airdate sorts episodes by premiere date. By recentlywatched sorts episodes by most recently watched tvshow. By todays is recentlywatched with episodes airing today at the front. By lastweek is recentlywatched with episodes airing in the past week sorted by airdate at the front."
-msgstr "Ordine di visualizzazione della lista I tuoi prossimi episodi. By airdate ordina gli episodi in base alla data di prima trasmissione. By recentlywatched ordina gli episodi in base alle serie TV viste più di recente. By todays è come recentlywatched, ma con gli episodi in programmazione oggi in cima. By lastweek è come recentlywatched, ma con gli episodi trasmessi nella settimana precedente ordinati per data di trasmissione in cima."
+msgid "Sort next episodes by airdate or recent viewing, optionally prioritising episodes airing today or in the past week."
+msgstr "Ordina i prossimi episodi in base alla data di trasmissione o alla visione più recente, dando eventualmente la priorità agli episodi in onda oggi o nell'ultima settimana."
 
 #: /resources/settings.xml
 msgctxt "#32050"
@@ -312,21 +312,6 @@ msgctxt "#32038"
 msgid "Kodi library details"
 msgstr "Dettagli della libreria di Kodi"
 
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr "Budget"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr "Entrate"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr "Ultima data di messa in onda"
-
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -336,11 +321,6 @@ msgstr "Scegli un'azione"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "Vai al successivo"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
-msgstr "Punteggio"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -371,11 +351,6 @@ msgstr "Riprova"
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "L'URL fornito non è valido o non è accessibile."
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
-msgstr "Utente"
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
@@ -652,31 +627,6 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr "Dati di sincronizzazione {} aggiornati con successo"
 
-#: /resources/settings.xml
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr "API Gemini"
-
-#: /resources/settings.xml
-msgctxt "#32148"
-msgid "Gemini key"
-msgstr "Chiave Gemini"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr "Gemini AI"
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr "Google Gemini AI richiede una chiave API sviluppatore per essere utilizzato."
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
-msgstr "Visita [B]{}[/B] per generare la tua chiave e poi inseriscila nelle impostazioni di TMDbHelper sotto la sezione Chiavi API."
-
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
 msgctxt "#32152"
 msgid "Remove node"
@@ -746,11 +696,6 @@ msgstr "Fonte delle liste"
 msgctxt "#32132"
 msgid "Do you wish to update the library from the list(s) now?"
 msgstr "Desideri aggiornare adesso la libreria dalla lista(e)?"
-
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Seleziona elenco(i)"
 
 #: /resources/lib/context.py
 msgctxt "#32154"
@@ -1784,11 +1729,6 @@ msgid "Retrieving Artwork"
 msgstr "Recupero delle immagini"
 
 #: /resources/settings.xml
-msgctxt "#32402"
-msgid "Scrobble items on MDbList while watching"
-msgstr "Registra le visualizzazioni su MDbList durante la riproduzione"
-
-#: /resources/settings.xml
 msgctxt "#32403"
 msgid "Sync"
 msgstr "Sincronizza"
@@ -1855,11 +1795,6 @@ msgid "Play local files"
 msgstr "Riproduci file locali"
 
 #: /resources/settings.xml
-msgctxt "#32417"
-msgid "MDbList support is currently experimental"
-msgstr "Il supporto a MDbList è attualmente sperimentale"
-
-#: /resources/settings.xml
 msgctxt "#32404"
 msgid "Combine same-day episodes"
 msgstr "Raggruppa gli episodi dello stesso giorno"
@@ -1921,23 +1856,8 @@ msgstr "Scegli la lingua e il paese da utilizzare per le ricerche su TMDb e Trak
 
 #: /resources/settings.xml
 msgctxt "#32420"
-msgid "Image quality"
-msgstr "Qualità delle immagini"
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Liste principali"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "API MDbList"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "Chiave API MDbList"
+msgid "Default image quality"
+msgstr "Qualità predefinita delle immagini"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
@@ -2099,11 +2019,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "I tuoi episodi in arrivo"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Premi"
-
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache own lists for 24h"
@@ -2183,11 +2098,6 @@ msgstr "Dimensione del pool di elementi"
 msgctxt "#32483"
 msgid "Share credentials"
 msgstr "Condividi le credenziali"
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "API TVDb"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
@@ -2300,31 +2210,6 @@ msgid "Alternate TMDb endpoint"
 msgstr "Endpoint TMDb alternativo"
 
 #: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "Aggiungi alla lista MDbList"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "Credenziali API MDbList non trovate."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in the MDbList module settings."
-msgstr "Aggiungi la tua chiave API personale MDbList nelle impostazioni del modulo MDBList."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "Nessuna lista statica trovata per l’utente MDbList corrente."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "Rimuovi dalla lista MDbList"
-
-#: /resources/settings.xml
 msgctxt "#32520"
 msgid "TMDb"
 msgstr "TMDb"
@@ -2413,26 +2298,6 @@ msgstr "Gruppi"
 msgctxt "#32542"
 msgid "Groups"
 msgstr "Gruppi"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32543"
-msgid "Curated Lists"
-msgstr "Elenchi selezionati"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32544"
-msgid "Official Lists"
-msgstr "Elenchi ufficiali"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32545"
-msgid "Streaming Charts"
-msgstr "Classifiche streaming"
-
-#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
-msgctxt "#32546"
-msgid "Trakt / MDbList options"
-msgstr "Opzioni Trakt / MDbList"
 
 #: /resources/tmdbhelper/lib/script/discover/trakt.py
 msgctxt "#32547"
@@ -2906,11 +2771,6 @@ msgid "Use TMDb numbers, ask for a group, or use the current group. Individual p
 msgstr "Utilizza la numerazione di TMDb, chiedi di selezionare un gruppo oppure usa il gruppo corrente. I singoli lettori possono sovrascrivere questa scelta."
 
 #: /resources/settings.xml
-msgctxt "#32598"
-msgid "Statistics"
-msgstr "Statistiche"
-
-#: /resources/settings.xml
 msgctxt "#32599"
 msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
 msgstr "Scegli i provider a cui inviare le attività di riproduzione. Deseleziona tutte le opzioni per disabilitare lo scrobbling."
@@ -3087,8 +2947,8 @@ msgstr "Memorizza nella cache per 24 ore gli elementi degli elenchi personalizza
 
 #: /resources/settings.xml
 msgctxt "#32635"
-msgid "Choose the resolution of artwork downloaded from TMDb."
-msgstr "Scegli la risoluzione dell'artwork scaricato da TMDb."
+msgid "Choose the default resolution of artwork downloaded from TMDb. Poster and fanart settings can override this default."
+msgstr "Scegli la risoluzione predefinita delle immagini scaricate da TMDb. Le impostazioni di poster e fanart possono sovrascrivere questo valore."
 
 #: /resources/settings.xml
 msgctxt "#32636"
@@ -3261,11 +3121,6 @@ msgid "Install MDbList support if needed, then open its provider settings."
 msgstr "Installa il supporto per MDbList, se necessario, quindi apri le impostazioni del relativo provider."
 
 #: /resources/settings.xml
-msgctxt "#32670"
-msgid "Retain the legacy MDbList key until it is migrated to the provider module."
-msgstr "Mantieni la chiave MDbList precedente finché non verrà trasferita al modulo provider."
-
-#: /resources/settings.xml
 msgctxt "#32671"
 msgid "Enter your OMDb API key for additional ratings and metadata."
 msgstr "Inserisci la tua chiave API OMDb per ottenere valutazioni e metadati aggiuntivi."
@@ -3274,11 +3129,6 @@ msgstr "Inserisci la tua chiave API OMDb per ottenere valutazioni e metadati agg
 msgctxt "#32672"
 msgid "Enter your RatingPosterDB API key for posters with ratings."
 msgstr "Inserisci la tua chiave API RatingPosterDB per ottenere poster con le valutazioni."
-
-#: /resources/settings.xml
-msgctxt "#32673"
-msgid "Enter your Gemini API key for AI-assisted features."
-msgstr "Inserisci la tua chiave API Gemini per utilizzare le funzionalità basate sull'intelligenza artificiale."
 
 #: /resources/settings.xml
 msgctxt "#32674"
@@ -3304,11 +3154,6 @@ msgstr "Scegli un provider per la lista dei contenuti da guardare, installane un
 msgctxt "#32678"
 msgid "Choose a collection provider, install one, or select None to disable collection lists."
 msgstr "Scegli un provider per le raccolte, installane uno oppure seleziona «Nessuno» per disabilitare le relative liste."
-
-#: /resources/settings.xml
-msgctxt "#32679"
-msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
-msgstr "Scegli un provider per le statistiche, installane uno oppure seleziona «Nessuno» per disabilitare le relative liste."
 
 #: /resources/settings.xml
 msgctxt "#32680"
@@ -3397,8 +3242,8 @@ msgstr "Registra informazioni diagnostiche aggiuntive nel log di Kodi."
 
 #: /resources/settings.xml
 msgctxt "#32697"
-msgid "Log the time taken to build directories."
-msgstr "Registra il tempo impiegato per creare le directory."
+msgid "Disabled collects no timer reports. Basic collects directory timer reports. Detailed also collects item detail timer reports."
+msgstr "Disattivato non raccoglie alcun report dei timer. Base raccoglie i report dei timer delle directory. Dettagliata raccoglie anche i report dei timer relativi ai dettagli degli elementi."
 
 #: /resources/settings.xml
 msgctxt "#32698"
@@ -3409,11 +3254,6 @@ msgstr "Esegui una richiesta a TMDb e registra la relativa risposta nel log di K
 msgctxt "#32699"
 msgid "Run a Trakt request and write its response to the Kodi log."
 msgstr "Esegui una richiesta a Trakt e registra la relativa risposta nel log di Kodi."
-
-#: /resources/settings.xml
-msgctxt "#32700"
-msgid "Store the TVDb authentication token used by TMDbHelper."
-msgstr "Memorizza il token di autenticazione TVDb utilizzato da TMDbHelper."
 
 #: /resources/settings.xml
 msgctxt "#32701"
@@ -3434,11 +3274,6 @@ msgstr "Consenti agli altri plugin di accedere alla chiave API OMDb salvata."
 msgctxt "#32704"
 msgid "Allow other plugins to access the saved Fanart.tv client key."
 msgstr "Consenti agli altri plugin di accedere alla chiave client Fanart.tv salvata."
-
-#: /resources/settings.xml
-msgctxt "#32705"
-msgid "Allow other plugins to access the saved TVDb token."
-msgstr "Consenti agli altri plugin di accedere al token TVDb salvato."
 
 #: /resources/settings.xml
 msgctxt "#32706"
@@ -3644,3 +3479,119 @@ msgstr "Confermi di voler disattivare {0}? Il modulo e le relative funzionalità
 msgctxt "#32746"
 msgid "Disabling this module will remove it from:\n{0}"
 msgstr "La disattivazione di questo modulo lo rimuoverà da:\n{0}"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32747"
+msgid "Provider module unavailable"
+msgstr "Modulo del provider non disponibile"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32748"
+msgid "The {0} module could not be loaded and its features are temporarily unavailable. Update the module to the latest version and try again. Your settings and synced data have been kept."
+msgstr "Impossibile caricare il modulo {0} e le relative funzionalità sono temporaneamente non disponibili. Aggiorna il modulo all'ultima versione e riprova. Le tue impostazioni e i dati sincronizzati sono stati conservati."
+
+#: /resources/settings.xml
+msgctxt "#32749"
+msgid "Trakt settings"
+msgstr "Impostazioni di Trakt"
+
+#: /resources/settings.xml
+msgctxt "#32750"
+msgid "Configure Trakt list caching, genre icons, and next-episode calendar checks."
+msgstr "Configura la memorizzazione nella cache degli elenchi Trakt, le icone dei generi e i controlli del calendario per i prossimi episodi."
+
+#: /resources/settings.xml
+msgctxt "#32751"
+msgid "Poster image quality"
+msgstr "Qualità delle immagini dei poster"
+
+#: /resources/settings.xml
+msgctxt "#32752"
+msgid "Fanart image quality"
+msgstr "Qualità delle immagini fanart"
+
+#: /resources/settings.xml
+msgctxt "#32754"
+msgid "Choose the resolution of TMDb posters and actor portraits, or use the default image quality setting."
+msgstr "Scegli la risoluzione dei poster e dei ritratti degli attori di TMDb oppure utilizza l'impostazione predefinita della qualità delle immagini."
+
+#: /resources/settings.xml
+msgctxt "#32755"
+msgid "Choose the resolution of TMDb fanart, landscape, and extra fanart, or use the default image quality setting."
+msgstr "Scegli la risoluzione delle fanart, delle immagini panoramiche e delle fanart aggiuntive di TMDb oppure utilizza l'impostazione predefinita della qualità delle immagini."
+
+#: /resources/settings.xml
+msgctxt "#32756"
+msgid "TMDb account"
+msgstr "Account TMDb"
+
+#: /resources/settings.xml
+msgctxt "#32757"
+msgid "Sign in to your TMDb account using a web browser or QR code."
+msgstr "Accedi al tuo account TMDb tramite un browser web o un codice QR."
+
+#: /resources/settings.xml
+msgctxt "#32758"
+msgid "Sign out of your TMDb account and remove the saved authentication token."
+msgstr "Esci dal tuo account TMDb e rimuovi il token di autenticazione salvato."
+
+#: /resources/settings.xml
+msgctxt "#32759"
+msgid "Basic"
+msgstr "Base"
+
+#: /resources/settings.xml
+msgctxt "#32760"
+msgid "Detailed"
+msgstr "Dettagliata"
+
+#: /resources/settings.xml
+msgctxt "#32761"
+msgid "Show expired widget lists for up to"
+msgstr "Mostra gli elenchi scaduti dei widget fino a"
+
+#: /resources/settings.xml
+msgctxt "#32762"
+msgid "When a widget's TMDb list is older than its normal 6 hour cache, show the saved list straight away and download the new list after the widget has loaded. The new list appears the next time Kodi reloads the widget. Lists for today, such as Airing Today, always wait for new data. Off waits for new data every time."
+msgstr "Quando un elenco TMDb di un widget supera il normale periodo di memorizzazione nella cache di 6 ore, mostra subito l'elenco salvato e scarica quello aggiornato dopo il caricamento del widget. Il nuovo elenco verrà visualizzato al successivo aggiornamento del widget da parte di Kodi. Gli elenchi relativi al giorno corrente, come In onda oggi, attendono sempre i nuovi dati. Con l'opzione Disattivato, vengono attesi i nuovi dati a ogni caricamento."
+
+#: /resources/settings.xml
+msgctxt "#32763"
+msgid "Off"
+msgstr "Disattivato"
+
+#: /resources/settings.xml
+msgctxt "#32764"
+msgid "24 hours"
+msgstr "24 ore"
+
+#: /resources/settings.xml
+msgctxt "#32765"
+msgid "48 hours"
+msgstr "48 ore"
+
+#: /resources/settings.xml
+msgctxt "#32766"
+msgid "72 hours"
+msgstr "72 ore"
+
+#: /resources/settings.xml
+#: /resources/tmdbhelper/lib/items/context_random.py
+msgctxt "#32767"
+msgid "Play random"
+msgstr "Riproduci casualmente"
+
+#: /resources/settings.xml
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr "Mostra nel menu contestuale un'opzione per riprodurre un film o un episodio casuale da una cartella, scegliendo tra gli elementi della pagina corrente a ogni livello."
+
+#: /resources/tmdbhelper/lib/script/method/play_random.py
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr "Nessun elemento riproducibile trovato."
+
+#: /resources/tmdbhelper/lib/items/context_nextepisodes.py
+msgctxt "#32770"
+msgid "Browse next episodes"
+msgstr "Sfoglia i prossimi episodi"
