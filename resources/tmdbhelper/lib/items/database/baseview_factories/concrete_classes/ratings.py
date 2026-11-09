@@ -157,6 +157,9 @@ class RatingsDict(BaseList):
             if v in (None, ''):
                 continue
 
+            if v == 0 and k.endswith(('_wins', '_nominations')):
+                continue
+
             mapped_data[k] = v
 
             if not isinstance(v, int):
