@@ -4,11 +4,51 @@ from tmdbhelper.lib.addon.thread import ParallelThread
 from jurialmunkey.ftools import cached_property
 
 
+class UniqueItems:
+    """Keep the first copy of items repeated across separately fetched pages."""
+
+    def __init__(self, items):
+        self.source_items = items
+
+    @staticmethod
+    def get_item_key(item):
+        return (item['params']['tmdb_type'], item['params']['tmdb_id'])
+
+    @cached_property
+    def item_keys(self):
+        return self.get_item_keys()
+
+    def get_item_keys(self):
+        return [self.get_item_key(i) for i in self.source_items]
+
+    @cached_property
+    def first_positions(self):
+        return self.get_first_positions()
+
+    def get_first_positions(self):
+        return {
+            key: x
+            for x, key in reversed(list(enumerate(self.item_keys)))
+        }
+
+    @cached_property
+    def items(self):
+        return self.get_items()
+
+    def get_items(self):
+        return [
+            i
+            for x, (key, i) in enumerate(zip(self.item_keys, self.source_items))
+            if self.first_positions[key] == x
+        ]
+
+
 class ListStandardProperties(ListProperties):
 
     total_pages = 0
     total_items = 0
     class_pages = UncachedItemsPage
+    unique_items_class = UniqueItems
 
     @cached_property
     def stale_hours(self):
@@ -31,6 +71,13 @@ class ListStandardProperties(ListProperties):
         return items_page.items
 
     def get_final_items(self):
+        return self.unique_items_class(self.paged_items).items
+
+    @cached_property
+    def paged_items(self):
+        return self.get_paged_items()
+
+    def get_paged_items(self):
         # Resolve URL configuration and any authorisation before starting workers.
         _ = self.url
         pages = range(self.page, self.next_page)
