@@ -171,15 +171,17 @@ class DetailsClient:
     def get_item(self, request, ratings=None):
         return self.get_items([request], ratings=ratings)[0]
 
-    def get_ratings(self, request, awards=False):
-        """An item's ratings, which a details request with 'prewarm' ratings started."""
+    def get_ratings(self, request, received=0, awards=False):
+        """An item's ratings so far, which a details request with 'prewarm' ratings started.
+        The reply has 'ratings', the count of providers 'received' to ask again with, and
+        'complete'. A failed request is complete without ratings, as the item had before."""
         try:
             return self.get_exchange_result(
-                ratings_request={'request': request.as_dict(), 'awards': awards},
+                ratings_request={'request': request.as_dict(), 'received': received, 'awards': awards},
             )[0]
         except (OSError, DetailsServiceError) as exc:
             kodi_log(f'Item ratings request failed: {exc}', 1)
-            return {}
+            return {'ratings': {}, 'received': received, 'complete': True}
 
     def prepare(self, info=None, tmdb_type=None):
         """Ask a running service to start refreshing synced play data while the list is

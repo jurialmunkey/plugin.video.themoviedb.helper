@@ -2,6 +2,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_try_except
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_setting
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from tmdbhelper.lib.monitor.ratings import MonitorPartialRatings
 from jurialmunkey.window import WindowPropertySetter
 
 
@@ -69,11 +70,11 @@ class CommonMonitorDetails(CommonContainerAPIs):
 
     @property
     def ratings_mode(self):
-        """Details requests prewarm ratings in the item detail service for get_all_ratings()."""
+        """Details requests prewarm ratings in the item detail service for get_partial_ratings()."""
         return 'prewarm' if self.is_ratings_enabled else None
 
-    def get_all_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
-        return self.lidc.get_ratings(tmdb_type, tmdb_id, season, episode, awards=True)
+    def get_partial_ratings(self, tmdb_type, tmdb_id, season=None, episode=None, is_current=None):
+        return MonitorPartialRatings(self.lidc, tmdb_type, tmdb_id, season, episode, is_current)
 
 
 class CommonMonitorItem:

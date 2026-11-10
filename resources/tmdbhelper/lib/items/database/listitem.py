@@ -167,11 +167,12 @@ class ListItemDetails:
             return
         return self.client.get_item(self.get_request(tmdb_type, tmdb_id, season, episode), ratings=self.ratings)
 
-    def get_ratings(self, tmdb_type, tmdb_id, season=None, episode=None, awards=False):
-        """Ratings that the item detail service prewarmed with the item's details request."""
+    def get_ratings(self, tmdb_type, tmdb_id, season=None, episode=None, received=0, awards=False):
+        """Ratings so far that the item detail service prewarmed with the item's details request."""
         if not tmdb_id:
-            return {}
-        return self.client.get_ratings(self.get_request(tmdb_type, tmdb_id, season, episode), awards=awards)
+            return {'ratings': {}, 'received': 0, 'complete': True}
+        request = self.get_request(tmdb_type, tmdb_id, season, episode)
+        return self.client.get_ratings(request, received=received, awards=awards)
 
     def configure_listitems_threaded(self, items):
         return ListItemBatch(self, items).get_configured_items()

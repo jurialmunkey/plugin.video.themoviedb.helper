@@ -8,7 +8,6 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings_e
     RatingsTop250Rank,
 )
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
-from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.sync.providers.ratings_settings import RatingsProviderSettings
 
 
@@ -129,27 +128,20 @@ class RatingsDict(BaseList):
             for provider_id, supplier in self.suppliers
         )
 
-    @staticmethod
-    def get_entry_online_values(entry):
-        return entry.online_values
-
-    def fetch_online(self):
-        """ Ask the providers that need it, in parallel """
-        entries = tuple(entry for entry in self.entries if entry.is_online_needed)
-        if not entries:
-            return
-        with ParallelThread(entries, self.get_entry_online_values):
-            pass
+    @property
+    def resolved_entries(self):
+        return tuple(entry for entry in self.entries if entry.is_resolved)
 
     @cached_property
     def merged_values(self):
-        return self.get_merged_values()
+        return self.get_merged_values(self.entries)
 
-    def get_merged_values(self):
+    @staticmethod
+    def get_merged_values(entries):
         """ Expired values first and current values last, each from the least preferred
         provider to the most preferred, so that later values replace earlier ones """
-        stale_entries = tuple(entry for entry in self.entries if entry.is_stale)
-        current_entries = tuple(entry for entry in self.entries if entry.is_current)
+        stale_entries = tuple(entry for entry in entries if entry.is_stale)
+        current_entries = tuple(entry for entry in entries if entry.is_current)
         return {
             key: value
             for entries in (stale_entries, current_entries)
@@ -162,10 +154,20 @@ class RatingsDict(BaseList):
         return self.get_ratings()
 
     def get_ratings(self):
+        """ Providers that need it are asked online one at a time, unless fetched beforehand """
         if not self.data_cond:
             return {}
-        self.fetch_online()
         return self.map_values({**self.merged_values, **self.top250})
+
+    @property
+    def partial_ratings(self):
+        return self.get_partial_ratings()
+
+    def get_partial_ratings(self):
+        """ The ratings of the providers that have finished, while others are still asked online """
+        if not self.data_cond:
+            return {}
+        return self.map_values({**self.get_merged_values(self.resolved_entries), **self.top250})
 
     @cached_property
     def top250(self):

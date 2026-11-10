@@ -1,3 +1,4 @@
+from threading import Lock
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import (
@@ -7,6 +8,7 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings i
     RatingsSeasonsDict,
 )
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings_entries import RatingsStoredData
+from tmdbhelper.lib.items.database.details.ratings.progress import DetailsRatingsProgress
 
 
 class DetailsRatingsItem:
@@ -38,14 +40,24 @@ class DetailsRatingsItem:
 
 class DetailsRatingsLookup:
     """Ratings for an item's show, season and episode levels, from the ratings table or online.
-    The levels are retrieved in parallel. Online ratings are returned before they are saved.
-    With allow_stale, expired ratings are returned for the caller to refresh separately."""
+    Every level's providers are asked online in parallel. Online ratings are returned before
+    they are saved. With allow_stale, expired ratings are returned for the caller to refresh
+    separately. The ratings so far are published to progress as each provider finishes."""
 
     def __init__(self, item, common_apis, ratings_settings, allow_stale=False):
         self.item = item
         self.common_apis = common_apis
         self.ratings_settings = ratings_settings
         self.allow_stale = allow_stale
+        self.publish_lock = Lock()  # One update at a time, so that an earlier one never replaces a later one
+
+    @cached_property
+    def progress(self):
+        return self.get_progress()
+
+    def get_progress(self):
+        """Replaced by the worker's progress for lookups that monitors wait on."""
+        return DetailsRatingsProgress()
 
     @cached_property
     def item_ids(self):
@@ -97,29 +109,68 @@ class DetailsRatingsLookup:
         level.allow_stale = self.allow_stale
         return level
 
+    @cached_property
+    def entries(self):
+        return self.get_entries()
+
+    def get_entries(self):
+        """Every level's providers, with their saved values read and their Top 250 rank."""
+        self.ratings_settings.providers
+        for attr in ('stored_values', 'expiries'):
+            getattr(self.stored_data, attr)
+        for level in self.levels:
+            level.top250
+        return tuple(entry for level in self.levels for entry in level.entries)
+
+    @property
+    def resolved_entries(self):
+        return tuple(entry for entry in self.entries if entry.is_resolved)
+
+    @property
+    def received(self):
+        """Providers whose values are known and not empty."""
+        return sum(1 for entry in self.resolved_entries if entry.values)
+
     @staticmethod
-    def get_level_ratings(level):
-        return level.ratings
+    def get_merged_ratings(levels_ratings):
+        """Later levels replace the show's values, as episodes and seasons did before."""
+        return {
+            key: value
+            for ratings in levels_ratings
+            for key, value in ratings.items()
+        }
+
+    @property
+    def partial_ratings(self):
+        return self.get_merged_ratings(level.partial_ratings for level in self.levels)
+
+    def publish(self, is_online):
+        """Counted before the values are merged, so that the values include every provider counted."""
+        with self.publish_lock:
+            received = self.received
+            self.progress.update(self.partial_ratings, received, is_online)
+
+    def fetch_entry(self, entry):
+        entry.fetch()
+        if entry.values:
+            self.publish(is_online=True)
+
+    def fetch_online(self):
+        """Ask every level's providers that need it, in parallel."""
+        entries = tuple(entry for entry in self.entries if entry.is_online_needed)
+        if not entries:
+            return
+        with ParallelThread(entries, self.fetch_entry):
+            pass
 
     @cached_property
     def ratings(self):
         return self.get_ratings()
 
     def get_ratings(self):
-        """Later levels replace the show's values, as episodes and seasons did before."""
-        # precache the shared provider settings and saved ratings before threading
-        self.ratings_settings.providers
-        for attr in ('stored_values', 'expiries'):
-            getattr(self.stored_data, attr)
-
-        with ParallelThread(self.levels, self.get_level_ratings) as pt:
-            items = pt.queue
-
-        return {
-            key: value
-            for ratings in items
-            for key, value in ratings.items()
-        }
+        self.publish(is_online=False)
+        self.fetch_online()
+        return self.get_merged_ratings(level.ratings for level in self.levels)
 
     @cached_property
     def expiry(self):

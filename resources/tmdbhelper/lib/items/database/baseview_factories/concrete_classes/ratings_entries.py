@@ -79,6 +79,7 @@ class RatingsProviderEntry:
         self.level = level  # RatingsDict, which configures the item and lookup rules
         self.provider_id = provider_id
         self.supplier = supplier
+        self.is_fetched = False  # Set once its online values are retrieved
 
     @cached_property
     def key(self):
@@ -112,6 +113,16 @@ class RatingsProviderEntry:
     @property
     def is_online_needed(self):
         return self.state == 'missing' or (self.state == 'stale' and not self.level.allow_stale)
+
+    @property
+    def is_resolved(self):
+        """ Whether the values are known, so that they can be merged without waiting online """
+        return self.is_fetched or not self.is_online_needed
+
+    def fetch(self):
+        """ Retrieve the online values, then mark the provider as finished """
+        self.online_values
+        self.is_fetched = True
 
     @cached_property
     def online_values(self):

@@ -1,14 +1,14 @@
-from concurrent.futures import CancelledError, Future, ThreadPoolExecutor
-from concurrent.futures import TimeoutError as FutureTimeoutError
+from concurrent.futures import ThreadPoolExecutor
 from threading import RLock, local
 from traceback import format_exc
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
 from tmdbhelper.lib.items.database.details.apis import DetailsAPIs
-from tmdbhelper.lib.items.database.details.protocol import DetailsLookupError
 from tmdbhelper.lib.items.database.details.ratings.awards import DetailsRatingsAwards
+from tmdbhelper.lib.items.database.details.ratings.job import DetailsRatingsJob
 from tmdbhelper.lib.items.database.details.ratings.lookup import DetailsRatingsItem, DetailsRatingsLookup
 from tmdbhelper.lib.items.database.details.ratings.memory import DetailsRatingsMemory
+from tmdbhelper.lib.items.database.details.ratings.partial import DetailsRatingsPartial
 from tmdbhelper.lib.sync.providers.ratings_settings import RatingsProviderSettings
 
 
@@ -16,7 +16,9 @@ class DetailsRatingsWorker:
     """Ratings for the service monitor, the player monitor and lists.
 
     Monitors prewarm the ratings of the item they show with its details request, then
-    ask for them separately so that the details are not held up. The monitor lane runs
+    ask for them separately so that the details are not held up. They ask again for
+    providers still to finish, so that each provider's ratings are shown as they arrive
+    (see DetailsRatingsPartial). The monitor lane runs
     one lookup and keeps one waiting: a newer item replaces the waiting one, so lookups
     do not pile up while scrolling. Lists receive ratings with their items from a pooled
     lane that is never replaced. Every request for an item shares its lookup in progress.
@@ -29,7 +31,7 @@ class DetailsRatingsWorker:
 
     def __init__(self):
         self.lock = RLock()
-        self.lookups = {}  # Lookup futures by item key while queued or running
+        self.lookups = {}  # Lookup jobs by item key while queued or running
         self.refreshes = {}  # Refresh futures by item key while queued or running
         self.waiting = None  # The monitor lane's queued lookup, which a newer item replaces
         self.memory = DetailsRatingsMemory()
@@ -65,28 +67,33 @@ class DetailsRatingsWorker:
             return
         self.get_monitor_lookup(item)
 
-    def get_monitor_ratings(self, request, awards=False, timeout=None):
+    def get_monitor_ratings(self, request, received=0, awards=False, timeout=None):
+        """A monitor's ratings so far, after more than the received count of providers have them."""
         item = DetailsRatingsItem(request)
         if not item.is_rated:
-            return {}
+            return {'ratings': {}, 'received': 0, 'complete': True}
+        reply = self.get_monitor_reply(item, received, timeout)
+        if awards:  # Every reply has the awards, as each replaces the ratings a monitor set
+            reply['ratings'] = {**reply['ratings'], **self.get_awards(item)}
+        return reply
+
+    def get_monitor_reply(self, item, received, timeout):
         ratings = self.memory.get(item.key)
-        if ratings is None:
-            ratings = self.get_result(self.get_monitor_lookup(item), timeout)
-        if not awards:
-            return ratings
-        return {**ratings, **self.get_awards(item)}
+        if ratings is not None:
+            return {'ratings': ratings, 'received': received, 'complete': True}
+        return DetailsRatingsPartial(self.get_monitor_lookup(item), received, timeout).reply
 
     def start_list_ratings(self, request):
-        """A future for the ratings of a list item, or None when the item has no ratings."""
+        """A job for the ratings of a list item, or None when the item has no ratings."""
         item = DetailsRatingsItem(request)
         if not item.is_rated:
             return
         ratings = self.memory.get(item.key)
         if ratings is None:
             return self.get_list_lookup(item)
-        future = Future()
-        future.set_result(ratings)
-        return future
+        job = DetailsRatingsJob(item)
+        job.set_result(ratings)
+        return job
 
     def get_awards(self, item):
         return DetailsRatingsAwards(self.awards_database, item.tmdb_type, item.request.tmdb_id).info
@@ -98,8 +105,8 @@ class DetailsRatingsWorker:
             except KeyError:
                 pass
             self.replace_waiting()
-            future = self.waiting = self.submit(self.monitor_lane, item)
-            return future
+            job = self.waiting = self.submit(self.monitor_lane, item)
+            return job
 
     def replace_waiting(self):
         """Drop the queued lookup of an item that monitors have moved on from.
@@ -110,30 +117,33 @@ class DetailsRatingsWorker:
     def get_list_lookup(self, item):
         """Share a lookup unless it is the monitor lane's waiting one, which may be replaced."""
         with self.lock:
-            future = self.lookups.get(item.key)
-            if future is not None and (future is not self.waiting or future.running()):
-                return future
+            job = self.lookups.get(item.key)
+            if job is not None and (job is not self.waiting or job.future.running()):
+                return job
             return self.submit(self.list_lane, item)
 
     def submit(self, lane, item):
-        future = self.lookups[item.key] = lane.submit(self.lookup, item)
-        future.add_done_callback(lambda future, key=item.key: self.remove(key, future))
-        return future
+        job = self.lookups[item.key] = DetailsRatingsJob(item)
+        job.submit(lane, self.lookup)
+        job.future.add_done_callback(lambda future, key=item.key: self.remove(key, job))
+        return job
 
-    def remove(self, key, future):
+    def remove(self, key, job):
         with self.lock:
-            if self.lookups.get(key) is future:
+            if self.lookups.get(key) is job:
                 del self.lookups[key]
 
-    def lookup(self, item):
+    def lookup(self, job):
         try:
-            return self.get_lookup_ratings(item)
+            return self.get_lookup_ratings(job)
         except Exception:
-            kodi_log(f'Item ratings lookup failed for {item.key}:\n{format_exc()}', 1)
+            kodi_log(f'Item ratings lookup failed for {job.item.key}:\n{format_exc()}', 1)
             raise
 
-    def get_lookup_ratings(self, item):
+    def get_lookup_ratings(self, job):
+        item = job.item
         lookup = self.get_lookup(item, allow_stale=True)
+        lookup.progress = job.progress
         self.complete(item, lookup)
         if lookup.is_stale:
             self.refresh(item)
@@ -188,18 +198,6 @@ class DetailsRatingsWorker:
             lookup.save()
         except Exception:
             kodi_log(f'Item ratings were not saved for {lookup.item.key}:\n{format_exc()}', 1)
-
-    @staticmethod
-    def get_result(future, timeout):
-        """The lookup's ratings. A replaced lookup has none, as its item is no longer shown."""
-        try:
-            return future.result(timeout=timeout)
-        except CancelledError:
-            return {}
-        except FutureTimeoutError:
-            raise DetailsLookupError('Item ratings lookup timed out')
-        except Exception as exc:
-            raise DetailsLookupError(f'Item ratings lookup failed: {exc}')
 
     def close(self):
         with self.lock:

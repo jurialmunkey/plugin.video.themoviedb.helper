@@ -107,13 +107,14 @@ class DetailsRequestHandler(BaseRequestHandler):
         return {'items': []}
 
     def get_ratings_response(self, ratings_request):
-        """Ratings that a monitor prewarmed with its details request, waiting if needed."""
-        ratings = self.server.ratings.get_monitor_ratings(
+        """Ratings that a monitor prewarmed with its details request, as their providers finish."""
+        reply = self.server.ratings.get_monitor_ratings(
             DetailsRequest(**ratings_request['request']),
+            received=ratings_request['received'],
             awards=ratings_request['awards'],
             timeout=RESPONSE_TIMEOUT,
         )
-        return {'items': [ratings]}
+        return {'items': [reply]}
 
     def start_ratings(self, entries):
         """Start ratings before item details: monitors prewarm them to ask for separately,
@@ -129,24 +130,24 @@ class DetailsRequestHandler(BaseRequestHandler):
         }
         return start[entry['ratings']](DetailsRequest(**entry['request']))
 
-    def get_ratings_results(self, entries, results, futures):
+    def get_ratings_results(self, entries, results, jobs):
         deadline = monotonic() + RESPONSE_TIMEOUT
         return [
-            self.get_entry_ratings_result(entry, result, future, deadline)
-            for entry, result, future in zip(entries, results, futures)
+            self.get_entry_ratings_result(entry, result, job, deadline)
+            for entry, result, job in zip(entries, results, jobs)
         ]
 
-    def get_entry_ratings_result(self, entry, result, future, deadline):
+    def get_entry_ratings_result(self, entry, result, job, deadline):
         """Add list ratings after the details merge, so that they replace list values as before.
         An item whose details failed still receives ratings with its own list data."""
-        if future is None:
+        if job is None:
             return result
         item, error = result
         item = item or entry['item']
         if item is None:
             return result
         try:
-            ratings = self.server.ratings.get_result(future, max(deadline - monotonic(), 0))
+            ratings = job.get_result(max(deadline - monotonic(), 0))
         except DetailsLookupError as exc:
             return (item, error or str(exc))
         item['infoproperties'].update(ratings)
