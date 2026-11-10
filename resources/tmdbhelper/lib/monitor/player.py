@@ -14,6 +14,7 @@ class PlayerItem():
     def baseitem(self):
         if not self._parent.isPlayingVideo():
             return
+        self._parent.lidc.ratings = self._parent.ratings_mode
         item_data = self._parent.lidc.get_item(
             self._parent.tmdb_type,
             self._parent.tmdb_id,
@@ -178,9 +179,7 @@ class PlayerItem():
     def get_ratings(self):
         if not self.details:
             return {}
-        if not get_setting('use_online_ratings'):
-            return {}
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableRatings)"):
+        if not self._parent.is_ratings_enabled:
             return {}
         return self._parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
 

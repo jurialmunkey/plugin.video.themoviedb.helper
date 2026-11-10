@@ -9,9 +9,7 @@ class ListItemMonitorFinaliser:
 
     @cached_property
     def ratings_enabled(self):
-        if not get_setting('use_online_ratings'):
-            return False
-        return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)")
+        return self.listitem_monitor_functions.is_ratings_enabled
 
     @cached_property
     def artwork_enabled(self):

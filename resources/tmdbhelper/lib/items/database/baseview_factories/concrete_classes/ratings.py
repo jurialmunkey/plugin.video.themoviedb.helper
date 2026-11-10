@@ -10,6 +10,7 @@ class RatingsDict(BaseList):
     expiry_time = 7 * 86400
     cached_data_table = table = 'ratings'
     cached_data_conditions = 'id=? AND expiry>=? AND provider_fingerprint=?'
+    placeholder_keys = ('id', 'mediatype', 'expiry', 'language')
 
     rating_attribs = (
         'provider_ratings',
@@ -141,18 +142,64 @@ class RatingsDict(BaseList):
                 return
         return [get_value(k) for k in self.keys]
 
-    def get_cached_data(self):
+    @cached_property
+    def cached_row(self):
+        return self.get_cached_row()
+
+    def get_cached_row(self):
         data = self.get_unmapped_data()
         if not data:
             return
+        return data[0]
 
+    def get_cached_data(self):
+        if self.cached_row is None:
+            return
+        return self.map_row(self.cached_row)
+
+    @cached_property
+    def cached_ratings(self):
+        return self.get_cached_data()
+
+    @cached_property
+    def online_row(self):
+        return self.get_online_row()
+
+    def get_online_row(self):
+        return dict(zip(self.keys, self.configure_mapped_data(self.online_data_mapped)))
+
+    @cached_property
+    def online_ratings(self):
+        return self.map_row(self.online_row)
+
+    @cached_property
+    def ratings(self):
+        return self.get_ratings()
+
+    def get_ratings(self):
+        """ Ratings saved by an earlier lookup, otherwise ratings retrieved online and not yet saved """
+        if not self.data_cond:
+            return {}
+        return self.cached_ratings or self.online_ratings
+
+    @property
+    def is_unsaved(self):
+        return bool(self.data_cond and not self.cached_ratings)
+
+    @property
+    def ratings_expiry(self):
+        if self.cached_ratings:
+            return self.cached_row['expiry']
+        return self.online_row['expiry']
+
+    def map_row(self, row):
         mapped_data = {}
 
-        for k in data[0].keys():
+        for k in row.keys():
             if k in ('id', 'expiry', 'provider_fingerprint'):
                 continue
 
-            v = data[0][k]
+            v = row[k]
 
             if v in (None, ''):
                 continue
@@ -180,20 +227,25 @@ class RatingsDict(BaseList):
 
         return mapped_data
 
-    def try_cached_data(self, return_data=False):
-        if not self.parent_item_data:
-            return
-        values = tuple(self.configure_mapped_data(self.online_data_mapped))
+    @property
+    def placeholder_values(self):
+        """ A placeholder item row for the ratings to link to, as cast members have """
+        return (self.item_id, self.mediatype, 0, self.common_apis.tmdb_api.language)
 
+    def save_online_ratings(self):
+        """ Saving does not wait for item details: the placeholder row never replaces them """
         with self.connection.open():
             self.connection.open_connection.execute('BEGIN')
-            self.set_cached_list_values(self.table, self.keys, values, overwrite=True)
+            self.set_or_update_null_cached_list_values('baseitem', self.placeholder_keys, self.placeholder_values)
+            self.set_cached_list_values(self.table, self.keys, tuple(self.online_row.values()), overwrite=True)
             self.set_cached_deletion((self.item_id, ), self.deletion)  # Keep the item until its ratings expire
             self.connection.open_connection.execute('COMMIT')
 
+    def try_cached_data(self, return_data=False):
+        self.save_online_ratings()
         if not return_data:
             return
-        return self.get_cached_data()
+        return self.online_ratings
 
 
 class RatingsSeasonsDict(RatingsDict):

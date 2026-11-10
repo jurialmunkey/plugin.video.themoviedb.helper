@@ -7,12 +7,15 @@ from xbmcgui import Window
 from xbmcvfs import translatePath
 
 
-# Items are {'request': DetailsRequest dict or None, 'item': list item merge data or None}.
+# Items are {'request': DetailsRequest dict or None, 'item': list item merge data or None,
+# 'ratings': None, 'prewarm' or 'merge'}. 'prewarm' starts the item's ratings for a later
+# 'ratings_request'; 'merge' adds them to the item's infoproperties in the response.
 # 'kodi_details' permits merging Kodi library details into items with list item data.
 # 'prepare' ({'info', 'tmdb_type'}) starts refreshing synced play data before a list's items are known.
 # 'invalidate' (True) clears assembled metadata after item details were changed outside the service.
+# 'ratings_request' ({'request': DetailsRequest dict, 'awards'}) returns an item's ratings as the only item.
 # Batch responses from a service writing timer reports include 'timings' ({stage: seconds}).
-PROTOCOL_VERSION = 6
+PROTOCOL_VERSION = 7
 MAX_MESSAGE_BYTES = 32 * 1024 * 1024
 MAX_REQUEST_ITEMS = 200
 PING_TIMEOUT = 5
