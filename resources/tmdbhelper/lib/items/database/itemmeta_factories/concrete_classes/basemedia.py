@@ -3,6 +3,7 @@ from tmdbhelper.lib.items.database.mappings import ItemMapperMethods
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseclass import BaseItem
 from tmdbhelper.lib.items.database.itemmeta_factories.concrete_classes.baseroutes import MediaItemInfoLabelItemRoutes
 from tmdbhelper.lib.addon.plugin import get_setting
+from tmdbhelper.lib.addon.tmdate import convert_timestamp, format_date_obj
 
 
 class MediaItemArtworkRoutes:
@@ -408,10 +409,18 @@ class MediaItem(BaseItem):
         lastplayed_timestamp = func_get(func_dbc('item_sync_state'), 'lastplayed')
         if not lastplayed_timestamp:
             return infoproperties
-        infoproperties.update(ItemMapperMethods.get_custom_date(
-            lastplayed_timestamp, name='lastplayed'
-        ))
+        infoproperties.update(
+            ItemMapperMethods.get_custom_date(
+                lastplayed_timestamp,
+                name='lastplayed',
+                utc_convert=True,
+            ),
+        )
         return infoproperties
+
+    @staticmethod
+    def get_collected_date(timestamp):
+        return format_date_obj(convert_timestamp(timestamp, utc_convert=True), '%Y-%m-%d')
 
     def get_infoproperties_ranks(self, infoproperties):
         func_get = self.get_instance_cached_data_value
@@ -420,7 +429,7 @@ class MediaItem(BaseItem):
         for column, name, func in (
             ('favorites_rank', 'favorites_rank', None),
             ('watchlist_rank', 'watchlist_rank', None),
-            ('collection_last_collected_at', 'collected_date', lambda i: i[:10]),
+            ('collection_last_collected_at', 'collected_date', self.get_collected_date),
         ):
             rank = func_get(func_dbc('item_sync_state'), column)
             if not rank:
