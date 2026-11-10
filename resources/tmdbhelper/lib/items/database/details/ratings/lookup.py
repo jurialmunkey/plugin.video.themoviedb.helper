@@ -6,6 +6,7 @@ from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings i
     RatingsItemIds,
     RatingsSeasonsDict,
 )
+from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings_entries import RatingsStoredData
 
 
 class DetailsRatingsItem:
@@ -55,10 +56,10 @@ class DetailsRatingsLookup:
         return RatingsItemIds(self.item.tmdb_type, self.item.request.tmdb_id, self.common_apis.tmdb_api)
 
     @cached_property
-    def levels(self):
-        return self.get_levels()
+    def item_levels(self):
+        return self.get_item_levels()
 
-    def get_levels(self):
+    def get_item_levels(self):
         request = self.item.request
         levels = (
             self.get_level(RatingsDict),
@@ -66,6 +67,24 @@ class DetailsRatingsLookup:
             self.get_level(RatingsEpisodesDict, request.season, request.episode),
         )
         return tuple(level for level in levels if level.data_cond)
+
+    @cached_property
+    def stored_data(self):
+        return self.get_stored_data()
+
+    def get_stored_data(self):
+        """Saved ratings for every level, read with one query per table."""
+        return RatingsStoredData((level.item_id for level in self.item_levels), common_apis=self.common_apis)
+
+    @cached_property
+    def levels(self):
+        return self.get_levels()
+
+    def get_levels(self):
+        """The item's levels, sharing one read of their saved ratings."""
+        for level in self.item_levels:
+            level.stored_data = self.stored_data
+        return self.item_levels
 
     def get_level(self, level_class, season=None, episode=None):
         level = level_class(common_apis=self.common_apis)
@@ -88,9 +107,10 @@ class DetailsRatingsLookup:
 
     def get_ratings(self):
         """Later levels replace the show's values, as episodes and seasons did before."""
-        # precache the shared provider settings before threading
-        for attr in ('providers', 'fingerprint'):
-            getattr(self.ratings_settings, attr)
+        # precache the shared provider settings and saved ratings before threading
+        self.ratings_settings.providers
+        for attr in ('stored_values', 'expiries'):
+            getattr(self.stored_data, attr)
 
         with ParallelThread(self.levels, self.get_level_ratings) as pt:
             items = pt.queue

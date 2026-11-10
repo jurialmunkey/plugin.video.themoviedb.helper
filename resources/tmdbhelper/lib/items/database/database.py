@@ -13,6 +13,7 @@ from tmdbhelper.lib.items.database.tabledef import (
     BELONGS_COLUMNS,
     COLLECTION_COLUMNS,
     RATINGS_COLUMNS,
+    RATINGS_PROVIDER_COLUMNS,
     PERSON_COLUMNS,
     CERTIFICATION_COLUMNS,
     VIDEO_COLUMNS,
@@ -54,7 +55,7 @@ class ItemDetailsDatabase(Database):
             return super().create_database_execute(connection)
 
     # DB version must be max of table_version
-    database_version = 54
+    database_version = 55
 
     database_changes = {
         21: (),
@@ -134,6 +135,10 @@ class ItemDetailsDatabase(Database):
             'DROP TABLE IF EXISTS translation',
             'DROP TABLE IF EXISTS baseitem',
         ),
+        55: (
+            # Store ratings as one row per item, provider and key, with each provider's expiry.
+            'DROP TABLE IF EXISTS ratings',
+        ),
     }
 
     baseitem_columns = BASEITEM_COLUMNS
@@ -147,6 +152,7 @@ class ItemDetailsDatabase(Database):
     belongs_columns = BELONGS_COLUMNS
     collection_columns = COLLECTION_COLUMNS
     ratings_columns = RATINGS_COLUMNS
+    ratings_provider_columns = RATINGS_PROVIDER_COLUMNS
     person_columns = PERSON_COLUMNS
     certification_columns = CERTIFICATION_COLUMNS
     video_columns = VIDEO_COLUMNS
@@ -189,6 +195,7 @@ class ItemDetailsDatabase(Database):
             'season': self.season_columns,
             'episode': self.episode_columns,
             'ratings': self.ratings_columns,
+            'ratings_provider': self.ratings_provider_columns,
             'person': self.person_columns,
             'genre': self.genre_columns,
             'language': self.language_columns,
