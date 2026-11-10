@@ -12,7 +12,6 @@ class SyncProvider:
     getter_classes = {}
     ratings_classes = {}
     imdb_top250_classes = {}
-    stats_class = None
     monitor_lists_class = None
     list_actions_class = None
     identifier_resolver_class = None
@@ -34,8 +33,6 @@ class SyncProvider:
             features.add('ratings')
         if self.imdb_top250_classes:
             features.add('imdb_top250')
-        if self.stats_class is not None:
-            features.add('stats')
         if self.monitor_lists_class is not None:
             features.add('monitor_lists')
         if self.list_actions_class is not None:

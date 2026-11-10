@@ -122,6 +122,11 @@
                 </setting>
             </group>
             <group id="3" label="32710">
+                <setting id="contextmenu_play_random" type="boolean" label="32767" help="32768">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="contextmenu_related_lists" type="boolean" label="32235" help="32613">
                     <level>0</level>
                     <default>true</default>
@@ -900,15 +905,6 @@
                     <control type="button" format="action">
                         <close>true</close>
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling,return_settings=true)</data>
-                    </control>
-                </setting>
-                <setting id="sync_provider_stats" type="string" label="32598" help="32679">
-                    <level>0</level>
-                    <default></default>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="button" format="action">
-                        <close>true</close>
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=stats,return_settings=true)</data>
                     </control>
                 </setting>
                 <setting id="install_sync_provider" type="action" label="32557" help="32680">

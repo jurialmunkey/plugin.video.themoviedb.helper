@@ -7,17 +7,8 @@ class PlaybackRefresh:
         self.provider = provider
         self.syncdata = syncdata
 
-    def refresh(self, history_changed, sync=False):
-        if history_changed:
-            self.refresh_stats()
+    def refresh(self, sync=False):
         self.refresh_watched(sync=sync)
-
-    def refresh_stats(self):
-        provider = self.syncdata.registry.get_selected_provider('stats')
-        if provider is None or provider.provider_id != self.provider.provider_id:
-            return
-        from tmdbhelper.lib.script.stats import get_stats
-        get_stats(forced=True)
 
     def refresh_watched(self, sync=False):
         provider = self.syncdata.registry.get_selected_provider('watched')

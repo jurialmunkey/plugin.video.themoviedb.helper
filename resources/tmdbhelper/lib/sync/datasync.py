@@ -105,12 +105,24 @@ class SyncDataGetterAll(SyncDataGetter):
     def get_keys(self):
         return (*(self.base_keys or ()), *(self.clause_keys or ()), *(self.additional_keys or ()), )
 
+    @cached_property
+    def query_keys(self):
+        """SELECT columns or expressions, separate from the source columns used by sync."""
+        return self.get_query_keys()
+
+    def get_query_keys(self):
+        return self.keys
+
     def get_sync_succeeded(self):
         return self.instance_syncdata.sync(self.item_type, self.keys)
 
     def get_items(self):
         self.sync_succeeded
-        return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
+        return self.instance_syncdata.cache.get_list_values(
+            keys=self.query_keys,
+            values=self.query_values,
+            conditions=self.clause,
+        )
 
 
 class SyncDataGetterProgressWatchedUnHidden(SyncDataGetterAll):
@@ -234,6 +246,32 @@ class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
     clause_keys = ('last_watched_at', )
 
 
+class SyncDataGetterStats(SyncDataGetterAllItems):
+    base_keys = ()
+
+    def get_query_keys(self):
+        return ('COUNT(*) AS item_count', )
+
+
+class SyncDataGetterWatchedStats(SyncDataGetterStats):
+    clause_keys = ('last_watched_at', )
+
+
+class SyncDataGetterWatchedShowsStats(SyncDataGetterStats):
+    operator = 'AND'
+    clause_keys = ('watched_episodes', 'aired_episodes')
+    query_clauses = ('item_type=?', 'aired_episodes > 0', 'watched_episodes >= aired_episodes')
+
+
+class SyncDataGetterCollectedStats(SyncDataGetterStats):
+    clause_keys = ('collection_last_collected_at', )
+
+
+class SyncDataGetterCollectedShowsStats(SyncDataGetterCollectedStats):
+    def get_query_keys(self):
+        return ('COUNT(DISTINCT tmdb_id) AS item_count', )
+
+
 class SyncDataGetterWatchedOn(SyncDataGetterAllItemsWatched):
     query_clauses = (
         'item_type=?',
@@ -255,6 +293,7 @@ class SyncDataGetterWatchedOn(SyncDataGetterAllItemsWatched):
 
 
 class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
+    base_keys = ()
     days = 30
     query_clauses = (
         'item_type=?',
@@ -266,7 +305,7 @@ class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
     def query_values(self):
         return (self.item_type, f'-{self.days - 1} days', )
 
-    def get_keys(self):
+    def get_query_keys(self):
         return (
             "DATE(last_watched_at, 'localtime') AS watched_date",
             'COUNT(*) AS watched_count',
@@ -274,10 +313,6 @@ class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
 
     def get_clause(self):
         return f'{super().get_clause()} GROUP BY watched_date ORDER BY watched_date DESC'
-
-    def get_items(self):
-        self.instance_syncdata.sync(self.item_type, self.clause_keys)
-        return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
 
 
 class SyncDataGetterWatchedMonthlyHistoryStats(SyncDataGetterWatchedHistoryStats):
@@ -292,7 +327,7 @@ class SyncDataGetterWatchedMonthlyHistoryStats(SyncDataGetterWatchedHistoryStats
     def query_values(self):
         return (self.item_type, f'-{self.months - 1} months', )
 
-    def get_keys(self):
+    def get_query_keys(self):
         return (
             "DATE(last_watched_at, 'localtime', 'start of month') AS watched_date",
             'COUNT(*) AS watched_count',
@@ -413,6 +448,15 @@ class SyncDataGetters:
 
     def get_all_watched_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllItemsWatched, item_type)
+
+    def get_watched_stats_getter(self, item_type):
+        getter_class = SyncDataGetterWatchedShowsStats if item_type == 'show' else SyncDataGetterWatchedStats
+        return self.get_item_type_getter(getter_class, item_type)
+
+    def get_collected_stats_getter(self, item_type):
+        getter_class = SyncDataGetterCollectedShowsStats if item_type == 'show' else SyncDataGetterCollectedStats
+        item_type = 'episode' if item_type == 'show' else item_type
+        return self.get_item_type_getter(getter_class, item_type)
 
     def get_watched_on_getter(self, item_type, watched_on):
         sd = self.get_item_type_getter(SyncDataGetterWatchedOn, item_type)

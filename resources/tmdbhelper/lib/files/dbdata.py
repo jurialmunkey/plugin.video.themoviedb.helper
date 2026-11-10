@@ -3,6 +3,7 @@
 from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.plugin import get_setting, get_version
 from tmdbhelper.lib.files.futils import FileUtils
+from hashlib import sha256
 import sqlite3
 import struct
 
@@ -28,7 +29,8 @@ class DatabaseCore:
         filename = filename or 'defaultcache.db'
 
         self._db_file = self._fileutils.get_file_path(basefolder, filename, join_addon_data=basefolder == folder)
-        self._sc_name = f'{folder}_{filename}_databaserowfactory_{get_version()}'
+        database_id = sha256(self._db_file.encode('utf-8')).hexdigest()
+        self._sc_name = f'{folder}_{filename}_databaserowfactory_{get_version()}_{database_id}'
         self.check_database_initialization()
         self.kodi_log(f"CACHE: Initialized: {self._sc_name} - Thread Safety Level: {sqlite3.threadsafety} - SQLite v{sqlite3.sqlite_version}")
 

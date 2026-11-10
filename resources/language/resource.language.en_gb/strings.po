@@ -2749,11 +2749,6 @@ msgid "Use TMDb numbers, ask for a group, or use the current group. Individual p
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32598"
-msgid "Statistics"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32599"
 msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
 msgstr ""
@@ -3136,11 +3131,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32678"
 msgid "Choose a collection provider, install one, or select None to disable collection lists."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32679"
-msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3561,4 +3551,25 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32766"
 msgid "72 hours"
+msgstr ""
+
+#: /resources/settings.xml
+#: /resources/tmdbhelper/lib/items/context_random.py
+msgctxt "#32767"
+msgid "Play random"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/play_random.py
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/context_nextepisodes.py
+msgctxt "#32770"
+msgid "Browse next episodes"
 msgstr ""

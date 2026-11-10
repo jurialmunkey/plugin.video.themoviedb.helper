@@ -17,9 +17,8 @@ class CronJobMonitor(SafeThread):
 
     def _on_startup(self):
         self._do_recache_kodidb()
-        from tmdbhelper.lib.script.stats import get_stats
-        get_stats()
         self._do_collection_update()
+        self._do_sync_stats_update()
 
     def _on_poll(self):
         self._do_database_maintenance()
@@ -27,6 +26,11 @@ class CronJobMonitor(SafeThread):
         self._do_library_update_check()
         self._do_delete_old_log_files()
         self._do_collection_update()
+        self._do_sync_stats_update()
+
+    def _do_sync_stats_update(self):
+        from tmdbhelper.lib.sync.stats import SyncStats
+        SyncStats().update()
 
     def _do_collection_update(self):
         from tmdbhelper.lib.collections.kodi import update_collection_index

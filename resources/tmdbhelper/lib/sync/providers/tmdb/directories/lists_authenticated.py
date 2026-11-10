@@ -1,8 +1,14 @@
-from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties
+from tmdbhelper.lib.items.directories.tmdb.lists_standard import ListStandard, ListStandardProperties, UniqueItems
 from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
 from tmdbhelper.lib.sync.providers.tmdb.directories.mapper import TMDbUserListMapper
 from tmdbhelper.lib.sync.providers.tmdb.directories.mapper_watchlist import TMDbWatchlistMapper
 from jurialmunkey.ftools import cached_property
+
+
+class UniqueUserListItems(UniqueItems):
+    @staticmethod
+    def get_item_key(item):
+        return item['params']['list_id']
 
 
 class ListAuthenticatedProperties(ListStandardProperties):
@@ -32,6 +38,7 @@ class ListAuthenticatedNoCacheProperties(ListAuthenticatedProperties):
 
 class ListAuthenticatedNoCacheListListsProperties(ListAuthenticatedNoCacheProperties):
     item_mapper_class = TMDbUserListMapper
+    unique_items_class = UniqueUserListItems
 
     def get_uncached_items(self):
         if not self.provider.is_user_authorized:

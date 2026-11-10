@@ -75,6 +75,14 @@ class ContextMenuConfig:
         return True
 
     @cached_property
+    def play_random_enabled(self):
+        return self.get_play_random_enabled()
+
+    @staticmethod
+    def get_play_random_enabled():
+        return get_setting('contextmenu_play_random')
+
+    @cached_property
     def items(self):
         return self.get_items()
 
@@ -107,9 +115,20 @@ class ContextMenu():
         self.mediatype = self._li.infolabels.get('mediatype')
 
     def get(self):
-        return [(name, str(item)) for name, item in (
-            (name, self._build_item(mediatypes))
-            for name, mediatypes in self.config.items.items()) if item]
+        items = [
+            (name, str(item))
+            for name, item in (
+                (name, self._build_item(mediatypes))
+                for name, mediatypes in self.config.items.items()
+            )
+            if item
+        ]
+        if self.config.play_random_enabled:
+            from tmdbhelper.lib.items.context_random import PlayRandomContextMenu
+            items += PlayRandomContextMenu(self._li).items
+        from tmdbhelper.lib.items.context_nextepisodes import BrowseNextEpisodesContextMenu
+        items += BrowseNextEpisodesContextMenu(self._li).items
+        return items
 
     def _build_item(self, mediatypes):
         params_def = mediatypes.get(self.mediatype, mediatypes.get('other'))
