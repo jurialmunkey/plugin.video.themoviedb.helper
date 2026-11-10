@@ -8,7 +8,8 @@ from tmdbhelper.lib.sync.providers.features import ACTION_FEATURES, SYNC_FEATURE
 from tmdbhelper.lib.sync.providers.ratings import RATINGS_MEDIATYPES, RatingsSupplier
 from tmdbhelper.lib.sync.providers.imdb_top250 import IMDB_TOP250_MEDIATYPES, IMDbTop250Supplier
 from tmdbhelper.lib.sync.providers.monitor_lists import MonitorListsSupplier
-from tmdbhelper.lib.sync.providers.stats import StatsSupplier
+from tmdbhelper.lib.sync.providers.list_actions import ListActions
+from tmdbhelper.lib.sync.providers.identifiers import IdentifierResolver
 from tmdbhelper.lib.sync.datatype import DataType
 from tmdbhelper.lib.sync.providers.services import SERVICE_SYNC_FEATURES, ServiceDataType
 
@@ -156,16 +157,6 @@ class SyncProviderLoader:
                 raise TypeError(f'IMDb Top 250 supplier for {mediatype} must implement get_items()')
 
     @staticmethod
-    def validate_stats_class(provider):
-        supplier_class = provider.stats_class
-        if supplier_class is None:
-            return
-        if not isinstance(supplier_class, type) or not issubclass(supplier_class, StatsSupplier):
-            raise TypeError('Stats supplier must inherit StatsSupplier')
-        if not callable(supplier_class.get_items) or supplier_class.get_items is StatsSupplier.get_items:
-            raise TypeError('Stats supplier must implement get_items()')
-
-    @staticmethod
     def validate_monitor_lists_class(provider):
         supplier_class = provider.monitor_lists_class
         if supplier_class is None:
@@ -176,6 +167,27 @@ class SyncProviderLoader:
             implementation = getattr(supplier_class, method)
             if not callable(implementation) or implementation is getattr(MonitorListsSupplier, method):
                 raise TypeError(f'Monitor lists supplier must implement {method}()')
+
+    @staticmethod
+    def validate_list_actions_class(provider):
+        actions_class = provider.list_actions_class
+        if actions_class is None:
+            return
+        if not isinstance(actions_class, type) or not issubclass(actions_class, ListActions):
+            raise TypeError('List actions must inherit ListActions')
+        for method in ('like_list', 'rename_list', 'delete_list'):
+            implementation = getattr(actions_class, method)
+            if not callable(implementation) or implementation is getattr(ListActions, method):
+                raise TypeError(f'List actions must implement {method}()')
+
+    @classmethod
+    def validate_identifier_resolver_class(cls, provider):
+        if provider.identifier_resolver_class is not None:
+            cls.validate_subclass(
+                provider.identifier_resolver_class, IdentifierResolver,
+                'Identifier resolver', ('get_ids',))
+            if not callable(provider.identifier_resolver_class.get_ids):
+                raise TypeError('Identifier resolver must implement get_ids()')
 
     @staticmethod
     def validate_directory(provider):
@@ -216,8 +228,9 @@ class SyncProviderLoader:
         self.validate_getter_classes(provider)
         self.validate_ratings_classes(provider)
         self.validate_imdb_top250_classes(provider)
-        self.validate_stats_class(provider)
         self.validate_monitor_lists_class(provider)
+        self.validate_list_actions_class(provider)
+        self.validate_identifier_resolver_class(provider)
         self.validate_directory(provider)
         if not provider.capabilities:
             raise ValueError('Provider must expose at least one capability')

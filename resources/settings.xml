@@ -122,6 +122,11 @@
                 </setting>
             </group>
             <group id="3" label="32710">
+                <setting id="contextmenu_play_random" type="boolean" label="32767" help="32768">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="contextmenu_related_lists" type="boolean" label="32235" help="32613">
                     <level>0</level>
                     <default>true</default>
@@ -161,6 +166,19 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="widgets_stale_hours" type="integer" label="32761" help="32762">
+                    <level>0</level>
+                    <default>24</default>
+                    <constraints>
+                        <options>
+                            <option label="32763">0</option>
+                            <option label="32764">24</option>
+                            <option label="32765">48</option>
+                            <option label="32766">72</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
                 <setting id="flatten_seasons" type="boolean" label="32085" help="32622">
                     <level>0</level>
                     <default>false</default>
@@ -187,11 +205,6 @@
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition operator="!is" setting="trakt_token"/>
-                        </dependency>
-                    </dependencies>
                 </setting>
             </group>
             <group id="3" label="32203">
@@ -235,6 +248,7 @@
                 <setting id="nextepisodes_usecalendar" type="boolean" label="32413" help="32630">
                     <level>0</level>
                     <default>false</default>
+                    <visible>false</visible>
                     <control type="toggle"/>
                 </setting>
             </group>
@@ -312,13 +326,6 @@
                     </control>
                 </setting>
             </group>
-            <group id="8" label="32470">
-                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="32634">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle" />
-                </setting>
-            </group>
         </category>
         <category id="artwork" label="32080" help="">
             <group id="1" label="32520">
@@ -327,6 +334,36 @@
                     <default>0</default>
                     <constraints>
                         <options>
+                            <option label="32452">0</option>
+                            <option label="32009">1</option>
+                            <option label="32398">2</option>
+                            <option label="32008">3</option>
+                            <option label="32397">4</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="artwork_quality_poster" type="integer" label="32751" help="32754" parent="artwork_quality">
+                    <level>0</level>
+                    <default>-1</default>
+                    <constraints>
+                        <options>
+                            <option label="571">-1</option>
+                            <option label="32452">0</option>
+                            <option label="32009">1</option>
+                            <option label="32398">2</option>
+                            <option label="32008">3</option>
+                            <option label="32397">4</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="artwork_quality_fanart" type="integer" label="32752" help="32755" parent="artwork_quality">
+                    <level>0</level>
+                    <default>-1</default>
+                    <constraints>
+                        <options>
+                            <option label="571">-1</option>
                             <option label="32452">0</option>
                             <option label="32009">1</option>
                             <option label="32398">2</option>
@@ -382,6 +419,7 @@
                 <setting id="trakt_genre_icon_location" type="path" label="32507" help="32640">
                     <level>0</level>
                     <default/>
+                    <visible>false</visible>
                     <constraints>
                         <sources>
                             <source>files</source>
@@ -666,6 +704,19 @@
         </category>
         <category id="services" label="32017" help="">
             <group id="1" label="32470">
+                <setting id="trakt_settings" type="action" label="32749" help="32750">
+                    <level>0</level>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.trakt)</data>
+                    </control>
+                </setting>
+                <setting id="trakt_cacheownlists" type="boolean" label="32463" help="32634">
+                    <level>0</level>
+                    <default>true</default>
+                    <visible>false</visible>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="trakt_token" type="string" label="32011" help="32702">
                     <level>0</level>
                     <default/>
@@ -679,38 +730,6 @@
                         <heading>32011</heading>
                     </control>
                 </setting>
-                <setting id="authenticate_trakt" type="action" label="32010" help="32666">
-                    <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper,authenticate_trakt)</data>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action">
-                        <close>true</close>
-                    </control>
-                </setting>
-                <setting id="trakt_token_access" type="boolean" label="32483" help="32707" parent="authenticate_trakt">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                    <enable>false</enable>
-                </setting>
-                <setting id="revoke_trakt" type="action" label="32169" help="32667">
-                    <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper,revoke_trakt)</data>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition operator="!is" setting="trakt_token"/>
-                        </dependency>
-                    </dependencies>
-                    <control type="button" format="action">
-                        <close>true</close>
-                    </control>
-                </setting>
             </group>
             <group id="2" label="32726">
                 <setting id="mdblist_settings" type="action" label="32668" help="32669">
@@ -719,16 +738,6 @@
                         <close>true</close>
                         <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.mdblist)</data>
                     </control>
-                </setting>
-                <!-- Retained only so Kodi can read and clear pre-module keys. -->
-                <setting id="mdblist_apikey" type="string" label="32423" help="32670">
-                    <level>4</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string"/>
-                    <visible>false</visible>
                 </setting>
             </group>
             <group id="3" label="32727">
@@ -765,14 +774,6 @@
                         <close>true</close>
                         <data>RunScript(plugin.video.themoviedb.helper,open_sync_provider_settings,addon_id=script.module.tmdbhelper.sync.gemini)</data>
                     </control>
-                </setting>
-                <!-- Retained only so Kodi can read and clear pre-module keys. -->
-                <setting id="gemini_apikey" type="string" label="32148" help="32673">
-                    <level>4</level>
-                    <default/>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="edit" format="string"/>
-                    <visible>false</visible>
                 </setting>
                 <setting id="tvdb_settings" type="action" label="32738" help="32739">
                     <level>0</level>
@@ -823,21 +824,25 @@
                     <enable>false</enable>
                 </setting>
             </group>
-            <group id="5" label="32728">
-                <visible>false</visible>
-                <setting id="tvdb_token" type="string" label="32011" help="32700">
+            <group id="5" label="32756">
+                <setting id="authenticate_tmdb" type="action" label="32010" help="32757">
                     <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
                     <dependencies>
-                        <dependency type="visible">
-                            <condition on="property" name="InfoBool">False</condition>
-                        </dependency>
+                        <dependency type="visible" operator="is" setting="tmdb_user_token"></dependency>
                     </dependencies>
-                    <control type="edit" format="string">
-                        <heading>32011</heading>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,authenticate_tmdb,return_settings=true)</data>
+                    </control>
+                </setting>
+                <setting id="revoke_tmdb" type="action" label="32169" help="32758">
+                    <level>0</level>
+                    <dependencies>
+                        <dependency type="visible" operator="!is" setting="tmdb_user_token"></dependency>
+                    </dependencies>
+                    <control type="button" format="action">
+                        <close>true</close>
+                        <data>RunScript(plugin.video.themoviedb.helper,revoke_tmdb,return_settings=true)</data>
                     </control>
                 </setting>
                 <setting id="tmdb_user_token" type="string" label="32011" help="32701">
@@ -900,15 +905,6 @@
                     <control type="button" format="action">
                         <close>true</close>
                         <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=scrobbling,return_settings=true)</data>
-                    </control>
-                </setting>
-                <setting id="sync_provider_stats" type="string" label="32598" help="32679">
-                    <level>0</level>
-                    <default></default>
-                    <constraints><allowempty>true</allowempty></constraints>
-                    <control type="button" format="action">
-                        <close>true</close>
-                        <data>RunScript(plugin.video.themoviedb.helper,select_sync_provider,capability=stats,return_settings=true)</data>
                     </control>
                 </setting>
                 <setting id="install_sync_provider" type="action" label="32557" help="32680">
@@ -1113,22 +1109,21 @@
                     <default>False</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="timer_reports" type="boolean" label="32395" help="32697">
+                <setting id="timer_reports" type="integer" label="32395" help="32697">
                     <level>0</level>
-                    <default>False</default>
-                    <control type="toggle"/>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="32585">0</option>
+                            <option label="32759">1</option>
+                            <option label="32760">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
                 </setting>
                 <setting id="log_request_tmdb" type="action" label="32348" help="32698">
                     <level>0</level>
                     <data>RunScript(plugin.video.themoviedb.helper, log_request=tmdb)</data>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="action"/>
-                </setting>
-                <setting id="log_request_trakt" type="action" label="32347" help="32699">
-                    <level>0</level>
-                    <data>RunScript(plugin.video.themoviedb.helper, log_request=trakt)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>

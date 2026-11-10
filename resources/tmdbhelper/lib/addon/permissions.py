@@ -13,6 +13,7 @@ class PermissionHandler:
     # Overrides _DENY_ALL
     _ALLOW = (
         'api.tmdb.api',
+        'sync.providers.interface',
     )
 
     # Any module name (relative to tmdbhelper.lib.) that starts with an item in
@@ -48,13 +49,11 @@ class PermissionHandler:
         'fanarttv': 2 ** 1,
         'omdb': 2 ** 3,
         'tmdb': 2 ** 4,
-        'trakt': 2 ** 5,
     }
 
     _PERMISSION_TYPES = {
         'fanarttv': 'fanarttv_clientkey_access',
         'omdb': 'omdb_apikey_access',
-        'trakt': 'trakt_token_access',
     }
 
     def __init__(self):

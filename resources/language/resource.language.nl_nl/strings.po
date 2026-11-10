@@ -352,11 +352,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Wilt u de bibliotheek nu bijwerken vanuit de Trakt lijst(en)?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Selecteer lijst(en)"
-
 
 
 #: /resources/lib/context.py

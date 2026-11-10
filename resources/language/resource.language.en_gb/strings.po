@@ -311,21 +311,6 @@ msgctxt "#32038"
 msgid "Kodi library details"
 msgstr ""
 
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr ""
-
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -334,11 +319,6 @@ msgstr ""
 #: /resources/lib/container.py
 msgctxt "#32043"
 msgid "Up Next"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
 msgstr ""
 
 #: /resources/lib/container.py
@@ -369,11 +349,6 @@ msgstr ""
 #: /resources/lib/downloader.py
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
 msgstr ""
 
 #: /resources/lib/downloader.py
@@ -651,31 +626,6 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr ""
 
-#: /resources/settings.xml
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32148"
-msgid "Gemini key"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
-msgstr ""
-
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
 msgctxt "#32152"
 msgid "Remove node"
@@ -744,11 +694,6 @@ msgstr ""
 #: /resources/lib/script.py
 msgctxt "#32132"
 msgid "Do you wish to update the library from the list(s) now?"
-msgstr ""
-
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
 msgstr ""
 
 #: /resources/lib/context.py
@@ -1765,11 +1710,6 @@ msgid "Retrieving Artwork"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32402"
-msgid "Scrobble items on MDbList while watching"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32403"
 msgid "Sync"
 msgstr ""
@@ -1814,7 +1754,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32395"
-msgid "Directory timings"
+msgid "Timer reports"
 msgstr ""
 
 #: /resources/settings.xml
@@ -1830,11 +1770,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32400"
 msgid "Play local files"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32417"
-msgid "MDbList support is currently experimental"
 msgstr ""
 
 #: /resources/settings.xml
@@ -1899,22 +1834,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32420"
-msgid "Image quality"
-msgstr ""
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
+msgid "Default image quality"
 msgstr ""
 
 #: /resources/lib/player/configure.py
@@ -2077,11 +1997,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr ""
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr ""
-
 #: /resources/settings.xml
 msgctxt "#32463"
 msgid "Cache own lists for 24h"
@@ -2160,11 +2075,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32483"
 msgid "Share credentials"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync.py
@@ -2278,31 +2188,6 @@ msgid "Alternate TMDb endpoint"
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in the MDbList module settings."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr ""
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32520"
 msgid "TMDb"
 msgstr ""
@@ -2390,26 +2275,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32542"
 msgid "Groups"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32543"
-msgid "Curated Lists"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32544"
-msgid "Official Lists"
-msgstr ""
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32545"
-msgid "Streaming Charts"
-msgstr ""
-
-#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
-msgctxt "#32546"
-msgid "Trakt / MDbList options"
 msgstr ""
 
 #: /resources/tmdbhelper/lib/script/discover/trakt.py
@@ -2884,11 +2749,6 @@ msgid "Use TMDb numbers, ask for a group, or use the current group. Individual p
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32598"
-msgid "Statistics"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32599"
 msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
 msgstr ""
@@ -3065,7 +2925,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32635"
-msgid "Choose the resolution of artwork downloaded from TMDb."
+msgid "Choose the default resolution of artwork downloaded from TMDb. Poster and fanart settings can override this default."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3239,11 +3099,6 @@ msgid "Install MDbList support if needed, then open its provider settings."
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32670"
-msgid "Retain the legacy MDbList key until it is migrated to the provider module."
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32671"
 msgid "Enter your OMDb API key for additional ratings and metadata."
 msgstr ""
@@ -3251,11 +3106,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32672"
 msgid "Enter your RatingPosterDB API key for posters with ratings."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32673"
-msgid "Enter your Gemini API key for AI-assisted features."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3281,11 +3131,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32678"
 msgid "Choose a collection provider, install one, or select None to disable collection lists."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32679"
-msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3375,7 +3220,7 @@ msgstr ""
 
 #: /resources/settings.xml
 msgctxt "#32697"
-msgid "Log the time taken to build directories."
+msgid "Disabled collects no timer reports. Basic collects directory timer reports. Detailed also collects item detail timer reports."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3386,11 +3231,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32699"
 msgid "Run a Trakt request and write its response to the Kodi log."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32700"
-msgid "Store the TVDb authentication token used by TMDbHelper."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3411,11 +3251,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32704"
 msgid "Allow other plugins to access the saved Fanart.tv client key."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32705"
-msgid "Allow other plugins to access the saved TVDb token."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3621,4 +3456,120 @@ msgstr ""
 #: /resources/tmdbhelper/lib/script/sync/provider_manager.py
 msgctxt "#32746"
 msgid "Disabling this module will remove it from:\n{0}"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32747"
+msgid "Provider module unavailable"
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32748"
+msgid "The {0} module could not be loaded and its features are temporarily unavailable. Update the module to the latest version and try again. Your settings and synced data have been kept."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32749"
+msgid "Trakt settings"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32750"
+msgid "Configure Trakt list caching, genre icons, and next-episode calendar checks."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32751"
+msgid "Poster image quality"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32752"
+msgid "Fanart image quality"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32754"
+msgid "Choose the resolution of TMDb posters and actor portraits, or use the default image quality setting."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32755"
+msgid "Choose the resolution of TMDb fanart, landscape, and extra fanart, or use the default image quality setting."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32756"
+msgid "TMDb account"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32757"
+msgid "Sign in to your TMDb account using a web browser or QR code."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32758"
+msgid "Sign out of your TMDb account and remove the saved authentication token."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32759"
+msgid "Basic"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32760"
+msgid "Detailed"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32761"
+msgid "Show expired widget lists for up to"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32762"
+msgid "When a widget's TMDb list is older than its normal 6 hour cache, show the saved list straight away and download the new list after the widget has loaded. The new list appears the next time Kodi reloads the widget. Lists for today, such as Airing Today, always wait for new data. Off waits for new data every time."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32763"
+msgid "Off"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32764"
+msgid "24 hours"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32765"
+msgid "48 hours"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32766"
+msgid "72 hours"
+msgstr ""
+
+#: /resources/settings.xml
+#: /resources/tmdbhelper/lib/items/context_random.py
+msgctxt "#32767"
+msgid "Play random"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/play_random.py
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/context_nextepisodes.py
+msgctxt "#32770"
+msgid "Browse next episodes"
 msgstr ""

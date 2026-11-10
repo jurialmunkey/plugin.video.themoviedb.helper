@@ -161,7 +161,7 @@ class PlayerScrobbler():
             return
         result = self.request.scrobble(method)
         if result.successful and method == 'stop':
-            self.playback_refresh.refresh(result.history_changed, sync=self.progress >= 80)
+            self.playback_refresh.refresh(sync=self.progress >= 80)
         return result
 
     @is_scrobbling

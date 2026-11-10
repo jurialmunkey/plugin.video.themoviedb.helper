@@ -17,10 +17,8 @@ class CronJobMonitor(SafeThread):
 
     def _on_startup(self):
         self._do_recache_kodidb()
-        self._do_trakt_authorization()
-        from tmdbhelper.lib.script.stats import get_stats
-        get_stats()
         self._do_collection_update()
+        self._do_sync_stats_update()
 
     def _on_poll(self):
         self._do_database_maintenance()
@@ -28,6 +26,11 @@ class CronJobMonitor(SafeThread):
         self._do_library_update_check()
         self._do_delete_old_log_files()
         self._do_collection_update()
+        self._do_sync_stats_update()
+
+    def _do_sync_stats_update(self):
+        from tmdbhelper.lib.sync.stats import SyncStats
+        SyncStats().update()
 
     def _do_collection_update(self):
         from tmdbhelper.lib.collections.kodi import update_collection_index
@@ -38,11 +41,6 @@ class CronJobMonitor(SafeThread):
             target=update_collection_index,
             kwargs={'abort': lambda: self.exit or self.update_monitor.abortRequested()})
         self.collection_thread.start()
-
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
 
     @cached_property
     def database_maintenance(self):
@@ -73,12 +71,9 @@ class CronJobMonitor(SafeThread):
             ('log_tagger', r".*\.json$"),
             ('log_library', r".*\.json$"),
             ('timer_report', r".*\.txt$"),
+            ('timer_report/item_details', r".*\.txt$"),
         ):
             self._do_delete_old_log_files_in_folder(folder, regex)
-
-    def _do_trakt_authorization(self):
-        self.trakt_api.authorize()
-        self.update_monitor.waitForAbort(1)
 
     def _do_library_update(self):
         from tmdbhelper.lib.addon.plugin import executebuiltin
@@ -108,6 +103,5 @@ class CronJobMonitor(SafeThread):
     def run(self):
         self._on_startup()
 
-        while not self.update_monitor.abortRequested() and not self.exit:
-            self.update_monitor.waitForAbort(self._poll_time)
+        while not self.update_monitor.waitForAbort(self._poll_time) and not self.exit:
             self._on_poll()

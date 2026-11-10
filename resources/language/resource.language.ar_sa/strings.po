@@ -270,22 +270,6 @@ msgctxt "#32065"
 msgid "Watchers"
 msgstr "المشاهدون"
 
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr "الميزانية"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr "الإيرادات"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr "تاريخ آخر عرض"
-
 #: /resources/settings.xml
 msgctxt "#32042"
 msgid "Choose Action"
@@ -295,11 +279,6 @@ msgstr "اختر إجراءً"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "التالي"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
-msgstr "النتيجة"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -331,11 +310,6 @@ msgstr "إعادة المحاولة"
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "عنوان URL المقدم إما غير صالح أو يتعذر الوصول إليه."
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
-msgstr "المستخدم"
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
@@ -565,31 +539,6 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr "تم تحديث بيانات مزامنة {} بنجاح"
 
-#: /resources/settings.xml
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr "واجهة Gemini API"
-
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr "Gemini AI"
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr "يتطلب Google Gemini AI مفتاح API للمطورين لاستخدامه."
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid ""
-"Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings"
-" under the API keys section."
-msgstr ""
-"قم بزيارة [B]{}[/B] لإنشاء مفتاحك ثم أدخله في إعدادات TMDbHelper ضمن قسم "
-"مفاتيح API."
-
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
 msgctxt "#32152"
 msgid "Remove node"
@@ -655,11 +604,6 @@ msgstr "إضافة عنصر آخر؟"
 msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "هل ترغب في تحديث المكتبة من قائمة/قوائم Trakt الآن؟"
-
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "اختر قائمة/قوائم"
 
 
 
@@ -1633,11 +1577,6 @@ msgid "Retrieving Artwork"
 msgstr "جارٍ استرجاع الأعمال الفنية"
 
 #: /resources/settings.xml
-msgctxt "#32402"
-msgid "Scrobble items on MDbList while watching"
-msgstr "تسجيل العناصر على MDbList أثناء المشاهدة"
-
-#: /resources/settings.xml
 msgctxt "#32403"
 msgid "Sync"
 msgstr "مزامنة"
@@ -1722,22 +1661,6 @@ msgid "Premieres"
 msgstr "العروض الأولى"
 
 
-
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "أفضل القوائم"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "واجهة MDbList API"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "مفتاح MDbList API"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
@@ -1890,11 +1813,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "حلقاتك المعروضة تاليًا"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "الجوائز"
-
 
 
 
@@ -1932,12 +1850,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "تغيير المشغل الافتراضي للمسلسل أو الموسم أو الحلقة"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "واجهة TVDb API"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
@@ -2015,32 +1927,6 @@ msgstr "إضافة {} إلى العقدة"
 
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "إضافة إلى قائمة MDbList"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "لم يتم العثور على بيانات اعتماد MDbList API."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "أضف مفتاح MDbList API الشخصي الخاص بك في إعدادات TMDbHelper."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "لم يتم العثور على قوائم ثابتة لمستخدم MDbList الحالي."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "إزالة من قائمة MDbList"
 
 #: /resources/settings.xml
 msgctxt "#32520"

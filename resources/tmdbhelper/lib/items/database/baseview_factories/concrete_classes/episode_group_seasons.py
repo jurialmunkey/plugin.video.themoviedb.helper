@@ -11,7 +11,7 @@ class EpisodeGroupSeasonsList(EpisodeGroupsList):
 
     @cached_property
     def parent_precache_tvshow(self):
-        return self.get_parent_data('tvshow')
+        return self.get_parent_precache('tvshow')
 
     @cached_property
     def parent_database(self):

@@ -373,11 +373,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Szeretnéd most frissíteni a Trakt listá(k)on található médiatárat?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Listák kiválasztása"
-
 
 
 #: /resources/lib/context.py
@@ -1334,22 +1329,6 @@ msgstr "Bemutatók"
 
 
 
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Toplisták"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "MDbList API"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "MDbList API kulcs"
-
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
@@ -1497,11 +1476,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Következő sugárzott saját epizódok"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Díjak"
-
 
 
 
@@ -1539,12 +1513,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Alapértelmezett lejátszó módosítása sorozathoz, évadhoz vagy epizódhoz"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "TVDb API kulcs"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
@@ -1622,32 +1590,6 @@ msgstr "{} hozzáadása a csomóponthoz"
 
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "Hozzáadás az MDbList listához"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "Az MDbList API hitelesítő adatai nem találhatók."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "Add hozzá a személyes MDbList API-kulcsodat a TMDbHelper beállításaiban."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "Nem találhatók statikus listák az aktuális MDbList felhasználóhoz."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "Eltávolítás az MDbList listából"
 
 #: /resources/settings.xml
 msgctxt "#32520"

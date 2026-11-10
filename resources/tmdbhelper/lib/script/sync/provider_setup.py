@@ -36,6 +36,8 @@ class SyncProviderSetup:
     def is_suppressed(self):
         if not self.eligible_capabilities:
             return True
+        if any(SyncProviderSetting(feature).provider_id for feature in self.eligible_capabilities):
+            return True  # An unavailable selection must not trigger replacement setup.
         return self.is_widget and bool(get_property(self.later_property))
 
     def ensure_provider(self):

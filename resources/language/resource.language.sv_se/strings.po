@@ -374,11 +374,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Vill du uppdatera biblioteket från Trakt-listan/-listorna nu?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Välj lista(or)"
-
 
 
 #: /resources/lib/context.py
@@ -1350,22 +1345,6 @@ msgstr "Premiärer"
 
 
 
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Topplistor"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "MDbList API"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "MDbList API-nyckel"
-
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
@@ -1517,11 +1496,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Dina avsnitt som sänds nästa gång"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Utmärkelser"
-
 
 
 
@@ -1559,12 +1533,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Ändra standardspelare för tv-serie, säsong eller avsnitt"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "TVDb API"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
@@ -1643,33 +1611,6 @@ msgstr "Lägg till {} till nod"
 
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "Lägg till i MDbList-listan"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "API-autentiseringsuppgifter för MDbList hittades inte."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr ""
-"Lägg till din personliga MDbList API-nyckel i TMDbHelper-inställningarna."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "Inga statiska listor hittades för den aktuella MDbList-användaren."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "Ta bort från MDbList-listan"
 
 #: /resources/settings.xml
 msgctxt "#32520"

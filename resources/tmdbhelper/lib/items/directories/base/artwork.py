@@ -40,22 +40,6 @@ DIRECTORY_ICON_VARIANTS = {
     'resources/icons/themoviedb/trending-week.png': ('movie', 'tv', 'person'),
     'resources/icons/themoviedb/upcoming.png': ('movie',),
     'resources/icons/themoviedb/watchlist.png': ('movie', 'tv'),
-    'resources/icons/trakt/airing.png': ('tv',),
-    'resources/icons/trakt/anticipated.png': ('movie', 'tv', 'both'),
-    'resources/icons/trakt/boxoffice.png': ('movie',),
-    'resources/icons/trakt/calendar.png': ('movie', 'tv'),
-    'resources/icons/trakt/favorites.png': ('movie', 'tv', 'both'),
-    'resources/icons/trakt/genres.png': ('movie', 'tv'),
-    'resources/icons/trakt/likedlist.png': ('both',),
-    'resources/icons/trakt/mostplayed.png': ('movie', 'tv', 'both'),
-    'resources/icons/trakt/mylists.png': ('both',),
-    'resources/icons/trakt/popular.png': ('movie', 'tv', 'both'),
-    'resources/icons/trakt/popularlist.png': ('both',),
-    'resources/icons/trakt/recommended.png': ('movie', 'tv'),
-    'resources/icons/trakt/searchlists.png': ('both',),
-    'resources/icons/trakt/trend.png': ('movie', 'tv', 'both'),
-    'resources/icons/trakt/trendinglist.png': ('both',),
-    'resources/icons/trakt/viewers.png': ('movie', 'tv', 'both'),
 }
 
 

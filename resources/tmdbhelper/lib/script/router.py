@@ -44,12 +44,18 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.kodi_utils', 'kodi_setting')(**kwargs),
 
         # Context Menu
+        'play_random':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.play_random', 'play_random')(**kwargs),
         'related_lists':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.related_lists', 'related_lists')(**kwargs),
         'drop_collection':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.collectiondrops', 'drop_collection')(**kwargs),
 
         # TMDb Utils
+        'authenticate_tmdb':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'authenticate_tmdb')(**kwargs),
+        'revoke_tmdb':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'revoke_tmdb')(**kwargs),
         'sync_tmdb':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'sync_tmdb')(**kwargs),
         'refresh_details':
@@ -72,16 +78,10 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'sync_item')(**kwargs),
         'sort_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.lists', 'sort_list')(**kwargs),
-        'sort_mdblist':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.mdblist', 'sort_mdblist')(**kwargs),
-        'like_mdblist':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.mdblist', 'like_mdblist')(**kwargs),
         'invalidate_sync':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'invalidate_sync')(**kwargs),
         'invalidate_trakt_sync':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.sync', 'invalidate_sync')(**kwargs),
-        'get_trakt_stats':
-            lambda **kwargs: importmodule('tmdbhelper.lib.script.stats', 'get_stats')(**kwargs),
         'authenticate_trakt':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'authenticate_trakt')(**kwargs),
         'revoke_trakt':

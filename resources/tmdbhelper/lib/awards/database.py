@@ -4,7 +4,7 @@ from pathlib import Path
 import sqlite3
 
 
-DATABASE_PATH = Path(__file__).resolve().parents[3] / 'databases' / 'awards.db'
+DATABASE_PATH = Path(__file__).absolute().parents[3] / 'databases' / 'awards.db'
 DATABASE_VERSION = 2
 ITEM_SCHEMA = '''
     CREATE TABLE item (
@@ -50,7 +50,7 @@ class AwardsDatabase:
         self.filename = Path(filename)
 
     def get_item_awards(self, tmdb_type, tmdb_id):
-        uri = f'{self.filename.resolve().as_uri()}?mode=ro'
+        uri = f'{self.filename.absolute().as_uri()}?mode=ro'
         with closing(sqlite3.connect(uri, uri=True)) as connection:
             rows = connection.execute(
                 '''SELECT category.award, category.name, nomination.year, nomination.is_winner

@@ -449,11 +449,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Обновить медиатеку из списков Trakt сейчас?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Выберите список (списки)"
-
 
 
 #: /resources/lib/context.py
@@ -1423,22 +1418,6 @@ msgstr "Премьера"
 
 
 
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Лучшие списки"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "MDbList API ключ"
-
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
@@ -1590,11 +1569,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Ваши следующий серии"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Награды"
-
 
 
 
@@ -1632,12 +1606,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Изменить проигрыватель по умолчанию для сериала, сезона или серии"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
@@ -1716,32 +1684,6 @@ msgstr "Добавить {} в узел"
 
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "Добавить в список MDbList"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "Учетные данные MDbList API не найдены."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in TMDbHelper settings."
-msgstr "Добавьте персональный ключ MDbList API в настройки TMDbHelper."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "Для текущего пользователя MDbList статические списки не найдены."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "Удалить из списка MDbList"
 
 #: /resources/settings.xml
 msgctxt "#32520"

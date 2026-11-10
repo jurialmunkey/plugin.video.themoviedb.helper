@@ -49,7 +49,12 @@ class Menu(BasicMenu):
         return f'{item.name} ({service_name})'
 
     def select(self, sync_type=None):
-        sync_type = {'rating': 'traktrating', 'favorites': 'traktfavorites'}.get(sync_type, sync_type)
+        sync_type = {
+            'rating': 'traktrating',
+            'favorites': 'traktfavorites',
+            'comments': 'traktcomments',
+            'userlist': 'traktuserlist',
+        }.get(sync_type, sync_type)
         if sync_type and sync_type not in self.items:
             return
         return super().select(sync_type)

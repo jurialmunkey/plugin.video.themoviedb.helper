@@ -306,27 +306,7 @@ msgctxt "#32065"
 msgid "Watchers"
 msgstr "Oglądający"
 
-#: /resources/settings.xml
-msgctxt "#32038"
-msgid "Kodi library details"
-msgstr "Szczegóły biblioteki Kodi"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32067"
-msgid "Budget"
-msgstr "Budżet"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32068"
-msgid "Revenue"
-msgstr "Dochód"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32069"
-msgid "Last Air Date"
-msgstr "Data ostatniej emisji"
-
-#: /resources/settings.xml
+#: /resources/lib/player.py
 msgctxt "#32042"
 msgid "Choose Action"
 msgstr "Wybierz akcję"
@@ -335,11 +315,6 @@ msgstr "Wybierz akcję"
 msgctxt "#32043"
 msgid "Up Next"
 msgstr "Następne"
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32072"
-msgid "Score"
-msgstr "Punktacja"
 
 #: /resources/lib/container.py
 msgctxt "#32044"
@@ -370,11 +345,6 @@ msgstr "Ponów"
 msgctxt "#32058"
 msgid "The provided URL is either invalid or inaccesible."
 msgstr "Podany adres URL jest nieprawidłowy lub niedostępny."
-
-#: /resources/tmdbhelper/lib/items/directories/mdblist/lists_sorting.py
-msgctxt "#32079"
-msgid "User"
-msgstr "Użytkownik"
 
 #: /resources/lib/downloader.py
 msgctxt "#32059"
@@ -651,31 +621,6 @@ msgctxt "#32146"
 msgid "Successfully refreshed {} sync data"
 msgstr "Pomyślnie odświeżono dane synchronizacji {}"
 
-#: /resources/settings.xml
-msgctxt "#32147"
-msgid "Gemini API"
-msgstr "API Gemini"
-
-#: /resources/settings.xml
-msgctxt "#32148"
-msgid "Gemini key"
-msgstr "Klucz Gemini"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_main.py
-msgctxt "#32149"
-msgid "Gemini AI"
-msgstr "Gemini AI"
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32150"
-msgid "Google Gemini AI requires a developer API key to use."
-msgstr "Google Gemini AI wymaga klucza API dewelopera."
-
-#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_gemini.py
-msgctxt "#32151"
-msgid "Visit [B]{}[/B] to generate your key and then input into TMDbHelper settings under the API keys section."
-msgstr "Odwiedź [B]{}[/B], aby wygenerować klucz, a następnie wprowadź go w ustawieniach TMDbHelper w sekcji kluczy API."
-
 #: /resources/tmdbhelper/lib/items/directories/base/basedir_nodes.py
 msgctxt "#32152"
 msgid "Remove node"
@@ -746,15 +691,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the list(s) now?"
 msgstr "Czy chcesz teraz zaktualizować bibliotekę z list(y)?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Wybierz listę (listy)"
-
-#: /resources/lib/context.py
-msgctxt "#32154"
-msgid "Update now"
-msgstr "Zaktualizuj teraz"
 
 #: /resources/settings.xml
 msgctxt "#32156"
@@ -1853,16 +1789,6 @@ msgctxt "#32400"
 msgid "Play local files"
 msgstr "Odtwarzaj lokalne pliki"
 
-#: /resources/settings.xml
-msgctxt "#32417"
-msgid "MDbList support is currently experimental"
-msgstr "Obsługa MDbList ma obecnie charakter eksperymentalny"
-
-#: /resources/settings.xml
-msgctxt "#32404"
-msgid "Combine same-day episodes"
-msgstr "Łącz odcinki emitowane tego samego dnia"
-
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
@@ -1917,26 +1843,6 @@ msgstr "Dodaj tekst przed kategorią wiekową, np. „Ocenione” przed „PG”
 msgctxt "#32419"
 msgid "Choose the language and country used for TMDb and Trakt lookups."
 msgstr "Wybierz język i kraj używane do wyszukiwania w TMDb i Trakt."
-
-#: /resources/settings.xml
-msgctxt "#32420"
-msgid "Image quality"
-msgstr "Jakość obrazów"
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Najlepsze listy"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "API MDbList"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "Klucz API MDbList"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
@@ -2098,20 +2004,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Twoje odcinki emitowane jako następne"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Nagrody"
-
-#: /resources/settings.xml
-msgctxt "#32463"
-msgid "Cache own lists for 24h"
-msgstr "Przechowuj własne listy w pamięci podręcznej przez 24 godz."
-
-#: /resources/settings.xml
-msgctxt "#32479"
-msgid "When regional artwork is missing, prefer English over artwork in your language from other regions."
-msgstr "Gdy brakuje grafiki regionalnej, preferuj grafikę angielską zamiast grafiki w Twoim języku z innych regionów."
 
 #: /resources/settings.xml
 msgctxt "#32466"
@@ -2177,16 +2069,6 @@ msgstr "Ustaw liczbę ostatnio oglądanych pozycji dostępnych jako losowe źró
 msgctxt "#32482"
 msgid "Seed pool size"
 msgstr "Rozmiar puli źródeł"
-
-#: /resources/settings.xml
-msgctxt "#32483"
-msgid "Share credentials"
-msgstr "Udostępnij dane uwierzytelniające"
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "API TVDb"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
@@ -2294,36 +2176,6 @@ msgid "Refresh local details for players"
 msgstr "Odśwież lokalne szczegóły dla playerów"
 
 #: /resources/settings.xml
-msgctxt "#32509"
-msgid "Alternate TMDb endpoint"
-msgstr "Alternatywny endpoint TMDb"
-
-#: /resources/settings.xml
-msgctxt "#32514"
-msgid "Add to MDbList list"
-msgstr "Dodaj do listy MDbList"
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32516"
-msgid "MDbList API credentials not found."
-msgstr "Nie znaleziono danych uwierzytelniających API MDbList."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32517"
-msgid "Add your personal MDbList API key in the MDbList module settings."
-msgstr "Dodaj swój osobisty klucz API MDbList w ustawieniach modułu MDbList."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32518"
-msgid "No static lists found for current MDbList user."
-msgstr "Nie znaleziono list statycznych dla bieżącego użytkownika MDbList."
-
-#: /resources/tmdbhelper/lib/script/sync.py
-msgctxt "#32519"
-msgid "Remove from MDbList list"
-msgstr "Usuń z listy MDbList"
-
-#: /resources/settings.xml
 msgctxt "#32520"
 msgid "TMDb"
 msgstr "TMDb"
@@ -2407,31 +2259,6 @@ msgstr "Wszystkie wydania cyfrowe"
 msgctxt "#32541"
 msgid "Groups"
 msgstr "Grupy odcinków"
-
-#: /resources/settings.xml
-msgctxt "#32542"
-msgid "Groups"
-msgstr "Grupy"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32543"
-msgid "Curated Lists"
-msgstr "Listy autorskie"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32544"
-msgid "Official Lists"
-msgstr "Listy oficjalne"
-
-#: /resources/tmdbhelper/lib/items/directories/base/basedir_mdblist.py
-msgctxt "#32545"
-msgid "Streaming Charts"
-msgstr "Rankingi streamingu"
-
-#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
-msgctxt "#32546"
-msgid "Trakt / MDbList options"
-msgstr "Opcje Trakt / MDbList"
 
 #: /resources/tmdbhelper/lib/script/discover/trakt.py
 msgctxt "#32547"

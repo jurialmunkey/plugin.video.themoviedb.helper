@@ -440,11 +440,6 @@ class DiscoverMain(WindowXMLDialog):
     def route_index(self, class_name):
         return next((x for x, i in enumerate(self.routes) if i.__class__.__name__ == class_name), None)
 
-    @cached_property
-    def trakt_api(self):
-        from tmdbhelper.lib.api.trakt.api import TraktAPI
-        return TraktAPI()
-
     def onAction(self, action):
         action_id = action.getId()
         if action_id in self.ACTION_CLOSEWINDOW:

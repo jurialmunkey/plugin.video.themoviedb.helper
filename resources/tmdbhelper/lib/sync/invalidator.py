@@ -4,13 +4,14 @@ from tmdbhelper.lib.addon.plugin import get_localized
 from tmdbhelper.lib.sync.features import FEATURE_LABELS, SYNC_FEATURES
 from tmdbhelper.lib.sync.datasync import SyncDataFactory
 from tmdbhelper.lib.sync.activity import SyncLastActivities
-from tmdbhelper.lib.sync.providers.stats import StatsInvalidator
+from tmdbhelper.lib.sync.stats import SyncStats
 
 
 class SyncInvalidatorAll:
     notification = True
     features = tuple(FEATURE_LABELS)
     localized_id = 593
+    cache_tables = {'ratings': 'ratings'}
     sync_table = {
         'plays': ('movie', 'show'),
         'aired_episodes': ('show',),
@@ -79,16 +80,26 @@ class SyncInvalidatorAll:
             item_id = f'{item_type}.{provider_id}.{method}'
             self.syncdata.invalidate_activity(item_id)
 
+    def invalidate_cached_tables(self):
+        for feature, table in self.cache_tables.items():
+            if feature in self.features:
+                self.syncdata.cache.del_list_values(table=table, conditions='1=1')
+
     def invalidate(self, clear_data=True):
         if clear_data and self.database_keys:
             self.syncdata.cache.del_column_values(keys=self.database_keys)
         for provider in self.providers:
             self.invalidate_provider(provider)
+        # Public caches refresh on demand, independently of account data resync.
+        self.invalidate_cached_tables()
+        if clear_data:
+            SyncStats(self.syncdata).clear(self.features)
 
     def sync(self):
         for item_type in ('movie', 'show', 'season', 'episode'):
             keys = tuple(key for key in self.database_keys if item_type in self.sync_table[key])
             self.syncdata.sync(item_type, keys)
+        SyncStats(self.syncdata).update(self.features)
 
     def run(self, sync=False):
         # Resync replaces columns after a successful response; keep them available until then.
@@ -125,9 +136,14 @@ class SyncInvalidatorRatings(SyncInvalidatorAll):
 
 
 def SyncInvalidator(datatype):
-    routes = {'watched': SyncInvalidatorWatchedProgress, 'collection': SyncInvalidatorCollection,
-              'watchlist': SyncInvalidatorWatchlist, 'favorites': SyncInvalidatorFavorites,
-              'ratings': SyncInvalidatorRatings, 'stats': StatsInvalidator, 'all': SyncInvalidatorAll}
+    routes = {
+        'watched': SyncInvalidatorWatchedProgress,
+        'collection': SyncInvalidatorCollection,
+        'watchlist': SyncInvalidatorWatchlist,
+        'favorites': SyncInvalidatorFavorites,
+        'ratings': SyncInvalidatorRatings,
+        'all': SyncInvalidatorAll,
+    }
     try:
         selected = routes[datatype]
     except KeyError:

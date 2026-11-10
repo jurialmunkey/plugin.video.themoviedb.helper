@@ -14,7 +14,7 @@ class MediaItemInfoLabelItemMethod:
 class MediaItemInfoLabelItemRoutes:
     certification = (('certification', None), MediaItemInfoLabelItemMethod.certification, 'mpaa')
     trailer = (('video', None), 'path', 'trailer')
-    playcount = (('playcount', None), 'plays', 'playcount')
+    playcount = (('item_sync_state', None), 'plays', 'playcount')
     imdbnumber = (('imdbnumber', None), 'value', 'imdbnumber')
     series_stats_rating = (('series_stats', None), 'rating', 'rating')
     series_stats_votes = (('series_stats', None), 'votes', 'votes')
@@ -30,5 +30,5 @@ class MediaItemInfoLabelItemRoutes:
 
 
 class MediaItemInfoPropertyItemRoutes:
-    watchedcount = (('watchedcount', None), 'watched_episodes', 'watchedepisodes')
-    episodecount = (('airedcount', None), 'aired_episodes', 'airedepisodes')
+    watchedcount = (('item_sync_state', None), 'watched_episodes', 'watchedepisodes')
+    episodecount = (('item_sync_state', None), 'aired_episodes', 'airedepisodes')

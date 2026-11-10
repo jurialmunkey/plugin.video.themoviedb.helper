@@ -4,6 +4,7 @@ from tmdbhelper.lib.items.database.baseitem_factories.concrete_classes.baseclass
 
 class MediaItem(BaseItem):
     ftv_type = None
+    metadata_save_scope = 'family'  # Other items only gain shared details that were missing
 
     @cached_property
     def db_table_caches(self):

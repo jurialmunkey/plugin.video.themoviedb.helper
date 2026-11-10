@@ -353,11 +353,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Halautko päivittää kirjaston Trakt-listoista nyt?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Valitse listat"
-
 
 
 #: /resources/lib/context.py
@@ -1314,22 +1309,6 @@ msgstr "Ensiesitykset"
 
 
 
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Top-listat"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr "MDbList API"
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "MDbList API -avain"
-
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
@@ -1472,11 +1451,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Seuraavaksi esitettävät jaksosi"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Palkinnot"
-
 
 
 
@@ -1514,12 +1488,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Valitse sarjan, kauden tai jakson oletussoitin"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr "TVDb API"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"

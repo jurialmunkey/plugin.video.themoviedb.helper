@@ -352,11 +352,6 @@ msgctxt "#32132"
 msgid "Do you wish to update the library from the Trakt list(s) now?"
 msgstr "Оновити медіатеку із списків Trakt зараз?"
 
-#: /resources/lib/script.py
-msgctxt "#32133"
-msgid "Select List(s)"
-msgstr "Оберіть список"
-
 
 
 #: /resources/lib/context.py
@@ -1315,22 +1310,6 @@ msgstr "Прем'єра"
 
 
 
-
-#: /resources/lib/items/basedir.py
-msgctxt "#32421"
-msgid "Top Lists"
-msgstr "Топ списки"
-
-#: /resources/settings.xml
-msgctxt "#32422"
-msgid "MDbList API"
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32423"
-msgid "MDbList API key"
-msgstr "API ключ MDbList"
-
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
 msgid "Make episode playlists"
@@ -1473,11 +1452,6 @@ msgctxt "#32459"
 msgid "Your Episodes Airing Next"
 msgstr "Ваші серії скоро в ефірі"
 
-#: /resources/lib/items/basedir.py
-msgctxt "#32460"
-msgid "Awards"
-msgstr "Нагороди"
-
 
 
 
@@ -1515,12 +1489,6 @@ msgid "Change default player for tvshow, season, or episode"
 msgstr "Змінити стандартний плеєр для серіалів, сезонів чи епізодів"
 
 
-
-
-#: /resources/settings.xml
-msgctxt "#32484"
-msgid "TVDb API"
-msgstr ""
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"

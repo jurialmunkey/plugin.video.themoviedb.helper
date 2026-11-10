@@ -71,4 +71,8 @@ class ArtworkDetailsMixin:
         return self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.values, conditions)
 
     def get_cached_data(self):
-        return self.get_cached_data_by_language() or self.get_cached_data_by_english() or self.get_cached_data_by_null()
+        data = self.get_cached_data_by_language()
+        # The language lookup already tried English when it is the configured language.
+        if not data and self.common_apis.tmdb_api.iso_language != 'en':
+            data = self.get_cached_data_by_english()
+        return data or self.get_cached_data_by_null()

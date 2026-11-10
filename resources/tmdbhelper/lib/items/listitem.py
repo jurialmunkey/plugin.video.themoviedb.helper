@@ -108,6 +108,7 @@ class _ListItem(object):
     is_unaired = False
 
     context_additions = None
+    context_menu_config = None  # A ContextMenuConfig shared by the list's items
     infoproperties_additions = {}
     format_unaired_labels = False
     label_format_unaired = '{}'
@@ -206,7 +207,7 @@ class _ListItem(object):
 
     def finalise_context_menu(self):
         from tmdbhelper.lib.items.context import ContextMenu
-        self.context_menu += ContextMenu(self).get()
+        self.context_menu += ContextMenu(self, self.context_menu_config).get()
         self.context_menu += self.context_additions or []
         return self.context_menu
 
@@ -245,10 +246,7 @@ class _ListItem(object):
 
         if self.infoproperties.get('is_sortable'):
             self.params['parent_info'] = self.params['info']
-            self.params['info'] = {
-                'mdblist': 'mdblist_sortby',
-                'sync': 'sync_sortby',
-            }.get(self.infoproperties['is_sortable'], 'trakt_sortby')  # Display sorting options in skinshortcuts
+            self.params['info'] = self.infoproperties.get('sortby_info') or 'sync_sortby'
 
         if self.params.get('info') == 'search' and not self.params.get('query'):
             self.params['reload'] = 'forced'  # Add param to empty search to ensure reloads

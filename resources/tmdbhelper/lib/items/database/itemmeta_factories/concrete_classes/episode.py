@@ -8,10 +8,11 @@ class Episode(MediaItem):
     infolabels_dbcitem_routes = (
         MediaItemInfoLabelItemRoutes.certification,
         MediaItemInfoLabelItemRoutes.trailer,
-        MediaItemInfoLabelItemRoutes.playcount,
         MediaItemInfoLabelItemRoutes.imdbnumber,
         MediaItemInfoLabelItemRoutes.english_plot,
     )
+
+    infolabels_freshitem_routes = (MediaItemInfoLabelItemRoutes.playcount, )
 
     @property
     def art_dbclist_routes(self):
@@ -82,6 +83,9 @@ class Episode(MediaItem):
     def get_infoproperties_special(self, infoproperties):
         infoproperties = self.get_infoproperties_custom(infoproperties)
         infoproperties = self.get_infoproperties_translation(infoproperties)
+        return infoproperties
+
+    def get_infoproperties_fresh(self, infoproperties):
         infoproperties = self.get_infoproperties_episode_type(infoproperties)
         infoproperties = self.get_infoproperties_lastplayed(infoproperties)
         infoproperties = self.get_infoproperties_progress(infoproperties)

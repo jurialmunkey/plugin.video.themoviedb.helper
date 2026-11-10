@@ -65,11 +65,16 @@ several layers, each retaining its own responsibility.
 
 ## Organization and reuse
 
-- Prefer hanging indents for continuation lines over vertical alignment with
-  the opening delimiter. Follow PEP 8's hanging-indent guidance:
-  put no arguments on the first line and indent continuation lines to clearly
-  distinguish them from the surrounding code. Use an extra indentation level
-  to distinguish continued function parameters from the body.
+- Use hanging indents only when the single-line form exceeds the applicable
+  line-length limit. Leave the opening delimiter's line empty of arguments or
+  entries, then put one argument, parameter, collection element, or dictionary
+  key-value pair per line. Use four-space continuation indents. Put closing
+  parentheses, brackets, and braces on separate lines aligned with the opening
+  line's indentation. Use trailing commas where valid. Apply the same rules to
+  nested collections that require wrapping.
+- In wrapped comprehensions and generator expressions, put the result
+  expression and each `for` or `if` clause on separate lines at the same
+  hanging-indent level.
 - Always use explicitly named absolute imports. Relative imports and wildcard
   (`from ... import *`) imports are not permitted.
 - Keep a distinct feature in its own appropriately named modules.
@@ -84,6 +89,17 @@ several layers, each retaining its own responsibility.
   as belonging to one configured list instance.
 - Implement object oriented programming (OOP) practices where practical. Create
   classes with properties. Use abstractions, inheritance, and subclassing.
+- Encapsulate related data transformation and result assembly in a focused
+  helper class. Initialise it with the source data and required configuration.
+- Expose derived values and the assembled result through named properties.
+  Build results from those properties, keeping intermediate calculations on
+  the instance rather than passing the same data between helper functions.
+- Keep each calculation small and single-purpose. Put calculation logic in
+  `get_x()` methods, with the corresponding properties returning their results.
+- Use `cached_property` for derived values that remain valid for the configured
+  instance and benefit from reuse; use `property` for values that must reflect
+  changing state. Create a new instance when changing inputs would invalidate
+  cached results.
 - Follow EAFP programming principles. Avoid using "guards" to deal with errors
   arising from unexpected or misconfigured data. Never wallpaper over issues or
   mask the error, instead investigate underlying cause.

@@ -24,7 +24,7 @@ class Tvshow(FlatSeasonMediaList):
     def get_parent_precache_seasons(self):
         # Include specials, and skip seasons whose premiere is after this range.
         return [
-            self.get_parent_data('season', item['infolabels']['season'], cache_refresh='basic')
+            self.get_parent_precache('season', item['infolabels']['season'], cache_refresh='basic')
             for item in self.parent_season_media_list or []
             if not item['infolabels'].get('premiered') or item['infolabels']['premiered'] < self.end_date
         ]
