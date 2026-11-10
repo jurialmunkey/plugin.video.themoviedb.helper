@@ -3552,3 +3552,53 @@ msgstr "基础"
 msgctxt "#32760"
 msgid "Detailed"
 msgstr "详细"
+
+#: /resources/settings.xml
+msgctxt "#32761"
+msgid "Show expired widget lists for up to"
+msgstr "过期小部件列表最长显示时间"
+
+#: /resources/settings.xml
+msgctxt "#32762"
+msgid "When a widget's TMDb list is older than its normal 6 hour cache, show the saved list straight away and download the new list after the widget has loaded. The new list appears the next time Kodi reloads the widget. Lists for today, such as Airing Today, always wait for new data. Off waits for new data every time."
+msgstr "当小部件的 TMDb 列表超过其正常的 6 小时缓存后，立即显示已保存的列表，并在小部件加载完成后下载新列表。新列表将在 Kodi 下次重新加载该小部件时显示。今日类列表（如“今日播出”）始终等待新数据。“关闭”表示每次都等待新数据。"
+
+#: /resources/settings.xml
+msgctxt "#32763"
+msgid "Off"
+msgstr "关闭"
+
+#: /resources/settings.xml
+msgctxt "#32764"
+msgid "24 hours"
+msgstr "24 小时"
+
+#: /resources/settings.xml
+msgctxt "#32765"
+msgid "48 hours"
+msgstr "48 小时"
+
+#: /resources/settings.xml
+msgctxt "#32766"
+msgid "72 hours"
+msgstr "72 小时"
+
+#: /resources/tmdbhelper/lib/items/context_random.py
+msgctxt "#32767"
+msgid "Play random"
+msgstr "随机播放"
+
+#: /resources/settings.xml
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr "在右键菜单中显示随机播放选项，从文件夹中随机播放一部电影或一集剧集，每一级从当前页面中选择。"
+
+#: /resources/tmdbhelper/lib/script/method/play_random.py
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr "未找到可播放的项目。"
+
+#: /resources/tmdbhelper/lib/items/context_nextepisodes.py
+msgctxt "#32770"
+msgid "Browse next episodes"
+msgstr "浏览下一集"
