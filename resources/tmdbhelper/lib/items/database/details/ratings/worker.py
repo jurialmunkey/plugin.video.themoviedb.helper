@@ -20,14 +20,17 @@ class DetailsRatingsWorker:
     one lookup and keeps one waiting: a newer item replaces the waiting one, so lookups
     do not pile up while scrolling. Lists receive ratings with their items from a pooled
     lane that is never replaced. Every request for an item shares its lookup in progress.
-    Ratings are returned first and saved afterwards.
+    Ratings are returned first and saved afterwards. Expired ratings are returned at once
+    and refreshed on their own lane, so that refreshes never hold up either lane.
     """
 
     list_workers = 8
+    stale_hold_time = 3600  # Expired ratings are reused this long before a failed refresh is retried
 
     def __init__(self):
         self.lock = RLock()
         self.lookups = {}  # Lookup futures by item key while queued or running
+        self.refreshes = {}  # Refresh futures by item key while queued or running
         self.waiting = None  # The monitor lane's queued lookup, which a newer item replaces
         self.memory = DetailsRatingsMemory()
         self.apis = DetailsAPIs()
@@ -35,6 +38,7 @@ class DetailsRatingsWorker:
         self.monitor_lane = ThreadPoolExecutor(max_workers=1, thread_name_prefix='TMDbHelper ratings')
         self.list_lane = ThreadPoolExecutor(max_workers=self.list_workers, thread_name_prefix='TMDbHelper list ratings')
         self.saves = ThreadPoolExecutor(max_workers=1, thread_name_prefix='TMDbHelper ratings save')
+        self.refresh_lane = ThreadPoolExecutor(max_workers=1, thread_name_prefix='TMDbHelper ratings refresh')
 
     @cached_property
     def awards_database(self):
@@ -129,13 +133,54 @@ class DetailsRatingsWorker:
             raise
 
     def get_lookup_ratings(self, item):
-        lookup = DetailsRatingsLookup(item, self.apis.get(item.request.language), self.get_ratings_settings())
-        ratings = lookup.ratings
-        if ratings:  # Empty ratings are retried next time, as an empty saved row is
-            self.memory.set(item.key, ratings, lookup.expiry)
+        lookup = self.get_lookup(item, allow_stale=True)
+        self.complete(item, lookup)
+        if lookup.is_stale:
+            self.refresh(item)
+        return lookup.ratings
+
+    def get_lookup(self, item, allow_stale=False):
+        return DetailsRatingsLookup(
+            item,
+            self.apis.get(item.request.language),
+            self.get_ratings_settings(),
+            allow_stale=allow_stale,
+        )
+
+    def complete(self, item, lookup):
+        """Remember the lookup's ratings, then save any that were retrieved online."""
+        self.remember(item, lookup)
         if lookup.unsaved_levels:
             self.saves.submit(self.save, lookup)
-        return ratings
+
+    def remember(self, item, lookup):
+        if not lookup.ratings:  # Empty ratings are retried next time, as an empty saved row is
+            return
+        self.memory.set(item.key, lookup.ratings, self.get_memory_expiry(lookup))
+
+    def get_memory_expiry(self, lookup):
+        """Expired ratings are held briefly, so that a failed refresh is retried later."""
+        if lookup.is_stale:
+            return self.memory.current_time + self.stale_hold_time
+        return lookup.expiry
+
+    def refresh(self, item):
+        """Refresh expired ratings once at a time per item, without holding up either lane."""
+        with self.lock:
+            if item.key in self.refreshes:
+                return
+            future = self.refreshes[item.key] = self.refresh_lane.submit(self.refresh_ratings, item)
+            future.add_done_callback(lambda future, key=item.key: self.remove_refresh(key))
+
+    def remove_refresh(self, key):
+        with self.lock:
+            del self.refreshes[key]
+
+    def refresh_ratings(self, item):
+        try:
+            self.complete(item, self.get_lookup(item))
+        except Exception:
+            kodi_log(f'Item ratings refresh failed for {item.key}:\n{format_exc()}', 1)
 
     @staticmethod
     def save(lookup):
@@ -162,3 +207,4 @@ class DetailsRatingsWorker:
         self.monitor_lane.shutdown(wait=False)
         self.list_lane.shutdown(wait=False)
         self.saves.shutdown(wait=False)
+        self.refresh_lane.shutdown(wait=False)

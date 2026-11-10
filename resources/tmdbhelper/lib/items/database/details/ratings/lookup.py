@@ -1,7 +1,9 @@
 from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.addon.thread import ParallelThread
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings import (
     RatingsDict,
     RatingsEpisodesDict,
+    RatingsItemIds,
     RatingsSeasonsDict,
 )
 
@@ -35,12 +37,22 @@ class DetailsRatingsItem:
 
 class DetailsRatingsLookup:
     """Ratings for an item's show, season and episode levels, from the ratings table or online.
-    Online ratings are returned before they are saved."""
+    The levels are retrieved in parallel. Online ratings are returned before they are saved.
+    With allow_stale, expired ratings are returned for the caller to refresh separately."""
 
-    def __init__(self, item, common_apis, ratings_settings):
+    def __init__(self, item, common_apis, ratings_settings, allow_stale=False):
         self.item = item
         self.common_apis = common_apis
         self.ratings_settings = ratings_settings
+        self.allow_stale = allow_stale
+
+    @cached_property
+    def item_ids(self):
+        return self.get_item_ids()
+
+    def get_item_ids(self):
+        """Shared by every level: each level's suppliers look items up by the show's IMDb ID."""
+        return RatingsItemIds(self.item.tmdb_type, self.item.request.tmdb_id, self.common_apis.tmdb_api)
 
     @cached_property
     def levels(self):
@@ -62,7 +74,13 @@ class DetailsRatingsLookup:
         level.season = season
         level.episode = episode
         level.ratings_settings = self.ratings_settings
+        level.item_ids = self.item_ids
+        level.allow_stale = self.allow_stale
         return level
+
+    @staticmethod
+    def get_level_ratings(level):
+        return level.ratings
 
     @cached_property
     def ratings(self):
@@ -70,10 +88,17 @@ class DetailsRatingsLookup:
 
     def get_ratings(self):
         """Later levels replace the show's values, as episodes and seasons did before."""
+        # precache the shared provider settings before threading
+        for attr in ('providers', 'fingerprint'):
+            getattr(self.ratings_settings, attr)
+
+        with ParallelThread(self.levels, self.get_level_ratings) as pt:
+            items = pt.queue
+
         return {
             key: value
-            for level in self.levels
-            for key, value in level.ratings.items()
+            for ratings in items
+            for key, value in ratings.items()
         }
 
     @cached_property
@@ -82,6 +107,10 @@ class DetailsRatingsLookup:
 
     def get_expiry(self):
         return min(level.ratings_expiry for level in self.levels)
+
+    @property
+    def is_stale(self):
+        return any(level.is_stale for level in self.levels)
 
     @property
     def unsaved_levels(self):

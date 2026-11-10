@@ -1,4 +1,6 @@
+from threading import Lock
 from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.addon.consts import DAY_IN_SECONDS
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
 from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.addon.thread import ParallelThread
@@ -6,11 +8,44 @@ from tmdbhelper.lib.sync.providers.ratings_settings import RatingsProviderSettin
 from jurialmunkey.parser import try_int
 
 
+class RatingsItemIds:
+    """ Identifiers that ratings suppliers look items up by. The IMDb ID is looked up once,
+    on first use, so that suppliers which only need the TMDb ID never wait for it """
+
+    def __init__(self, tmdb_type, tmdb_id, tmdb_api):
+        self.tmdb_type = tmdb_type
+        self.tmdb_id = tmdb_id
+        self.tmdb_api = tmdb_api
+        self.lock = Lock()  # Per item, so that lookups for other items do not wait
+
+    @property
+    def imdb_id(self):
+        with self.lock:
+            return self.cached_imdb_id
+
+    @cached_property
+    def cached_imdb_id(self):
+        return self.get_imdb_id()
+
+    def get_imdb_id(self):
+        database = FindQueriesDatabase()
+        database.tmdb_api = self.tmdb_api
+        return database.get_external_ids(self.tmdb_type, self.tmdb_id).get('imdb')
+
+
 class RatingsDict(BaseList):
     expiry_time = 7 * 86400
+    deletion_grace = 30 * DAY_IN_SECONDS  # Expired ratings are kept to show while they refresh
     cached_data_table = table = 'ratings'
-    cached_data_conditions = 'id=? AND expiry>=? AND provider_fingerprint=?'
+    cached_data_conditions = 'id=? AND provider_fingerprint=?'
     placeholder_keys = ('id', 'mediatype', 'expiry', 'language')
+    allow_stale = False  # Return expired ratings for the caller to refresh separately
+
+    ratings_sources = {
+        'cached': 'cached_ratings',
+        'stale': 'stale_ratings',
+        'online': 'online_ratings',
+    }
 
     rating_attribs = (
         'provider_ratings',
@@ -29,8 +64,13 @@ class RatingsDict(BaseList):
 
     @property
     def cached_data_values(self):
-        """ WHERE condition ? ? ? ? = value, value, value, value """
-        return (self.item_id, self.current_time, self.ratings_settings.fingerprint)
+        """ WHERE condition ? ? = value, value. Expired rows are read too """
+        return (self.item_id, self.ratings_settings.fingerprint)
+
+    @property
+    def deletion(self):
+        """ Lease that keeps the row long enough after expiry to show while it refreshes """
+        return self.expiry + self.deletion_grace
 
     @cached_property
     def ratings_settings(self):
@@ -44,8 +84,11 @@ class RatingsDict(BaseList):
         return self.get_mediatype()
 
     @cached_property
-    def imdb_id(self):
-        return self.get_imdb_id()
+    def item_ids(self):
+        return self.get_item_ids()
+
+    def get_item_ids(self):
+        return RatingsItemIds(self.tmdb_type, self.tmdb_id, self.common_apis.tmdb_api)
 
     @cached_property
     def imdb_top250_list(self):
@@ -56,11 +99,6 @@ class RatingsDict(BaseList):
             return 'movie'
         if self.tmdb_type == 'tv':
             return 'tvshow'
-
-    def get_imdb_id(self):
-        database = FindQueriesDatabase()
-        database.tmdb_api = self.common_apis.tmdb_api
-        return database.get_external_ids(self.tmdb_type, self.tmdb_id).get('imdb')
 
     def get_imdb_top250_list(self):
         return FindQueriesDatabase().get_imdb_top250_list_cached(self.tmdb_type)
@@ -74,7 +112,7 @@ class RatingsDict(BaseList):
         return tuple(
             provider.ratings_classes[self.mediatype](
                 provider=provider, tmdb_type=self.tmdb_type, tmdb_id=self.tmdb_id,
-                imdb_id=self.imdb_id, season=self.season, episode=self.episode)
+                item_ids=self.item_ids, season=self.season, episode=self.episode)
             for provider in providers)
 
     @cached_property
@@ -119,8 +157,8 @@ class RatingsDict(BaseList):
             data = getattr(self, attr)
             return data or {}
 
-        # precache some property values before threading
-        for attr in ('mediatype', 'imdb_id', 'ratings_suppliers'):
+        # precache some property values before threading; suppliers look up the IMDb ID if needed
+        for attr in ('mediatype', 'ratings_suppliers'):
             getattr(self, attr)
 
         with ParallelThread(self.rating_attribs, get_data_attr) as pt:
@@ -152,14 +190,29 @@ class RatingsDict(BaseList):
             return
         return data[0]
 
+    @cached_property
+    def is_cached_fresh(self):
+        return self.cached_row is not None and self.cached_row['expiry'] >= self.current_time
+
     def get_cached_data(self):
-        if self.cached_row is None:
+        """ Saved ratings that have not expired """
+        if not self.is_cached_fresh:
             return
         return self.map_row(self.cached_row)
 
     @cached_property
     def cached_ratings(self):
         return self.get_cached_data()
+
+    @cached_property
+    def stale_ratings(self):
+        return self.get_stale_ratings()
+
+    def get_stale_ratings(self):
+        """ Saved ratings that have expired """
+        if self.cached_row is None or self.is_cached_fresh:
+            return
+        return self.map_row(self.cached_row)
 
     @cached_property
     def online_row(self):
@@ -177,20 +230,40 @@ class RatingsDict(BaseList):
         return self.get_ratings()
 
     def get_ratings(self):
-        """ Ratings saved by an earlier lookup, otherwise ratings retrieved online and not yet saved """
-        if not self.data_cond:
+        if self.ratings_source is None:
             return {}
-        return self.cached_ratings or self.online_ratings
+        return getattr(self, self.ratings_sources[self.ratings_source]) or {}
+
+    @cached_property
+    def ratings_source(self):
+        return self.get_ratings_source()
+
+    def get_ratings_source(self):
+        """ Unexpired saved ratings, then expired ones when allowed, then online ratings.
+        An empty online result falls back to expired ratings rather than replacing them """
+        if not self.data_cond:
+            return
+        if self.cached_ratings:
+            return 'cached'
+        if self.allow_stale and self.stale_ratings:
+            return 'stale'
+        if self.online_ratings or not self.stale_ratings:
+            return 'online'
+        return 'stale'
+
+    @property
+    def is_stale(self):
+        return self.ratings_source == 'stale'
 
     @property
     def is_unsaved(self):
-        return bool(self.data_cond and not self.cached_ratings)
+        return self.ratings_source == 'online'
 
     @property
     def ratings_expiry(self):
-        if self.cached_ratings:
-            return self.cached_row['expiry']
-        return self.online_row['expiry']
+        if self.is_unsaved:
+            return self.online_row['expiry']
+        return self.cached_row['expiry']
 
     def map_row(self, row):
         mapped_data = {}
