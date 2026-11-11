@@ -3,6 +3,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.monitor.images import ImageFunctions
 from tmdbhelper.lib.monitor.common import CommonMonitorFunctions
 from tmdbhelper.lib.addon.plugin import get_condvisibility, get_infolabel, get_setting
+from tmdbhelper.lib.addon.thread import SafeThread
 from tmdbhelper.lib.monitor.scrobbler import PlayerScrobblerFactory
 
 
@@ -14,6 +15,7 @@ class PlayerItem():
     def baseitem(self):
         if not self._parent.isPlayingVideo():
             return
+        self._parent.lidc.ratings = self._parent.ratings_mode
         item_data = self._parent.lidc.get_item(
             self._parent.tmdb_type,
             self._parent.tmdb_id,
@@ -175,14 +177,13 @@ class PlayerItem():
                 episode_year=self.episode_year,
             )
 
-    def get_ratings(self):
+    def get_partial_ratings(self, is_current):
+        """Each set of the item's ratings as its providers finish, until is_current() is False."""
         if not self.details:
-            return {}
-        if not get_setting('use_online_ratings'):
-            return {}
-        if get_condvisibility("Skin.HasSetting(TMDbHelper.DisableRatings)"):
-            return {}
-        return self._parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
+            return ({}, )
+        if not self._parent.is_ratings_enabled:
+            return ({}, )
+        return self._parent.get_partial_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode, is_current)
 
     def get_artwork(self):
         if not self.details:
@@ -241,6 +242,19 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
 
     def reset_player_item(self):
         self.player_item = PlayerItem(self)
+
+    def start_ratings(self):
+        """The item's ratings are read here, as the thread may outlast this player item."""
+        current_item = self.current_item
+        partial_ratings = self.player_item.get_partial_ratings(lambda: self.current_item == current_item)
+        SafeThread(target=self.set_partial_ratings, args=(partial_ratings, current_item)).start()
+
+    def set_partial_ratings(self, partial_ratings, current_item):
+        """Stops when another item plays or playback stops, so that their ratings are not replaced."""
+        for ratings in partial_ratings:
+            if self.current_item != current_item:
+                return
+            self.set_ratings_properties({'ratings': ratings})
 
     def reset_properties(self):
         self.clear_properties()
@@ -450,11 +464,11 @@ class PlayerMonitor(Player, CommonMonitorFunctions):
         # Update our artwork manipulation cropped logo
         self.update_artwork()
 
-        # Update ratings
-        self.set_ratings_properties({'ratings': self.player_item.get_ratings()})
-
         # Update our properties
         self.set_properties(self.details)
+
+        # Update ratings as their providers finish, without holding up the scrobbler
+        self.start_ratings()
 
         # Start the selected scrobblers after any resume seek.
         self.wait_for_seek(10)

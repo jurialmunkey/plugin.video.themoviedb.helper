@@ -2,7 +2,7 @@ from jurialmunkey.parser import boolean
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized
-from tmdbhelper.lib.api.contains import CommonContainerAPIs, CommonRatingsAPIs
+from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.addon.logger import TimerList
 
 
@@ -358,6 +358,13 @@ class ContainerDirectory(ContainerDirectoryCommon):
         return 'basic'
 
     @cached_property
+    def lidc_ratings(self):
+        """Lists with ratings receive them merged into their items by the item detail service."""
+        if self.is_ratings:
+            return 'merge'
+        return None
+
+    @cached_property
     def lidc(self):
         from tmdbhelper.lib.items.database.listitem import ListItemDetails
         lidc = ListItemDetails(self)
@@ -368,33 +375,11 @@ class ContainerDirectory(ContainerDirectoryCommon):
         lidc.extendedinfo = self.is_detailed
         lidc.kodi_details = self.kodi_details
         lidc.sync_details = self.sync_details
+        lidc.ratings = self.lidc_ratings
         return lidc
 
     def prepare_item_details(self):
         self.lidc.prepare(**self.params)
-
-    def build_ratings_item(self, li):
-        if not li or not li.tmdb_id:
-            return li
-        if li.tmdb_type not in ('movie', 'tv'):
-            return li
-
-        ratings_api = CommonRatingsAPIs()
-        ratings_api.tmdb_type = li.tmdb_type
-        ratings_api.tmdb_id = li.tmdb_id
-        ratings_api.season = li.season
-        ratings_api.episode = li.episode
-
-        li.infoproperties.update(ratings_api.all_ratings_no_awards)
-        return li
-
-    def build_ratings_items(self, items):
-        if not self.is_ratings:
-            return items
-        from tmdbhelper.lib.addon.thread import ParallelThread
-        with ParallelThread(items, self.build_ratings_item) as pt:
-            items = pt.queue
-        return [i for i in items if i]
 
     def build_detailed_item(self, li):
         if li.infoproperties.get('label_override'):
@@ -408,7 +393,6 @@ class ContainerDirectory(ContainerDirectoryCommon):
     def build_detailed_items(self, items):
         with TimerList(self.timer_lists, '--lidc', log_threshold=0.001, logging=self.log_timers):
             items = self.get_configured_listitems(items)
-            items = self.build_ratings_items(items)
             items = [i for i in (self.build_detailed_item(li) for li in items if li) if i]
         self.add_details_rest_timer()
         return items

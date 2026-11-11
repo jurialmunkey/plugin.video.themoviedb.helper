@@ -1,7 +1,6 @@
-from datetime import timezone
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_localized
-from tmdbhelper.lib.addon.tmdate import convert_timestamp, format_date_obj
+from tmdbhelper.lib.addon.tmdate import convert_timestamp, convert_timestamp_to_local, format_date_obj
 from tmdbhelper.lib.items.directories.mapper_basic import ItemMapper
 from tmdbhelper.lib.items.itemlist import ItemMappingBasicFactory
 
@@ -36,17 +35,25 @@ class NextMovieItemMapper(ItemMapper):
     def get_infoproperties(self):
         properties = {
             key: self.meta[key]
-            for key in ('collection_id', 'collection_position', 'collection_total', 'collection_reset_at')
+            for key in ('collection_id', 'collection_position', 'collection_total')
         }
+        properties['collection_reset_at'] = self.reset_timestamp
         properties.update(self.reset_properties)
         return properties
+
+    @cached_property
+    def reset_timestamp(self):
+        return self.get_reset_timestamp()
+
+    def get_reset_timestamp(self):
+        return convert_timestamp_to_local(self.meta['collection_reset_at'])
 
     @cached_property
     def reset_datetime(self):
         return self.get_reset_datetime()
 
     def get_reset_datetime(self):
-        return convert_timestamp(self.meta['collection_reset_at']).replace(tzinfo=timezone.utc).astimezone()
+        return convert_timestamp(self.reset_timestamp)
 
     @cached_property
     def reset_properties(self):

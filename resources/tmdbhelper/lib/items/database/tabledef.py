@@ -383,120 +383,37 @@ COLLECTION_COLUMNS = {
 
 RATINGS_COLUMNS = {
     'id': {
-        'data': 'TEXT PRIMARY KEY',
+        'data': 'TEXT',
         'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
     },
-    'provider_fingerprint': {
+    'provider': {
         'data': 'TEXT',
+        'unique': True,
     },
-    'top250': {
-        'data': 'INTEGER',
-    },
-    'tmdb_rating': {
-        'data': 'INTEGER',
-    },
-    'tmdb_votes': {
-        'data': 'INTEGER',
-    },
-    'imdb_rating': {
-        'data': 'INTEGER',
-    },
-    'imdb_votes': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_rating': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_usermeter': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_userreviews': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_reviewstotal': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_reviewsfresh': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_reviewsrotten': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_consensus': {
+    'key': {
         'data': 'TEXT',
+        'unique': True,
     },
-    'rottentomatoes_image': {
+    'value': {
+        'data': '',  # No declared type, so that values keep their own type
+    },
+}
+
+RATINGS_PROVIDER_COLUMNS = {
+    'id': {
         'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
     },
-    'rottentomatoes_usermeter_image': {
+    'provider': {
         'data': 'TEXT',
-    },
-    'metacritic_rating': {
-        'data': 'INTEGER',
-    },
-    'metacriticuser_rating': {
-        'data': 'INTEGER',
-    },
-    'metacritic_image': {
-        'data': 'TEXT',
-    },
-    'trakt_rating': {
-        'data': 'INTEGER',
-    },
-    'trakt_votes': {
-        'data': 'INTEGER',
-    },
-    'letterboxd_rating': {
-        'data': 'INTEGER',
-    },
-    'letterboxd_votes': {
-        'data': 'INTEGER',
-    },
-    'mdblist_rating': {
-        'data': 'INTEGER',
-    },
-    'mdblist_votes': {
-        'data': 'INTEGER',
-    },
-    'rogerebert_rating': {
-        'data': 'INTEGER',
-    },
-    'rogerebert_image': {
-        'data': 'TEXT',
-    },
-    'myanimelist_rating': {
-        'data': 'INTEGER',
-    },
-    'awards': {
-        'data': 'TEXT',
-    },
-    'goldenglobe_wins': {
-        'data': 'INTEGER',
-    },
-    'goldenglobe_nominations': {
-        'data': 'INTEGER',
-    },
-    'oscar_wins': {
-        'data': 'INTEGER',
-    },
-    'oscar_nominations': {
-        'data': 'INTEGER',
-    },
-    'award_wins': {
-        'data': 'INTEGER',
-    },
-    'award_nominations': {
-        'data': 'INTEGER',
-    },
-    'emmy_wins': {
-        'data': 'INTEGER',
-    },
-    'emmy_nominations': {
-        'data': 'INTEGER',
+        'unique': True,
     },
     'expiry': {
         'data': 'INTEGER',
-        'indexed': True
     },
 }
 
