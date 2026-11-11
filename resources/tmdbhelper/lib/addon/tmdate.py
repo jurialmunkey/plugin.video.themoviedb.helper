@@ -170,30 +170,33 @@ def get_days_to_air(datetime_object):
     return abs(days), days < 0
 
 
+def convert_timestamp_to_local(time_str):
+    """Format a UTC ISO timestamp in local time, retaining its offset and precision."""
+    if not time_str:
+        return
+    time_obj = datetime.datetime.fromisoformat(time_str.replace('Z', '+00:00'))
+    return time_obj.replace(tzinfo=time_obj.tzinfo or datetime.timezone.utc).astimezone().isoformat()
+
+
 def convert_timestamp(time_str, time_fmt="%Y-%m-%dT%H:%M:%S", time_lim=19, utc_convert=False):
     from tmdbhelper.lib.addon.logger import kodi_log
     if not time_str:
         return
     time_str = time_str[:time_lim] if time_lim else time_str
-    utc_offset = 0
-    if utc_convert:
-        utc_offset = -time.timezone // 3600
-        utc_offset += 1 if time.localtime().tm_isdst > 0 else 0
     try:
         time_obj = datetime.datetime.strptime(time_str, time_fmt)
-        time_obj = time_obj + datetime.timedelta(hours=utc_offset)
-        return time_obj
     except TypeError:
         try:
             time_obj = datetime.datetime(*(time.strptime(time_str, time_fmt)[0:6]))
-            time_obj = time_obj + datetime.timedelta(hours=utc_offset)
-            return time_obj
         except Exception as exc:
             kodi_log(exc, 1)
             return
     except Exception as exc:
         kodi_log(exc, 1)
         return
+    if utc_convert:
+        time_obj = time_obj.replace(tzinfo=time_obj.tzinfo or datetime.timezone.utc).astimezone().replace(tzinfo=None)
+    return time_obj
 
 
 def age_difference(birthday, deathday=None):

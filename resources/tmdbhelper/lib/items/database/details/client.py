@@ -20,18 +20,22 @@ class DetailsClient:
         self.version = get_version()
         self.timings = {}  # Stage seconds summed over batches when the service reports timings
 
-    def exchange(self, endpoint, items=None, kodi_details=False, prepare=None, invalidate=False):
+    def exchange(self, endpoint, items=None, kodi_details=False, prepare=None, invalidate=False, ratings_request=None):
         with socket.create_connection(('127.0.0.1', endpoint['port']), timeout=2) as connection:
             connection.settimeout(5)
             send_message(connection, {
-                'version': PROTOCOL_VERSION, 'token': endpoint['token'],
-                'items': items, 'kodi_details': kodi_details, 'prepare': prepare,
+                'version': PROTOCOL_VERSION,
+                'token': endpoint['token'],
+                'items': items,
+                'kodi_details': kodi_details,
+                'prepare': prepare,
                 'invalidate': invalidate,
+                'ratings_request': ratings_request,
             })
             connection.settimeout(0.25)
             response = receive_message(
                 connection, self.monitor,
-                timeout=PING_TIMEOUT if items is None else REQUEST_TIMEOUT)
+                timeout=self.get_timeout(items, ratings_request))
         if response.get('unavailable'):
             raise DetailsServiceUnavailable(response['error'])
         if response.get('error'):
@@ -42,6 +46,13 @@ class DetailsClient:
         self.log_item_errors(response.get('errors') or {})
         self.add_timings(response.get('timings') or {})
         return result
+
+    @staticmethod
+    def get_timeout(items, ratings_request):
+        """Lookups may wait online; other messages are answered at once."""
+        if items is None and ratings_request is None:
+            return PING_TIMEOUT
+        return REQUEST_TIMEOUT
 
     @staticmethod
     def log_item_errors(errors):
@@ -109,18 +120,22 @@ class DetailsClient:
             return endpoint
         return self.get_endpoint(failed_endpoint=endpoint)
 
-    def get_batch_items(self, entries, kodi_details=False):
+    def get_exchange_result(self, **kwargs):
+        """Exchange with the service, restarting it once if it no longer answers."""
         # Waiting for the service to start or answer is timed as boot.
         with self.measure('boot'):
             endpoint = self.get_current_endpoint()
         try:
-            return self.exchange(endpoint, entries, kodi_details)
+            return self.exchange(endpoint, **kwargs)
         except (OSError, DetailsServiceUnavailable):
             if self.monitor.abortRequested():
                 raise
         with self.measure('boot'):
             endpoint = self.get_retry_endpoint(endpoint)
-        return self.exchange(endpoint, entries, kodi_details)
+        return self.exchange(endpoint, **kwargs)
+
+    def get_batch_items(self, entries, kodi_details=False):
+        return self.get_exchange_result(items=entries, kodi_details=kodi_details)
 
     def get_batch(self, entries, kodi_details=False):
         try:
@@ -130,26 +145,43 @@ class DetailsClient:
             return [None for _ in entries]
 
     @staticmethod
-    def get_entries(requests, items=None):
+    def get_entries(requests, items=None, ratings=None):
         """Pair each request with the list item data to merge its details into.
         Requests without list item data are answered with the details alone.
-        A None request sends list item data for Kodi library matching only."""
+        A None request sends list item data for Kodi library matching only.
+        Ratings ('prewarm' or 'merge') apply to every request."""
         items = items or [None for _ in requests]
         return [
-            {'request': request.as_dict() if request else None, 'item': item}
+            {
+                'request': request.as_dict() if request else None,
+                'item': item,
+                'ratings': ratings if request else None,
+            }
             for request, item in zip(requests, items)
         ]
 
-    def get_items(self, requests, items=None, kodi_details=False):
-        entries = self.get_entries(requests, items)
+    def get_items(self, requests, items=None, kodi_details=False, ratings=None):
+        entries = self.get_entries(requests, items, ratings)
         return [
             item
             for offset in range(0, len(entries), MAX_REQUEST_ITEMS)
             for item in self.get_batch(entries[offset:offset + MAX_REQUEST_ITEMS], kodi_details)
         ]
 
-    def get_item(self, request):
-        return self.get_items([request])[0]
+    def get_item(self, request, ratings=None):
+        return self.get_items([request], ratings=ratings)[0]
+
+    def get_ratings(self, request, received=0, awards=False):
+        """An item's ratings so far, which a details request with 'prewarm' ratings started.
+        The reply has 'ratings', the count of providers 'received' to ask again with, and
+        'complete'. A failed request is complete without ratings, as the item had before."""
+        try:
+            return self.get_exchange_result(
+                ratings_request={'request': request.as_dict(), 'received': received, 'awards': awards},
+            )[0]
+        except (OSError, DetailsServiceError) as exc:
+            kodi_log(f'Item ratings request failed: {exc}', 1)
+            return {'ratings': {}, 'received': received, 'complete': True}
 
     def prepare(self, info=None, tmdb_type=None):
         """Ask a running service to start refreshing synced play data while the list is

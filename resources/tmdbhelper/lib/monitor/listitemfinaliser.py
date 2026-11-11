@@ -9,9 +9,7 @@ class ListItemMonitorFinaliser:
 
     @cached_property
     def ratings_enabled(self):
-        if not get_setting('use_online_ratings'):
-            return False
-        return get_condvisibility("!Skin.HasSetting(TMDbHelper.DisableRatings)")
+        return self.listitem_monitor_functions.is_ratings_enabled
 
     @cached_property
     def artwork_enabled(self):
@@ -84,12 +82,13 @@ class ListItemMonitorFinaliser:
         return self.service_monitor.images_monitor
 
     def ratings(self):
+        """Ratings are set as their providers finish. The item changing stops asking for the rest."""
         if not self.item.is_same_item:  # Dont bother getting if item changed before reached
             return
-        ratings = self.item.all_ratings
-        if not self.item.is_same_item:  # Dont bother setting if item changed before retrieved
-            return
-        self.set_ratings(ratings)
+        for ratings in self.item.partial_ratings:
+            if not self.item.is_same_item:  # Dont bother setting if item changed before retrieved
+                return
+            self.set_ratings(ratings)
 
     def artwork(self):
         if not self.item.is_same_item:  # Dont bother getting if item changed before reached

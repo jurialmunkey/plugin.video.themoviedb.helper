@@ -294,12 +294,16 @@ class MonitorItemDetails(ImageManipulations):
         return self.parent.get_infolabel(info, self.position)
 
     @cached_property
-    def all_ratings(self):
+    def partial_ratings(self):
+        return self.get_partial_ratings()
+
+    def get_partial_ratings(self):
+        """Each set of the item's ratings as its providers finish, until the item changes."""
         if self.tmdb_type not in ('movie', 'tv'):
-            return {}
+            return ({}, )
         if not self.item:
-            return {}
-        return self.parent.get_all_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode) or {}
+            return ({}, )
+        return self.parent.get_partial_ratings(self.tmdb_type, self.tmdb_id, self.season, self.episode, lambda: self.is_same_item)
 
     def set_additional_properties(self, infoproperties=None):
         if not self.item:
@@ -334,6 +338,7 @@ class MonitorItemDetails(ImageManipulations):
         self.parent.lidc.extendedinfo = self.is_extended
         self.parent.lidc.cache_refresh = None
         self.parent.lidc.cache_translations = bool(self.is_translation)
+        self.parent.lidc.ratings = self.parent.ratings_mode
         return self.parent.lidc.get_item(self.tmdb_type, self.tmdb_id, self.season, self.episode)
 
     def update_lidc_item(self):

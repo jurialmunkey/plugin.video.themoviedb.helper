@@ -4,8 +4,9 @@ import xbmcvfs
 import colorsys
 import hashlib
 import random
+import re
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
-from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, get_condvisibility, get_localized, ADDONDATA
+from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, get_condvisibility, ADDONDATA
 from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
@@ -20,29 +21,6 @@ ARTWORK_LOOKUP_TABLE = {
     'fanart': ['Art(fanart)', 'Art(thumb)'],
     'landscape': ['Art(landscape)', 'Art(fanart)', 'Art(thumb)'],
     'thumb': ['Art(thumb)']}
-
-# Localized folder labels from Kodi's video/music database directory nodes.
-BLUR_FALLBACK_CONTENT_LABELS = (
-    ('genres', (135, )),
-    ('years', (652, 38078)),
-    ('actors', (344, )),
-    ('directors', (20348, )),
-    ('studios', (20388, )),
-    ('sets', (20434, )),
-    ('countries', (20451, )),
-    ('tags', (20459, )),
-    ('videoversions', (40000, )),
-    ('movies', (342, 20386)),
-    ('tvshows', (20343, 626)),
-    ('episodes', (20387, )),
-    ('musicvideos', (20389, 20390)),
-    ('artists', (133, )),
-    ('albums', (132, 359, 517, 521, 10505)),
-    ('songs', (134, 1050, 10504)),
-    ('roles', (38033, )),
-    ('sources', (39031, )),
-    ('discs', (14087, )),
-)
 
 # PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
 # Lazy import PIL to avoid using it unless user requires ImageFunctions
@@ -559,31 +537,12 @@ class ImageManipulations(WindowPropertySetter):
             if img_get.artwork_fallback:
                 return img_get.artwork_fallback
 
-    def get_blur_fallback_content(self):
-        if not self.get_condvisibility('IsFolder'):
-            return
-        label = (self.get_infolabel('Label') or '').casefold()
-        if not label:
-            return
-        if label == get_localized(10024).casefold():  # Titles has a different content type for each video library.
-            path = (self.get_infolabel('FolderPath') or '').lower()
-            return next((
-                content for content in ('movies', 'tvshows', 'musicvideos')
-                if path.startswith(f'videodb://{content}/titles/')
-            ), None)
-        return next((
-            content for content, label_ids in BLUR_FALLBACK_CONTENT_LABELS
-            if any(label == get_localized(label_id).casefold() for label_id in label_ids)
-        ), None)
+    def get_blur_fallback(self):
+        fallback = self.get_property('Blur.Fallback')
+        variable = re.fullmatch(r'\$SKINVAR\[([^\[\],]+)\]', fallback or '')
+        return get_infolabel(f'$VAR[{variable[1]}]') if variable else fallback
 
-    def get_blur_fallback(self, container_content=None):
-        container_content = container_content or get_infolabel('Container.Content')
-        container_content = container_content or self.get_blur_fallback_content()
-        fallback = self.get_property(f'Blur.Fallback.{container_content.lower()}') if container_content else None
-        fallback = fallback or self.get_property('Blur.Fallback')
-        return fallback
-
-    def get_image_manipulations(self, use_winprops=False, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', ), container_content=None):
+    def get_image_manipulations(self, use_winprops=False, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', )):
         images = {}
 
         _manipulations = (
@@ -599,7 +558,7 @@ class ImageManipulations(WindowPropertySetter):
                     source=self.get_property('Blur.SourceImage'),
                     build_fallback=True,
                     built_artwork=built_artwork)
-                or self.get_blur_fallback(container_content)},
+                or self.get_blur_fallback()},
             {'method': 'desaturate',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableDesaturate)"),
                 'images': lambda: self.get_artwork(

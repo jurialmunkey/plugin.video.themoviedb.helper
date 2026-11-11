@@ -1,5 +1,4 @@
 import json
-from hashlib import sha1
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting, set_setting
 from tmdbhelper.lib.sync.providers.registry import SyncProviderRegistry
@@ -43,18 +42,6 @@ class RatingsProviderSettings:
         return tuple(
             provider for provider in self.providers
             if provider.provider_id not in self.disabled and mediatype in provider.ratings_classes)
-
-    @cached_property
-    def fingerprint(self):
-        return self.get_fingerprint()
-
-    def get_fingerprint(self):
-        provider_ids = [
-            provider.provider_id
-            for provider in self.providers
-            if provider.provider_id not in self.disabled
-        ]
-        return sha1(json.dumps(provider_ids).encode('utf-8')).hexdigest()
 
     def save(self, order, disabled):
         configuration = {

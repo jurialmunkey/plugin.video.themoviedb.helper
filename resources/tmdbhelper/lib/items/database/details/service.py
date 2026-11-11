@@ -17,6 +17,7 @@ from tmdbhelper.lib.items.database.details.protocol import (
     MAX_REQUEST_ITEMS, PROTOCOL_VERSION, RESPONSE_TIMEOUT, ServiceLocation,
     encode_message, receive_message,
 )
+from tmdbhelper.lib.items.database.details.ratings.worker import DetailsRatingsWorker
 from tmdbhelper.lib.items.database.details.refresh import DetailsSyncRefresher
 from tmdbhelper.lib.items.database.details.request import DetailsRequest
 from tmdbhelper.lib.items.database.details.settings import DetailsSettings
@@ -65,6 +66,8 @@ class DetailsRequestHandler(BaseRequestHandler):
     def get_response(self, message):
         if message['version'] != PROTOCOL_VERSION or message['token'] != self.server.token:
             raise DetailsServiceUnavailable('Item detail service protocol/token mismatch')
+        if message.get('ratings_request') is not None:
+            return self.get_ratings_response(message['ratings_request'])
         if message.get('prepare') is not None:
             return self.get_prepare_response(message['prepare'])
         if message.get('invalidate'):
@@ -79,11 +82,13 @@ class DetailsRequestHandler(BaseRequestHandler):
         return self.get_batch_response(entries, message)
 
     def get_batch_response(self, entries, message):
+        ratings = self.start_ratings(entries)
         results = [
             self.get_entry_result(entry, result)
             for entry, result in zip(entries, self.get_detail_results(entries))]
         if message.get('kodi_details'):
             results = self.get_kodi_results(entries, results)
+        results = self.get_ratings_results(entries, results, ratings)
         return {
             'items': [item for item, error in results],
             'errors': {f'{x}': error for x, (item, error) in enumerate(results) if error},
@@ -100,6 +105,53 @@ class DetailsRequestHandler(BaseRequestHandler):
         """Clear assembled metadata after item details were changed outside the service."""
         self.server.coordinator.invalidate()
         return {'items': []}
+
+    def get_ratings_response(self, ratings_request):
+        """Ratings that a monitor prewarmed with its details request, as their providers finish."""
+        reply = self.server.ratings.get_monitor_ratings(
+            DetailsRequest(**ratings_request['request']),
+            received=ratings_request['received'],
+            awards=ratings_request['awards'],
+            timeout=RESPONSE_TIMEOUT,
+        )
+        return {'items': [reply]}
+
+    def start_ratings(self, entries):
+        """Start ratings before item details: monitors prewarm them to ask for separately,
+        and lists receive them merged into their items."""
+        return [self.start_entry_ratings(entry) for entry in entries]
+
+    def start_entry_ratings(self, entry):
+        if entry.get('ratings') is None or entry['request'] is None:
+            return
+        start = {
+            'prewarm': self.server.ratings.prewarm,
+            'merge': self.server.ratings.start_list_ratings,
+        }
+        return start[entry['ratings']](DetailsRequest(**entry['request']))
+
+    def get_ratings_results(self, entries, results, jobs):
+        deadline = monotonic() + RESPONSE_TIMEOUT
+        return [
+            self.get_entry_ratings_result(entry, result, job, deadline)
+            for entry, result, job in zip(entries, results, jobs)
+        ]
+
+    def get_entry_ratings_result(self, entry, result, job, deadline):
+        """Add list ratings after the details merge, so that they replace list values as before.
+        An item whose details failed still receives ratings with its own list data."""
+        if job is None:
+            return result
+        item, error = result
+        item = item or entry['item']
+        if item is None:
+            return result
+        try:
+            ratings = job.get_result(max(deadline - monotonic(), 0))
+        except DetailsLookupError as exc:
+            return (item, error or str(exc))
+        item['infoproperties'].update(ratings)
+        return (item, error)
 
     def get_detail_results(self, entries):
         """Details for each entry. Entries sent only for Kodi library matching have no request."""
@@ -165,6 +217,7 @@ class DetailsServer(ThreadingMixIn, TCPServer):
         self.coordinator = coordinator
         self.monitor = monitor
         self.sync_refresher = DetailsSyncRefresher()
+        self.ratings = DetailsRatingsWorker()
         self.kodi_library_cache = KodiLibraryCache()  # Library indexes kept between lists
         self.token = token_hex(24)
         super().__init__(('127.0.0.1', 0), handler_class)
@@ -174,6 +227,7 @@ class DetailsServer(ThreadingMixIn, TCPServer):
             super().server_close()
         finally:
             self.sync_refresher.close()
+            self.ratings.close()
 
     def handle_error(self, request, client_address):
         kodi_log(f'Item detail transport error:\n{traceback.format_exc()}', 1)

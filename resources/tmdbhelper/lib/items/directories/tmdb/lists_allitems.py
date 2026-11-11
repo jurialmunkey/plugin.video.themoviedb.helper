@@ -1,6 +1,7 @@
 from tmdbhelper.lib.items.container import ContainerDirectory
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, ADDONPATH
+from tmdbhelper.lib.addon.tmdate import convert_timestamp, format_date_obj
 from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
 import xbmcvfs
 
@@ -399,13 +400,10 @@ class ItemReviews(ItemViews):
         self.init_dates('updated_at', updated_at)
 
     def init_dates(self, name, value):
+        date_obj = convert_timestamp(value, utc_convert=True)
         setattr(self, name, value)
-        setattr(self, f'{name}_date', self.slice_datetime(value, None, 10))
-        setattr(self, f'{name}_time', self.slice_datetime(value, 11, 16))
-
-    @staticmethod
-    def slice_datetime(datetime, start=None, stop=None):
-        return datetime[slice(start, stop)] if datetime else ''
+        setattr(self, f'{name}_date', format_date_obj(date_obj, '%Y-%m-%d') or '')
+        setattr(self, f'{name}_time', format_date_obj(date_obj, '%H:%M') or '')
 
     @cached_property
     def icon(self):
