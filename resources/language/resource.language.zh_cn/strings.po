@@ -7,9 +7,9 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 21:05+0000\n"
-"PO-Revision-Date: 2026-11-05 16:55+0800\n"
+"PO-Revision-Date: 2026-11-11 12:03+0800\n"
 "Last-Translator: Wabisabi926\n"
-"Language-Team: LANGUAGE\n"
+"Language-Team: Chinese (Simplified)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -506,7 +506,7 @@ msgstr "将 {} 艺术图重置为默认值？"
 #: /resources/tmdbhelper/lib/script/method/modify_artwork.py
 msgctxt "#32116"
 msgid "Remove user artwork override and reset artwork to default artwork selection as defined in the settings."
-msgstr "删除用户艺术图覆盖，并将艺术图重置为设置中定义的默认艺术图选择。"
+msgstr "移除用户艺术图覆盖，并将艺术图重置为设置中定义的默认艺术图选择。"
 
 #: /resources/lib/container.py
 msgctxt "#32101"
@@ -945,7 +945,7 @@ msgstr "最多播放"
 #: /resources/lib/plugin.py
 msgctxt "#32206"
 msgid "Anticipated"
-msgstr "待上映"
+msgstr "待上线"
 
 #: /resources/lib/plugin.py
 msgctxt "#32207"
@@ -1458,7 +1458,7 @@ msgstr "错误代码：{}"
 #: /resources/lib/trakt/api.py
 msgctxt "#32319"
 msgid "Remove from liked lists"
-msgstr "从人气列表中删除"
+msgstr "从人气列表中移除"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32320"
@@ -2227,7 +2227,7 @@ msgstr "用户列表"
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32527"
 msgid "Remove from {}"
-msgstr "从{}中删除"
+msgstr "从{}中移除"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32528"
@@ -2242,7 +2242,7 @@ msgstr "观看时在 Trakt 上记录播放进度"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32530"
 msgid "Remove rating"
-msgstr "删除评分"
+msgstr "移除评分"
 
 #: /resources/tmdbhelper/lib/script/sync/item.py
 msgctxt "#32531"
@@ -2429,7 +2429,7 @@ msgstr "图像缓存清理已取消。已释放空间：{0}。"
 #: /resources/tmdbhelper/lib/script/method/image_cache.py
 msgctxt "#32573"
 msgid "Image cache cleanup is disabled while the target size is Unlimited."
-msgstr "目标大小为「无限制」时，图像缓存清理已禁用。"
+msgstr "目标大小为“无限制”时，图像缓存清理已禁用。"
 
 #: /resources/settings.xml
 msgctxt "#32574"
@@ -2464,7 +2464,7 @@ msgstr "512 MB"
 #: /resources/tmdbhelper/lib/script/sync/provider_directory.py
 msgctxt "#32580"
 msgid "The route \"{0}\" is not available in TMDbHelper. It may be available in the {1} sync module. Install or enable this module?"
-msgstr "TMDbHelper 中不提供路由「{0}」。它可能在 {1} 同步模块中可用。是否安装或启用该模块？"
+msgstr "TMDbHelper 中不提供路由“{0}”。它可能在 {1} 同步模块中可用。是否安装或启用该模块？"
 
 #: /resources/settings.xml
 msgctxt "#32581"
@@ -2769,11 +2769,6 @@ msgid "Episode player"
 msgstr "剧集播放器"
 
 #: /resources/settings.xml
-msgctxt "#32598"
-msgid "Statistics"
-msgstr "统计"
-
-#: /resources/settings.xml
 msgctxt "#32599"
 msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
 msgstr "选择接收播放活动的提供商。清空所有选择即可关闭播放同步。"
@@ -2796,7 +2791,7 @@ msgstr "更新合集"
 #: /resources/settings.xml
 msgctxt "#32604"
 msgid "Discover new movie collections daily and refresh older ones for Your Next Movies after its first use."
-msgstr "每天发现新的电影合集，并在「待看新片」首次使用后刷新较旧的合集。"
+msgstr "每天发现新的电影合集，并在“待看新片”首次使用后刷新较旧的合集。"
 
 #: /resources/settings.xml
 msgctxt "#32605"
@@ -2841,7 +2836,7 @@ msgstr "服务连接失败时显示通知。"
 #: /resources/settings.xml
 msgctxt "#32613"
 msgid "Show Browse lists in the item context menu."
-msgstr "在条目右键菜单中显示「浏览列表」。"
+msgstr "在条目右键菜单中显示“浏览列表”。"
 
 #: /resources/settings.xml
 msgctxt "#32614"
@@ -2856,12 +2851,12 @@ msgstr "在条目右键菜单中显示 TMDb 账户操作。"
 #: /resources/settings.xml
 msgctxt "#32616"
 msgid "Show Refresh details in the item context menu."
-msgstr "在条目右键菜单中显示「刷新详情」。"
+msgstr "在条目右键菜单中显示“刷新详情”。"
 
 #: /resources/settings.xml
 msgctxt "#32617"
 msgid "Show Modify artwork in the item context menu."
-msgstr "在条目右键菜单中显示「修改艺术图」。"
+msgstr "在条目右键菜单中显示“修改艺术图”。"
 
 #: /resources/settings.xml
 msgctxt "#32618"
@@ -2871,17 +2866,17 @@ msgstr "添加到媒体库"
 #: /resources/settings.xml
 msgctxt "#32619"
 msgid "Show Add to library in the item context menu."
-msgstr "在条目右键菜单中显示「添加到媒体库」。"
+msgstr "在条目右键菜单中显示“添加到媒体库”。"
 
 #: /resources/settings.xml
 msgctxt "#32620"
 msgid "Show Add node in the item context menu."
-msgstr "在条目右键菜单中显示「添加节点」。"
+msgstr "在条目右键菜单中显示“添加节点”。"
 
 #: /resources/settings.xml
 msgctxt "#32621"
 msgid "Show a next-page item in widgets when more results are available."
-msgstr "当还有更多结果时，在小部件中显示「下一页」条目。"
+msgstr "当还有更多结果时，在小部件中显示“下一页”条目。"
 
 #: /resources/settings.xml
 msgctxt "#32622"
@@ -2891,22 +2886,22 @@ msgstr "直接打开剧集列表，不显示季列表。"
 #: /resources/settings.xml
 msgctxt "#32623"
 msgid "Show the additional Specials season entry."
-msgstr "显示附加的「特别篇」季条目。"
+msgstr "显示附加的“特别篇”季条目。"
 
 #: /resources/settings.xml
 msgctxt "#32624"
 msgid "Show the additional Anticipated season entry."
-msgstr "显示附加的「待上线」季条目。"
+msgstr "显示附加的“待上线”季条目。"
 
 #: /resources/settings.xml
 msgctxt "#32625"
 msgid "Show the additional episode Groups entry."
-msgstr "显示附加的「剧集分组」条目。"
+msgstr "显示附加的“剧集分组”条目。"
 
 #: /resources/settings.xml
 msgctxt "#32626"
 msgid "Show the additional Up next season entry when signed in to Trakt."
-msgstr "登录 Trakt 后显示附加的「下个播放」季条目。"
+msgstr "登录 Trakt 后显示附加的“下个播放”季条目。"
 
 #: /resources/settings.xml
 msgctxt "#32627"
@@ -2916,7 +2911,7 @@ msgstr "将同一剧集在同一天播出的多集合并为一个日历条目。
 #: /resources/settings.xml
 msgctxt "#32628"
 msgid "Open the local TV show from entries in the next-aired library calendar."
-msgstr "从媒体库「即将播出」日历的条目打开本地剧集。"
+msgstr "从媒体库“即将播出”日历的条目打开本地剧集。"
 
 #: /resources/settings.xml
 msgctxt "#32629"
@@ -3151,17 +3146,12 @@ msgstr "存储已选评分提供商及其优先级顺序。"
 #: /resources/settings.xml
 msgctxt "#32677"
 msgid "Choose a watchlist provider, install one, or select None to disable watchlist lists."
-msgstr "选择观看列表提供商、安装一个，或选择「无」以关闭观看列表。"
+msgstr "选择观看列表提供商、安装一个，或选择“无”以关闭观看列表。"
 
 #: /resources/settings.xml
 msgctxt "#32678"
 msgid "Choose a collection provider, install one, or select None to disable collection lists."
-msgstr "选择合集提供商、安装一个，或选择「无」以关闭合集列表。"
-
-#: /resources/settings.xml
-msgctxt "#32679"
-msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
-msgstr "选择统计提供商、安装一个，或选择「无」以关闭统计列表。"
+msgstr "选择合集提供商、安装一个，或选择“无”以关闭合集列表。"
 
 #: /resources/settings.xml
 msgctxt "#32680"
@@ -3251,7 +3241,7 @@ msgstr "将额外的诊断信息写入 Kodi 日志。"
 #: /resources/settings.xml
 msgctxt "#32697"
 msgid "Disabled collects no timer reports. Basic collects directory timer reports. Detailed also collects item detail timer reports."
-msgstr "「已禁用」不收集计时报告。「基础」收集目录计时报告。「详细」还会收集条目详情计时报告。"
+msgstr "“已禁用”不收集计时报告。“基础”收集目录计时报告。“详细”还会收集条目详情计时报告。"
 
 #: /resources/settings.xml
 msgctxt "#32698"
