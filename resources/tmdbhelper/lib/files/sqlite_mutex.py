@@ -1,7 +1,7 @@
 from hashlib import sha256
 from os import makedirs
 from os.path import join
-from sqlite3 import OperationalError, connect
+from sqlite3 import connect
 from time import monotonic
 from xbmc import Monitor
 from xbmcvfs import translatePath
@@ -45,8 +45,10 @@ class SQLiteMutex:
             try:
                 self.connection.execute('BEGIN IMMEDIATE')
                 return self.name
-            except OperationalError as exc:
-                if str(exc) != 'database is locked':
+            except Exception as exc:
+                # SQLite can replace its exception classes when Kodi recreates Python subinterpreters.
+                error_type = f'{type(exc).__module__}.{type(exc).__name__}'
+                if error_type != 'sqlite3.OperationalError' or str(exc) != 'database is locked':
                     raise
             remaining = deadline - monotonic()
             if remaining <= 0:
