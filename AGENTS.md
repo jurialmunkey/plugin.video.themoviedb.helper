@@ -109,6 +109,8 @@ several layers, each retaining its own responsibility.
 - When using cached properties, prefer `get_x():` type function which returns
   the data into the cached property rather than doing the work directly in the
   property function.
+- When a subclass replaces a derived property with a fixed value, declare the
+  value directly as a class attribute instead of overriding its getter method.
 
 ## Changes to shared classes
 
@@ -146,7 +148,12 @@ several layers, each retaining its own responsibility.
   Keep SQL and sync operations out of containers and mappers.
 - Add `SyncDataGetter...` subclasses consistent with `sync/datasync.py`. Declare
   `query_clauses` and `clause_keys`, provide a `query_values` property, and override
-  `get_keys()` and `get_clause()` only where necessary.
+  `get_keys()` only where necessary. Do not override `get_clause()`; keep SQL
+  clause assembly in `SyncDataGetterAll`.
+- Set `query_grouping` and `query_ordering` to the SQL expressions after
+  `GROUP BY` and `ORDER BY`, respectively. The base `get_clause()` appends them
+  when set, after assembling the WHERE predicates from `query_clauses` and
+  `clause_keys`.
 - Reuse the inherited constructor and cached `.items` interface. Getter factory
   methods configure attributes such as `item_type`, `days`, or `months` before
   accessing cached properties. Use `get_item_type_getter()` for typed getters.
