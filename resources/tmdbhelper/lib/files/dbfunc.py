@@ -5,28 +5,35 @@ from contextlib import contextmanager
 
 
 class DatabaseConnection:
+    """Own a cursor and its connection; nested scopes borrow them from the owner."""
     open_connection = None
 
     def __init__(self, cache):
         self.cache = cache
 
     def close(self):
-        if not self.open_connection:
+        if self.open_connection is None:
             return
-        self.open_connection.close()
+        cursor = self.open_connection
+        connection = cursor.connection
         self.open_connection = None
+        try:
+            cursor.close()
+        finally:
+            connection.close()
 
     @contextmanager
     def open(self):
-        existing_connection = bool(self.open_connection)
+        existing_connection = self.open_connection is not None
 
         if not existing_connection:
             self.open_connection = self.cache.get_database().cursor()
 
-        yield self.open_connection
-
-        if not existing_connection:
-            self.close()
+        try:
+            yield self.open_connection
+        finally:
+            if not existing_connection:
+                self.close()
 
 
 class DatabaseAccess:

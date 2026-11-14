@@ -1,5 +1,4 @@
 import sqlite3
-from contextlib import contextmanager
 from threading import Lock, local
 from jurialmunkey.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
@@ -48,26 +47,6 @@ class DetailsConnection(DatabaseConnection):
         connection = cls(cache)
         connection.open_connection = cache.get_shared_database().cursor()
         return connection
-
-    def close(self):
-        if self.open_connection is None:
-            return
-        connection = self.open_connection.connection
-        try:
-            super().close()
-        finally:
-            connection.close()
-
-    @contextmanager
-    def open(self):
-        existing_connection = self.open_connection is not None
-        if not existing_connection:
-            self.open_connection = self.cache.get_database().cursor()
-        try:
-            yield self.open_connection
-        finally:
-            if not existing_connection:
-                self.close()
 
 
 class DetailsReaderConnections:
