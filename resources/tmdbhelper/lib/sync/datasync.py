@@ -373,6 +373,7 @@ class SyncDataGetterCurrentlyWatchingPlayback(SyncDataGetterAllItemsPlayback):
 class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHidden):
     clause_keys = ('upnext_episode_id', )
     query_clauses = ('item_type=?', 'tmdb_id=?', )
+    query_ordering = 'season_number, episode_number'
 
     @property
     def query_values(self):
