@@ -1,7 +1,9 @@
-from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures import wait
 from threading import RLock
 from traceback import format_exc
 from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.files.dbworkers import DatabaseWorkerPool
+from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.sync.prepare import SyncPreparation
 
 
@@ -15,6 +17,8 @@ class DetailsSyncRefresher:
     After a successful refresh, an item type is not checked again while its providers'
     last activities are unchanged: every change that needs a new sync replaces or clears
     them, and they expire so that the provider is asked again.
+
+    Each refresh thread holds its connection to the synced data for its lifetime.
     """
 
     max_workers = 2  # One movie and one show refresh at a time
@@ -24,7 +28,11 @@ class DetailsSyncRefresher:
         self.refreshes = {}
         self.preparations = {}
         self.current_markers = {}  # Last activities seen after each item type's last successful refresh
-        self.executor = ThreadPoolExecutor(max_workers=self.max_workers, thread_name_prefix='TMDbHelper sync')
+        self.executor = DatabaseWorkerPool(
+            (ItemDetailsDatabase(), ),
+            max_workers=self.max_workers,
+            thread_name_prefix='TMDbHelper sync',
+        )
 
     def get_preparation(self, item_type):
         # Selected providers only change with settings, which restart the service.

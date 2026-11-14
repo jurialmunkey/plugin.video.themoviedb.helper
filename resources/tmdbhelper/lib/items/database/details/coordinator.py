@@ -4,6 +4,7 @@ from queue import Empty, Queue
 from threading import Event, RLock, Thread
 from traceback import format_exc
 from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.files.dbworkers import DatabaseWorkerPool
 from tmdbhelper.lib.items.database.details.backend import DetailsBackend
 from tmdbhelper.lib.items.database.details.protocol import DetailsLookupError, DetailsServiceUnavailable
 from tmdbhelper.lib.items.database.details.queues import (
@@ -35,9 +36,9 @@ class DetailsCoordinator(Thread):
     """One scheduling/commit owner with separate cached, online and fast-track lanes.
 
     The coordinator thread holds its connection for the service's lifetime. Cached reads
-    run on reader threads and online lookups on lookup threads, each opening its own
-    connection. Commits run only while no reads are in flight, so reads never overlap the
-    service's own writes.
+    run on reader threads that hold their own connections for their lifetime, and online
+    lookups open one for each lookup. Commits run only while no reads are in flight, so
+    reads never overlap the service's own writes.
     """
 
     batch_size = 20
@@ -147,7 +148,8 @@ class DetailsCoordinator(Thread):
                 max_workers=self.batch_size,
                 thread_name_prefix='TMDbHelper lookup',
             )
-            self.reader = ThreadPoolExecutor(
+            self.reader = DatabaseWorkerPool(
+                (self.backend.cache, ),
                 max_workers=self.read_workers,
                 thread_name_prefix='TMDbHelper read',
             )
@@ -163,7 +165,7 @@ class DetailsCoordinator(Thread):
                 # are discarded because nothing reads the event queue any more.
                 self.executor.shutdown(wait=False)
             if self.reader is not None:
-                # Local reads are short; finish them before the backend closes.
+                # Local reads are short; readers finish them, then close their own connections.
                 self.reader.shutdown(wait=True)
             if self.backend is not None:
                 self.backend.close()
