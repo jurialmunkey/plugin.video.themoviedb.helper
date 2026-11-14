@@ -34,8 +34,10 @@ class LookupJob:
 class DetailsCoordinator(Thread):
     """One scheduling/commit owner with separate cached, online and fast-track lanes.
 
-    Cached reads run on reader threads with their own connections. Commits run only
-    while no reads are in flight, so reads never overlap the service's own writes.
+    The coordinator thread holds its connection for the service's lifetime. Cached reads
+    run on reader threads and online lookups on lookup threads, each opening its own
+    connection. Commits run only while no reads are in flight, so reads never overlap the
+    service's own writes.
     """
 
     batch_size = 20
@@ -149,15 +151,8 @@ class DetailsCoordinator(Thread):
                 max_workers=self.read_workers,
                 thread_name_prefix='TMDbHelper read',
             )
-            self.backend.prepare_stored_metadata()
-            while not self.stopping:
-                batch = self.get_batch()
-                if self.stopping:
-                    break
-                with self.backend.connection.open():
-                    self.process_batch(batch)
-            # Keep copies assembled since the last flush for the next start.
-            self.flush_stored_metadata()
+            with self.backend.cache.session():
+                self.run_batches()
         except BaseException as exc:
             self.failure = exc
             kodi_log(f'Item detail lookup failed:\n{format_exc()}', 1)
@@ -168,13 +163,23 @@ class DetailsCoordinator(Thread):
                 # are discarded because nothing reads the event queue any more.
                 self.executor.shutdown(wait=False)
             if self.reader is not None:
-                # Local reads are short; finish them before their connections close.
+                # Local reads are short; finish them before the backend closes.
                 self.reader.shutdown(wait=True)
             if self.backend is not None:
                 self.backend.close()
 
+    def run_batches(self):
+        self.backend.prepare_stored_metadata()
+        while not self.stopping:
+            batch = self.get_batch()
+            if self.stopping:
+                break
+            self.process_batch(batch)
+        # Keep copies assembled since the last flush for the next start.
+        self.flush_stored_metadata()
+
     def process_batch(self, batch):
-        """Reuse the owner connection until all immediately runnable work and reads yield."""
+        """Process all immediately runnable work until it and the reads in flight yield."""
         self.process_events(batch)
         self.run_turn()
         while not self.stopping and (self.has_work or self.reading or not self.events.empty()):
@@ -242,7 +247,7 @@ class DetailsCoordinator(Thread):
             self.lookup(admission.request, admission.future, admission.group, admission.fast_track)
             return
         self.reading += 1
-        future = self.reader.submit(self.backend.read_worker, admission.request)
+        future = self.reader.submit(self.backend.read, admission.request)
         future.add_done_callback(
             lambda future, admission=admission: self.post_event('read', admission, future),
         )
@@ -269,15 +274,11 @@ class DetailsCoordinator(Thread):
             future.job = job
             if fast_track:
                 self.promote(job)
-            lookup.close()
             return
         job = LookupJob(request, key, (request, future), group, fast_track)
         future.job = job
         self.pending[key] = job
-        try:
-            dependencies = lookup.factory.get_lookup_dependencies(request)
-        finally:
-            lookup.close()
+        dependencies = lookup.factory.get_lookup_dependencies(request)
         if not dependencies:
             self.make_ready(job)
             return
@@ -335,12 +336,9 @@ class DetailsCoordinator(Thread):
             self.finish(job)
             return
         lookup = self.backend.lookup(job.request, job.parent_data)
-        try:
-            if not lookup.factory.data_cond or not lookup.factory.online_data_cond:
-                self.finish(job)
-                return
-        finally:
-            lookup.close()
+        if not lookup.factory.data_cond or not lookup.factory.online_data_cond:
+            self.finish(job)
+            return
         queue = self.fast_track.ready if job.fast_track else self.ready
         queue.add(job)
 

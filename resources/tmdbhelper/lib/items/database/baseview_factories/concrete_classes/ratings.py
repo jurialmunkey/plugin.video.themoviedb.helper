@@ -238,18 +238,16 @@ class RatingsDict(BaseList):
     def save_online_ratings(self):
         """ Replace the saved values of each provider retrieved online, in one transaction.
         Saving does not wait for item details: the placeholder row never replaces them """
-        with self.connection.open():
-            self.connection.open_connection.execute('BEGIN')
+        with self.cache.transaction():
             self.set_or_update_null_cached_list_values('baseitem', self.placeholder_keys, self.placeholder_values)
             for entry in self.unsaved_entries:
                 self.save_entry(entry)
             self.set_cached_deletion((self.item_id, ), self.deletion)  # Keep the item while its ratings can be shown
-            self.connection.open_connection.execute('COMMIT')
 
     def save_entry(self, entry):
         """ Keys that the provider no longer returns are removed with its previous values """
         self.cache.del_list_values(
-            self.table, values=entry.key, conditions='id=? AND provider=?', connection=self.open_connection)
+            self.table, values=entry.key, conditions='id=? AND provider=?')
         self.set_cached_list_values(self.table, self.keys, entry.saved_rows, overwrite=True)
         self.set_cached_list_values(self.provider_table, self.provider_keys, entry.saved_expiry_row, overwrite=True)
 

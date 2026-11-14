@@ -82,8 +82,8 @@ class DetailsMetadataCache(ItemMetadataCache):
             return super().set_entry(key, item)
 
     def get_stored_item(self, mapper, key):
-        """Read a stored copy on the reading thread's own connection."""
-        return self.stored_metadata.read(key, mapper.parent_db_cache.connection.open_connection)
+        """Read a stored copy on the reading thread's own session."""
+        return self.stored_metadata.read(key)
 
     def get_assembled_item(self, mapper, key):
         """Assemble an item and prepare its stored copy outside the lock."""

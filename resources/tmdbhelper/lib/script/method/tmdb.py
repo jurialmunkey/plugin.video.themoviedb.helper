@@ -125,7 +125,7 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
         background=False,
     ) as progress_dialog:
         database = ItemDetailsDatabase()
-        with TimerFunc(f'Deleting mediatype {mediatype}:', inline=True):
+        with TimerFunc(f'Deleting mediatype {mediatype}:', inline=True), database.session():
             for i in routes[mediatype]['baseitems']:
                 statement = f'DELETE FROM baseitem WHERE mediatype="{i}"'
                 progress_dialog.update(statement)
@@ -140,7 +140,7 @@ def delete_itemtype(mediatype=None, confirmation=True, **kwargs):
                 progress_dialog.update(statement)
                 database.execute_sql(statement)
             progress_dialog.update('Vacuuming database...')
-            database.execute_sql('VACUUM')
+            database.vacuum()
 
     # Deleted rows can feed other items' assembled metadata, such as a person's appearances.
     from tmdbhelper.lib.items.database.details.client import DetailsClient

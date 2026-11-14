@@ -35,8 +35,7 @@ class EpisodeGroupSeasons(EpisodeGroups):
     def delete_cached_data(self):
         self.cache.del_list_values(
             table='baseitem', values=self.values,
-            conditions='id IN (SELECT id FROM episode_group_seasons WHERE group_id=?)',
-            connection=self.open_connection)
+            conditions='id IN (SELECT id FROM episode_group_seasons WHERE group_id=?)')
 
 
 class EpisodeGroupSeasonEpisodes(EpisodeGroupSeasons):

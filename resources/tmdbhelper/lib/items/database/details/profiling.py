@@ -317,17 +317,17 @@ class ProfiledDetailsBackend(DetailsBackend):
             return func(request, *args)
         return self.work_profiler.call(record, record.call, stage, func, request, *args)
 
-    def lookup(self, request, parent_data=None, connection=None):
-        lookup = self.call(request, 'factory_configuration', super().lookup, parent_data, connection)
+    def lookup(self, request, parent_data=None):
+        lookup = self.call(request, 'factory_configuration', super().lookup, parent_data)
         record = self.profiles.get(request)
         if record is not None:
             record.last_lookup = lookup
         return lookup
 
-    def read(self, request, connection=None):
+    def read(self, request):
         record = self.profiles.get(request)
         before = record.get_total('db_read') if record is not None else 0
-        data = self.call(request, 'cache_read', super().read, connection)
+        data = self.call(request, 'cache_read', super().read)
         if record is not None:
             database_time = record.get_total('db_read') - before
             record.add_time('cache_read_other', max(record.timings['cache_read'][-1] - database_time, 0))

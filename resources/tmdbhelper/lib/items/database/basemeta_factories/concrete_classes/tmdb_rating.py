@@ -18,7 +18,7 @@ class MovieTMDbRating(ItemDetailsList):
         return self.get_data()
 
     def get_data(self):
-        with self.connection.open():
+        with self.cache.session():
             rows = self.cached_data
         if not rows or rows[0]['rating'] is None:
             return {}

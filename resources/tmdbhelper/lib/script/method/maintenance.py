@@ -152,10 +152,11 @@ class DatabaseMaintenance:
         from tmdbhelper.lib.query.database.database import FindQueriesDatabase
         with TimerFunc('Vacuuming databases:', inline=True):
             item_details = ItemDetailsDatabase()
-            DetailsStoredMetadata(item_details).prune()
-            ItemDetailsCleanup(item_details).prune()
-            item_details.execute_sql("VACUUM")
-            FindQueriesDatabase().execute_sql("VACUUM")
+            with item_details.session():
+                DetailsStoredMetadata(item_details).prune()
+                ItemDetailsCleanup(item_details).prune()
+                item_details.vacuum()
+            FindQueriesDatabase().vacuum()
 
     def delete_legacy_folders(self, force=False):
         """ Once-off routine to delete old unused database versions to avoid wasting disk space """

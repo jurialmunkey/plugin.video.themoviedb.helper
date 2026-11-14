@@ -19,7 +19,6 @@ class EpisodeGroupSeasonsList(EpisodeGroupsList):
         database_obj.tmdb_id = self.group_id
         database_obj.tvshow_tmdb_id = self.tmdb_id
         database_obj.cache = self.cache
-        database_obj.connection = self.connection
         database_obj.cache_refresh = self.cache_refresh
         return database_obj
 

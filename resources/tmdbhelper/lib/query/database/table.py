@@ -72,7 +72,7 @@ class FindQueriesDatabaseTable:
 
     def get(self):
         data = None
-        with self.access.connection.open():
+        with self.parent.session():
             if not self.is_expired_get:
                 data = self.parent.get_list_values(
                     self.table,
@@ -82,9 +82,8 @@ class FindQueriesDatabaseTable:
         return self.get_mapping(data)
 
     def set(self):
-        with self.access.connection.open():
-            if not self.is_expired_set:
-                return
+        if not self.is_expired_set:
+            return
 
         data = self.tmdb_api.get_response_json(*self.request_args, **self.request_kwgs)
 
@@ -96,11 +95,9 @@ class FindQueriesDatabaseTable:
 
         statements = [i.statement(i.table, i.keys) for i in self.insert_statements]
 
-        with self.access.connection.open() as connection:
-            connection.execute('BEGIN')
+        with self.parent.transaction() as connection:
             self.set_tables(connection, statements, data)
             self.set_expiry(self.expiry_id)
-            connection.execute('COMMIT')
 
         return self.get()
 

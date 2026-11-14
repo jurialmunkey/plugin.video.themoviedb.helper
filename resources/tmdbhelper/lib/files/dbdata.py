@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.plugin import get_setting, get_version
+from tmdbhelper.lib.files.dbconnection import DatabaseSession
 from tmdbhelper.lib.files.futils import FileUtils
+from contextlib import closing
 from hashlib import sha256
+from operator import attrgetter, methodcaller
 import sqlite3
 import struct
 
@@ -72,36 +75,37 @@ class DatabaseCore:
             return
 
     def set_pragmas(self, connection):
-        cursor = connection.cursor()
-        cursor.execute("PRAGMA synchronous=NORMAL")
-        cursor.execute("PRAGMA journal_mode=WAL")
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.execute(f"PRAGMA mmap_size={self._db_mmap_size}")
+        connection.execute("PRAGMA synchronous=NORMAL")
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.execute(f"PRAGMA mmap_size={self._db_mmap_size}")
         return connection
 
     def init_database(self):
-        # import xbmcvfs
         from jurialmunkey.locker import MutexPropLock
         with MutexPropLock(f'{self._db_file}.lockfile', kodi_log=self.kodi_log):
-            # if xbmcvfs.exists(self._db_file):
-            #     self.set_database_init()
-            #     return
-            database = self.create_database()
+            self.create_database()
             self.set_database_init()
-        return database
 
     def create_database(self):
         try:
             with TimerFunc(f'CACHE: Initialisation {self._db_file} took:'):
                 self.kodi_log(f'CACHE: Initialising...\n{self._db_file}\n{self._sc_name}', 1)
-                connection = sqlite3.connect(self._db_file, timeout=self._db_timeout)
-                connection = self.set_pragmas(connection)
-                connection = self.create_database_execute(connection)
-            return connection
+                with closing(self.connect()) as connection:
+                    self.create_database_execute(connection)
         except Exception as error:
             self.kodi_log(f'CACHE: Exception while initializing _database: {error}\n{self._sc_name}', 1)
 
+    def connect(self):
+        """Open a connection that the calling thread owns and must close.
+        Statements autocommit unless they run in a transaction()."""
+        connection = sqlite3.connect(self._db_file, timeout=self._db_timeout, isolation_level=None)
+        connection.row_factory = sqlite3.Row
+        return self.set_pragmas(connection)
+
     def get_database(self, read_only=False, log_level=1):
+        """Open a connection for sync providers that manage their own transactions.
+        The caller owns the connection and must close it, e.g. with contextlib.closing."""
         timeout = self._db_read_timeout if read_only else self._db_timeout
         try:
             connection = sqlite3.connect(self._db_file, timeout=timeout)
@@ -111,26 +115,52 @@ class DatabaseCore:
         connection.row_factory = sqlite3.Row
         return self.set_pragmas(connection)
 
-    def database_execute(self, connection, query, data=None):
+    def session(self):
+        """Use the current thread's connection, opening and closing one if it has none."""
+        return DatabaseSession(self).open()
+
+    def transaction(self):
+        """Write atomically in the current thread's session."""
+        return DatabaseSession(self).transaction()
+
+    def database_execute(self, cursor, query, data=None):
         try:
             if not data:
-                return connection.execute(query)
+                return cursor.execute(query)
             if isinstance(data, list):
-                return connection.executemany(query, data)
-            return connection.execute(query, data)
+                return cursor.executemany(query, data)
+            return cursor.execute(query, data)
         except sqlite3.OperationalError as operational_exception:
             self.kodi_log(f'CACHE: database OPERATIONAL ERROR! -- {operational_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
         except Exception as other_exception:
             self.kodi_log(f'CACHE: database OTHER ERROR! -- {other_exception}\n{self._sc_name}\n--query--\n{query}\n--data--\n{data}', 2)
 
-    def execute_sql(self, query, data=None, read_only=False, connection=None):
+    def get_session_result(self, scope, query, data, get_result):
+        """Execute in a scope of the thread's session; read the result before the cursor closes."""
+        with scope() as connection, closing(connection.cursor()) as cursor:
+            if self.database_execute(cursor, query, data) is None:
+                return
+            return get_result(cursor)
+
+    def get_result(self, scope, query, data, get_result):
         try:
-            if connection:
-                return self.database_execute(connection, query, data=data)
-            with self.get_database(read_only=read_only) as connection:
-                return self.database_execute(connection, query, data=data)
+            return self.get_session_result(scope, query, data, get_result)
         except Exception as database_exception:
-            self.kodi_log(f'CACHE: database GET DATABASE ERROR! -- {database_exception}\n{self._sc_name} -- read_only: {read_only}', 2)
+            self.kodi_log(f'CACHE: database GET DATABASE ERROR! -- {database_exception}\n{self._sc_name}', 2)
+
+    def execute_sql(self, query, data=None):
+        """Write in a transaction; return the number of rows changed, or None after an error."""
+        return self.get_result(self.transaction, query, data, attrgetter('rowcount'))
+
+    def fetch_all(self, query, data=None):
+        return self.get_result(self.session, query, data, methodcaller('fetchall'))
+
+    def fetch_one(self, query, data=None):
+        return self.get_result(self.session, query, data, methodcaller('fetchone'))
+
+    def vacuum(self):
+        """VACUUM cannot run in a transaction, so it runs in the session directly."""
+        return self.get_result(self.session, 'VACUUM', None, attrgetter('rowcount'))
 
     @property
     def database_tables(self):
@@ -274,7 +304,9 @@ class DatabaseStatements:
 
 
 class DatabaseMethod:
-    def set_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), overwrite=False, connection=None):
+    """Statements run in the current thread's session; results are fetched before it closes."""
+
+    def set_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), overwrite=False):
         if not values:
             return
         statement = (
@@ -282,135 +314,56 @@ class DatabaseMethod:
             if not overwrite else
             DatabaseStatements.insert_or_replace
         )
-        cursor = self.execute_sql(
-            statement(table, keys),
-            values,
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
+        self.execute_sql(statement(table, keys), values)
 
-    def get_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conditions=None, connection=None):
-        cursor = self.execute_sql(
-            DatabaseStatements.select(table, keys, conditions),
-            data=values,
-            read_only=True,
-            connection=connection)
+    def get_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conditions=None):
+        return self.fetch_all(DatabaseStatements.select(table, keys, conditions), values)
 
-        if not cursor:
-            return
+    def del_list_values(self, table=DEFAULT_TABLE, values=(), conditions=None):
+        self.execute_sql(DatabaseStatements.delete_item(table, conditions), values)
 
-        data = cursor.fetchall()
-        if not connection and cursor:
-            cursor.close()
-
-        return data
-
-    def del_list_values(self, table=DEFAULT_TABLE, values=(), conditions=None, connection=None):
-        cursor = self.execute_sql(
-            DatabaseStatements.delete_item(table, conditions),
-            data=values,
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
-
-    def set_or_update_null_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conflict_constraint='id', connection=None):
+    def set_or_update_null_list_values(self, table=DEFAULT_TABLE, keys=(), values=(), conflict_constraint='id'):
         if not values:
             return
         statement = DatabaseStatements.insert_or_update_if_null
-        cursor = self.execute_sql(
-            statement(table, keys, conflict_constraint=conflict_constraint),
-            values,
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
+        self.execute_sql(statement(table, keys, conflict_constraint=conflict_constraint), values)
 
-    def get_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), connection=None):
-        cursor = self.execute_sql(
-            DatabaseStatements.select_limit(table, keys),
-            data=(item_id, ),
-            read_only=True,
-            connection=connection)
+    def get_values(self, table=DEFAULT_TABLE, item_id=None, keys=()):
+        return self.fetch_one(DatabaseStatements.select_limit(table, keys), (item_id, ))
 
-        if not cursor:
-            return
-
-        data = cursor.fetchone()
-        if not connection and cursor:
-            cursor.close()
-
-        return data
-
-    def set_item_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), values=(), connection=None):
+    def set_item_values(self, table=DEFAULT_TABLE, item_id=None, keys=(), values=()):
         """ Create a new row at id=item_id (or update if it exists) and then update null values with new data """
-        self.create_item(
-            table=table,
-            item_id=item_id,
-            connection=connection)
+        with self.transaction():
+            self.create_item(table=table, item_id=item_id)
+            self.execute_sql(DatabaseStatements.update_if_null(table, keys), (*values, item_id, ))
 
-        cursor = self.execute_sql(
-            DatabaseStatements.update_if_null(table, keys),
-            data=(*values, item_id, ),
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
-
-    def set_many_values(self, table=DEFAULT_TABLE, keys=(), data=None, connection=None):
+    def set_many_values(self, table=DEFAULT_TABLE, keys=(), data=None):
         """ data={item_id: ((key, value), (key, value))} """
+        with self.transaction():
+            # Create new rows if items dont exist
+            self.create_many_items(table=table, item_ids=[item_id for item_id in data.keys()])
+            self.execute_sql(
+                DatabaseStatements.update_if_null(table, keys),
+                [(*values, item_id, ) for item_id, values in data.items()])
 
-        # Create new rows if items dont exist
-        self.create_many_items(
-            table=table,
-            item_ids=[item_id for item_id in data.keys()],
-            connection=connection)
-
-        cursor = self.execute_sql(
-            DatabaseStatements.update_if_null(table, keys),
-            data=[(*values, item_id, ) for item_id, values in data.items()],
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
-
-    def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None, connection=None):
-        cursor = self.execute_sql(
+    def del_column_values(self, table=DEFAULT_TABLE, keys=(), item_type=None):
+        self.execute_sql(
             DatabaseStatements.delete_keys(
                 table, keys,
                 conditions=None if item_type is None else 'item_type=?'),
-            data=None if item_type is None else (item_type, ),
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
+            None if item_type is None else (item_type, ))
 
-    def del_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
-        cursor = self.execute_sql(
-            DatabaseStatements.delete_item(table),
-            data=(item_id, ),
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
+    def del_item(self, table=DEFAULT_TABLE, item_id=None):
+        self.execute_sql(DatabaseStatements.delete_item(table), (item_id, ))
 
-    def del_item_like(self, table=DEFAULT_TABLE, item_id=None, connection=None):
-        cursor = self.execute_sql(
-            DatabaseStatements.delete_item(table, conditions='id LIKE ?'),
-            data=(item_id, ),
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
+    def del_item_like(self, table=DEFAULT_TABLE, item_id=None):
+        self.execute_sql(DatabaseStatements.delete_item(table, conditions='id LIKE ?'), (item_id, ))
 
-    def create_item(self, table=DEFAULT_TABLE, item_id=None, connection=None):
-        cursor = self.execute_sql(
-            DatabaseStatements.insert_or_ignore(table),
-            data=(item_id,),
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
+    def create_item(self, table=DEFAULT_TABLE, item_id=None):
+        self.execute_sql(DatabaseStatements.insert_or_ignore(table), (item_id, ))
 
-    def create_many_items(self, table=DEFAULT_TABLE, item_ids=(), connection=None):
-        cursor = self.execute_sql(
-            DatabaseStatements.insert_or_ignore(table),
-            data=[(item_id,) for item_id in item_ids],
-            connection=connection)
-        if not connection and cursor:
-            cursor.close()
+    def create_many_items(self, table=DEFAULT_TABLE, item_ids=()):
+        self.execute_sql(DatabaseStatements.insert_or_ignore(table), [(item_id, ) for item_id in item_ids])
 
 
 class Database(DatabaseCore, DatabaseMethod):

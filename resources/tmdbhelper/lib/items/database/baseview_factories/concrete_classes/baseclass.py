@@ -64,7 +64,7 @@ class BaseList(ItemDetailsDatabaseAccess):
         return self.get_parent_data(mediatype, season, cache_refresh=cache_refresh, sync_details=False)
 
     def get_unmapped_data(self):
-        with self.connection.open():
+        with self.cache.session():
             data = self.get_cached_list_values(
                 self.cached_data_table,
                 self.cached_data_keys,

@@ -147,10 +147,10 @@ class ItemMetadataCache:
 
     def get_version(self):
         # data_version is comparable only on the same connection. Keep this
-        # observer separate from the service's short-lived read/write cursors;
-        # it also sees commits made by the service itself.
+        # observer separate from the owning thread's session, so that it also
+        # sees commits made on that session. The owning thread closes it in close().
         if self.connection is None:
-            self.connection = self.database.get_database(read_only=True)
+            self.connection = self.database.connect()
         return self.connection.execute('PRAGMA data_version').fetchone()[0]
 
     def invalidate(self):
