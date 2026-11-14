@@ -28,4 +28,12 @@ class Router():
     def run(self):
         if self.params.get('info') == 'play':
             return self.play_player()
-        self.get_directory()
+        self.get_held_directory()
+
+    def get_held_directory(self):
+        """The directory reuses its connections for its lifespan; its worker threads open their own."""
+        from tmdbhelper.lib.files.dbconnection import DatabaseHold
+        from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        with DatabaseHold(FindQueriesDatabase(), ItemDetailsDatabase()):
+            self.get_directory()
