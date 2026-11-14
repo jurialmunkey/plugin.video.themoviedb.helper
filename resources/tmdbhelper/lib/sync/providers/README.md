@@ -468,6 +468,26 @@ and the loader rejects provider getters that do not override them.
 filter another getter, such as `shows_in_progress`, inherit `SyncDataGetter` and
 derive both values from their parent getter.
 
+For `SyncDataGetterAll` subclasses, configure query parts through attributes:
+
+- `query_clauses`: WHERE predicates joined with `AND`.
+- `clause_keys`: columns checked with `IS NOT NULL`, joined with `operator` and
+  appended to the WHERE predicates.
+- `query_values`: bound SQL parameter values in placeholder order.
+- `filter_keys`: additional source columns needed by WHERE predicates. These are
+  appended after `additional_keys` in the sync columns and default SELECT output;
+  they do not add WHERE predicates.
+- `query_keys`: SELECT columns or expressions. Declare fixed values directly as
+  a class attribute; use `get_query_keys()` when constructing them requires
+  instance configuration. By default, these are the columns in `keys`.
+- `query_grouping`: expressions after `GROUP BY`, or `None` to omit grouping.
+- `query_ordering`: expressions after `ORDER BY`, or `None` to omit ordering.
+
+Do not override `get_clause()`. The base implementation assembles the WHERE
+predicates, then appends grouping and ordering when configured. For example,
+`query_ordering = 'season_number, episode_number'` sorts episodes numerically.
+Configure attributes before accessing the cached `clause` or `items` properties.
+
 ## Interface versions
 
 `SyncProviderLoader` accepts providers whose `interface_version` lies between its
