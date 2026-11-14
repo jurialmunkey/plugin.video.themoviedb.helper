@@ -4,6 +4,7 @@ from tmdbhelper.lib.addon.logger import kodi_log, TimerFunc
 from tmdbhelper.lib.addon.plugin import get_setting, get_version
 from tmdbhelper.lib.files.dbconnection import DatabaseSession
 from tmdbhelper.lib.files.futils import FileUtils
+from jurialmunkey.ftools import cached_property
 from contextlib import closing
 from hashlib import sha256
 from operator import attrgetter, methodcaller
@@ -115,13 +116,17 @@ class DatabaseCore:
         connection.row_factory = sqlite3.Row
         return self.set_pragmas(connection)
 
+    @cached_property
+    def sessions(self):
+        return DatabaseSession(self)
+
     def session(self):
         """Use the current thread's connection, opening and closing one if it has none."""
-        return DatabaseSession(self).open()
+        return self.sessions.open()
 
     def transaction(self):
         """Write atomically in the current thread's session."""
-        return DatabaseSession(self).transaction()
+        return self.sessions.transaction()
 
     def database_execute(self, cursor, query, data=None):
         try:
@@ -137,10 +142,14 @@ class DatabaseCore:
 
     def get_session_result(self, scope, query, data, get_result):
         """Execute in a scope of the thread's session; read the result before the cursor closes."""
-        with scope() as connection, closing(connection.cursor()) as cursor:
-            if self.database_execute(cursor, query, data) is None:
-                return
-            return get_result(cursor)
+        with scope() as connection:
+            cursor = connection.cursor()
+            try:
+                if self.database_execute(cursor, query, data) is None:
+                    return
+                return get_result(cursor)
+            finally:
+                cursor.close()
 
     def get_result(self, scope, query, data, get_result):
         try:
