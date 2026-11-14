@@ -163,14 +163,14 @@ def delete_listdata(patterns=(), **kwargs):
         background=False,
     ) as progress_dialog:
         database = BasicCache(filename='ItemContainer.db').ret_cache()
-        with TimerFunc(f'Deleting list data:', inline=True):
+        with TimerFunc(f'Deleting list data:', inline=True), database.session():
             for pattern in patterns:
                 statement = f'DELETE FROM simplecache WHERE id LIKE "{pattern}"'
                 progress_dialog.update(statement)
-                database._execute_sql(statement)
+                database.execute_sql(statement)
             if not patterns:
                 statement = f'DELETE FROM simplecache'
                 progress_dialog.update(statement)
-                database._execute_sql(statement)
+                database.execute_sql(statement)
             progress_dialog.update('Vacuuming database...')
-            database._execute_sql('VACUUM')
+            database.vacuum()
