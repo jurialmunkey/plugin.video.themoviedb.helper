@@ -93,7 +93,7 @@ class MediaItemArtworkRoutes:
         'art_extrafanart': {
             'affixes': (None, ),
             'outputs': 'fanart',
-            'parents': (None, ),
+            'parents': (None, 'tvshow'),
             'art_api': 'tmdb',
         },
         'user_art_poster': {
