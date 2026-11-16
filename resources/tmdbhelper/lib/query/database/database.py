@@ -58,7 +58,7 @@ class FindQueriesDatabase(
         },
     }
 
-    database_version = 6
+    database_version = 7
 
     database_changes = {
         2: (
@@ -72,6 +72,10 @@ class FindQueriesDatabase(
         6: (
             'DROP TABLE IF EXISTS trakt_stats',
             "DELETE FROM expiry WHERE id='trakt_stats'",
+        ),
+        7: (
+            'DROP TABLE IF EXISTS identifier',
+            "DELETE FROM expiry WHERE id='identifier'",
         ),
     }
 
