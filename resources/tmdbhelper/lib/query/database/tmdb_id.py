@@ -35,12 +35,11 @@ class TableID:
             return
 
     def get_id(self):
-        with self.access.connection.open():
-            return self.get_id_results(self.access.get_cached_list_values(
-                self.table,
-                keys=self.keys,
-                values=self.values,
-                conditions=self.conditions))
+        return self.get_id_results(self.access.get_cached_list_values(
+            self.table,
+            keys=self.keys,
+            values=self.values,
+            conditions=self.conditions))
 
     def set_id(self):
         if not self.tmdb_id or not self.tmdb_type:
@@ -50,11 +49,9 @@ class TableID:
         statement_update = DatabaseStatements.update_if_null(
             self.table, self.update_keys, conditions="tmdb_type=? AND tmdb_id=?")
 
-        with self.access.connection.open() as connection:
-            connection.execute('BEGIN')
+        with self.parent.transaction() as connection:
             connection.execute(statement_insert, (self.tmdb_id, self.tmdb_type))
             connection.execute(statement_update, self.update_values)
-            connection.execute('COMMIT')
 
         return self.get_id()
 

@@ -58,7 +58,7 @@ class FindQueriesDatabase(
         },
     }
 
-    database_version = 6
+    database_version = 7
 
     database_changes = {
         2: (
@@ -72,6 +72,10 @@ class FindQueriesDatabase(
         6: (
             'DROP TABLE IF EXISTS trakt_stats',
             "DELETE FROM expiry WHERE id='trakt_stats'",
+        ),
+        7: (
+            'DROP TABLE IF EXISTS identifier',
+            "DELETE FROM expiry WHERE id='identifier'",
         ),
     }
 
@@ -134,7 +138,7 @@ class FindQueriesDatabase(
 
     def get_cached_values(self, table, keys, mapping_function=None, values=None, conditions=None):
         data = None
-        with self.access.connection.open():
+        with self.session():
             if not self.is_expired(table):
                 data = self.get_all_values(
                     table,
@@ -144,8 +148,6 @@ class FindQueriesDatabase(
         return mapping_function(data) if mapping_function else data
 
     def set_cached_values(self, table, keys, values, item_id=None, expiry=DEFAULT_EXPIRY, overwrite=True):
-        with self.access.connection.open() as connection:
-            connection.execute('BEGIN')
+        with self.transaction():
             self.set_expiry(f'{table}.{item_id}' if item_id else table, expiry=expiry) if expiry else None
             self.access.set_cached_list_values(table, keys=keys, values=values, overwrite=overwrite)
-            connection.execute('COMMIT')

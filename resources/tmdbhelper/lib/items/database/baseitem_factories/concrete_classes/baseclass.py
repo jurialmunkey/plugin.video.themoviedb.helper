@@ -177,7 +177,6 @@ class BaseItem(ItemDetailsDatabaseAccess):
         database_obj.item_id = self.item_id
         database_obj.parent_id = self.parent_id
         database_obj.common_apis = self.common_apis
-        database_obj.connection = self.connection
         database_obj.sync_details = self.sync_details
         return database_obj
 
@@ -222,7 +221,7 @@ class BaseItem(ItemDetailsDatabaseAccess):
         self.expiry_time = ((days_to_air // 2) + 1) * DAY_IN_SECONDS  # Refresh in half number of days (rounded + 1)
 
     def get_cached_data(self):
-        with self.connection.open():
+        with self.cache.session():
             data = self.get_cached_list_values(self.cached_data_table, self.cached_data_keys, self.cached_data_values, self.cached_data_conditions)
             if not data or not data[0] or not data[0][self.cached_data_check_key]:
                 return
@@ -286,11 +285,9 @@ class BaseItem(ItemDetailsDatabaseAccess):
         return self.get_cached_data()
 
     def write_data_queue(self, queue):
-        with self.connection.open():
-            self.connection.open_connection.execute('BEGIN')
+        with self.cache.transaction():
             for func, args, kwgs in queue:
                 func(*args, **kwgs)
-            self.connection.open_connection.execute('COMMIT')
 
     @cached_property
     def data(self):

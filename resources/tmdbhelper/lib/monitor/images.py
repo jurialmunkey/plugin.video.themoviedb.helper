@@ -152,7 +152,7 @@ def _openimage(image, targetpath, filename):
                 the source will be copied to the addon_data folder to get access.
             '''
             if skinHasImage(image):
-                if not image.startswith('special://skin'):
+                if '://' not in image and not os.path.isabs(image):
                     image = os.path.join('special://skin/media/', image)
 
                 try:  # in case image is packed in textures.xbt

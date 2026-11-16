@@ -1,4 +1,3 @@
-from contextlib import closing
 from tmdbhelper.lib.calendar.tabledef import CALENDAR_DAY_COLUMNS, CALENDAR_ITEM_COLUMNS
 from tmdbhelper.lib.files.dbdata import Database
 
@@ -27,9 +26,8 @@ class CalendarDatabase(Database):
         return [item['tmdb_id'] for item in items]
 
     def set_day(self, date, tmdb_type, timezone, language, filters, expiry, items):
-        with closing(self.get_database()) as connection:
-            with connection:
-                self.write_day(connection, date, tmdb_type, timezone, language, filters, expiry, items)
+        with self.transaction() as connection:
+            self.write_day(connection, date, tmdb_type, timezone, language, filters, expiry, items)
 
     def write_day(self, connection, date, tmdb_type, timezone, language, filters, expiry, items):
         values = (date, tmdb_type, timezone, language, filters)

@@ -12,7 +12,7 @@ class ExternalIds(UniqueId):
         return self.get_ids()
 
     def get_ids(self):
-        with self.connection.open():
+        with self.cache.session():
             return {
                 item['key']: item['value'] for item in self.cached_data or ()
                 if item['key'] in self.id_types and item['value'] not in (None, '', 'None')}
@@ -41,6 +41,6 @@ class EpisodeParent(ItemDetailsList):
         return self.get_parent_id()
 
     def get_parent_id(self):
-        with self.connection.open():
+        with self.cache.session():
             rows = self.cached_data
         return try_int(rows[0]['tmdb_id'], fallback=None) if rows else None

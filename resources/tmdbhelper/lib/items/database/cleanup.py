@@ -28,8 +28,7 @@ class ItemDetailsCleanup:
 
     def delete_batch(self):
         """Delete one batch and return how many items it removed; execute_sql logs failures"""
-        cursor = self.database.execute_sql(self.delete_statement, (self.current_time, self.batch_size))
-        return cursor.rowcount if cursor else 0
+        return self.database.execute_sql(self.delete_statement, (self.current_time, self.batch_size)) or 0
 
     def prune(self):
         for _ in range(self.batch_limit):
