@@ -107,7 +107,8 @@ class ItemMapper(_ItemMapper):
         item = self.add_base(item, base_item, tmdb_type)
         item['label'] = info_item.get('label') or ''
         item['cast'] = info_item.get('cast') or []
-        item['art'] = info_item.get('art') or {}
+        # Let TMDbHelper choose the icon rather than importing Kodi's file-type icon.
+        item['art'] = {k: v for k, v in (info_item.get('art') or {}).items() if k != 'icon'}
         item['stream_details'] = info_item.get('streamdetails') or {}
         item['unique_ids'] = info_item.get('uniqueid') or {}
         return item
