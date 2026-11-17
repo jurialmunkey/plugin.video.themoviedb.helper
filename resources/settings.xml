@@ -1048,19 +1048,6 @@
                         <heading>32409</heading>
                     </control>
                 </setting>
-                <setting id="image_location" type="path" label="32472" help="32694">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <sources>
-                            <source>files</source>
-                        </sources>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="path">
-                        <heading>32472</heading>
-                    </control>
-                </setting>
                 <setting id="image_cache_size" type="integer" label="32564" help="32565">
                     <level>0</level>
                     <default>128</default>

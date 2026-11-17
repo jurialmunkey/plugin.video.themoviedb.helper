@@ -3,7 +3,7 @@ import xbmcvfs
 from collections import defaultdict
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
-from tmdbhelper.lib.addon.plugin import ADDONDATA, get_setting
+from tmdbhelper.lib.addon.plugin import IMAGECACHE, get_setting
 from tmdbhelper.lib.files.futils import validate_join
 
 
@@ -107,10 +107,10 @@ class BlurImageCacheFolder(ImageCacheFolder):
 
 class ImageCacheMaintenance:
     folder_classes = (
-        ('blur_v3', BlurImageCacheFolder),
-        ('crop_v2', ImageCacheFolder),
-        ('desaturate_v2', ImageCacheFolder),
-        ('colors_v2', ImageCacheFolder),
+        ('blur', BlurImageCacheFolder),
+        ('crop', ImageCacheFolder),
+        ('desaturate', ImageCacheFolder),
+        ('colors', ImageCacheFolder),
     )
 
     def __init__(self, progress=None):
@@ -120,10 +120,9 @@ class ImageCacheMaintenance:
         target_size = get_setting('image_cache_size', 'int') * 1024 * 1024
         if not target_size:
             return 0
-        location = get_setting('image_location', 'str') or ADDONDATA
         removed = 0
         for folder, folder_class in self.folder_classes:
-            cache_folder = folder_class(validate_join(location, f'{folder}/'), target_size, self.progress)
+            cache_folder = folder_class(validate_join(IMAGECACHE, f'{folder}/'), target_size, self.progress)
             removed += cache_folder.prune()
             if cache_folder.cancelled:
                 break

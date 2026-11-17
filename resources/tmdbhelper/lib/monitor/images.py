@@ -6,7 +6,7 @@ import hashlib
 import random
 import re
 from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
-from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, get_condvisibility, ADDONDATA
+from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, IMAGECACHE
 from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
@@ -110,7 +110,7 @@ def _add_tile(image, destination):
     image_flip = image_flip.transpose(Image.FLIP_TOP_BOTTOM)
     image_tile.paste(image_flip, (0, 0))
 
-    _saveimage(image_tile, destination)
+    _saveimage_jpeg(image_tile, destination)
 
     image_flip.close()
     image_tile.close()
@@ -182,19 +182,24 @@ def _openimage(image, targetpath, filename):
     return ('', None)
 
 
-def _saveimage(image, targetfile):
+def _saveimage(image, targetfile, image_format='PNG', **kwargs):
     """ Save image object to disk
     Uses flush() and os.fsync() to ensure file is written to disk before continuing
     Used to prevent Kodi from attempting to cache the image before writing is complete
     """
     with xbmcvfs.File(targetfile, 'wb') as f:
-        image.save(f, 'PNG')
+        image.save(f, image_format, **kwargs)
         # f.flush()
         # os.fsync(f)
 
 
+def _saveimage_jpeg(image, targetfile):
+    """ Save image object without alpha channel as JPEG for faster encoding and decoding """
+    _saveimage(image, targetfile, image_format='JPEG', quality=90)
+
+
 class ImageFunctions(SafeThread, WindowPropertySetter):
-    save_path = f"{get_setting('image_location', 'str') or ADDONDATA}{{}}/"
+    save_path = f'{IMAGECACHE}{{}}/'
     blur_size = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Size)')) or 480
     crop_size = (800, 310)
     radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 40
@@ -209,22 +214,22 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         self.save_prop = None
         if method == 'blur':
             self.func = self.blur
-            self.save_path = make_path(self.save_path.format('blur_v3'))
+            self.save_path = make_path(self.save_path.format('blur'))
             self.save_prop = f'{prefix}.BlurImage'
             self.save_orig = True
         elif method == 'crop':
             self.func = self.crop
-            self.save_path = make_path(self.save_path.format('crop_v2'))
+            self.save_path = make_path(self.save_path.format('crop'))
             self.save_prop = f'{prefix}.CropImage'
             self.save_orig = True
         elif method == 'desaturate':
             self.func = self.desaturate
-            self.save_path = make_path(self.save_path.format('desaturate_v2'))
+            self.save_path = make_path(self.save_path.format('desaturate'))
             self.save_prop = f'{prefix}.DesaturateImage'
             self.save_orig = True
         elif method == 'colors':
             self.func = self.colors
-            self.save_path = make_path(self.save_path.format('colors_v2'))
+            self.save_path = make_path(self.save_path.format('colors'))
             self.save_prop = f'{prefix}.Colors'
 
     def run(self):
@@ -283,7 +288,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
                 img.thumbnail((self.blur_size, self.blur_size))
                 img = img.convert('RGB')
                 img = img.filter(ImageFilter.GaussianBlur(self.radius))
-                _saveimage(img, destination)
+                _saveimage_jpeg(img, destination)
 
                 if diffuse_destination:
                     _add_corners(img, diffuse_destination, radius=self.corner)

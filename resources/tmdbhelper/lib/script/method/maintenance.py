@@ -67,10 +67,10 @@ class DatabaseMaintenance:
     )
 
     legacy_img_cache_folders = (
-        'blur', 'blur_v2',
-        'crop',
-        'desaturate',
-        'colors'
+        'blur', 'blur_v2', 'blur_v3',
+        'crop', 'crop_v2',
+        'desaturate', 'desaturate_v2',
+        'colors', 'colors_v2',
     )
 
     @cached_property
@@ -128,15 +128,6 @@ class DatabaseMaintenance:
         return self.image_cleanup_schedule.is_due
 
     @property
-    def legacy_usr_cache_folders(self):
-        from tmdbhelper.lib.addon.plugin import get_setting
-        image_location = get_setting('image_location', 'str')
-        return tuple((
-            f'{image_location}{f}'
-            for f in self.legacy_img_cache_folders
-        )) if image_location else tuple()
-
-    @property
     def todays_date(self):
         from tmdbhelper.lib.addon.tmdate import get_todays_date
         return get_todays_date()
@@ -168,8 +159,6 @@ class DatabaseMaintenance:
             delete_folder(f, force=True, check_exists=True, join_addon_data=True)
         for f in self.legacy_img_cache_folders:
             delete_folder(f, force=True, check_exists=True, join_addon_data=True)
-        for f in self.legacy_usr_cache_folders:
-            delete_folder(f, force=True, check_exists=True, join_addon_data=False)
 
     def prune_image_cache(self):
         if not self.is_image_cleanup_allowed:
