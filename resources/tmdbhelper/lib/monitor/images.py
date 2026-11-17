@@ -12,6 +12,7 @@ from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
 from tmdbhelper.lib.addon.thread import SafeThread
 import urllib.request as urllib
+from urllib.parse import quote
 from tmdbhelper.lib.addon.logger import kodi_log
 
 CROPIMAGE_SOURCE = "Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"
@@ -122,6 +123,13 @@ def _closeimage(image, targetfile=None):
     xbmcvfs.delete(targetfile)
 
 
+def _get_wrapped_image(image):
+    """ Wrap source in image:// so that opening it caches the source in Kodi's texture cache """
+    if image.startswith('image://'):
+        return image
+    return f'image://{quote(image, safe="")}/'
+
+
 def _openimage(image, targetpath, filename):
     """ Open image helper with thanks to sualfred """
     # some paths require unquoting to get a valid cached thumb hash
@@ -149,7 +157,7 @@ def _openimage(image, targetpath, filename):
                         kodi_log('Image error: Could not open cached image --> %s' % error, 2)
 
             ''' Skin images will be tried to be accessed directly. For all other ones
-                the source will be copied to the addon_data folder to get access.
+                Kodi caches the source in its texture cache and returns the cached copy.
             '''
             if skinHasImage(image):
                 if '://' not in image and not os.path.isabs(image):
@@ -163,12 +171,8 @@ def _openimage(image, targetpath, filename):
                     return ('', None)
 
             else:
-                targetfile = os.path.join(targetpath, f'temp_{filename}')  # Use temp file to avoid Kodi writing early
-                if not xbmcvfs.exists(targetfile):
-                    xbmcvfs.copy(image, targetfile)
-
-                img = _imageopen(targetfile)
-                return (img, targetfile)
+                img = _imageopen(_get_wrapped_image(image))
+                return (img, None)
 
         except Exception as error:
             kodi_log('Image error: Could not get image for %s (try %d) -> %s' % (image, i, error), 2)
