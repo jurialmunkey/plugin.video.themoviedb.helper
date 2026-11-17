@@ -80,7 +80,7 @@ def _add_corners(image, destination, radius=40, aa_factor=4):
     alpha.paste(circle.crop((radius, radius, diameter, diameter)), (w - radius, h - radius))
     image.putalpha(alpha)
 
-    _saveimage(image, destination)
+    _saveimage_png(image, destination)
     image.close()
 
 
@@ -182,6 +182,20 @@ def _openimage(image, targetpath, filename):
     return ('', None)
 
 
+def _get_crop_bbox(img):
+    """ Get bounding box of visible area for cropping """
+    if 'A' in img.getbands():
+        # Visible area is wherever alpha is non-zero
+        return img.getchannel('A').getbbox()
+    try:
+        # Errors with single channel L conversion to RGBa so catch exceptions
+        return img.convert('RGBa').getbbox()
+    except Exception:
+        # If we get a conversion error just try getting bounding box with current channel
+        # We'll probably be okay with single channel texture since Kodi now handles these better
+        return img.getbbox()
+
+
 def _saveimage(image, targetfile, image_format='PNG', **kwargs):
     """ Save image object to disk
     Uses flush() and os.fsync() to ensure file is written to disk before continuing
@@ -198,12 +212,19 @@ def _saveimage_jpeg(image, targetfile):
     _saveimage(image, targetfile, image_format='JPEG', quality=90)
 
 
+def _saveimage_png(image, targetfile):
+    """ Save image object as PNG with low compression for faster encoding """
+    _saveimage(image, targetfile, image_format='PNG', compress_level=1)
+
+
 class ImageFunctions(SafeThread, WindowPropertySetter):
     save_path = f'{IMAGECACHE}{{}}/'
     blur_size = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Size)')) or 480
     crop_size = (800, 310)
     radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 40
     corner = try_int(get_infolabel('Skin.String(TMDbHelper.Corner.Radius)')) or 20
+    blur_scale = max(1, min(4, radius // 10))  # Heavy blurs are processed at reduced size then scaled back up
+    blur_work_size = blur_size // blur_scale
 
     def __init__(self, method=None, artwork=None, is_thread=True, prefix='ListItem'):
         if is_thread:
@@ -258,16 +279,9 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         try:
             if not xbmcvfs.exists(destination):  # Used to do os.utime(destination, None) on existing here
                 img, targetfile = _openimage(source, self.save_path, filename)
-                try:
-                    # Errors with single channel L conversion to RGBa so catch exceptions
-                    img_rgba = img.convert('RGBa')
-                    img = img.crop(img_rgba.getbbox())
-                except Exception:
-                    # If we get a conversion error just try getting bounding box with current channel
-                    # We'll probably be okay with single channel texture since Kodi now handles these better
-                    img = img.crop(img.getbbox())
+                img = img.crop(_get_crop_bbox(img))
                 img.thumbnail(self.crop_size)
-                _saveimage(img, destination)
+                _saveimage_png(img, destination)
                 _closeimage(img, targetfile)
 
             return destination
@@ -285,9 +299,11 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         try:
             if not xbmcvfs.exists(destination) or (diffuse_destination and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
                 img, targetfile = _openimage(source, self.save_path, filename)
-                img.thumbnail((self.blur_size, self.blur_size))
+                img.draft(None, (self.blur_work_size, self.blur_work_size))  # JPEG sources decode directly at reduced scale
+                img.thumbnail((self.blur_work_size, self.blur_work_size))
                 img = img.convert('RGB')
-                img = img.filter(ImageFilter.GaussianBlur(self.radius))
+                img = img.filter(ImageFilter.GaussianBlur(self.radius / self.blur_scale))
+                img = img.resize((img.width * self.blur_scale, img.height * self.blur_scale), Image.BILINEAR)
                 _saveimage_jpeg(img, destination)
 
                 if diffuse_destination:
@@ -311,7 +327,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
             if not xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img, targetfile = _openimage(source, self.save_path, filename)
                 img = img.convert('LA')
-                _saveimage(img, destination)
+                _saveimage_png(img, destination)
                 _closeimage(img, targetfile)
 
             return destination
@@ -399,7 +415,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
                 img, targetfile = _openimage(source, self.save_path, filename)
                 img.thumbnail((128, 128))
                 img = img.convert('RGB')
-                _saveimage(img, destination)
+                _saveimage_png(img, destination)
 
             maincolor_rgb = self.get_maincolor(img)
             maincolor_hex = self.rgb_to_hex(*self.get_color_lumsat(*maincolor_rgb))
