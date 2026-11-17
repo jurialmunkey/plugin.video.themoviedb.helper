@@ -138,6 +138,12 @@ TMDbHelper 6.21.3 or later in `addon.xml`.
 
 Providers declare:
 
+- `validate_setup()`: optional interactive validation before the Default/Custom
+  setup dialog. Return `True` to proceed or `False` to stop; the provider owns
+  failure feedback. The inherited default returns `True`, preserving existing
+  providers. Keep network tests here rather than in discovery or
+  `is_authorized()`. This additive hook requires core 6.22.2 and retains
+  interface version 4. It does not gate ordinary feature selectors or sync.
 - `interface_version = 4` explicitly on the Provider class. See
   [Interface versions](#interface-versions) for the supported range and policy.
 - `sync_classes`: sync-type names from `SYNC_FEATURES` to DataType subclasses,
