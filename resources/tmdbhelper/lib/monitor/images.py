@@ -5,7 +5,7 @@ import colorsys
 import hashlib
 import random
 import re
-from xbmc import skinHasImage, Monitor, sleep
+from xbmc import skinHasImage, Monitor
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, IMAGECACHE
 from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int, try_float
@@ -115,13 +115,6 @@ def _add_tile(image, destination):
     image_tile.close()
 
 
-def _closeimage(image, targetfile=None):
-    image.close()
-    if not targetfile:
-        return
-    xbmcvfs.delete(targetfile)
-
-
 def _get_wrapped_image(image):
     """ Wrap source in image:// so that opening it caches the source in Kodi's texture cache """
     if image.startswith('image://'):
@@ -129,34 +122,13 @@ def _get_wrapped_image(image):
     return f'image://{quote(image, safe="")}/'
 
 
-def _openimage(image, targetpath, filename):
-    """ Open image helper with thanks to sualfred """
-    for i in range(1, 4):
-        try:
-            ''' Skin images will be tried to be accessed directly. For all other ones
-                Kodi returns the copy in its texture cache, caching the source first if needed.
-            '''
-            if skinHasImage(image):
-                if '://' not in image and not os.path.isabs(image):
-                    image = os.path.join('special://skin/media/', image)
-
-                try:  # in case image is packed in textures.xbt
-                    img = _imageopen(xbmcvfs.translatePath(image))
-                    return (img, None)
-
-                except Exception:
-                    return ('', None)
-
-            else:
-                img = _imageopen(_get_wrapped_image(image))
-                return (img, None)
-
-        except Exception as error:
-            kodi_log('Image error: Could not get image for %s (try %d) -> %s' % (image, i, error), 2)
-            sleep(500)
-            pass
-
-    return ('', None)
+def _openimage(image):
+    """ Open skin images directly and all other images via Kodi's texture cache """
+    if not skinHasImage(image):
+        return _imageopen(_get_wrapped_image(image))
+    if '://' not in image and not os.path.isabs(image):
+        image = os.path.join('special://skin/media/', image)
+    return _imageopen(xbmcvfs.translatePath(image))
 
 
 def _get_crop_bbox(img):
@@ -255,11 +227,11 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # Used to do os.utime(destination, None) on existing here
-                img, targetfile = _openimage(source, self.save_path, filename)
+                img = _openimage(source)
                 img = img.crop(_get_crop_bbox(img))
                 img.thumbnail(self.crop_size)
                 _saveimage_png(img, destination)
-                _closeimage(img, targetfile)
+                img.close()
 
             return destination
 
@@ -275,7 +247,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         tile_destination = os.path.join(self.save_path, f'{filename}-tiled.jpg')
         try:
             if not xbmcvfs.exists(destination) or (diffuse_destination and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
-                img, targetfile = _openimage(source, self.save_path, filename)
+                img = _openimage(source)
                 img.draft(None, (self.blur_work_size, self.blur_work_size))  # JPEG sources decode directly at reduced scale
                 img.thumbnail((self.blur_work_size, self.blur_work_size))
                 img = img.convert('RGB')
@@ -289,7 +261,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
                 if tile_destination:
                     _add_tile(img, tile_destination)
 
-                _closeimage(img, targetfile)
+                img.close()
 
             return destination
 
@@ -302,10 +274,10 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # os.utime(destination, None)
-                img, targetfile = _openimage(source, self.save_path, filename)
+                img = _openimage(source)
                 img = img.convert('LA')
                 _saveimage_png(img, destination)
-                _closeimage(img, targetfile)
+                img.close()
 
             return destination
 
@@ -383,13 +355,12 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
     def colors(self, source):
         filename = f'{md5hash(source)}.png'
         destination = self.save_path + filename
-        targetfile = None
 
         try:
             if xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _imageopen(xbmcvfs.translatePath(destination))
             else:
-                img, targetfile = _openimage(source, self.save_path, filename)
+                img = _openimage(source)
                 img.thumbnail((128, 128))
                 img = img.convert('RGB')
                 _saveimage_png(img, destination)
@@ -421,7 +392,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
                     compcolor_propname, compcolor_propvalu, compcolor_hex, compcolor_propchek])
                 thread_compcolor.start()
 
-            _closeimage(img, targetfile)
+            img.close()
             return maincolor_hex
 
         except Exception as exc:

@@ -101,7 +101,7 @@ class ImageCacheFolder:
 
 class BlurImageCacheFolder(ImageCacheFolder):
     def get_file_key(self, filename):
-        match = re.match(r'^(?:temp_)?([0-9a-f]{32})(?:[-.]|$)', filename)
+        match = re.match(r'^([0-9a-f]{32})(?:[-.]|$)', filename)
         return match[1] if match else filename
 
 
