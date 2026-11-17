@@ -5,13 +5,12 @@ import colorsys
 import hashlib
 import random
 import re
-from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
+from xbmc import skinHasImage, Monitor, sleep
 from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, IMAGECACHE
 from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
 from tmdbhelper.lib.addon.thread import SafeThread
-import urllib.request as urllib
 from urllib.parse import quote
 from tmdbhelper.lib.addon.logger import kodi_log
 
@@ -132,32 +131,10 @@ def _get_wrapped_image(image):
 
 def _openimage(image, targetpath, filename):
     """ Open image helper with thanks to sualfred """
-    # some paths require unquoting to get a valid cached thumb hash
-    cached_image_path = urllib.unquote(image.replace('image://', ''))
-    if cached_image_path.endswith('/'):
-        cached_image_path = cached_image_path[:-1]
-
-    cached_files = []
-    for path in [getCacheThumbName(cached_image_path), getCacheThumbName(image)]:
-        cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.jpg'))
-        cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.png'))
-        cached_files.append(os.path.join('special://profile/Thumbnails/Video/', path[0], path))
-
     for i in range(1, 4):
         try:
-            ''' Try to get cached image at first
-            '''
-            for cache in cached_files:
-                if xbmcvfs.exists(cache):
-                    try:
-                        img = _imageopen(xbmcvfs.translatePath(cache))
-                        return (img, None)
-
-                    except Exception as error:
-                        kodi_log('Image error: Could not open cached image --> %s' % error, 2)
-
             ''' Skin images will be tried to be accessed directly. For all other ones
-                Kodi caches the source in its texture cache and returns the cached copy.
+                Kodi returns the copy in its texture cache, caching the source first if needed.
             '''
             if skinHasImage(image):
                 if '://' not in image and not os.path.isabs(image):
