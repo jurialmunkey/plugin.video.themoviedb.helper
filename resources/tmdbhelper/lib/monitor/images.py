@@ -351,8 +351,16 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         self.get_property(propname, set_property=end_hex)
         return end_hex
 
-    @lazyimport_pil
     def colors(self, source):
+        colors = self.get_colors(source)
+        if not colors:
+            return ''
+        self.set_colors_properties(*colors)
+        return colors[0]
+
+    @lazyimport_pil
+    def get_colors(self, source):
+        """ Returns main and complementary colors of image as hex values """
         filename = f'{md5hash(source)}.png'
         destination = self.save_path + filename
 
@@ -370,34 +378,26 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
             compcolor_rgb = self.get_compcolor(*maincolor_rgb)
             compcolor_hex = self.rgb_to_hex(*self.get_color_lumsat(*compcolor_rgb))
 
-            maincolor_propname = self.save_prop + '.Main'
-            maincolor_propchek = self.save_prop + '.MainCheck'
-            maincolor_propvalu = self.get_property(maincolor_propname)
-            if not maincolor_propvalu:
-                self.get_property(maincolor_propname, set_property=maincolor_hex)
-            else:
-                self.get_property(maincolor_propchek, set_property=maincolor_propvalu)
-                thread_maincolor = SafeThread(target=self.set_prop_colorgradient, args=[
-                    maincolor_propname, maincolor_propvalu, maincolor_hex, maincolor_propchek])
-                thread_maincolor.start()
-
-            compcolor_propname = self.save_prop + '.Comp'
-            compcolor_propchek = self.save_prop + '.CompCheck'
-            compcolor_propvalu = self.get_property(compcolor_propname)
-            if not compcolor_propvalu:
-                self.get_property(compcolor_propname, set_property=compcolor_hex)
-            else:
-                self.get_property(compcolor_propchek, set_property=compcolor_propvalu)
-                thread_compcolor = SafeThread(target=self.set_prop_colorgradient, args=[
-                    compcolor_propname, compcolor_propvalu, compcolor_hex, compcolor_propchek])
-                thread_compcolor.start()
-
             img.close()
-            return maincolor_hex
+            return (maincolor_hex, compcolor_hex)
 
         except Exception as exc:
             kodi_log(exc, 1)
-            return ''
+            return
+
+    def set_colors_properties(self, maincolor_hex, compcolor_hex):
+        self.set_color_property(f'{self.save_prop}.Main', maincolor_hex)
+        self.set_color_property(f'{self.save_prop}.Comp', compcolor_hex)
+
+    def set_color_property(self, propname, color_hex):
+        """ Set color immediately if unset otherwise fade from current color in background """
+        current_hex = self.get_property(propname)
+        if not current_hex:
+            self.get_property(propname, set_property=color_hex)
+            return
+        checkprop = f'{propname}Check'
+        self.get_property(checkprop, set_property=current_hex)
+        SafeThread(target=self.set_prop_colorgradient, args=[propname, current_hex, color_hex, checkprop]).start()
 
 
 class ImageArtworkGetter():
@@ -515,10 +515,16 @@ class ImageManipulations(WindowPropertySetter):
         variable = re.fullmatch(r'\$SKINVAR\[([^\[\],]+)\]', fallback or '')
         return get_infolabel(f'$VAR[{variable[1]}]') if variable else fallback
 
-    def get_image_manipulations(self, use_winprops=False, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', )):
-        images = {}
+    def get_image_manipulation_requests(self, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', )):
+        """ Source image for each manipulation that is allowed and enabled by the skin """
+        return {
+            i['method']: i['images']()
+            for i in self.get_image_manipulation_configs(built_artwork)
+            if i['method'] in allow_list and i['active']()
+        }
 
-        _manipulations = (
+    def get_image_manipulation_configs(self, built_artwork=None):
+        return (
             {'method': 'crop',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"),
                 'images': lambda: self.get_artwork(
@@ -546,19 +552,3 @@ class ImageManipulations(WindowPropertySetter):
                     build_fallback=True,
                     built_artwork=built_artwork)
                 or self.get_property('Colors.Fallback')},)
-
-        for i in _manipulations:
-            if i['method'] not in allow_list:
-                continue
-            if not i['active']():
-                continue
-            imgfunc = ImageFunctions(method=i['method'], is_thread=False, artwork=i['images']())
-
-            output = imgfunc.func(imgfunc.image)
-            images[f'{i["method"]}image'] = output
-            images[f'{i["method"]}image.original'] = imgfunc.image
-
-            if use_winprops:
-                imgfunc.set_properties(output)
-
-        return images
