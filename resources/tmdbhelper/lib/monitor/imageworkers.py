@@ -74,6 +74,13 @@ class ImageColorsJob(ImageManipulationJob):
             self.image_functions.set_colors_properties(*self.colors)
 
 
+class ImagePrewarmJob(ImageManipulationJob):
+    """ Generates the cached image of an upcoming item without setting any properties """
+
+    def apply(self):
+        return
+
+
 class ImageManipulationWorker:
     """ Generates one job at a time and keeps one job waiting
 
@@ -176,6 +183,15 @@ class ImageManipulationWorkers:
         job_class = self.job_classes.get(method, ImageManipulationJob)
         return job_class(method, source, cancel_id, set_properties)
 
+    @staticmethod
+    def get_prewarm_job(method, source, cancel_id):
+        return ImagePrewarmJob(method, source, cancel_id, None)
+
+    @property
+    def is_idle(self):
+        with self.lock:
+            return not any(worker.running for worker in self.workers.values())
+
     def submit(self, requests, set_properties):
         """ Submit a job for each manipulation request and return the jobs """
         with self.lock:
@@ -183,9 +199,22 @@ class ImageManipulationWorkers:
                 self.get_job(method, source, self.cancel_id, set_properties)
                 for method, source in requests.items()
             ]
-            for job in jobs:
-                self.get_worker(job.method).submit(job)
+            self.submit_jobs(jobs)
         return jobs
+
+    def prewarm(self, requests):
+        """ Submit a prewarm job for each manipulation request, replaced by any job submitted afterwards """
+        with self.lock:
+            jobs = [
+                self.get_prewarm_job(method, source, self.cancel_id)
+                for method, source in requests.items()
+            ]
+            self.submit_jobs(jobs)
+        return jobs
+
+    def submit_jobs(self, jobs):
+        for job in jobs:
+            self.get_worker(job.method).submit(job)
 
     def is_current(self, job):
         return job.cancel_id == self.cancel_id

@@ -2,6 +2,7 @@ from functools import partial
 from threading import RLock
 from tmdbhelper.lib.monitor.images import ImageManipulations
 from tmdbhelper.lib.monitor.imageworkers import ImageManipulationWorkers
+from tmdbhelper.lib.monitor.itemdetails import MonitorItemDetails
 from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT
 from tmdbhelper.lib.monitor.listitemgetter import ListItemInfoGetter
 from tmdbhelper.lib.addon.plugin import get_condvisibility
@@ -48,6 +49,9 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         "!Skin.HasSetting(TMDbHelper.EnableColors)")
 
     _allow_list = ('crop', 'blur', 'desaturate', 'colors', )
+    _prewarm_allow_list = ('crop', 'blur', )
+    _prewarm_positions = (1, -1, 2, -2, 3, )  # Upcoming items prewarmed in order while sitting idle on the current item
+    _unpositioned_container_item = 'ListItem.'  # Container item infolabels that cannot be read at other positions
     _check_list = (
         'Art(fanart)', 'Art(poster)', 'Art(clearlogo)',
         'Art(tvshow.fanart)', 'Art(tvshow.poster)', 'Art(tvshow.clearlogo)',
@@ -81,10 +85,26 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self.pre_window = 1
         self.cur_base_window = 0
         self.pre_base_window = 1
+        self.reset_prewarm()
+
+    def reset_prewarm(self):
+        self.prewarm_positions = iter(self._prewarm_positions)
 
     @property
     def is_artwork_disabled(self):
         return get_condvisibility(self._cond_artwork_disabled)
+
+    @property
+    def is_prewarm_allowed(self):
+        if not self.image_workers.is_idle:
+            return False
+        if self.container_item == self._unpositioned_container_item:
+            return False
+        if self.is_on_scroll:
+            return False
+        if self.is_artwork_disabled:
+            return False
+        return True
 
     @property
     def is_service_disabled(self):
@@ -124,6 +144,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
         # Check if the item has changed before retrieving details again
         if not self.is_same_item(update=True) or not self.is_same_window(update=True):
+            self.reset_prewarm()
             return True
 
         # Set refresh time if not set yet and still on same item
@@ -155,6 +176,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         """
 
         if not forced and not self.is_next_refresh():
+            self.prewarm_artwork()
             return
 
         self._this_refresh = 0
@@ -178,6 +200,19 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         )
         set_properties = partial(self.set_properties, use_current_window=self.is_current_window_images)
         return self.image_workers.submit(requests, set_properties)
+
+    def prewarm_artwork(self):
+        """ Generate images for the next upcoming item each cycle that the workers are idle """
+        if not self.is_prewarm_allowed:
+            return
+        position = next(self.prewarm_positions, None)
+        if position is None:
+            return
+        self.image_workers.prewarm(self.get_prewarm_requests(position))
+
+    def get_prewarm_requests(self, position):
+        requests = MonitorItemDetails(self, position=position).get_image_manipulation_requests(allow_list=self._prewarm_allow_list)
+        return {method: source for method, source in requests.items() if source}
 
     @staticmethod
     def get_image_manipulation_results(jobs):
