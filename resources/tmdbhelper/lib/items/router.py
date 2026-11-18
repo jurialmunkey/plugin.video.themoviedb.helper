@@ -22,7 +22,7 @@ class Router():
     def get_directory(self, items_only=False, build_items=True):
         from tmdbhelper.lib.items.routes import get_container
         container = get_container(self.params.get('info'))(self.handle, self.paramstring, **self.params)
-        container.get_tmdb_id()  # TODO: Only get this as necessary
+        container.get_tmdb_id()  # Containers declare their lookup inputs in tmdb_id_lookup_params
         return container.get_directory(items_only, build_items)
 
     def run(self):
