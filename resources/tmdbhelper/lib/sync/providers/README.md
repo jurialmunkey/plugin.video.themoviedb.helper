@@ -527,6 +527,23 @@ ignores their `stats_class` registration and never constructs these suppliers.
 Remove this shim once users have updated their Trakt module. The provider
 interface remains version 4; the remaining capabilities are unchanged.
 
+## Sync actions availability
+
+`SyncActionsAvailability` in `tmdbhelper.lib.script.actions.availability` decides
+whether the sync options menu has any actions, using `ActionDiscovery.is_available`:
+an authorized selected provider supplying an item action, or any authorized
+provider supplying service actions. The answer is cached in a window property tied
+to the add-on version and the selected watched, watchlist, and collection providers.
+
+Skins can use `Window(Home).Property(TMDbHelper.SyncActions.IsAvailable)`, which is
+`True` when actions are available and empty otherwise. It replaces the legacy
+`TraktIsAuth` property for this purpose and does not depend on the
+`contextmenu_sync_options` setting. The service publishes it at startup and every
+ten minutes, and again when TMDbHelper settings change the selected providers.
+Signing in or out of a provider without changing those selections is reflected at
+the next ten-minute refresh. Context menu builds also update it whenever they work
+the answer out again.
+
 ## List actions
 
 `tmdbhelper.lib.sync.providers.list_actions.ListActions` defines operations on

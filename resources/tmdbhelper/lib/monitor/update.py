@@ -32,6 +32,15 @@ class UpdateMonitor(xbmc.Monitor):
         from tmdbhelper.lib.update.builder.tags import library_tagger
         SafeThread(target=library_tagger).start()
 
+    @staticmethod
+    def update_sync_actions():
+        from tmdbhelper.lib.script.actions.availability import SyncActionsAvailabilitySelectionRefresh
+        SyncActionsAvailabilitySelectionRefresh().refresh()
+
+    def onSettingsChanged(self):
+        from tmdbhelper.lib.addon.thread import SafeThread
+        SafeThread(target=self.update_sync_actions).start()
+
     def onScanFinished(self, library):
         if library == 'video':
             self.run_library_tagger()
