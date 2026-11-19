@@ -761,10 +761,17 @@ class ItemMapperMethods:
         return infoproperties
 
     @staticmethod
-    def get_custom_date(air_date, name):
+    def get_custom_date(air_date, name, utc_convert=False):
         from tmdbhelper.lib.addon.plugin import get_infolabel
-        from tmdbhelper.lib.addon.tmdate import format_date_obj, convert_timestamp, get_days_to_air
-        air_date_obj = convert_timestamp(air_date, time_fmt="%Y-%m-%d", time_lim=10, utc_convert=False)
+        from tmdbhelper.lib.addon.tmdate import (
+            format_date_obj,
+            convert_timestamp,
+            convert_timestamp_to_local,
+            get_days_to_air,
+        )
+        if utc_convert:
+            air_date = convert_timestamp_to_local(air_date)
+        air_date_obj = convert_timestamp(air_date, time_fmt="%Y-%m-%d", time_lim=10)
 
         if not air_date_obj:
             return {}

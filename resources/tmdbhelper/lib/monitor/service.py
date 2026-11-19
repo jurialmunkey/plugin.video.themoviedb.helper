@@ -16,6 +16,13 @@ class ServiceMonitor(Poller):
         self.listitem = None
 
     def run(self):
+        """The poller thread holds its connection to the queries database for its lifetime."""
+        from tmdbhelper.lib.files.dbconnection import DatabaseHold
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        with DatabaseHold(FindQueriesDatabase()):
+            self.run_monitors()
+
+    def run_monitors(self):
         self.mutex_lock = Lock()
 
         self.update_monitor = UpdateMonitor()

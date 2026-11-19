@@ -17,7 +17,7 @@ class AnticipatedSeasonMediaListMixin(FlatSeasonMediaListMixin):
             for season in self.parent_season_media_list
             if season and 'infolabels' in season and season['infolabels'].get('season')
         ]
-        return self.get_parent_data('season', max(season_numbers), cache_refresh='basic')
+        return self.get_parent_precache('season', max(season_numbers), cache_refresh='basic')
 
     @property
     def data_cond(self):

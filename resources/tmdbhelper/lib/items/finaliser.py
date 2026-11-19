@@ -73,7 +73,7 @@ class ItemFinaliserMedia(ItemFinaliserBasic):
         if not self.is_visible:
             return
 
-        self.has_unaired_formatting
+        self.list_item.format_unaired_labels = self.has_unaired_formatting and self.container.is_labelformatting
 
         if self.is_excluded:
             return

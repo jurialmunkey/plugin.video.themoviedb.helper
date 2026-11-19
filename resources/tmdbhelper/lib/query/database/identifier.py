@@ -64,7 +64,4 @@ class FindQueriesDatabaseIdentifier:
         return identifier_tuple
 
     def del_identifier(self, item_id):
-        with self.access.connection.open() as connection:
-            connection.execute('BEGIN')
-            self.access.del_cached(TABLE, item_id, children=False)
-            connection.execute('COMMIT')
+        self.access.del_cached(TABLE, item_id, children=False)

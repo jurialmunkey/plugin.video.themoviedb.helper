@@ -26,12 +26,7 @@ class Menu:
         return i(self.tmdb_type, self.tmdb_id, self.season, self.episode).get_self()
 
     def choose(self):
-        if not self.choices:
-            return -1
-        if len(self.choices) == 1:
-            return 0
-        from xbmcgui import Dialog
-        return Dialog().contextmenu([i.name for i in self.choices])
+        raise NotImplementedError
 
     def select(self, sync_type=None):
         if sync_type:

@@ -1,4 +1,5 @@
 from timeit import default_timer as timer
+from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.plugin import get_setting, format_name, get_localized
 import jurialmunkey.logger as jurialmunkey_logger
 
@@ -14,6 +15,34 @@ kodi_try_except = LOGGER.kodi_try_except
 log_timer_report = LOGGER.log_timer_report
 TimerList = jurialmunkey_logger.TimerList
 TimerFunc = jurialmunkey_logger.TimerFunc
+
+
+class TimerReportLists():
+    threshold = 0.001  # Timers totalling less than this are too small to show where a directory spends its time
+
+    def __init__(self, timer_lists):
+        """ Copy of timer_lists without the timers that total less than the threshold """
+        self.source_lists = timer_lists
+
+    @cached_property
+    def timed_keys(self):
+        return self.get_timed_keys()
+
+    def get_timed_keys(self):
+        return {
+            k for k, v in self.source_lists.items()
+            if k[:5] != 'name_' and sum(v) >= self.threshold
+        }
+
+    @cached_property
+    def timer_lists(self):
+        return self.get_timer_lists()
+
+    def get_timer_lists(self):
+        return {
+            k: v for k, v in self.source_lists.items()
+            if k in self.timed_keys or (k[:5] == 'name_' and k[5:] in self.timed_keys)
+        }
 
 
 def dump_log(json_data, file_name, log_level=2):

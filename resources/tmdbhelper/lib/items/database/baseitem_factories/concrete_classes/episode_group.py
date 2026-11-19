@@ -19,6 +19,10 @@ class EpisodeGroup(BaseItem):
         return self.get_base_id('tv', self.tvshow_tmdb_id)
 
     @property
+    def lease_parent_ids(self):
+        return (self.tvshow_id, )
+
+    @property
     def data_cond(self):
         if not self.tmdb_id or not self.tvshow_tmdb_id:
             return False

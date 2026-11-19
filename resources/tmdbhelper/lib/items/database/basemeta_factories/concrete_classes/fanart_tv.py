@@ -1,4 +1,4 @@
-from requests.utils import requote_uri
+import requests
 from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.baseclass import ItemDetailsList, ArtworkDetailsMixin
 
 
@@ -22,7 +22,7 @@ class FanartTVType(ArtworkDetailsMixin, FanartTV):
 
     @staticmethod
     def image_path_func(v):
-        return requote_uri(v)
+        return requests.utils.requote_uri(v)
 
 
 class FanartTVPoster(FanartTVType):

@@ -58,8 +58,3 @@ def revoke_trakt(**kwargs):
         return
     from tmdbhelper.lib.addon.plugin import executebuiltin
     executebuiltin('RunScript(script.module.tmdbhelper.sync.trakt,action=revoke)')
-
-
-def get_stats(forced=False, **kwargs):
-    from tmdbhelper.lib.script.stats import get_stats as get_provider_stats
-    return get_provider_stats(forced=forced)

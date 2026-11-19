@@ -68,8 +68,7 @@ several layers, each retaining its own responsibility.
 - Use hanging indents only when the single-line form exceeds the applicable
   line-length limit. Leave the opening delimiter's line empty of arguments or
   entries, then put one argument, parameter, collection element, or dictionary
-  key-value pair per line. Use four-space continuation indents, with an extra
-  level for function parameters to distinguish them from the body. Put closing
+  key-value pair per line. Use four-space continuation indents. Put closing
   parentheses, brackets, and braces on separate lines aligned with the opening
   line's indentation. Use trailing commas where valid. Apply the same rules to
   nested collections that require wrapping.
@@ -90,6 +89,17 @@ several layers, each retaining its own responsibility.
   as belonging to one configured list instance.
 - Implement object oriented programming (OOP) practices where practical. Create
   classes with properties. Use abstractions, inheritance, and subclassing.
+- Encapsulate related data transformation and result assembly in a focused
+  helper class. Initialise it with the source data and required configuration.
+- Expose derived values and the assembled result through named properties.
+  Build results from those properties, keeping intermediate calculations on
+  the instance rather than passing the same data between helper functions.
+- Keep each calculation small and single-purpose. Put calculation logic in
+  `get_x()` methods, with the corresponding properties returning their results.
+- Use `cached_property` for derived values that remain valid for the configured
+  instance and benefit from reuse; use `property` for values that must reflect
+  changing state. Create a new instance when changing inputs would invalidate
+  cached results.
 - Follow EAFP programming principles. Avoid using "guards" to deal with errors
   arising from unexpected or misconfigured data. Never wallpaper over issues or
   mask the error, instead investigate underlying cause.
@@ -99,6 +109,8 @@ several layers, each retaining its own responsibility.
 - When using cached properties, prefer `get_x():` type function which returns
   the data into the cached property rather than doing the work directly in the
   property function.
+- When a subclass replaces a derived property with a fixed value, declare the
+  value directly as a class attribute instead of overriding its getter method.
 
 ## Changes to shared classes
 
@@ -136,7 +148,12 @@ several layers, each retaining its own responsibility.
   Keep SQL and sync operations out of containers and mappers.
 - Add `SyncDataGetter...` subclasses consistent with `sync/datasync.py`. Declare
   `query_clauses` and `clause_keys`, provide a `query_values` property, and override
-  `get_keys()` and `get_clause()` only where necessary.
+  `get_keys()` only where necessary. Do not override `get_clause()`; keep SQL
+  clause assembly in `SyncDataGetterAll`.
+- Set `query_grouping` and `query_ordering` to the SQL expressions after
+  `GROUP BY` and `ORDER BY`, respectively. The base `get_clause()` appends them
+  when set, after assembling the WHERE predicates from `query_clauses` and
+  `clause_keys`.
 - Reuse the inherited constructor and cached `.items` interface. Getter factory
   methods configure attributes such as `item_type`, `days`, or `months` before
   accessing cached properties. Use `get_item_type_getter()` for typed getters.

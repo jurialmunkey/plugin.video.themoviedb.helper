@@ -94,6 +94,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
 
     def test_func_write_user_art(aspect, icon, parent_id, **kwargs):
         from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+        from tmdbhelper.lib.items.database.details.client import DetailsClient
         iddb = ItemDetailsDatabase()
         iddb.set_list_values(
             table='user_art',
@@ -101,6 +102,7 @@ def test_func(test_func, dialog_output=False, **kwargs):
             values=(aspect, icon, parent_id),
             overwrite=True
         )
+        DetailsClient().invalidate()
 
     def test_func_jrpc(dbid, **kwargs):
         from tmdbhelper.lib.api.kodi.rpc import get_jsonrpc

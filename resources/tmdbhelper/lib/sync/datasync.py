@@ -16,19 +16,14 @@ class SyncItemDetailsDatabase(ItemDetailsDatabase):
         return tuple(item['id'] for item in items)
 
     def set_activity(self, item_type, method, value, expiry):
-        cursor = self.execute_sql(
+        self.execute_sql(
             DatabaseStatements.insert_or_replace('lactivities', keys=('id', 'data', 'expiry')),
             (f'{item_type}.{method}', value, expiry))
-        cursor.close() if cursor else None
 
     def get_activity(self, item_type, method, expiry=0):
-        cursor = self.execute_sql(
+        result = self.fetch_one(
             DatabaseStatements.select_limit('lactivities', keys=('data', ), conditions='id=? and expiry>=?'),
             (f'{item_type}.{method}', expiry))
-        if not cursor:
-            return
-        result = cursor.fetchone()
-        cursor.close()
         if not result:
             return
         return result[0]
@@ -66,15 +61,17 @@ class SyncDataGetterAll(SyncDataGetter):
     operator = 'OR'
     query_clauses = ('item_type=?', )  # WHERE {query_clauses}
     query_values = ('', )  # WHERE {query_clauses}={query_values}
+    query_grouping = None  # GROUP BY {query_grouping}
+    query_ordering = None  # ORDER BY {query_ordering}
     clause_keys = ()  # WHERE {query_clauses} AND ({clause_key} IS NOT NULL {operator} {clause_key} IS NOT NULL)
-    query_value_item_argx = 0  # Query value to use as sync item_type (normally item_type query is first ie 0 index)
+    filter_keys = ()  # Additional source columns needed by WHERE predicates
 
     @cached_property
     def item_type(self):
         return self.get_item_type()
 
     def get_item_type(self):
-        return self.query_values[self.query_value_item_argx]
+        return self.query_values[0]  # Query value for sunc item_type is usually first
 
     @cached_property
     def base_keys(self):
@@ -92,25 +89,60 @@ class SyncDataGetterAll(SyncDataGetter):
         return self.get_clause()
 
     def get_clause(self):
+        """Assemble query conditions; subclasses configure attributes instead of overriding."""
         clause = [f'{k} IS NOT NULL' for k in self.clause_keys]
         clause = '({})'.format(f' {self.operator} '.join(clause))
         clause = (*self.query_clauses, clause, )
         clause = ' AND '.join(clause)
+        clause = ' '.join((i for i in (clause, self.clause_grouping, self.clause_ordering) if i))
         return clause
+
+    @property
+    def clause_grouping(self):
+        if not self.query_grouping:
+            return
+        return f'GROUP BY {self.query_grouping}'
+
+    @property
+    def clause_ordering(self):
+        if not self.query_ordering:
+            return
+        return f'ORDER BY {self.query_ordering}'
 
     @cached_property
     def keys(self):
         return self.get_keys()
 
     def get_keys(self):
-        return (*(self.base_keys or ()), *(self.clause_keys or ()), *(self.additional_keys or ()), )
+        return (
+            *self.base_keys,
+            *self.clause_keys,
+            *self.additional_keys,
+            *self.filter_keys,
+        )
+
+    @cached_property
+    def query_keys(self):
+        """SELECT columns or expressions, separate from the source columns used by sync.
+
+        Subclasses declare fixed query_keys directly as a class attribute. Override
+        get_query_keys() only when construction depends on instance configuration.
+        """
+        return self.get_query_keys()
+
+    def get_query_keys(self):
+        return self.keys
 
     def get_sync_succeeded(self):
         return self.instance_syncdata.sync(self.item_type, self.keys)
 
     def get_items(self):
         self.sync_succeeded
-        return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
+        return self.instance_syncdata.cache.get_list_values(
+            keys=self.query_keys,
+            values=self.query_values,
+            conditions=self.clause,
+        )
 
 
 class SyncDataGetterProgressWatchedUnHidden(SyncDataGetterAll):
@@ -140,19 +172,11 @@ class SyncDataGetterDroppedCalendarUnHidden(SyncDataGetterAll):
 class SyncDataGetterAllMoviesToWatch(SyncDataGetterAll):
     query_values = ('movie', )
     clause_keys = ('playback_progress', 'watchlist_listed_at', )
-    filter_keys = ()
-
-    def get_keys(self):
-        return (*super().get_keys(), *self.filter_keys, )
 
 
 class SyncDataGetterAllShowsToWatch(SyncDataGetterAll):
     query_values = ('show', )
     clause_keys = ('next_episode_id', 'watchlist_listed_at', )
-    filter_keys = ()
-
-    def get_keys(self):
-        return (*super().get_keys(), *self.filter_keys, )
 
 
 class SyncDataGetterAllUnHiddenShowsStarted(SyncDataGetterDroppedWatchedUnHidden):
@@ -234,6 +258,29 @@ class SyncDataGetterAllItemsWatched(SyncDataGetterAllItems):
     clause_keys = ('last_watched_at', )
 
 
+class SyncDataGetterStats(SyncDataGetterAllItems):
+    base_keys = ()
+    query_keys = ('COUNT(*) AS item_count', )
+
+
+class SyncDataGetterWatchedStats(SyncDataGetterStats):
+    clause_keys = ('last_watched_at', )
+
+
+class SyncDataGetterWatchedShowsStats(SyncDataGetterStats):
+    operator = 'AND'
+    clause_keys = ('watched_episodes', 'aired_episodes')
+    query_clauses = ('item_type=?', 'aired_episodes > 0', 'watched_episodes >= aired_episodes')
+
+
+class SyncDataGetterCollectedStats(SyncDataGetterStats):
+    clause_keys = ('collection_last_collected_at', )
+
+
+class SyncDataGetterCollectedShowsStats(SyncDataGetterCollectedStats):
+    query_keys = ('COUNT(DISTINCT tmdb_id) AS item_count', )
+
+
 class SyncDataGetterWatchedOn(SyncDataGetterAllItemsWatched):
     query_clauses = (
         'item_type=?',
@@ -255,7 +302,14 @@ class SyncDataGetterWatchedOn(SyncDataGetterAllItemsWatched):
 
 
 class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
+    base_keys = ()
     days = 30
+    query_grouping = 'watched_date'
+    query_ordering = 'watched_date DESC'
+    query_keys = (
+        "DATE(last_watched_at, 'localtime') AS watched_date",
+        'COUNT(*) AS watched_count',
+    )
     query_clauses = (
         'item_type=?',
         "DATE(last_watched_at, 'localtime') >= DATE('now', 'localtime', ?)",
@@ -266,22 +320,13 @@ class SyncDataGetterWatchedHistoryStats(SyncDataGetterAllItemsWatched):
     def query_values(self):
         return (self.item_type, f'-{self.days - 1} days', )
 
-    def get_keys(self):
-        return (
-            "DATE(last_watched_at, 'localtime') AS watched_date",
-            'COUNT(*) AS watched_count',
-        )
-
-    def get_clause(self):
-        return f'{super().get_clause()} GROUP BY watched_date ORDER BY watched_date DESC'
-
-    def get_items(self):
-        self.instance_syncdata.sync(self.item_type, self.clause_keys)
-        return self.instance_syncdata.cache.get_list_values(keys=self.keys, values=self.query_values, conditions=self.clause)
-
 
 class SyncDataGetterWatchedMonthlyHistoryStats(SyncDataGetterWatchedHistoryStats):
     months = 12
+    query_keys = (
+        "DATE(last_watched_at, 'localtime', 'start of month') AS watched_date",
+        'COUNT(*) AS watched_count',
+    )
     query_clauses = (
         'item_type=?',
         "DATE(last_watched_at, 'localtime') >= DATE('now', 'localtime', 'start of month', ?)",
@@ -291,12 +336,6 @@ class SyncDataGetterWatchedMonthlyHistoryStats(SyncDataGetterWatchedHistoryStats
     @property
     def query_values(self):
         return (self.item_type, f'-{self.months - 1} months', )
-
-    def get_keys(self):
-        return (
-            "DATE(last_watched_at, 'localtime', 'start of month') AS watched_date",
-            'COUNT(*) AS watched_count',
-        )
 
 
 class SyncDataGetterAllItemsPlayback(SyncDataGetterAllItems):
@@ -329,6 +368,7 @@ class SyncDataGetterCurrentlyWatchingPlayback(SyncDataGetterAllItemsPlayback):
 class SyncDataGetterUnHiddenShowEpisodesUpNext(SyncDataGetterDroppedWatchedUnHidden):
     clause_keys = ('upnext_episode_id', )
     query_clauses = ('item_type=?', 'tmdb_id=?', )
+    query_ordering = 'season_number, episode_number'
 
     @property
     def query_values(self):
@@ -413,6 +453,15 @@ class SyncDataGetters:
 
     def get_all_watched_getter(self, item_type):
         return self.get_item_type_getter(SyncDataGetterAllItemsWatched, item_type)
+
+    def get_watched_stats_getter(self, item_type):
+        getter_class = SyncDataGetterWatchedShowsStats if item_type == 'show' else SyncDataGetterWatchedStats
+        return self.get_item_type_getter(getter_class, item_type)
+
+    def get_collected_stats_getter(self, item_type):
+        getter_class = SyncDataGetterCollectedShowsStats if item_type == 'show' else SyncDataGetterCollectedStats
+        item_type = 'episode' if item_type == 'show' else item_type
+        return self.get_item_type_getter(getter_class, item_type)
 
     def get_watched_on_getter(self, item_type, watched_on):
         sd = self.get_item_type_getter(SyncDataGetterWatchedOn, item_type)

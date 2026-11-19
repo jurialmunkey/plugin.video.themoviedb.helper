@@ -44,6 +44,7 @@ class SeriesItem:
 
 class Series(BaseItem):
     get_unique_ids = MediaItem.get_unique_ids
+    reads_other_items = True  # Parts and stats come from member movies' rows
 
     art_dbclist_routes = (
         (('art_poster', None), 'poster'),

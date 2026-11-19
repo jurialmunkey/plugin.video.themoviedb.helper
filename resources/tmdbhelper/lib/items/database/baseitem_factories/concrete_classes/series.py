@@ -8,6 +8,7 @@ class Series(BaseItem):
     append_to_response_tmdbtype = 'collection'
     append_to_response_extended = False
     append_to_response_language = False
+    metadata_save_scope = 'family'  # Member movies only gain shared details that were missing
 
     @property
     def cached_data_keys(self):

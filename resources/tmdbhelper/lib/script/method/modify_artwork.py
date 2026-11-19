@@ -7,6 +7,7 @@ from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.script.method.kodi_utils import container_refresh, service_refresh
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.items.database.baseview_factories.factory import BaseViewFactory
+from tmdbhelper.lib.items.database.details.client import DetailsClient
 from tmdbhelper.lib.items.listitem import ListItem
 from tmdbhelper.lib.script.method.decorators import is_in_kwargs, get_tmdb_id
 
@@ -221,11 +222,16 @@ class ModifyArtwork:
             return False
         if self.url is None:
             return False
+        self.write_item()
+        return True
+
+    def write_item(self):
         if self.url == '':
             self.del_item()
-            return True
-        self.set_item()
-        return True
+        else:
+            self.set_item()
+        # The item detail service keeps assembled artwork, including user artwork.
+        DetailsClient().invalidate()
 
 
 class ModifyArtworkMovie(ModifyArtwork):

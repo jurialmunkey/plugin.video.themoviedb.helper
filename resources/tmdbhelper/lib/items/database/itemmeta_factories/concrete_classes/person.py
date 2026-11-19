@@ -6,6 +6,7 @@ from tmdbhelper.lib.addon.plugin import get_localized
 
 class Person(BaseItem):
     get_unique_ids = MediaItem.get_unique_ids
+    reads_other_items = True  # Appearances come from other titles' credits
 
     art_dbclist_routes = (
         (('art_profile', None), 'thumb'),

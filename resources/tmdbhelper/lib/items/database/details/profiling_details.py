@@ -4,8 +4,8 @@ from collections import deque
 from itertools import chain
 from sys import getsizeof
 from threading import local
-from tmdbhelper.lib.items.database.baseitem_factories.metadata import ItemMetadataCache
 from tmdbhelper.lib.items.database.details.backend import DetailsDatabase
+from tmdbhelper.lib.items.database.details.metadata import DetailsMetadataCache
 
 
 class DetailsWorkProfiler:
@@ -36,16 +36,24 @@ class DetailsWorkProfiler:
         return record.call(stage, func, *args)
 
 
-class ProfiledItemMetadataCache(ItemMetadataCache):
-    def __init__(self, database, profiler):
-        super().__init__(database)
+class ProfiledItemMetadataCache(DetailsMetadataCache):
+    def __init__(self, database, stored_metadata, profiler):
+        super().__init__(database, stored_metadata)
         self.profiler = profiler
 
-    def get_version(self):
+    def get_stored_item(self, mapper, key):
         record = self.profiler.record
         if record is None:
-            return super().get_version()
-        return record.call('metadata_validation', super().get_version)
+            return super().get_stored_item(mapper, key)
+        item = record.call('stored_read', super().get_stored_item, mapper, key)
+        record.count('stored_hits' if item is not None else 'stored_misses')
+        return item
+
+    def queue_stored_copy(self, stored):
+        record = self.profiler.record
+        if record is not None:
+            record.count('stored_queued')
+        super().queue_stored_copy(stored)
 
     def get_entry(self, key):
         record = self.profiler.record
@@ -78,16 +86,29 @@ class ProfiledItemMetadataCache(ItemMetadataCache):
             return super().copy_item(item)
         return record.call('metadata_copy', super().copy_item, item)
 
+    def discard_saved(self, factory):
+        record = self.profiler.record
+        if record is None:
+            return super().discard_saved(factory)
+        record.count(f'metadata_save_scope_{factory.metadata_save_scope}')
+        return record.call('metadata_discard', super().discard_saved, factory)
+
+    def discard_entry(self, key):
+        record = self.profiler.record
+        if record is not None:
+            record.count('metadata_discarded_entries')
+        super().discard_entry(key)
+
 
 class ProfiledDetailsDatabase(DetailsDatabase):
     def __init__(self, profiler):
         self.profiler = profiler
         super().__init__()
 
-    def database_execute(self, connection, query, data=None):
+    def database_execute(self, cursor, query, data=None):
         record = self.profiler.record
         if record is None:
-            return super().database_execute(connection, query, data)
+            return super().database_execute(cursor, query, data)
         record.count('sql_execute_calls')
         operation = query.lstrip().split(None, 1)[0].lower()
         record.count(f'sql_{operation}_calls')
@@ -97,17 +118,17 @@ class ProfiledDetailsDatabase(DetailsDatabase):
         else:
             record.count('sql_parameter_sets')
         try:
-            return record.call('sql_execute', super().database_execute, connection, query, data)
+            return record.call('sql_execute', super().database_execute, cursor, query, data)
         except Exception:
             record.count('sql_errors')
             raise
 
-    def get_list_values(self, table='simplecache', keys=(), values=(), conditions=None, connection=None):
+    def get_list_values(self, table='simplecache', keys=(), values=(), conditions=None):
         return self.read_rows(
-            table, False, super().get_list_values, table, keys, values, conditions, connection)
+            table, False, super().get_list_values, table, keys, values, conditions)
 
-    def get_values(self, table='simplecache', item_id=None, keys=(), connection=None):
-        return self.read_rows(table, True, super().get_values, table, item_id, keys, connection)
+    def get_values(self, table='simplecache', item_id=None, keys=()):
+        return self.read_rows(table, True, super().get_values, table, item_id, keys)
 
     def read_rows(self, table, single_row, func, *args):
         record = self.profiler.record

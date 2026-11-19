@@ -1,11 +1,10 @@
-from contextlib import contextmanager
-from jurialmunkey.ftools import cached_property
+from jurialmunkey.ftools import cached_property, threaded_cached_property
 from tmdbhelper.lib.addon.plugin import get_setting
-from tmdbhelper.lib.files.dbfunc import DatabaseConnection
 from tmdbhelper.lib.items.database.baseitem_factories.factory import BaseItemFactory
-from tmdbhelper.lib.items.database.baseitem_factories.metadata import ItemMetadataCache
 from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.items.database.details.apis import DetailsAPIs
+from tmdbhelper.lib.items.database.details.metadata import DetailsMetadataCache
+from tmdbhelper.lib.items.database.details.storedmetadata import DetailsStoredMetadata
 
 
 class DetailsDatabase(ItemDetailsDatabase):
@@ -13,44 +12,17 @@ class DetailsDatabase(ItemDetailsDatabase):
         self._basefolder = get_setting('cache_location', 'str') or ''
         super().__init__()
 
-    def database_execute(self, connection, query, data=None):
+    def database_execute(self, cursor, query, data=None):
         # The coordinator must roll back and restart on database errors. Treating
         # an unsuccessful statement as a cache miss could commit a partial item.
         if not data:
-            return connection.execute(query)
+            return cursor.execute(query)
         if isinstance(data, list):
-            return connection.executemany(query, data)
-        return connection.execute(query, data)
+            return cursor.executemany(query, data)
+        return cursor.execute(query, data)
 
-    def execute_sql(self, query, data=None, read_only=False, connection=None):
-        if connection is not None:
-            return self.database_execute(connection, query, data)
-        with self.get_database(read_only=read_only) as connection:
-            return self.database_execute(connection, query, data)
-
-
-class DetailsConnection(DatabaseConnection):
-    """Own both the cursor and connection, including rollback on failed batches."""
-
-    def close(self):
-        if self.open_connection is None:
-            return
-        connection = self.open_connection.connection
-        try:
-            super().close()
-        finally:
-            connection.close()
-
-    @contextmanager
-    def open(self):
-        existing_connection = self.open_connection is not None
-        if not existing_connection:
-            self.open_connection = self.cache.get_database().cursor()
-        try:
-            yield self.open_connection
-        finally:
-            if not existing_connection:
-                self.close()
+    def get_result(self, scope, query, data, get_result):
+        return self.get_session_result(scope, query, data, get_result)
 
 
 class DetailsLookup:
@@ -59,14 +31,12 @@ class DetailsLookup:
     item_factory = staticmethod(BaseItemFactory)
 
     def __init__(
-            self, cache, request, common_apis, connection=None, parent_data=None,
+            self, cache, request, common_apis, parent_data=None,
             sync_enabled=True, metadata_cache=None):
         self.request = request
         self.common_apis = common_apis
-        self.owns_connection = connection is None
         self.factory = self.item_factory(request.mediatype, common_apis=self.common_apis)
         self.factory.cache = cache
-        self.factory.connection = connection or DetailsConnection(cache)
         for name in (
                 'tmdb_id', 'season', 'episode', 'cache_refresh',
                 'cache_translations', 'extendedinfo'):
@@ -96,10 +66,6 @@ class DetailsLookup:
             data['label'] = data['infolabels']['title']
         return data
 
-    def close(self):
-        if self.owns_connection:
-            self.factory.connection.close()
-
 
 class DetailsBackend:
     lookup_class = DetailsLookup
@@ -111,15 +77,28 @@ class DetailsBackend:
     def cache(self):
         return DetailsDatabase()
 
-    @cached_property
-    def connection(self):
-        return DetailsConnection(self.cache)
+    @threaded_cached_property
+    def stored_metadata(self):
+        return DetailsStoredMetadata(self.cache)
 
-    @cached_property
+    @threaded_cached_property
     def metadata_cache(self):
-        return ItemMetadataCache(self.cache)
+        return self.get_metadata_cache()
 
-    @cached_property
+    def get_metadata_cache(self):
+        return DetailsMetadataCache(self.cache, self.stored_metadata)
+
+    def prepare_stored_metadata(self):
+        """Clear stored metadata from another add-on version or settings before reads start."""
+        self.stored_metadata.prepare()
+
+    def flush_stored_metadata(self):
+        """Write queued stored metadata; the coordinator calls this while no reads are in flight."""
+        if not self.stored_metadata.has_work:
+            return
+        self.stored_metadata.flush()
+
+    @threaded_cached_property
     def is_sync_enabled(self):
         """Settings changes restart the service, so the setting is read once."""
         from tmdbhelper.lib.sync.prepare import SyncPreparation
@@ -128,61 +107,61 @@ class DetailsBackend:
     def lookup(self, request, parent_data=None):
         return self.lookup_class(
             self.cache, request, self.apis.get(request.language),
-            self.connection, parent_data, sync_enabled=self.is_sync_enabled,
+            parent_data, sync_enabled=self.is_sync_enabled,
             metadata_cache=self.metadata_cache)
 
     def read(self, request):
+        """Read on the calling thread's session: the coordinator's or a reader's held connection."""
         lookup = self.lookup(request)
         return lookup.get_cached_data()
 
     def fetch(self, request, parent_data):
+        """Look up online on a lookup thread, with one connection for the lookup."""
         lookup = self.lookup_class(
             self.cache, request, self.apis.get(request.language),
             parent_data=parent_data, sync_enabled=self.is_sync_enabled)
-        try:
-            if not lookup.factory.data_cond:
-                return []
+        if not lookup.factory.data_cond:
+            return []
+        with self.cache.session():
             return lookup.factory.try_cached_data(return_queue=True) or []
-        finally:
-            lookup.close()
 
     def commit(self, request, queue):
         # A basic lookup may have finished after a richer lookup populated the row.
         # Keep the richer records rather than replacing them with the basic response.
         if request.cache_refresh != 'force' and self.read(request) is not None:
             return
-        with self.connection.open() as cursor:
-            cursor.execute('BEGIN')
-            try:
-                if request.clear_user_art:
-                    self.clear_user_art(request)
-                for func, args, kwargs in queue:
-                    func.__self__.connection = self.connection
-                for func, args, kwargs in queue:
-                    func(*args, **kwargs)
-                cursor.execute('COMMIT')
-            except BaseException:
-                cursor.execute('ROLLBACK')
-                raise
+        factory = self.lookup(request).factory
+        # Queued writes run on the coordinator's held connection, whichever thread queued them.
+        with self.cache.transaction():
+            if request.clear_user_art:
+                self.clear_user_art(request)
+            for func, args, kwargs in queue:
+                func(*args, **kwargs)
+            # Stored copies change with the item, so a crash cannot leave a stale copy.
+            self.stored_metadata.delete_saved(factory)
+        self.metadata_cache.discard_saved(factory)
 
     def clear_user_art(self, request):
         lookup = self.lookup(request)
         item_id = lookup.factory.item_id
         self.cache.del_list_values(
             table='user_art', values=(item_id, f'{item_id}.%'),
-            conditions='parent_id=? OR parent_id LIKE ?',
-            connection=self.connection.open_connection)
+            conditions='parent_id=? OR parent_id LIKE ?')
 
     def fallback(self, request):
         lookup = self.lookup(request)
         return lookup.factory.get_lookup_fallback()
 
     def close(self):
+        # Reader threads have stopped and closed their own connections before the backend closes.
+        self.close_created(('metadata_cache', 'apis'))
+
+    def close_created(self, names):
+        """Close each created resource in order, even when an earlier close fails."""
+        if not names:
+            return
         try:
-            self.connection.close()
+            if names[0] in self.__dict__:
+                self.__dict__[names[0]].close()
         finally:
-            try:
-                if 'metadata_cache' in self.__dict__:
-                    self.metadata_cache.close()
-            finally:
-                self.apis.close()
+            self.close_created(names[1:])

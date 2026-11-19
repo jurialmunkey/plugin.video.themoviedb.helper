@@ -157,6 +157,16 @@ def import_episode_parent():
     return EpisodeParent
 
 
+def import_movie_tmdb_rating():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.tmdb_rating import MovieTMDbRating
+    return MovieTMDbRating
+
+
+def import_tvshow_tmdb_rating():
+    from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.tmdb_rating import TvshowTMDbRating
+    return TvshowTMDbRating
+
+
 def import_imdbnumber():
     from tmdbhelper.lib.items.database.basemeta_factories.concrete_classes.info import IMDbNumber
     return IMDbNumber
@@ -553,6 +563,8 @@ FACTORY_ROUTES = {
     'unique_id': import_unique_id,
     'external_ids': import_external_ids,
     'episode_parent': import_episode_parent,
+    'movie_tmdb_rating': import_movie_tmdb_rating,
+    'tvshow_tmdb_rating': import_tvshow_tmdb_rating,
     'imdbnumber': import_imdbnumber,
     'custom': import_custom,
     'genre': import_genre,

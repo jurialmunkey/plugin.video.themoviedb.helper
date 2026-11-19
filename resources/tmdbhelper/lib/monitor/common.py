@@ -1,6 +1,8 @@
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_try_except
-from tmdbhelper.lib.api.contains import CommonContainerAPIs, CommonRatingsAPIs
+from tmdbhelper.lib.addon.plugin import get_condvisibility, get_setting
+from tmdbhelper.lib.api.contains import CommonContainerAPIs
+from tmdbhelper.lib.monitor.ratings import MonitorPartialRatings
 from jurialmunkey.window import WindowPropertySetter
 
 
@@ -60,29 +62,19 @@ class CommonMonitorDetails(CommonContainerAPIs):
     def del_identifier_details(self, identifier):
         return self.query_database.del_identifier(identifier)
 
-    @cached_property
-    def awards_database(self):
-        return CommonRatingsAPIs.get_awards_database()
+    @property
+    def is_ratings_enabled(self):
+        if not get_setting('use_online_ratings'):
+            return False
+        return get_condvisibility('!Skin.HasSetting(TMDbHelper.DisableRatings)')
 
-    def get_all_ratings(self, tmdb_type, tmdb_id, season=None, episode=None):
-        ratings_api = CommonRatingsAPIs()
+    @property
+    def ratings_mode(self):
+        """Details requests prewarm ratings in the item detail service for get_partial_ratings()."""
+        return 'prewarm' if self.is_ratings_enabled else None
 
-        # Reuse the reader; each lookup opens its own read-only connection.
-        ratings_api.awards_database = self.awards_database
-
-        # Set defaults
-        ratings_api.tmdb_type = tmdb_type
-        ratings_api.tmdb_id = tmdb_id
-        ratings_api.season = season
-        ratings_api.episode = episode
-
-        # Reuse some APIs to avoid reinit
-        ratings_api.tmdb_api = self.tmdb_api
-        ratings_api.tmdb_imagepath = self.tmdb_imagepath
-        ratings_api.ftv_api = self.ftv_api
-        ratings_api.query_database = self.query_database
-
-        return ratings_api.all_ratings
+    def get_partial_ratings(self, tmdb_type, tmdb_id, season=None, episode=None, is_current=None):
+        return MonitorPartialRatings(self.lidc, tmdb_type, tmdb_id, season, episode, is_current)
 
 
 class CommonMonitorItem:

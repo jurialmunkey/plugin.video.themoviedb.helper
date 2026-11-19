@@ -108,6 +108,7 @@ class _ListItem(object):
     is_unaired = False
 
     context_additions = None
+    context_menu_config = None  # A ContextMenuConfig shared by the list's items
     infoproperties_additions = {}
     format_unaired_labels = False
     label_format_unaired = '{}'
@@ -206,7 +207,7 @@ class _ListItem(object):
 
     def finalise_context_menu(self):
         from tmdbhelper.lib.items.context import ContextMenu
-        self.context_menu += ContextMenu(self).get()
+        self.context_menu += ContextMenu(self, self.context_menu_config).get()
         self.context_menu += self.context_additions or []
         return self.context_menu
 

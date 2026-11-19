@@ -7,7 +7,7 @@ from tmdbhelper.lib.sync.providers.selection import SyncProviderSetting
 
 class SyncProviderDefaultSelection(SyncProviderFeatureSelection):
     def select(self):
-        if not self.capabilities:
+        if not self.capabilities or not self.provider.validate_setup():
             return
         selected = Dialog().yesnocustom(
             get_localized(32550), get_localized(32560).format(self.provider.display_name),

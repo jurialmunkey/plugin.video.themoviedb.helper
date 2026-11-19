@@ -2749,11 +2749,6 @@ msgid "Use TMDb numbers, ask for a group, or use the current group. Individual p
 msgstr ""
 
 #: /resources/settings.xml
-msgctxt "#32598"
-msgid "Statistics"
-msgstr ""
-
-#: /resources/settings.xml
 msgctxt "#32599"
 msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
 msgstr ""
@@ -3136,11 +3131,6 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32678"
 msgid "Choose a collection provider, install one, or select None to disable collection lists."
-msgstr ""
-
-#: /resources/settings.xml
-msgctxt "#32679"
-msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
 msgstr ""
 
 #: /resources/settings.xml
@@ -3531,4 +3521,55 @@ msgstr ""
 #: /resources/settings.xml
 msgctxt "#32760"
 msgid "Detailed"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32761"
+msgid "Show expired widget lists for up to"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32762"
+msgid "When a widget's TMDb list is older than its normal 6 hour cache, show the saved list straight away and download the new list after the widget has loaded. The new list appears the next time Kodi reloads the widget. Lists for today, such as Airing Today, always wait for new data. Off waits for new data every time."
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32763"
+msgid "Off"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32764"
+msgid "24 hours"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32765"
+msgid "48 hours"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32766"
+msgid "72 hours"
+msgstr ""
+
+#: /resources/settings.xml
+#: /resources/tmdbhelper/lib/items/context_random.py
+msgctxt "#32767"
+msgid "Play random"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/script/method/play_random.py
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr ""
+
+#: /resources/tmdbhelper/lib/items/context_nextepisodes.py
+msgctxt "#32770"
+msgid "Browse next episodes"
 msgstr ""

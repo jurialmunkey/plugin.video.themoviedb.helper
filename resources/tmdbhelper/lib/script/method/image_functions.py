@@ -2,6 +2,11 @@
 # Author: jurialmunkey
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from jurialmunkey.ftools import cached_property
+from hashlib import sha256
+from time import monotonic
+from jurialmunkey.window import get_property
+from tmdbhelper.lib.files.futils import json_loads, json_dumps
+from tmdbhelper.lib.files.locker import mutexlock
 
 
 def blur_image(blur_image=None, prefix='ListItem', **kwargs):
@@ -28,7 +33,6 @@ class GenreArtwork:
         return get_setting('sync_notifications')
 
     def run(self):
-        from jurialmunkey.window import get_property
         for k, v in self.fanart.items():
             get_property(k, v)
 
@@ -70,10 +74,14 @@ class GenreArtwork:
 
     @cached_property
     def data(self):
+        return self.get_data()
+
+    def get_data(self):
         self.p_dialog_max = len(self.items_movie) + len(self.items_tv)  # Init value outside of threading to avoid sqlite object reuse
-        data = {'movie': self.data_movie, 'tv': self.data_tv}
-        self.p_dialog.close() if self.p_dialog else None
-        return data
+        try:
+            return {'movie': self.data_movie, 'tv': self.data_tv}
+        finally:
+            self.p_dialog.close() if self.p_dialog else None
 
     @cached_property
     def data_movie(self):
@@ -98,7 +106,39 @@ class GenreArtwork:
 
     @cached_property
     def fanart(self):
-        return self.get_formatted_dict('fanart')
+        return self.get_fanart()
+
+    @cached_property
+    def mutex_lockname(self):
+        return self.get_mutex_lockname()
+
+    def get_mutex_lockname(self):
+        cache_key = json_dumps(self.get_cache_key())
+        return f'TMDbHelper.Artwork.{sha256(cache_key.encode("utf-8")).hexdigest()}'
+
+    def get_cache_key(self):
+        from xbmcvfs import translatePath
+        from tmdbhelper.lib.addon.plugin import ADDONDATA, get_language
+        return (translatePath(ADDONDATA), self.tmdb_type, get_language())
+
+    def get_fanart(self):
+        return self.get_fanart_data(monotonic()) or {}
+
+    @mutexlock
+    def get_fanart_data(self, requested_at):
+        # Only reuse a batch completed since this request began, preserving later refreshes.
+        cached_fanart = self.get_cached_fanart(requested_at)
+        if cached_fanart is not None:
+            return cached_fanart
+        fanart = self.get_formatted_dict('fanart')
+        result = {'completed_at': monotonic(), 'fanart': fanart}
+        get_property(self.mutex_lockname, set_property=json_dumps(result))
+        return fanart
+
+    def get_cached_fanart(self, requested_at):
+        result = json_loads(get_property(self.mutex_lockname))
+        if result and result['completed_at'] >= requested_at:
+            return result['fanart']
 
     def get_formatted_dict(self, key):
         datadict = {
@@ -140,6 +180,10 @@ class ProviderArtwork(GenreArtwork):
 
     def __init__(self):
         self.iso_country = self.query_database.tmdb_api.iso_country
+
+    def get_cache_key(self):
+        from tmdbhelper.lib.addon.plugin import get_setting
+        return (*super().get_cache_key(), self.iso_country, get_setting('provider_allowlist', 'str'))
 
     @cached_property
     def items_movie(self):

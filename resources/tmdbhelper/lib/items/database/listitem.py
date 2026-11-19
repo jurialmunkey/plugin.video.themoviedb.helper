@@ -129,7 +129,8 @@ class ListItemBatch:
         data = self.parent.client.get_items(
             [item.sent_request for item in self.sent_items],
             [item.listitem.get_merge_data() for item in self.sent_items],
-            kodi_details=self.parent.kodi_details)
+            kodi_details=self.parent.kodi_details,
+            ratings=self.parent.ratings)
         details = dict(zip(self.sent_items, data))
         return [item.get_configured_listitem(details.get(item)) for item in self.items]
 
@@ -141,6 +142,7 @@ class ListItemDetails:
     extendedinfo = False
     kodi_details = False  # Permit Kodi library details; the service applies the user's setting
     sync_details = True  # Permit synced play data; the service applies the user's setting
+    ratings = None  # 'prewarm' starts ratings for a later get_ratings(); 'merge' adds them to list items
     parent_params = {}
 
     def __init__(self, common_apis=None):
@@ -163,7 +165,14 @@ class ListItemDetails:
     def get_item(self, tmdb_type, tmdb_id, season=None, episode=None):
         if not tmdb_id:
             return
-        return self.client.get_item(self.get_request(tmdb_type, tmdb_id, season, episode))
+        return self.client.get_item(self.get_request(tmdb_type, tmdb_id, season, episode), ratings=self.ratings)
+
+    def get_ratings(self, tmdb_type, tmdb_id, season=None, episode=None, received=0, awards=False):
+        """Ratings so far that the item detail service prewarmed with the item's details request."""
+        if not tmdb_id:
+            return {'ratings': {}, 'received': 0, 'complete': True}
+        request = self.get_request(tmdb_type, tmdb_id, season, episode)
+        return self.client.get_ratings(request, received=received, awards=awards)
 
     def configure_listitems_threaded(self, items):
         return ListItemBatch(self, items).get_configured_items()

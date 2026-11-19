@@ -42,6 +42,10 @@ class Episode(Season):
         return self.get_season_id(self.tmdb_type, self.tmdb_id, self.season)
 
     @property
+    def lease_parent_ids(self):
+        return (self.tvshow_id, self.season_id)
+
+    @property
     def online_data_args(self):
         return (self.tmdb_type, self.tmdb_id, 'season', self.season, 'episode', self.episode)
 

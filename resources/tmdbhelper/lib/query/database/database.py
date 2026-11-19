@@ -20,7 +20,6 @@ from tmdbhelper.lib.query.database.imdb_top250 import FindQueriesDatabaseIMDbTop
 from tmdbhelper.lib.query.database.external_ids import FindQueriesDatabaseExternalIds
 from tmdbhelper.lib.query.database.episode_parent import FindQueriesDatabaseEpisodeParent
 from tmdbhelper.lib.query.database.trakt_id import FindQueriesDatabaseTraktID
-from tmdbhelper.lib.query.database.trakt_stats import FindQueriesDatabaseTraktStats
 from tmdbhelper.lib.query.database.identifier import FindQueriesDatabaseIdentifier
 from tmdbhelper.lib.query.database.user_ratings import FindQueriesDatabaseUserRatings
 
@@ -44,7 +43,6 @@ class FindQueriesDatabase(
     FindQueriesDatabaseExternalIds,
     FindQueriesDatabaseEpisodeParent,
     FindQueriesDatabaseTraktID,
-    FindQueriesDatabaseTraktStats,
     FindQueriesDatabaseIdentifier,
     FindQueriesDatabaseUserRatings,
 ):
@@ -60,7 +58,7 @@ class FindQueriesDatabase(
         },
     }
 
-    database_version = 5
+    database_version = 7
 
     database_changes = {
         2: (
@@ -71,6 +69,14 @@ class FindQueriesDatabase(
             'DROP TABLE IF EXISTS trakt_id',
         ),
         5: (),
+        6: (
+            'DROP TABLE IF EXISTS trakt_stats',
+            "DELETE FROM expiry WHERE id='trakt_stats'",
+        ),
+        7: (
+            'DROP TABLE IF EXISTS identifier',
+            "DELETE FROM expiry WHERE id='identifier'",
+        ),
     }
 
     @property
@@ -93,7 +99,6 @@ class FindQueriesDatabase(
             'tvshows': self.tvshows_columns,
             'imdb_top250': self.imdb_top250_columns,
             'external_ids': self.external_ids_columns,
-            'trakt_stats': self.trakt_stats_columns,
             'identifier': self.identifier_columns,
             'user_ratings': self.user_ratings_columns,
         }
@@ -133,7 +138,7 @@ class FindQueriesDatabase(
 
     def get_cached_values(self, table, keys, mapping_function=None, values=None, conditions=None):
         data = None
-        with self.access.connection.open():
+        with self.session():
             if not self.is_expired(table):
                 data = self.get_all_values(
                     table,
@@ -143,8 +148,6 @@ class FindQueriesDatabase(
         return mapping_function(data) if mapping_function else data
 
     def set_cached_values(self, table, keys, values, item_id=None, expiry=DEFAULT_EXPIRY, overwrite=True):
-        with self.access.connection.open() as connection:
-            connection.execute('BEGIN')
+        with self.transaction():
             self.set_expiry(f'{table}.{item_id}' if item_id else table, expiry=expiry) if expiry else None
             self.access.set_cached_list_values(table, keys=keys, values=values, overwrite=overwrite)
-            connection.execute('COMMIT')

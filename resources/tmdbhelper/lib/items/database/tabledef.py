@@ -29,6 +29,10 @@ BASEITEM_COLUMNS = {
     'language': {
         'data': 'TEXT',
     },
+    'deletion': {
+        'data': 'INTEGER DEFAULT 0 NOT NULL',
+        'indexed': True
+    },
 }
 
 MOVIE_COLUMNS = {
@@ -379,117 +383,37 @@ COLLECTION_COLUMNS = {
 
 RATINGS_COLUMNS = {
     'id': {
-        'data': 'TEXT PRIMARY KEY',
+        'data': 'TEXT',
         'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
     },
-    'top250': {
-        'data': 'INTEGER',
-    },
-    'tmdb_rating': {
-        'data': 'INTEGER',
-    },
-    'tmdb_votes': {
-        'data': 'INTEGER',
-    },
-    'imdb_rating': {
-        'data': 'INTEGER',
-    },
-    'imdb_votes': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_rating': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_usermeter': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_userreviews': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_reviewstotal': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_reviewsfresh': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_reviewsrotten': {
-        'data': 'INTEGER',
-    },
-    'rottentomatoes_consensus': {
+    'provider': {
         'data': 'TEXT',
+        'unique': True,
     },
-    'rottentomatoes_image': {
+    'key': {
         'data': 'TEXT',
+        'unique': True,
     },
-    'rottentomatoes_usermeter_image': {
+    'value': {
+        'data': '',  # No declared type, so that values keep their own type
+    },
+}
+
+RATINGS_PROVIDER_COLUMNS = {
+    'id': {
         'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True,
+        'unique': True,
     },
-    'metacritic_rating': {
-        'data': 'INTEGER',
-    },
-    'metacriticuser_rating': {
-        'data': 'INTEGER',
-    },
-    'metacritic_image': {
+    'provider': {
         'data': 'TEXT',
-    },
-    'trakt_rating': {
-        'data': 'INTEGER',
-    },
-    'trakt_votes': {
-        'data': 'INTEGER',
-    },
-    'letterboxd_rating': {
-        'data': 'INTEGER',
-    },
-    'letterboxd_votes': {
-        'data': 'INTEGER',
-    },
-    'mdblist_rating': {
-        'data': 'INTEGER',
-    },
-    'mdblist_votes': {
-        'data': 'INTEGER',
-    },
-    'rogerebert_rating': {
-        'data': 'INTEGER',
-    },
-    'rogerebert_image': {
-        'data': 'TEXT',
-    },
-    'myanimelist_rating': {
-        'data': 'INTEGER',
-    },
-    'awards': {
-        'data': 'TEXT',
-    },
-    'goldenglobe_wins': {
-        'data': 'INTEGER',
-    },
-    'goldenglobe_nominations': {
-        'data': 'INTEGER',
-    },
-    'oscar_wins': {
-        'data': 'INTEGER',
-    },
-    'oscar_nominations': {
-        'data': 'INTEGER',
-    },
-    'award_wins': {
-        'data': 'INTEGER',
-    },
-    'award_nominations': {
-        'data': 'INTEGER',
-    },
-    'emmy_wins': {
-        'data': 'INTEGER',
-    },
-    'emmy_nominations': {
-        'data': 'INTEGER',
+        'unique': True,
     },
     'expiry': {
         'data': 'INTEGER',
-        'indexed': True
     },
 }
 
@@ -1200,5 +1124,41 @@ LACTIVITIES_COLUMNS = {
     'expiry': {
         'data': 'INTEGER',
         'indexed': True
+    },
+}
+
+STORED_METADATA_COLUMNS = {
+    'id': {
+        'data': 'TEXT PRIMARY KEY',
+        'indexed': True
+    },
+    'item_id': {
+        'data': 'TEXT',
+        'foreign_key': 'baseitem(id)',
+        'indexed': True
+    },
+    'family_id': {
+        'data': 'TEXT',
+        'indexed': True
+    },
+    'reads_other_items': {
+        'data': 'INTEGER DEFAULT 0 NOT NULL',
+        'indexed': True
+    },
+    'data': {
+        'data': 'TEXT',
+    },
+    'used': {
+        'data': 'INTEGER',
+        'indexed': True
+    },
+}
+
+STORED_METADATA_STATE_COLUMNS = {
+    'id': {
+        'data': 'TEXT PRIMARY KEY',
+    },
+    'data': {
+        'data': 'TEXT',
     },
 }

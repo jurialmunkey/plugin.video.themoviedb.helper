@@ -1,4 +1,8 @@
+from functools import partial
+from threading import RLock
 from tmdbhelper.lib.monitor.images import ImageManipulations
+from tmdbhelper.lib.monitor.imageworkers import ImageManipulationWorkers
+from tmdbhelper.lib.monitor.itemdetails import MonitorItemDetails
 from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT
 from tmdbhelper.lib.monitor.listitemgetter import ListItemInfoGetter
 from tmdbhelper.lib.addon.plugin import get_condvisibility
@@ -45,6 +49,9 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         "!Skin.HasSetting(TMDbHelper.EnableColors)")
 
     _allow_list = ('crop', 'blur', 'desaturate', 'colors', )
+    _prewarm_allow_list = ('crop', 'blur', )
+    _prewarm_positions = (1, -1, 2, -2, 3, )  # Upcoming items prewarmed in order while sitting idle on the current item
+    _unpositioned_container_item = 'ListItem.'  # Container item infolabels that cannot be read at other positions
     _check_list = (
         'Art(fanart)', 'Art(poster)', 'Art(clearlogo)',
         'Art(tvshow.fanart)', 'Art(tvshow.poster)', 'Art(tvshow.clearlogo)',
@@ -68,6 +75,8 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self._allow_on_scroll = True  # Allow updating while scrolling
         self._parent = parent
         self.properties = set()
+        self.properties_lock = RLock()  # Image workers set properties from their own threads
+        self.image_workers = ImageManipulationWorkers()
 
     def reset_current_item(self):
         self.cur_item = 0
@@ -76,11 +85,26 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         self.pre_window = 1
         self.cur_base_window = 0
         self.pre_base_window = 1
-        self.pre_container_content = None
+        self.reset_prewarm()
+
+    def reset_prewarm(self):
+        self.prewarm_positions = iter(self._prewarm_positions)
 
     @property
     def is_artwork_disabled(self):
         return get_condvisibility(self._cond_artwork_disabled)
+
+    @property
+    def is_prewarm_allowed(self):
+        if not self.image_workers.is_idle:
+            return False
+        if self.container_item == self._unpositioned_container_item:
+            return False
+        if self.is_on_scroll:
+            return False
+        if self.is_artwork_disabled:
+            return False
+        return True
 
     @property
     def is_service_disabled(self):
@@ -118,12 +142,9 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         if self.is_same_base_window(update=True) and not self.get_cur_info():
             return False
 
-        container_content = self.container_content
-        content_changed = container_content != self.pre_container_content
-        self.pre_container_content = container_content
-
         # Check if the item has changed before retrieving details again
-        if not self.is_same_item(update=True) or not self.is_same_window(update=True) or content_changed:
+        if not self.is_same_item(update=True) or not self.is_same_window(update=True):
+            self.reset_prewarm()
             return True
 
         # Set refresh time if not set yet and still on same item
@@ -155,51 +176,81 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         """
 
         if not forced and not self.is_next_refresh():
+            self.prewarm_artwork()
             return
 
         self._this_refresh = 0
         self._next_refresh = 0
 
-        if not self.update_properties(self.blurcrop_properties, use_current_window=self.is_current_window_images):
-            return
+        jobs = self.submit_image_manipulations()
 
         if not self.update_properties(self.baseitem_properties if not self.is_service_disabled else {}):
             return
 
-        return self.cur_blurcrop_properties
+        return self.get_image_manipulation_results(jobs) if forced else None
 
-    cur_blurcrop_properties = None
-
-    @property
-    def blurcrop_properties(self):
-        self.cur_blurcrop_properties = self.get_image_manipulations(
-            use_winprops=False,
+    def submit_image_manipulations(self):
+        """ Image workers generate images and set their properties without holding up the monitor """
+        if self.is_artwork_disabled:
+            self.image_workers.cancel()
+            return []
+        requests = self.get_image_manipulation_requests(
             built_artwork=self.remote_artwork.get(self.pre_item),
             allow_list=self._allow_list,
-            container_content=self.container_content
-        ) if not self.is_artwork_disabled else {}
-        return self.cur_blurcrop_properties
+        )
+        set_properties = partial(self.set_properties, use_current_window=self.is_current_window_images)
+        return self.image_workers.submit(requests, set_properties)
+
+    def prewarm_artwork(self):
+        """ Generate images for the next upcoming item each cycle that the workers are idle """
+        if not self.is_prewarm_allowed:
+            return
+        position = next(self.prewarm_positions, None)
+        if position is None:
+            return
+        self.image_workers.prewarm(self.get_prewarm_requests(position))
+
+    def get_prewarm_requests(self, position):
+        requests = MonitorItemDetails(self, position=position).get_image_manipulation_requests(allow_list=self._prewarm_allow_list)
+        return {method: source for method, source in requests.items() if source}
+
+    @staticmethod
+    def get_image_manipulation_results(jobs):
+        """ Wait for jobs and return the properties of those applied """
+        for job in jobs:
+            job.done.wait()
+        return {
+            k: v
+            for job in jobs
+            if job.applied
+            for k, v in job.properties.items()
+        }
 
     def update_properties(self, infoproperties, use_current_window=False):
         if not self.is_same_item():
             return False
+        self.set_properties(infoproperties, use_current_window)
+        return True
+
+    def set_properties(self, infoproperties, use_current_window=False):
         for k, v in infoproperties.items():
             if use_current_window:
                 self.get_property(f'ListItem.{k}', set_property=v, clear_property=(v is None), use_current_window=True)
                 self.add_property(f'ListItem.Current.{k}', v)  # We only track properties set to Home, local properties are kept constant
             else:
                 self.add_property(f'ListItem.{k}', v)
-        return True
 
     def add_property(self, k, v):
         if v is None:
             return self.del_property(k)
-        self.get_property(k, set_property=v)
-        self.properties.add(k)
+        with self.properties_lock:
+            self.get_property(k, set_property=v)
+            self.properties.add(k)
 
     def del_property(self, k):
-        self.get_property(k, clear_property=True)
-        self.properties.discard(k)
+        with self.properties_lock:
+            self.get_property(k, clear_property=True)
+            self.properties.discard(k)
 
     def _on_listitem(self):
         self.on_listitem()
@@ -215,9 +266,12 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         IF we've got properties to clear lets clear them and then jump back in the loop
         """
         self.reset_current_item()  # Reset current item so that it will retrigger lookup on return to previous window
-        for k in tuple(self.properties):
-            self.del_property(k)
+        self.image_workers.cancel()  # Stop images already submitted from setting properties after clearing
+        with self.properties_lock:
+            for k in tuple(self.properties):
+                self.del_property(k)
         self._on_idle(POLL_MIN_INCREMENT)
 
     def run(self):
         self.poller()
+        self.image_workers.cancel()

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 21:05+0000\n"
-"PO-Revision-Date: 2026-08-15 19:00+0800\n"
+"PO-Revision-Date: 2026-11-05 16:55+0800\n"
 "Last-Translator: Wabisabi926\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_CN\n"
@@ -77,11 +77,19 @@ msgctxt "#30009"
 msgid "German (Austria)"
 msgstr "德语（奥地利）"
 
+#: /resources/settings.xml
+msgctxt "#32013"
+msgid "Sync watched and resume"
+msgstr "同步观看记录与续播"
 
 msgctxt "#30010"
 msgid "German (Switzerland)"
 msgstr "德语（瑞士）"
 
+#: /resources/settings.xml
+msgctxt "#32015"
+msgid "Up next"
+msgstr "下个播放"
 
 msgctxt "#30011"
 msgid "German (Germany)"
@@ -91,11 +99,19 @@ msgctxt "#30012"
 msgid "Greek (Greece)"
 msgstr "希腊语（希腊）"
 
+#: /resources/settings.xml
+msgctxt "#32018"
+msgid "Anticipated"
+msgstr "待上线"
 
 msgctxt "#30013"
 msgid "English (Australia)"
 msgstr "英语（澳大利亚）"
 
+#: /resources/settings.xml
+msgctxt "#32020"
+msgid "Specials"
+msgstr "特别篇"
 
 msgctxt "#30014"
 msgid "English (Canada)"
@@ -160,7 +176,7 @@ msgstr "播放进度"
 #: /resources/tmdbhelper/lib/script/method/trakt.py
 msgctxt "#32036"
 msgid "Dropped"
-msgstr "已丢弃"
+msgstr "已移除"
 
 msgctxt "#30024"
 msgid "Persian (Iran)"
@@ -170,6 +186,10 @@ msgctxt "#30025"
 msgid "Finnish (Finland)"
 msgstr "芬兰语（芬兰）"
 
+#: /resources/settings.xml
+msgctxt "#32039"
+msgid "Prefer Fanart.tv"
+msgstr "首选 Fanart.tv"
 
 #: /resources/tmdbhelper/lib/items/directories/tmdb/lists_seasons.py
 msgctxt "#32040"
@@ -206,21 +226,37 @@ msgstr "移除电视剧"
 #: /resources/tmdbhelper/lib/script/sync/basic.py
 msgctxt "#32047"
 msgid "Undrop TV show"
-msgstr "恢复移除电视剧"
+msgstr "取消移除电视剧"
 
 #: /resources/tmdbhelper/lib/items/directories/trakt/lists_sync.py
 msgctxt "#32048"
 msgid "Dropped TV Shows"
 msgstr "已移除的电视剧"
 
+#: /resources/settings.xml
+msgctxt "#32049"
+msgid "Sort next episodes by airdate or recent viewing, optionally prioritising episodes airing today or in the past week."
+msgstr "按播出日期或最近观看排序下一集，可选择优先显示今日或过去一周内播出的剧集。"
 
+#: /resources/settings.xml
+msgctxt "#32050"
+msgid "Prefer my language"
+msgstr "首选我的语言"
 
 #: /resources/tmdbhelper/lib/script/method/tmdb.py
 msgctxt "#32051"
 msgid "Deleted cached {} items"
 msgstr "删除缓存的 {} 项目"
 
+#: /resources/settings.xml
+msgctxt "#32052"
+msgid "Delete item cache"
+msgstr "删除项目缓存"
 
+#: /resources/settings.xml
+msgctxt "#32053"
+msgid "Delete cached TMDb item details for troubleshooting. Routine deletion slows lookups and increases API requests."
+msgstr "删除缓存的 TMDb 项目详情以进行故障排查。频繁删除会降低查询速度并增加 API 请求。"
 
 msgctxt "#30029"
 msgid "Hebrew (Israel)"
@@ -254,7 +290,7 @@ msgstr "使用内置播放器"
 #: /resources/tmdbhelper/lib/items/directories/lists_base.py
 msgctxt "#32062"
 msgid "Networks"
-msgstr "网络"
+msgstr "电视网"
 
 #: /resources/tmdbhelper/lib/api/trakt/sorting.py
 msgctxt "#32063"
@@ -270,6 +306,11 @@ msgstr "相关内容"
 msgctxt "#32065"
 msgid "Watchers"
 msgstr "追更人数"
+
+#: /resources/settings.xml
+msgctxt "#32038"
+msgid "Kodi library details"
+msgstr "Kodi 媒体库详情"
 
 #: /resources/settings.xml
 msgctxt "#32042"
@@ -321,17 +362,25 @@ msgctxt "#32060"
 msgid "files extracted"
 msgstr "文件已提取"
 
+#: /resources/settings.xml
+msgctxt "#32082"
+msgid "Other page multiplier"
+msgstr "其他列表分页乘数"
 
+#: /resources/settings.xml
+msgctxt "#32083"
+msgid "Sync page multiplier"
+msgstr "同步列表分页乘数"
 
 #: /resources/lib/player.py
 msgctxt "#32061"
 msgid "Play with"
-msgstr "播放"
+msgstr "使用…播放"
 
 #: /resources/lib/context.py
 msgctxt "#32066"
 msgid "Debug logging"
-msgstr "调试记录"
+msgstr "调试日志"
 
 #: /resources/settings.xml
 msgctxt "#32070"
@@ -353,8 +402,20 @@ msgctxt "#32074"
 msgid "Library Integration"
 msgstr "媒体库整合"
 
+#: /resources/settings.xml
+msgctxt "#32075"
+msgid "TV shows folder"
+msgstr "电视剧文件夹"
 
+#: /resources/settings.xml
+msgctxt "#32076"
+msgid "Scan after adding"
+msgstr "添加后扫描"
 
+#: /resources/settings.xml
+msgctxt "#32077"
+msgid "Skip folder checks"
+msgstr "跳过文件夹检查"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32094"
@@ -366,7 +427,15 @@ msgctxt "#32078"
 msgid "Still to Watch"
 msgstr "待观看"
 
+#: /resources/settings.xml
+msgctxt "#32080"
+msgid "Artwork"
+msgstr "艺术图"
 
+#: /resources/settings.xml
+msgctxt "#32081"
+msgid "Widget next page"
+msgstr "小组件下一页"
 
 #: /resources/tmdbhelper/lib/script/method/modify_identifier.py
 msgctxt "#32098"
@@ -379,6 +448,10 @@ msgctxt "#32085"
 msgid "Flatten seasons"
 msgstr "合并季数显示"
 
+#: /resources/settings.xml
+msgctxt "#32086"
+msgid "Auto-update episodes"
+msgstr "自动更新剧集"
 
 #: /resources/settings.xml
 msgctxt "#32090"
@@ -395,7 +468,15 @@ msgctxt "#32106"
 msgid "Enter {} URL"
 msgstr "输入 {} 网址"
 
+#: /resources/settings.xml
+msgctxt "#32092"
+msgid "Lists"
+msgstr "列表"
 
+#: /resources/settings.xml
+msgctxt "#32093"
+msgid "Sort order"
+msgstr "排序方式"
 
 #: /resources/settings.xml
 msgctxt "#32095"
@@ -462,12 +543,20 @@ msgctxt "#32110"
 msgid "Match ALL Values"
 msgstr "匹配所有值"
 
+#: /resources/settings.xml
+msgctxt "#32127"
+msgid "RatingPosterDB key"
+msgstr "RatingPosterDB 密钥"
 
 #: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/ftv_fanart.py
 msgctxt "#32128"
 msgid "Likes"
 msgstr "顶"
 
+#: /resources/settings.xml
+msgctxt "#32129"
+msgid "Override playback clearlogo"
+msgstr "覆盖播放透明徽标"
 
 #: /resources/lib/container.py
 msgctxt "#32113"
@@ -497,13 +586,17 @@ msgstr "你想将此列表设为公开列表还是私有列表？"
 #: /resources/tmdbhelper/lib/script/sync/tmdb/userlist.py
 msgctxt "#32137"
 msgid "Public or private list?"
-msgstr "公开名单还是私有名单？"
+msgstr "公开列表还是私有列表？"
 
 #: /resources/settings.xml
 msgctxt "#32138"
 msgid "Scrobbling"
-msgstr "滚动"
+msgstr "播放同步"
 
+#: /resources/settings.xml
+msgctxt "#32139"
+msgid "Rate on TMDb"
+msgstr "在 TMDb 评分"
 
 #: /resources/tmdbhelper/lib/player/configure.py
 msgctxt "#32140"
@@ -573,7 +666,7 @@ msgstr "XBMC 虚拟文件系统报告无法创建路径"
 #: /resources/lib/context.py
 msgctxt "#32123"
 msgid "If error persists and the folders are created correctly, please disable folder path creation checking in TMDBHelper settings."
-msgstr "如果错误仍然存在并且文件夹创建正确，请在 TMDBHelper 设置中禁用文件夹路径检查。"
+msgstr "如果错误仍然存在并且文件夹创建正确，请在 TMDbHelper 设置中禁用文件夹路径检查。"
 
 #: /resources/lib/context.py
 msgctxt "#32125"
@@ -590,14 +683,30 @@ msgctxt "#32165"
 msgid "Add another item?"
 msgstr "添加另一项目？"
 
+#: /resources/lib/context.py
+msgctxt "#32130"
+msgid "Update time"
+msgstr "更新时间"
 
+#: /resources/settings.xml
+msgctxt "#32131"
+msgid "Source lists"
+msgstr "来源列表"
 
 #: /resources/lib/script.py
 msgctxt "#32132"
-msgid "Do you wish to update the library from the Trakt list(s) now?"
-msgstr "你想现在从 Trakt 列表中更新媒体库吗？"
+msgid "Do you wish to update the library from the list(s) now?"
+msgstr "你想现在从列表中更新媒体库吗？"
 
+#: /resources/lib/context.py
+msgctxt "#32154"
+msgid "Update now"
+msgstr "立即更新"
 
+#: /resources/settings.xml
+msgctxt "#32156"
+msgid "Link to library shows"
+msgstr "关联媒体库剧集"
 
 #: /resources/lib/context.py
 msgctxt "#32164"
@@ -621,8 +730,12 @@ msgstr "正在更新"
 #: /resources/lib/libraryupdate.py
 msgctxt "#32168"
 msgid "[B]{}[/B] by user [B]{}[/B]"
-msgstr "[B]{}[/B] 通过用户 [B]{}[/B]"
+msgstr "[B]{}[/B]（由用户 [B]{}[/B] 创建）"
 
+#: /resources/settings.xml
+msgctxt "#32169"
+msgid "Sign out"
+msgstr "退出登录"
 
 #: /resources/lib/libraryupdate.py
 msgctxt "#32170"
@@ -692,7 +805,7 @@ msgstr "正在播放"
 #: /resources/lib/plugin.py
 msgctxt "#32183"
 msgid "Next Aired Library"
-msgstr "播放媒体库"
+msgstr "媒体库下一集"
 
 #: /resources/lib/plugin.py
 msgctxt "#32184"
@@ -722,7 +835,7 @@ msgstr "评论"
 #: /resources/lib/plugin.py
 msgctxt "#32189"
 msgid "TV Networks"
-msgstr "电视网络"
+msgstr "电视网"
 
 #: /resources/lib/plugin.py
 msgctxt "#32190"
@@ -787,7 +900,7 @@ msgstr "你的"
 #: /resources/lib/plugin.py
 msgctxt "#32202"
 msgid "Airing This Week"
-msgstr "本周上映"
+msgstr "本周播出"
 
 #: /resources/lib/plugin.py
 msgctxt "#32203"
@@ -832,7 +945,7 @@ msgstr "最多播放"
 #: /resources/lib/plugin.py
 msgctxt "#32206"
 msgid "Anticipated"
-msgstr "预测"
+msgstr "待上映"
 
 #: /resources/lib/plugin.py
 msgctxt "#32207"
@@ -862,12 +975,12 @@ msgstr "你的列表"
 #: /resources/lib/traktapi.py
 msgctxt "#32212"
 msgid "Trakt user account logout"
-msgstr "Trakt 用户帐户注销"
+msgstr "Trakt 用户账户注销"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32213"
 msgid "Do you wish to logout of your Trakt account?"
-msgstr "你想注销你的 Trakt 帐户吗？"
+msgstr "你想注销你的 Trakt 账户吗？"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32214"
@@ -882,7 +995,7 @@ msgstr "注销失败！"
 #: /resources/lib/traktapi.py
 msgctxt "#32216"
 msgid "Successfully logged out of Trakt user account"
-msgstr "成功注销 Trakt 用户帐户"
+msgstr "成功注销 Trakt 用户账户"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32234"
@@ -892,7 +1005,7 @@ msgstr "真人秀"
 #: /resources/lib/plugin.py
 msgctxt "#32223"
 msgid "Recommended"
-msgstr "建议"
+msgstr "推荐"
 
 #: /resources/lib/plugin.py
 msgctxt "#32224"
@@ -902,7 +1015,7 @@ msgstr "类似"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32238"
 msgid "Scripted"
-msgstr "剧本剧"
+msgstr "有剧本节目"
 
 #: /resources/lib/plugin.py
 msgctxt "#32225"
@@ -982,22 +1095,22 @@ msgstr "首映"
 #: /resources/lib/userdiscover.py
 msgctxt "#32243"
 msgid "Theatrical (limited)"
-msgstr "剧场版（限量版）"
+msgstr "院线（有限上映）"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32244"
 msgid "Theatrical"
-msgstr "剧场版"
+msgstr "院线上映"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32245"
 msgid "Digital"
-msgstr "数字"
+msgstr "数字发行"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32246"
 msgid "Physical"
-msgstr "物理"
+msgstr "实体发行"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32247"
@@ -1052,7 +1165,7 @@ msgstr "上映区域"
 #: /resources/lib/userdiscover.py
 msgctxt "#32257"
 msgid "With Networks"
-msgstr "使用网络"
+msgstr "按电视网筛选"
 
 #: /resources/lib/userdiscover.py
 msgctxt "#32258"
@@ -1132,7 +1245,7 @@ msgstr "输入年份"
 #: /resources/lib/basedir.py
 msgctxt "#32280"
 msgid "Last Fortnight"
-msgstr "上半个月"
+msgstr "过去两周"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32293"
@@ -1147,12 +1260,12 @@ msgstr "计划中"
 #: /resources/lib/basedir.py
 msgctxt "#32281"
 msgid "Last Week"
-msgstr "近一周"
+msgstr "过去一周"
 
 #: /resources/lib/basedir.py
 msgctxt "#32282"
 msgid "Yesterday"
-msgstr "去年"
+msgstr "昨天"
 
 #: /resources/lib/basedir.py
 msgctxt "#32284"
@@ -1162,7 +1275,7 @@ msgstr "本周"
 #: /resources/lib/basedir.py
 msgctxt "#32285"
 msgid "This Fortnight"
-msgstr "这半个月"
+msgstr "近两周"
 
 #: /resources/lib/_trakt_itemlists.py
 msgctxt "#32286"
@@ -1212,25 +1325,21 @@ msgstr "已结束"
 #: /resources/lib/script.py
 msgctxt "#32295"
 msgid "Trakt options"
-msgstr "Trakt 设置"
+msgstr "Trakt 选项"
 
 #: /resources/lib/script.py
 msgctxt "#32296"
 msgid ""
 "{} failed for {}!\n"
 "{} ID {}"
-msgstr ""
-"{} 失败{}!\n"
-"{} ID {}"
+msgstr "{} 操作失败：{}！\n{} ID {}"
 
 #: /resources/lib/script.py
 msgctxt "#32297"
 msgid ""
 "{} was successful for {}!\n"
 "{} ID {}"
-msgstr ""
-"{} 已成功用于 {}!\n"
-"{} ID {}"
+msgstr "{} 操作成功：{}！\n{} ID {}"
 
 #: /resources/lib/syncitem.py
 msgctxt "#32298"
@@ -1285,7 +1394,7 @@ msgstr "浏览排序列表"
 #: /resources/lib/window/manager.py
 msgctxt "#32310"
 msgid "TMDb ID for {} not found!"
-msgstr "在 TMDB 未找到 {} !"
+msgstr "未找到 {} 的 TMDb ID！"
 
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32323"
@@ -1305,7 +1414,7 @@ msgstr "编辑筛选条件"
 #: /resources/lib/player/players.py
 msgctxt "#32311"
 msgid "Clear default player"
-msgstr "清除自带播放器"
+msgstr "清除默认播放器"
 
 #: /resources/lib/helpers/update.py
 msgctxt "#32312"
@@ -1334,17 +1443,17 @@ msgstr "添加到人气列表"
 #: /resources/lib/trakt/api.py
 msgctxt "#32316"
 msgid "Successfully {} list!"
-msgstr "列表成功 {} ！"
+msgstr "已成功{}列表！"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32317"
 msgid "Unable to {} list!"
-msgstr "不支持 {} 列表！"
+msgstr "无法{}列表！"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32318"
 msgid "Error code: {}"
-msgstr "错误代码: {}"
+msgstr "错误代码：{}"
 
 #: /resources/lib/trakt/api.py
 msgctxt "#32319"
@@ -1379,7 +1488,7 @@ msgstr "上月"
 #: /resources/lib/player/configure.py
 msgctxt "#32328"
 msgid "Select Player to Configure"
-msgstr "选择播放器设置"
+msgstr "选择要配置的播放器"
 
 #: /resources/settings.xml
 msgctxt "#32329"
@@ -1394,7 +1503,7 @@ msgstr "恢复默认设置"
 #: /resources/lib/player/configure.py
 msgctxt "#32331"
 msgid "Enter New Name for {}"
-msgstr "输入新名字为 {}"
+msgstr "为 {} 输入新名称"
 
 #: /resources/tmdbhelper/lib/script/discover/tmdb/routes.py
 msgctxt "#32346"
@@ -1443,22 +1552,42 @@ msgstr "选择备用播放方式"
 #: /resources/lib/player/configure.py
 msgctxt "#32342"
 msgid "Fallbacks for {}"
-msgstr "备用播放"
+msgstr "{} 的备用播放器"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32344"
 msgid "Enter New Priority for {}"
 msgstr "输入 {} 的新优先级"
 
+#: /resources/settings.xml
+msgctxt "#32347"
+msgid "Log Trakt request"
+msgstr "记录 Trakt 请求"
 
+#: /resources/settings.xml
+msgctxt "#32348"
+msgid "Log TMDb request"
+msgstr "记录 TMDb 请求"
 
+#: /resources/settings.xml
+msgctxt "#32349"
+msgid "English plot fallback"
+msgstr "英文剧情备用"
 
+#: /resources/settings.xml
+msgctxt "#32350"
+msgid "Fetch English plots when your language has none. Increases lookup time and database size."
+msgstr "当你的语言没有剧情时获取英文剧情。会增加查询时间与数据库体积。"
 
 #: /resources/lib/kodi/library.py
 msgctxt "#32351"
 msgid "Dummy ResolvedURL"
 msgstr "虚拟解析网址"
 
+#: /resources/settings.xml
+msgctxt "#32352"
+msgid "Dummy duration (s)"
+msgstr "占位时长（秒）"
 
 #: /resources/lib/script/sync.py
 msgctxt "#32355"
@@ -1476,10 +1605,7 @@ msgid ""
 "Are you sure you want to delete [B]{}[/B]?\n"
 "\n"
 "This action cannot be undone."
-msgstr ""
-"确定删除 [B]{}[/B]?\n"
-"\n"
-"未完成."
+msgstr "确定删除 [B]{}[/B]？\n\n此操作无法撤消。"
 
 #: /resources/lib/script/router.py
 msgctxt "#32358"
@@ -1506,7 +1632,15 @@ msgctxt "#32362"
 msgid "Do you want to add this item to the library now?"
 msgstr "现在添加项目到媒体库？"
 
+#: /resources/settings.xml
+msgctxt "#32363"
+msgid "Resolve delay (s)"
+msgstr "解析延迟（秒）"
 
+#: /resources/settings.xml
+msgctxt "#32377"
+msgid "Online monitor artwork"
+msgstr "在线监视器艺术图"
 
 #: /resources/lib/addon/plugin.py
 msgctxt "#32365"
@@ -1533,15 +1667,35 @@ msgctxt "#32370"
 msgid "landscape"
 msgstr "横向展示模式"
 
+#: /resources/settings.xml
+msgctxt "#32371"
+msgid "Thumbnail artwork"
+msgstr "缩略图艺术图"
 
 #: /resources/settings.xml
 msgctxt "#32372"
 msgid "fanart"
 msgstr "背景图"
 
+#: /resources/settings.xml
+msgctxt "#32386"
+msgid "Online monitor ratings"
+msgstr "在线监视器评分"
 
+#: /resources/settings.xml
+msgctxt "#32373"
+msgid "Resolve library STRM only"
+msgstr "仅解析媒体库 STRM"
 
+#: /resources/settings.xml
+msgctxt "#32388"
+msgid "Genre fanart"
+msgstr "类型背景图"
 
+#: /resources/settings.xml
+msgctxt "#32389"
+msgid "Provider fanart"
+msgstr "提供商背景图"
 
 #: /resources/lib/player/players.py
 msgctxt "#32374"
@@ -1558,6 +1712,10 @@ msgctxt "#32376"
 msgid "Building players dialog"
 msgstr "构建播放器对话框"
 
+#: /resources/settings.xml
+msgctxt "#32396"
+msgid "Delete list cache"
+msgstr "删除列表缓存"
 
 #: /resources/tmdbhelper/lib/script/method/image_functions.py
 msgctxt "#32399"
@@ -1574,11 +1732,20 @@ msgctxt "#32387"
 msgid "Delete {} Cache"
 msgstr "删除 {} 缓存"
 
+#: /resources/lib/script/router.py
+msgctxt "#32390"
+msgid "Alternative NFO name"
+msgstr "备用 NFO 文件名"
 
 #: /resources/lib/script/router.py
 msgctxt "#32391"
 msgid "Select update type"
 msgstr "选择更新类型"
+
+#: /resources/settings.xml
+msgctxt "#32408"
+msgid "History"
+msgstr "历史记录"
 
 #: /resources/lib/script/router.py
 msgctxt "#32392"
@@ -1601,6 +1768,10 @@ msgctxt "#32394"
 msgid "Quick Update"
 msgstr "快速更新"
 
+#: /resources/settings.xml
+msgctxt "#32395"
+msgid "Timer reports"
+msgstr "计时报告"
 
 #: /resources/settings.xml
 msgctxt "#32397"
@@ -1612,38 +1783,75 @@ msgctxt "#32398"
 msgid "Medium"
 msgstr "中等"
 
+#: /resources/settings.xml
+msgctxt "#32400"
+msgid "Play local files"
+msgstr "播放本地文件"
 
+#: /resources/settings.xml
+msgctxt "#32404"
+msgid "Combine same-day episodes"
+msgstr "合并同日剧集"
 
 #: /resources/lib/container/basedir.py
 msgctxt "#32406"
 msgid "Your In-Progress Episodes"
 msgstr "你正在观看的剧集"
 
+#: /resources/settings.xml
+msgctxt "#32409"
+msgid "Database folder"
+msgstr "数据库文件夹"
 
+#: /resources/settings.xml
+msgctxt "#32410"
+msgid "Thread limit"
+msgstr "线程上限"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32411"
 msgid "Providers"
-msgstr "供应商"
+msgstr "提供商"
 
 #: /resources/lib/api/tmdb/discover.py
 msgctxt "#32412"
 msgid "With Watch Provider"
 msgstr "使用在线观看"
 
+#: /resources/settings.xml
+msgctxt "#32413"
+msgid "Check calendar"
+msgstr "检查日历"
 
 #: /resources/lib/addon/consts.py
 msgctxt "#32414"
 msgid "Most Watched"
 msgstr "最多观看"
 
+#: /resources/settings.xml
+msgctxt "#32415"
+msgid "Combine plugin players"
+msgstr "合并插件播放器"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32416"
 msgid "Premieres"
 msgstr "首映"
 
+#: /resources/lib/script/sync.py
+msgctxt "#32418"
+msgid "Add text before the certification, such as Rated before PG. Refresh cached items to apply changes."
+msgstr "在分级前添加文本，例如在 PG 前加“分级”。需刷新缓存项目以应用更改。"
 
+#: /resources/settings.xml
+msgctxt "#32419"
+msgid "Choose the language and country used for TMDb and Trakt lookups."
+msgstr "选择用于 TMDb 和 Trakt 查询的语言和国家/地区。"
+
+#: /resources/settings.xml
+msgctxt "#32420"
+msgid "Default image quality"
+msgstr "默认图像质量"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32424"
@@ -1653,7 +1861,7 @@ msgstr "新建剧集播放列表"
 #: /resources/lib/player/configure.py
 msgctxt "#32425"
 msgid "Have TMDbHelper queue all episodes in a playlist when playing an episode using this player?"
-msgstr "使用此播放器播放剧集时，是否需要 TMDbHelper 将列表中分集排序?"
+msgstr "使用此播放器播放剧集时，是否需要 TMDbHelper 将所有剧集加入播放列表排队？"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32426"
@@ -1673,17 +1881,17 @@ msgstr "浏览电影搜索网址"
 #: /resources/lib/player/configure.py
 msgctxt "#32429"
 msgid "Browse for TVSHOW search url"
-msgstr "剧集浏览搜索网址"
+msgstr "浏览剧集搜索网址"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32430"
 msgid "Enter a name for this player"
-msgstr "为播放器新建名称"
+msgstr "为此播放器输入名称"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32431"
 msgid "Use the same search URL for tvshows as movies?"
-msgstr "搜索电影和剧集使用同样网址的吗？"
+msgstr "电影和剧集使用相同的搜索网址吗？"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32432"
@@ -1698,7 +1906,7 @@ msgstr "网址中缺少 QUERYKEY"
 #: /resources/lib/player/configure.py
 msgctxt "#32434"
 msgid "You must insert QUERYKEY where the search query for the URL goes"
-msgstr "你必须在搜索网址时插入 QUERYKEY"
+msgstr "必须在网址中放置搜索词的位置插入 QUERYKEY"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32435"
@@ -1710,16 +1918,25 @@ msgctxt "#32436"
 msgid "Details"
 msgstr "详情"
 
+#: /resources/settings.xml
+msgctxt "#32437"
+msgid "Provider data allowlist"
+msgstr "提供商数据白名单"
+
+#: /resources/settings.xml
+msgctxt "#32450"
+msgid "Prefer English fallbacks"
+msgstr "首选英文备用"
 
 #: /resources/lib/script/method.py
 msgctxt "#32438"
 msgid "Provider allowlist updated"
-msgstr "提供程序允许列表已更新"
+msgstr "提供商白名单已更新"
 
 #: /resources/lib/script/method.py
 msgctxt "#32439"
 msgid "The provider allowlist has been updated."
-msgstr "提供程序列表已更新。"
+msgstr "提供商白名单已更新。"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32440"
@@ -1744,7 +1961,7 @@ msgstr "选择要与 {} 匹配的值"
 #: /resources/lib/player/configure.py
 msgctxt "#32444"
 msgid "Select rule or listitem key"
-msgstr "选择规则或列表项密钥"
+msgstr "选择规则或列表项键"
 
 #: /resources/lib/player/configure.py
 msgctxt "#32445"
@@ -1754,8 +1971,12 @@ msgstr "为 {} 编辑规则"
 #: /resources/lib/player/configure.py
 msgctxt "#32446"
 msgid "plugin:// search URL for {}"
-msgstr "plugin:// search URL for {}"
+msgstr "{} 的 plugin:// 搜索网址"
 
+#: /resources/settings.xml
+msgctxt "#32449"
+msgid "Ignore release region"
+msgstr "忽略发行地区"
 
 #: /resources/settings.xml
 msgctxt "#32451"
@@ -1785,23 +2006,52 @@ msgstr "观看列表（预计）"
 #: /resources/lib/items/basedir.py
 msgctxt "#32458"
 msgid "Airing Next Library"
-msgstr "播放下一个媒体库"
+msgstr "媒体库下一集"
 
 #: /resources/lib/items/basedir.py
 msgctxt "#32459"
 msgid "Your Episodes Airing Next"
-msgstr "你的下一个播放分集"
+msgstr "你接下来播出的剧集"
 
+#: /resources/settings.xml
+msgctxt "#32463"
+msgid "Cache own lists for 24h"
+msgstr "自建列表缓存 24 小时"
 
+#: /resources/settings.xml
+msgctxt "#32479"
+msgid "When regional artwork is missing, prefer English over artwork in your language from other regions."
+msgstr "当所在地区艺术图缺失时，优先使用英文艺术图，而非其他地区中与你语言相同的艺术图。"
 
+#: /resources/settings.xml
+msgctxt "#32466"
+msgid "Auto-select provider"
+msgstr "自动选择提供商"
 
+#: /resources/settings.xml
+msgctxt "#32467"
+msgid "Refresh cached details"
+msgstr "刷新缓存详情"
+
+#: /resources/settings.xml
+msgctxt "#32468"
+msgid "Startup notifications"
+msgstr "启动通知"
 
 #: /resources/settings.xml
 msgctxt "#32470"
 msgid "Trakt"
 msgstr "Trakt"
 
+#: /resources/settings.xml
+msgctxt "#32471"
+msgid "Connection errors"
+msgstr "连接错误"
 
+#: /resources/settings.xml
+msgctxt "#32472"
+msgid "Image folder"
+msgstr "图像文件夹"
 
 #: /resources/lib/api/trakt/api.py
 msgctxt "#32473"
@@ -1826,14 +2076,27 @@ msgstr "选择默认播放器"
 #: /resources/lib/script/method.py
 msgctxt "#32477"
 msgid "Change default player for tvshow, season, or episode"
-msgstr "更改剧集默认播放器"
+msgstr "更改电视剧、季或剧集的默认播放器"
 
+#: /resources/settings.xml
+msgctxt "#32481"
+msgid "Set the number of recently watched items available as random seeds for Because You Watched recommendations."
+msgstr "设置可作为“因你看过”推荐随机种子的最近观看项目数量。"
 
+#: /resources/settings.xml
+msgctxt "#32482"
+msgid "Seed pool size"
+msgstr "种子池大小"
+
+#: /resources/settings.xml
+msgctxt "#32483"
+msgid "Share credentials"
+msgstr "共享凭据"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32485"
 msgid "Add rating"
-msgstr "增加评分"
+msgstr "添加评分"
 
 #: /resources/tmdbhelper/lib/api/tmdb/discover.py
 msgctxt "#32486"
@@ -1853,17 +2116,17 @@ msgstr "分级认证大于等于"
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32489"
 msgid "Change rating"
-msgstr "改变评分"
+msgstr "修改评分"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32490"
 msgid "Add to favourites"
-msgstr "添加到收藏夹"
+msgstr "添加到收藏"
 
 #: /resources/tmdbhelper/lib/script/sync.py
 msgctxt "#32491"
 msgid "Remove from favourites"
-msgstr "从收藏夹移除"
+msgstr "从收藏中移除"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32492"
@@ -1873,12 +2136,12 @@ msgstr "{} 已存在于 {} 中！"
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32493"
 msgid "Successfully removed {} from {}"
-msgstr "成功移除 {} 从 {}"
+msgstr "已从 {} 中移除 {}"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32494"
 msgid "Successfully added {} to {}"
-msgstr "成功添加 {} 到 {}"
+msgstr "已将 {} 添加到 {}"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32495"
@@ -1890,7 +2153,15 @@ msgctxt "#32496"
 msgid "Add node"
 msgstr "添加节点"
 
+#: /resources/settings.xml
+msgctxt "#32497"
+msgid "Container type fallback"
+msgstr "容器类型备用"
 
+#: /resources/settings.xml
+msgctxt "#32498"
+msgid "Use the container's content type when an item has no media type. May cause incorrect matches."
+msgstr "当项目没有媒体类型时使用容器的内容类型。可能导致错误匹配。"
 
 # 翻页速度倍数
 #: /resources/settings.xml
@@ -1898,15 +2169,40 @@ msgctxt "#32499"
 msgid "Page multipliers (higher is slower)"
 msgstr "分页乘数（越高速度越慢）"
 
+#: /resources/settings.xml
+msgctxt "#32500"
+msgid "TMDb page multiplier"
+msgstr "TMDb 分页乘数"
 
 #: /resources/tmdbhelper/lib/script/method.py
 msgctxt "#32504"
 msgid "Add {} to node"
 msgstr "将{}添加到节点"
 
+#: /resources/settings.xml
+msgctxt "#32505"
+msgid "TMDb genre folder"
+msgstr "TMDb 类型文件夹"
 
+#: /resources/settings.xml
+msgctxt "#32506"
+msgid "Provider folder"
+msgstr "提供商文件夹"
 
+#: /resources/settings.xml
+msgctxt "#32507"
+msgid "Trakt genre folder"
+msgstr "Trakt 类型文件夹"
 
+#: /resources/settings.xml
+msgctxt "#32508"
+msgid "Refresh local details for players"
+msgstr "为播放器刷新本地详情"
+
+#: /resources/settings.xml
+msgctxt "#32509"
+msgid "Alternate TMDb endpoint"
+msgstr "备用 TMDb 端点"
 
 #: /resources/settings.xml
 msgctxt "#32520"
@@ -1916,8 +2212,12 @@ msgstr "TMDb"
 #: /resources/tmdbhelper/lib/addon/consts.py
 msgctxt "#32521"
 msgid "Rated"
-msgstr "分级"
+msgstr "已评分"
 
+#: /resources/settings.xml
+msgctxt "#32522"
+msgid "TMDb options"
+msgstr "TMDb 选项"
 
 #: /resources/tmdbhelper/lib/api/tmdb/useritemmethods.py
 msgctxt "#32524"
@@ -1949,11 +2249,15 @@ msgctxt "#32531"
 msgid "Method only available for VIP accounts."
 msgstr "该方法仅适用于 VIP 账户。"
 
+#: /resources/settings.xml
+msgctxt "#32534"
+msgid "Sync progress"
+msgstr "同步进度"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32535"
 msgid "Non-binary"
-msgstr "非二进制"
+msgstr "非二元性别"
 
 #: /resources/tmdbhelper/lib/items/database/itemmeta_factories/concrete_classes/person.py
 msgctxt "#32536"
@@ -1979,6 +2283,263 @@ msgstr "正在线上播放"
 msgctxt "#32540"
 msgid "All digital releases"
 msgstr "全部数字发行影片"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_details.py
+#: /resources/tmdbhelper/lib/items/directories/tmdb/lists_episode_groups.py
+#: /resources/tmdbhelper/lib/items/database/baseview_factories/concrete_classes/groupsseason.py
+msgctxt "#32541"
+msgid "Groups"
+msgstr "分组"
+
+#: /resources/settings.xml
+msgctxt "#32542"
+msgid "Groups"
+msgstr "分组"
+
+#: /resources/tmdbhelper/lib/script/discover/trakt.py
+msgctxt "#32547"
+msgid "Subgenres"
+msgstr "子类型"
+
+#: /resources/settings.xml
+msgctxt "#32548"
+msgid "Choose a history provider, install one, or select None to disable history lists."
+msgstr "选择历史记录提供商；安装一个，或选择“无”以禁用历史记录列表。"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/items/context.py
+msgctxt "#32549"
+msgid "Sync options"
+msgstr "同步选项"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32550"
+msgid "TMDbHelper Sync Provider"
+msgstr "TMDbHelper 同步提供商"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_install.py
+msgctxt "#32551"
+msgid "Install {0}"
+msgstr "安装 {0}"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_install.py
+msgctxt "#32552"
+msgid "Enable {0}"
+msgstr "启用 {0}"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_features.py
+msgctxt "#32553"
+msgid "Choose features for {0}"
+msgstr "为 {0} 选择功能"
+
+#: /resources/tmdbhelper/lib/script/method/sync_provider.py
+msgctxt "#32554"
+msgid "{0} does not support {1}. Choose another provider for this list."
+msgstr "{0} 不支持 {1}。请为此列表选择其他提供商。"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32555"
+msgid "{0} requires a sync provider. Choose a provider to use, install or enable. Installation uses your installed repositories."
+msgstr "{0} 需要同步提供商。请选择要使用的提供商，并进行安装或启用。安装将使用你已安装的软件源。"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_setup.py
+msgctxt "#32556"
+msgid "Later"
+msgstr "稍后"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/script/sync/provider_catalog.py
+msgctxt "#32557"
+msgid "Install provider"
+msgstr "安装提供商"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_catalog.py
+msgctxt "#32558"
+msgid "{0} (install)"
+msgstr "{0}（安装）"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_catalog.py
+msgctxt "#32559"
+msgid "{0} (enable)"
+msgstr "{0}（启用）"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_default.py
+msgctxt "#32560"
+msgid "Set {0} as the default sync provider? This clears all current provider selections and uses {0} for every feature it supports."
+msgstr "将 {0} 设为默认同步提供商？这会清除当前所有提供商选择，并在其支持的所有功能中使用 {0}。"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_default.py
+msgctxt "#32561"
+msgid "Default"
+msgstr "默认"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_default.py
+msgctxt "#32562"
+msgid "Custom"
+msgstr "自定义"
+
+#: /resources/tmdbhelper/lib/script/method/sync_provider.py
+msgctxt "#32563"
+msgid "You are enabling {0}, a third-party sync service outside TMDbHelper's trusted list. Only continue if you trust this service and understand the risks, including sharing your viewing activity and account data."
+msgstr "你正在启用 {0}，这是一个不在 TMDbHelper 受信任列表中的第三方同步服务。请仅在信任该服务并了解相关风险（包括共享你的观看活动和账户数据）的情况下继续。"
+
+#: /resources/settings.xml
+msgctxt "#32564"
+msgid "Image cache limit"
+msgstr "图像缓存上限"
+
+#: /resources/settings.xml
+msgctxt "#32565"
+msgid "Set the size limit per image-cache folder. Unlimited disables automatic cleanup."
+msgstr "设置每个图像缓存文件夹的大小上限。选择“无限制”将禁用自动清理。"
+
+#: /resources/settings.xml
+msgctxt "#32566"
+msgid "Unlimited"
+msgstr "无限制"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32567"
+msgid "Clean image cache"
+msgstr "清理图像缓存"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32568"
+msgid "Scanning {0}: {1} of {2} files"
+msgstr "正在扫描 {0}：第 {1}/{2} 个文件"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32569"
+msgid "Cleaning {0}"
+msgstr "正在清理 {0}"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32570"
+msgid "Space reclaimed: {0}"
+msgstr "已释放空间：{0}"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32571"
+msgid "Image cache cleanup finished. Space reclaimed: {0}."
+msgstr "图像缓存清理完成。已释放空间：{0}。"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32572"
+msgid "Image cache cleanup cancelled. Space reclaimed: {0}."
+msgstr "图像缓存清理已取消。已释放空间：{0}。"
+
+#: /resources/tmdbhelper/lib/script/method/image_cache.py
+msgctxt "#32573"
+msgid "Image cache cleanup is disabled while the target size is Unlimited."
+msgstr "目标大小为「无限制」时，图像缓存清理已禁用。"
+
+#: /resources/settings.xml
+msgctxt "#32574"
+msgid "Save settings and clean the image cache to the selected size limit."
+msgstr "保存设置并将图像缓存清理至所选大小上限。"
+
+#: /resources/settings.xml
+msgctxt "#32575"
+msgid "32 MB"
+msgstr "32 MB"
+
+#: /resources/settings.xml
+msgctxt "#32576"
+msgid "64 MB"
+msgstr "64 MB"
+
+#: /resources/settings.xml
+msgctxt "#32577"
+msgid "128 MB"
+msgstr "128 MB"
+
+#: /resources/settings.xml
+msgctxt "#32578"
+msgid "256 MB"
+msgstr "256 MB"
+
+#: /resources/settings.xml
+msgctxt "#32579"
+msgid "512 MB"
+msgstr "512 MB"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_directory.py
+msgctxt "#32580"
+msgid "The route \"{0}\" is not available in TMDbHelper. It may be available in the {1} sync module. Install or enable this module?"
+msgstr "TMDbHelper 中不提供路由「{0}」。它可能在 {1} 同步模块中可用。是否安装或启用该模块？"
+
+#: /resources/settings.xml
+msgctxt "#32581"
+msgid "Ratings providers"
+msgstr "评分提供商"
+
+#: /resources/settings.xml
+msgctxt "#32582"
+msgid "Choose which installed ratings providers to use. Existing cached ratings are retained."
+msgstr "选择要使用的已安装评分提供商。现有缓存评分将保留。"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32583"
+msgid "{0}. {1} ({2})"
+msgstr "{0}. {1}（{2}）"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32584"
+msgid "Enabled"
+msgstr "已启用"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32585"
+msgid "Disabled"
+msgstr "已禁用"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32586"
+msgid "Move up"
+msgstr "上移"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32587"
+msgid "Move down"
+msgstr "下移"
+
+#: /resources/tmdbhelper/lib/script/ratings/providers.py
+msgctxt "#32588"
+msgid "No ratings providers are installed."
+msgstr "未安装任何评分提供商。"
+
+#: /resources/settings.xml
+msgctxt "#32591"
+msgid "Provider priority"
+msgstr "提供商优先级"
+
+#: /resources/settings.xml
+msgctxt "#32592"
+msgid "Order ratings providers from highest to lowest priority. Existing cached ratings are retained."
+msgstr "按优先级从高到低排列评分提供商。现有缓存评分将保留。"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32593"
+msgid "Episode numbering"
+msgstr "剧集编号"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32594"
+msgid "Default"
+msgstr "默认"
+
+#: /resources/settings.xml
+msgctxt "#32595"
+msgid "Select"
+msgstr "选择"
+
+#: /resources/settings.xml
+msgctxt "#32596"
+msgid "Group"
+msgstr "分组"
+
+#: /resources/settings.xml /resources/tmdbhelper/lib/player/dialog/episode_groups.py
+msgctxt "#32597"
+msgid "Use TMDb numbers, ask for a group, or use the current group. Individual players can override this choice."
+msgstr "使用 TMDb 编号、询问剧集组，或使用当前剧集组。单个播放器可覆盖此选项。"
 
 msgctxt "#30030"
 msgid "Hindi (India)"
@@ -2122,11 +2683,11 @@ msgstr "普通话（中国）"
 
 msgctxt "#30065"
 msgid "Mandarin (Hong Kong)"
-msgstr "普通话（香港）"
+msgstr "普通话（中国香港）"
 
 msgctxt "#30066"
 msgid "Mandarin (Taiwan)"
-msgstr "普通话（台湾）"
+msgstr "普通话（中国台湾）"
 
 msgctxt "#30067"
 msgid "Zulu (South Africa)"
@@ -2136,7 +2697,16 @@ msgctxt "#30068"
 msgid "Croatian (Croatia)"
 msgstr "克罗地亚语（克罗地亚）"
 
+#: /resources/settings.xml
+msgctxt "#32001"
+msgid "OMDb key"
+msgstr "OMDb 密钥"
 
+# "MPAA rating prefix" 通常指美国电影协会分级前缀（例如 Rated: PG-13 中的 Rated: 部分）
+#: /resources/settings.xml
+msgctxt "#32004"
+msgid "Certification prefix"
+msgstr "分级前缀"
 
 #: /resources/settings.xml
 msgctxt "#32005"
@@ -2148,18 +2718,887 @@ msgctxt "#32007"
 msgid "Unauthorised 401 Error"
 msgstr "未经授权的 401 错误"
 
+#: /resources/lib/requestapi.py
+msgctxt "#32010"
+msgid "Sign in"
+msgstr "登录"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32011"
 msgid "Token"
-msgstr "Token"
+msgstr "令牌"
 
 #: /resources/lib/traktapi.py
 msgctxt "#32012"
 msgid "You must authenticate your Trakt account to use this feature."
-msgstr "你必须验证你的 Trakt 帐户才能使用此功能。"
+msgstr "你必须验证你的 Trakt 账户才能使用此功能。"
 
 #: /resources/settings.xml
 msgctxt "#32014"
 msgid "Players"
 msgstr "播放器"
+
+#: /resources/settings.xml
+msgctxt "#32016"
+msgid "Update from URL"
+msgstr "从网址更新"
+
+#: /resources/settings.xml
+msgctxt "#32017"
+msgid "Services"
+msgstr "服务"
+
+#: /resources/settings.xml
+msgctxt "#32019"
+msgid "Fanart.tv key"
+msgstr "Fanart.tv 密钥"
+
+#: /resources/settings.xml
+msgctxt "#32021"
+msgid "Enable artwork lookups"
+msgstr "启用艺术图查询"
+
+#: /resources/settings.xml
+msgctxt "#32024"
+msgid "Movie player"
+msgstr "电影播放器"
+
+#: /resources/settings.xml
+msgctxt "#32025"
+msgid "Episode player"
+msgstr "剧集播放器"
+
+#: /resources/settings.xml
+msgctxt "#32598"
+msgid "Statistics"
+msgstr "统计"
+
+#: /resources/settings.xml
+msgctxt "#32599"
+msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
+msgstr "选择接收播放活动的提供商。清空所有选择即可关闭播放同步。"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
+msgctxt "#32600"
+msgid "Currently Watching"
+msgstr "正在观看"
+
+#: /resources/tmdbhelper/lib/items/directories/base/basedir_sync.py
+msgctxt "#32602"
+msgid "Your Next Movies"
+msgstr "待看新片"
+
+#: /resources/settings.xml
+msgctxt "#32603"
+msgid "Update collections"
+msgstr "更新合集"
+
+#: /resources/settings.xml
+msgctxt "#32604"
+msgid "Discover new movie collections daily and refresh older ones for Your Next Movies after its first use."
+msgstr "每天发现新的电影合集，并在「待看新片」首次使用后刷新较旧的合集。"
+
+#: /resources/settings.xml
+msgctxt "#32605"
+msgid "Daily request limit"
+msgstr "每日请求上限"
+
+#: /resources/settings.xml
+msgctxt "#32606"
+msgid "Limit daily movie collection requests, including retries. New collections take priority over overdue refreshes."
+msgstr "限制每日电影合集请求数（含重试）。新合集的优先级高于逾期刷新。"
+
+#: /resources/tmdbhelper/lib/items/directories/sync/mapper_nextmovies.py
+msgctxt "#32607"
+msgid "Drop collection"
+msgstr "移除合集"
+
+#: /resources/settings.xml
+msgctxt "#32608"
+msgid "Advanced"
+msgstr "高级"
+
+#: /resources/settings.xml
+msgctxt "#32609"
+msgid "Include movie releases outside your selected country when filtering TMDb lists."
+msgstr "筛选 TMDb 列表时，包含所选国家以外地区上映的电影。"
+
+#: /resources/settings.xml
+msgctxt "#32610"
+msgid "Show authorisation and sync notifications when Kodi starts."
+msgstr "Kodi 启动时显示授权和同步通知。"
+
+#: /resources/settings.xml
+msgctxt "#32611"
+msgid "Show notifications while user data is synchronising."
+msgstr "用户数据同步时显示通知。"
+
+#: /resources/settings.xml
+msgctxt "#32612"
+msgid "Show a notification when a service connection fails."
+msgstr "服务连接失败时显示通知。"
+
+#: /resources/settings.xml
+msgctxt "#32613"
+msgid "Show Browse lists in the item context menu."
+msgstr "在条目右键菜单中显示「浏览列表」。"
+
+#: /resources/settings.xml
+msgctxt "#32614"
+msgid "Show sync actions in the item context menu."
+msgstr "在条目右键菜单中显示同步操作。"
+
+#: /resources/settings.xml
+msgctxt "#32615"
+msgid "Show TMDb account actions in the item context menu."
+msgstr "在条目右键菜单中显示 TMDb 账户操作。"
+
+#: /resources/settings.xml
+msgctxt "#32616"
+msgid "Show Refresh details in the item context menu."
+msgstr "在条目右键菜单中显示「刷新详情」。"
+
+#: /resources/settings.xml
+msgctxt "#32617"
+msgid "Show Modify artwork in the item context menu."
+msgstr "在条目右键菜单中显示「修改艺术图」。"
+
+#: /resources/settings.xml
+msgctxt "#32618"
+msgid "Add to library"
+msgstr "添加到媒体库"
+
+#: /resources/settings.xml
+msgctxt "#32619"
+msgid "Show Add to library in the item context menu."
+msgstr "在条目右键菜单中显示「添加到媒体库」。"
+
+#: /resources/settings.xml
+msgctxt "#32620"
+msgid "Show Add node in the item context menu."
+msgstr "在条目右键菜单中显示「添加节点」。"
+
+#: /resources/settings.xml
+msgctxt "#32621"
+msgid "Show a next-page item in widgets when more results are available."
+msgstr "当还有更多结果时，在小部件中显示「下一页」条目。"
+
+#: /resources/settings.xml
+msgctxt "#32622"
+msgid "Open the episode list directly instead of showing seasons."
+msgstr "直接打开剧集列表，不显示季列表。"
+
+#: /resources/settings.xml
+msgctxt "#32623"
+msgid "Show the additional Specials season entry."
+msgstr "显示附加的「特别篇」季条目。"
+
+#: /resources/settings.xml
+msgctxt "#32624"
+msgid "Show the additional Anticipated season entry."
+msgstr "显示附加的「待上线」季条目。"
+
+#: /resources/settings.xml
+msgctxt "#32625"
+msgid "Show the additional episode Groups entry."
+msgstr "显示附加的「剧集分组」条目。"
+
+#: /resources/settings.xml
+msgctxt "#32626"
+msgid "Show the additional Up next season entry when signed in to Trakt."
+msgstr "登录 Trakt 后显示附加的「下个播放」季条目。"
+
+#: /resources/settings.xml
+msgctxt "#32627"
+msgid "Combine episodes from the same show airing on the same day into one calendar entry."
+msgstr "将同一剧集在同一天播出的多集合并为一个日历条目。"
+
+#: /resources/settings.xml
+msgctxt "#32628"
+msgid "Open the local TV show from entries in the next-aired library calendar."
+msgstr "从媒体库「即将播出」日历的条目打开本地剧集。"
+
+#: /resources/settings.xml
+msgctxt "#32629"
+msgid "Choose the artwork used for next-episode thumbnails."
+msgstr "选择下一集缩略图使用的艺术图。"
+
+#: /resources/settings.xml
+msgctxt "#32630"
+msgid "Check the calendar for next episodes. Slower, but more accurate."
+msgstr "通过日历检查下一集。速度较慢，但更准确。"
+
+#: /resources/settings.xml
+msgctxt "#32631"
+msgid "Load this many pages per request for basic TMDb lists. Higher values are slower."
+msgstr "基础 TMDb 列表每次请求加载的页数。数值越大速度越慢。"
+
+#: /resources/settings.xml
+msgctxt "#32632"
+msgid "Load this many pages per request for other basic lists. Higher values are slower."
+msgstr "其他基础列表每次请求加载的页数。数值越大速度越慢。"
+
+#: /resources/settings.xml
+msgctxt "#32633"
+msgid "Load this many pages per request for synced database lists. Higher values are slower."
+msgstr "同步数据库列表每次请求加载的页数。数值越大速度越慢。"
+
+#: /resources/settings.xml
+msgctxt "#32634"
+msgid "Cache the items in Trakt custom lists you own for 24 hours."
+msgstr "将你自己拥有的 Trakt 自定义列表条目缓存 24 小时。"
+
+#: /resources/settings.xml
+msgctxt "#32635"
+msgid "Choose the default resolution of artwork downloaded from TMDb. Poster and fanart settings can override this default."
+msgstr "选择从 TMDb 下载艺术图的默认分辨率。海报和背景图设置可覆盖此默认值。"
+
+#: /resources/settings.xml
+msgctxt "#32636"
+msgid "Fetch Fanart.tv artwork for plugin items. Additional lookups are slower."
+msgstr "为插件条目获取 Fanart.tv 艺术图。额外查询会变慢。"
+
+#: /resources/settings.xml
+msgctxt "#32637"
+msgid "Prefer Fanart.tv artwork over TMDb artwork when both are available."
+msgstr "两者都可用时，优先使用 Fanart.tv 艺术图而非 TMDb 艺术图。"
+
+#: /resources/settings.xml
+msgctxt "#32638"
+msgid "Prefer artwork in your selected language when choosing images."
+msgstr "选择图片时优先使用所选语言的艺术图。"
+
+#: /resources/settings.xml
+msgctxt "#32639"
+msgid "Choose the folder containing custom icons for TMDb genres."
+msgstr "选择存放 TMDb 类型自定义图标的文件夹。"
+
+#: /resources/settings.xml
+msgctxt "#32640"
+msgid "Choose the folder containing custom icons for Trakt genres."
+msgstr "选择存放 Trakt 类型自定义图标的文件夹。"
+
+#: /resources/settings.xml
+msgctxt "#32641"
+msgid "Choose the folder containing custom TMDb watch-provider icons."
+msgstr "选择存放 TMDb 观看提供商自定义图标的文件夹。"
+
+#: /resources/settings.xml
+msgctxt "#32642"
+msgid "Retrieve background artwork for genre entries."
+msgstr "为类型条目获取背景艺术图。"
+
+#: /resources/settings.xml
+msgctxt "#32643"
+msgid "Retrieve background artwork for watch-provider entries."
+msgstr "为观看提供商条目获取背景艺术图。"
+
+#: /resources/settings.xml
+msgctxt "#32644"
+msgid "Choose the default player used for movies."
+msgstr "选择电影使用的默认播放器。"
+
+#: /resources/settings.xml
+msgctxt "#32645"
+msgid "Choose the default player used for TV episodes."
+msgstr "选择电视剧集使用的默认播放器。"
+
+#: /resources/settings.xml
+msgctxt "#32646"
+msgid "Automatically play using available providers instead of asking for a player."
+msgstr "自动使用可用提供商播放，不询问播放器。"
+
+#: /resources/settings.xml
+msgctxt "#32647"
+msgid "Choose how playback uses files already in the Kodi library."
+msgstr "选择播放时如何使用媒体库中已有的文件。"
+
+#: /resources/settings.xml
+msgctxt "#32648"
+msgid "Show one player entry per plugin instead of separate entries for each player."
+msgstr "每个插件只显示一个播放器条目，而不是为每个播放器分别显示。"
+
+#: /resources/settings.xml
+msgctxt "#32649"
+msgid "Include player definitions supplied with the add-on."
+msgstr "包含插件自带的播放器定义。"
+
+#: /resources/settings.xml
+msgctxt "#32650"
+msgid "Download player definitions from the URL you provide."
+msgstr "从你提供的 URL 下载播放器定义。"
+
+#: /resources/settings.xml
+msgctxt "#32651"
+msgid "Choose and customise the available player definitions."
+msgstr "选择并自定义可用的播放器定义。"
+
+#: /resources/settings.xml
+msgctxt "#32652"
+msgid "Ask for a TMDb rating after watching an item when signed in to TMDb."
+msgstr "登录 TMDb 后，观看条目后询问 TMDb 评分。"
+
+#: /resources/settings.xml
+msgctxt "#32653"
+msgid "Movies folder"
+msgstr "电影文件夹"
+
+#: /resources/settings.xml
+msgctxt "#32654"
+msgid "Choose where movie STRM and NFO files are created for the Kodi library."
+msgstr "选择为 Kodi 媒体库创建电影 STRM 和 NFO 文件的位置。"
+
+#: /resources/settings.xml
+msgctxt "#32655"
+msgid "Choose where TV show STRM and NFO files are created for the Kodi library."
+msgstr "选择为 Kodi 媒体库创建电视剧 STRM 和 NFO 文件的位置。"
+
+#: /resources/settings.xml
+msgctxt "#32656"
+msgid "Scan the Kodi library after adding items through TMDbHelper."
+msgstr "通过 TMDbHelper 添加条目后扫描 Kodi 媒体库。"
+
+#: /resources/settings.xml
+msgctxt "#32657"
+msgid "Automatically update library exports and add new or missing episodes."
+msgstr "自动更新媒体库导出，并添加新的或缺失的剧集。"
+
+#: /resources/settings.xml
+msgctxt "#32658"
+msgid "Choose the hour for the daily library update."
+msgstr "选择每日媒体库更新的时间（小时）。"
+
+#: /resources/settings.xml
+msgctxt "#32659"
+msgid "Choose the lists used to add items during automatic library updates."
+msgstr "选择自动媒体库更新期间用于添加条目的列表。"
+
+#: /resources/settings.xml
+msgctxt "#32660"
+msgid "Store the source-list identifiers used by automatic library updates."
+msgstr "存储自动媒体库更新使用的来源列表标识符。"
+
+#: /resources/settings.xml
+msgctxt "#32661"
+msgid "Choose which library exports to update now."
+msgstr "选择现在要更新哪些媒体库导出。"
+
+#: /resources/settings.xml
+msgctxt "#32662"
+msgid "Choose whether to add local Kodi library details to items."
+msgstr "选择是否将本地 Kodi 媒体库详情添加到条目。"
+
+#: /resources/settings.xml
+msgctxt "#32663"
+msgid "Refresh TMDbHelper's cached details from the local Kodi library."
+msgstr "从本地 Kodi 媒体库刷新 TMDbHelper 的缓存详情。"
+
+#: /resources/settings.xml
+msgctxt "#32664"
+msgid "Skip checks after creating library folders on systems that report new folders slowly."
+msgstr "在报告新文件夹较慢的系统上，创建媒体库文件夹后跳过检查。"
+
+#: /resources/settings.xml
+msgctxt "#32665"
+msgid "Use movie-tmdbhelper.nfo or tvshow-tmdbhelper.nfo instead of the standard NFO filename."
+msgstr "使用 movie-tmdbhelper.nfo 或 tvshow-tmdbhelper.nfo 代替标准 NFO 文件名。"
+
+#: /resources/settings.xml
+msgctxt "#32666"
+msgid "Connect your Trakt account to TMDbHelper."
+msgstr "将你的 Trakt 账户连接到 TMDbHelper。"
+
+#: /resources/settings.xml
+msgctxt "#32667"
+msgid "Disconnect your Trakt account from TMDbHelper."
+msgstr "断开你的 Trakt 账户与 TMDbHelper 的连接。"
+
+#: /resources/settings.xml
+msgctxt "#32668"
+msgid "Open settings"
+msgstr "打开设置"
+
+#: /resources/settings.xml
+msgctxt "#32669"
+msgid "Install MDbList support if needed, then open its provider settings."
+msgstr "如需要先安装 MDbList 支持，然后打开其提供商设置。"
+
+#: /resources/settings.xml
+msgctxt "#32671"
+msgid "Enter your OMDb API key for additional ratings and metadata."
+msgstr "输入 OMDb API 密钥以获取额外评分和元数据。"
+
+#: /resources/settings.xml
+msgctxt "#32672"
+msgid "Enter your RatingPosterDB API key for posters with ratings."
+msgstr "输入 RatingPosterDB API 密钥以获取带评分的海报。"
+
+#: /resources/settings.xml
+msgctxt "#32674"
+msgid "Enter your Fanart.tv client key for artwork lookups."
+msgstr "输入 Fanart.tv 客户端密钥以查询艺术图。"
+
+#: /resources/settings.xml
+msgctxt "#32675"
+msgid "Configure providers"
+msgstr "配置提供商"
+
+#: /resources/settings.xml
+msgctxt "#32676"
+msgid "Store the selected ratings providers and their priority order."
+msgstr "存储已选评分提供商及其优先级顺序。"
+
+#: /resources/settings.xml
+msgctxt "#32677"
+msgid "Choose a watchlist provider, install one, or select None to disable watchlist lists."
+msgstr "选择观看列表提供商、安装一个，或选择「无」以关闭观看列表。"
+
+#: /resources/settings.xml
+msgctxt "#32678"
+msgid "Choose a collection provider, install one, or select None to disable collection lists."
+msgstr "选择合集提供商、安装一个，或选择「无」以关闭合集列表。"
+
+#: /resources/settings.xml
+msgctxt "#32679"
+msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
+msgstr "选择统计提供商、安装一个，或选择「无」以关闭统计列表。"
+
+#: /resources/settings.xml
+msgctxt "#32680"
+msgid "Choose a supported sync provider to install or enable."
+msgstr "选择要安装或启用的受支持同步提供商。"
+
+#: /resources/settings.xml
+msgctxt "#32681"
+msgid "Synchronise watched status and resume points with the selected history provider."
+msgstr "与所选历史记录提供商同步已观看状态和续播点。"
+
+#: /resources/settings.xml
+msgctxt "#32682"
+msgid "Clear cached synced user data so it can be downloaded again."
+msgstr "清除已缓存的同步用户数据，以便重新下载。"
+
+#: /resources/settings.xml
+msgctxt "#32683"
+msgid "Choose which watch providers are included in provider data lookups."
+msgstr "选择哪些观看提供商包含在提供商数据查询中。"
+
+#: /resources/settings.xml
+msgctxt "#32684"
+msgid "Allow the image monitor to fetch artwork from online sources."
+msgstr "允许图像监视器从在线来源获取艺术图。"
+
+#: /resources/settings.xml
+msgctxt "#32685"
+msgid "Allow the details monitor to fetch ratings from online sources."
+msgstr "允许详情监视器从在线来源获取评分。"
+
+#: /resources/settings.xml
+msgctxt "#32686"
+msgid "Use TMDbHelper artwork instead of the clearlogo supplied by the playback monitor."
+msgstr "使用 TMDbHelper 艺术图，而不是播放监视器提供的透明台标。"
+
+#: /resources/settings.xml
+msgctxt "#32687"
+msgid "Set how long the dummy video plays when resolving playback, in seconds."
+msgstr "设置解析播放时虚拟视频的播放时长（秒）。"
+
+#: /resources/settings.xml
+msgctxt "#32688"
+msgid "Set the delay after the dummy video stops before playback continues, in seconds."
+msgstr "设置虚拟视频停止后到继续播放之间的延迟（秒）。"
+
+#: /resources/settings.xml
+msgctxt "#32689"
+msgid "Restrict URL resolving to library STRM playback."
+msgstr "将 URL 解析限制为媒体库 STRM 播放。"
+
+#: /resources/settings.xml
+msgctxt "#32690"
+msgid "Refresh cached Kodi library details when building the player list."
+msgstr "构建播放器列表时刷新缓存的 Kodi 媒体库详情。"
+
+#: /resources/settings.xml
+msgctxt "#32691"
+msgid "Use the alternative TMDb API address for network compatibility."
+msgstr "为兼容网络环境，使用备用 TMDb API 地址。"
+
+#: /resources/settings.xml
+msgctxt "#32692"
+msgid "Set the maximum number of concurrent threads. Zero means unlimited."
+msgstr "设置最大并发线程数。0 表示不限制。"
+
+#: /resources/settings.xml
+msgctxt "#32693"
+msgid "Choose a custom location for TMDbHelper cache databases."
+msgstr "选择 TMDbHelper 缓存数据库的自定义位置。"
+
+#: /resources/settings.xml
+msgctxt "#32694"
+msgid "Choose a custom location for cached images."
+msgstr "选择缓存图像的自定义位置。"
+
+#: /resources/settings.xml
+msgctxt "#32695"
+msgid "Delete cached TMDb list details for troubleshooting. Lists will be downloaded again when needed."
+msgstr "删除缓存的 TMDb 列表详情以进行故障排查。需要时会重新下载列表。"
+
+#: /resources/settings.xml
+msgctxt "#32696"
+msgid "Write additional diagnostic information to the Kodi log."
+msgstr "将额外的诊断信息写入 Kodi 日志。"
+
+#: /resources/settings.xml
+msgctxt "#32697"
+msgid "Disabled collects no timer reports. Basic collects directory timer reports. Detailed also collects item detail timer reports."
+msgstr "「已禁用」不收集计时报告。「基础」收集目录计时报告。「详细」还会收集条目详情计时报告。"
+
+#: /resources/settings.xml
+msgctxt "#32698"
+msgid "Run a TMDb request and write its response to the Kodi log."
+msgstr "执行一次 TMDb 请求并将其响应写入 Kodi 日志。"
+
+#: /resources/settings.xml
+msgctxt "#32699"
+msgid "Run a Trakt request and write its response to the Kodi log."
+msgstr "执行一次 Trakt 请求并将其响应写入 Kodi 日志。"
+
+#: /resources/settings.xml
+msgctxt "#32701"
+msgid "Store the TMDb account authentication token used by TMDbHelper."
+msgstr "存储 TMDbHelper 使用的 TMDb 账户身份验证令牌。"
+
+#: /resources/settings.xml
+msgctxt "#32702"
+msgid "Store the Trakt account authentication token used by TMDbHelper."
+msgstr "存储 TMDbHelper 使用的 Trakt 账户身份验证令牌。"
+
+#: /resources/settings.xml
+msgctxt "#32703"
+msgid "Allow other plugins to access the saved OMDb API key."
+msgstr "允许其他插件访问已保存的 OMDb API 密钥。"
+
+#: /resources/settings.xml
+msgctxt "#32704"
+msgid "Allow other plugins to access the saved Fanart.tv client key."
+msgstr "允许其他插件访问已保存的 Fanart.tv 客户端密钥。"
+
+#: /resources/settings.xml
+msgctxt "#32706"
+msgid "Allow other plugins to access the saved TMDb account token."
+msgstr "允许其他插件访问已保存的 TMDb 账户令牌。"
+
+#: /resources/settings.xml
+msgctxt "#32707"
+msgid "Allow other plugins to access the saved Trakt account token."
+msgstr "允许其他插件访问已保存的 Trakt 账户令牌。"
+
+#: /resources/settings.xml
+msgctxt "#32708"
+msgid "Regional"
+msgstr "地区"
+
+#: /resources/settings.xml
+msgctxt "#32709"
+msgid "Notifications"
+msgstr "通知"
+
+#: /resources/settings.xml
+msgctxt "#32710"
+msgid "Context menu"
+msgstr "右键菜单"
+
+#: /resources/settings.xml
+msgctxt "#32711"
+msgid "Navigation"
+msgstr "导航"
+
+#: /resources/settings.xml
+msgctxt "#32712"
+msgid "Extra seasons"
+msgstr "附加季"
+
+#: /resources/settings.xml
+msgctxt "#32713"
+msgid "Next episodes"
+msgstr "下一集"
+
+#: /resources/settings.xml
+msgctxt "#32714"
+msgid "Next movies"
+msgstr "待看新片"
+
+#: /resources/settings.xml
+msgctxt "#32715"
+msgid "Recommendations"
+msgstr "推荐"
+
+#: /resources/settings.xml
+msgctxt "#32716"
+msgid "Pagination"
+msgstr "分页"
+
+#: /resources/settings.xml
+msgctxt "#32717"
+msgid "Fanart.tv"
+msgstr "Fanart.tv"
+
+#: /resources/settings.xml
+msgctxt "#32718"
+msgid "Icons"
+msgstr "图标"
+
+#: /resources/settings.xml
+msgctxt "#32719"
+msgid "Backgrounds"
+msgstr "背景图"
+
+#: /resources/settings.xml
+msgctxt "#32720"
+msgid "Defaults"
+msgstr "默认值"
+
+#: /resources/settings.xml
+msgctxt "#32721"
+msgid "Configuration"
+msgstr "配置"
+
+#: /resources/settings.xml
+msgctxt "#32722"
+msgid "After playback"
+msgstr "播放后"
+
+#: /resources/settings.xml
+msgctxt "#32723"
+msgid "Folders"
+msgstr "文件夹"
+
+#: /resources/settings.xml
+msgctxt "#32724"
+msgid "Updates"
+msgstr "更新"
+
+#: /resources/settings.xml
+msgctxt "#32725"
+msgid "Local details"
+msgstr "本地详情"
+
+#: /resources/settings.xml
+msgctxt "#32726"
+msgid "MDbList"
+msgstr "MDbList"
+
+#: /resources/settings.xml
+msgctxt "#32727"
+msgid "API keys"
+msgstr "API 密钥"
+
+#: /resources/settings.xml
+msgctxt "#32728"
+msgid "Credentials"
+msgstr "凭据"
+
+#: /resources/settings.xml
+msgctxt "#32729"
+msgid "Status"
+msgstr "状态"
+
+#: /resources/settings.xml
+msgctxt "#32730"
+msgid "Maintenance"
+msgstr "维护"
+
+#: /resources/settings.xml
+msgctxt "#32731"
+msgid "Skin integration"
+msgstr "皮肤集成"
+
+#: /resources/settings.xml
+msgctxt "#32732"
+msgid "Playback"
+msgstr "播放"
+
+#: /resources/settings.xml
+msgctxt "#32733"
+msgid "Network"
+msgstr "网络"
+
+#: /resources/settings.xml
+msgctxt "#32734"
+msgid "Cache"
+msgstr "缓存"
+
+#: /resources/settings.xml
+msgctxt "#32735"
+msgid "Logging"
+msgstr "日志"
+
+#: /resources/settings.xml
+msgctxt "#32736"
+msgid "Gemini settings"
+msgstr "Gemini 设置"
+
+#: /resources/settings.xml
+msgctxt "#32737"
+msgid "Install or enable the Gemini module and open its API settings."
+msgstr "安装或启用 Gemini 模块并打开其 API 设置。"
+
+#: /resources/settings.xml
+msgctxt "#32738"
+msgid "TVDb settings"
+msgstr "TVDb 设置"
+
+#: /resources/settings.xml
+msgctxt "#32739"
+msgid "Install or enable the TVDb module and open its API settings."
+msgstr "安装或启用 TVDb 模块并打开其 API 设置。"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32740"
+msgid "Provider modules"
+msgstr "提供商模块"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32741"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager_features.py
+msgctxt "#32742"
+msgid "Set {0} as the default sync provider? This replaces the current sync selections and clears features it does not support. Ratings and scrobbling are configured separately."
+msgstr "将 {0} 设为默认同步提供商？这会替换当前的同步选择，并清除其不支持的功能。评分和播放同步单独配置。"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager_features.py
+msgctxt "#32743"
+msgid "Enable {0} as a ratings provider?"
+msgstr "将 {0} 启用为评分提供商？"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager_features.py
+msgctxt "#32744"
+msgid "Enable scrobbling with {0}?"
+msgstr "启用 {0} 的播放同步？"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32745"
+msgid "Are you sure you want to disable {0}? The module and its features will be unavailable."
+msgstr "确定要禁用 {0} 吗？该模块及其功能将不可用。"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_manager.py
+msgctxt "#32746"
+msgid "Disabling this module will remove it from:\n{0}"
+msgstr "禁用此模块会将其从以下位置移除：\n{0}"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32747"
+msgid "Provider module unavailable"
+msgstr "提供商模块不可用"
+
+#: /resources/tmdbhelper/lib/script/sync/provider_errors.py
+msgctxt "#32748"
+msgid "The {0} module could not be loaded and its features are temporarily unavailable. Update the module to the latest version and try again. Your settings and synced data have been kept."
+msgstr "无法加载 {0} 模块，其功能暂时不可用。请将模块更新到最新版本后重试。你的设置和同步数据已保留。"
+
+#: /resources/settings.xml
+msgctxt "#32749"
+msgid "Trakt settings"
+msgstr "Trakt 设置"
+
+#: /resources/settings.xml
+msgctxt "#32750"
+msgid "Configure Trakt list caching, genre icons, and next-episode calendar checks."
+msgstr "配置 Trakt 列表缓存、类型图标和下一集日历检查。"
+
+#: /resources/settings.xml
+msgctxt "#32751"
+msgid "Poster image quality"
+msgstr "海报图像质量"
+
+#: /resources/settings.xml
+msgctxt "#32752"
+msgid "Fanart image quality"
+msgstr "背景图图像质量"
+
+#: /resources/settings.xml
+msgctxt "#32754"
+msgid "Choose the resolution of TMDb posters and actor portraits, or use the default image quality setting."
+msgstr "选择 TMDb 海报和演员头像的分辨率，或使用默认图像质量设置。"
+
+#: /resources/settings.xml
+msgctxt "#32755"
+msgid "Choose the resolution of TMDb fanart, landscape, and extra fanart, or use the default image quality setting."
+msgstr "选择 TMDb 背景图、横向图和额外背景图的分辨率，或使用默认图像质量设置。"
+
+#: /resources/settings.xml
+msgctxt "#32756"
+msgid "TMDb account"
+msgstr "TMDb 账户"
+
+#: /resources/settings.xml
+msgctxt "#32757"
+msgid "Sign in to your TMDb account using a web browser or QR code."
+msgstr "使用网页浏览器或二维码登录你的 TMDb 账户。"
+
+#: /resources/settings.xml
+msgctxt "#32758"
+msgid "Sign out of your TMDb account and remove the saved authentication token."
+msgstr "退出你的 TMDb 账户并移除已保存的认证令牌。"
+
+#: /resources/settings.xml
+msgctxt "#32759"
+msgid "Basic"
+msgstr "基础"
+
+#: /resources/settings.xml
+msgctxt "#32760"
+msgid "Detailed"
+msgstr "详细"
+
+#: /resources/settings.xml
+msgctxt "#32761"
+msgid "Show expired widget lists for up to"
+msgstr "过期小部件列表最长显示时间"
+
+#: /resources/settings.xml
+msgctxt "#32762"
+msgid "When a widget's TMDb list is older than its normal 6 hour cache, show the saved list straight away and download the new list after the widget has loaded. The new list appears the next time Kodi reloads the widget. Lists for today, such as Airing Today, always wait for new data. Off waits for new data every time."
+msgstr "当小部件的 TMDb 列表超过其正常的 6 小时缓存后，立即显示已保存的列表，并在小部件加载完成后下载新列表。新列表将在 Kodi 下次重新加载该小部件时显示。今日类列表（如“今日播出”）始终等待新数据。“关闭”表示每次都等待新数据。"
+
+#: /resources/settings.xml
+msgctxt "#32763"
+msgid "Off"
+msgstr "关闭"
+
+#: /resources/settings.xml
+msgctxt "#32764"
+msgid "24 hours"
+msgstr "24 小时"
+
+#: /resources/settings.xml
+msgctxt "#32765"
+msgid "48 hours"
+msgstr "48 小时"
+
+#: /resources/settings.xml
+msgctxt "#32766"
+msgid "72 hours"
+msgstr "72 小时"
+
+#: /resources/tmdbhelper/lib/items/context_random.py
+msgctxt "#32767"
+msgid "Play random"
+msgstr "随机播放"
+
+#: /resources/settings.xml
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr "在右键菜单中显示随机播放选项，从文件夹中随机播放一部电影或一集剧集，每一级从当前页面中选择。"
+
+#: /resources/tmdbhelper/lib/script/method/play_random.py
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr "未找到可播放的项目。"
+
+#: /resources/tmdbhelper/lib/items/context_nextepisodes.py
+msgctxt "#32770"
+msgid "Browse next episodes"
+msgstr "浏览下一集"
