@@ -49,6 +49,10 @@ class SyncProvider:
     def is_authorized(self):
         raise NotImplementedError
 
+    def validate_setup(self):
+        """Return whether setup may proceed; providers own interactive failure feedback."""
+        return True
+
     def migrate_settings(self):
         """Migrate provider settings before constructing any API clients."""
         pass

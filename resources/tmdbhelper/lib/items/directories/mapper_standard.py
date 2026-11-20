@@ -1,5 +1,6 @@
 from tmdbhelper.lib.items.directories.mapper_basic import ItemMapper, NullItemMapper
 from jurialmunkey.ftools import cached_property
+from tmdbhelper.lib.addon.tmdate import convert_timestamp_to_local
 
 
 class MediaItemMapper(ItemMapper):
@@ -41,8 +42,14 @@ class MediaItemMapper(ItemMapper):
         'list_count': 'lists',
         'rank': 'rank',
         'notes': 'notes',
-        'listed_at': 'listed_at',
     }
+
+    @cached_property
+    def listed_at(self):
+        return self.get_listed_at()
+
+    def get_listed_at(self):
+        return convert_timestamp_to_local(self.meta.get('listed_at'))
 
     def get_infoproperties(self):
         infoproperties = {
@@ -52,6 +59,7 @@ class MediaItemMapper(ItemMapper):
         }
         infoproperties['tmdb_type'] = self.tmdb_type
         infoproperties['tmdb_id'] = self.tmdb_id
+        infoproperties['listed_at'] = self.listed_at
         return infoproperties
 
     def get_unique_ids(self):

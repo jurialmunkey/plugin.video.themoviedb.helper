@@ -19,7 +19,7 @@ class RatingsStoredData(ItemDetailsDatabaseAccess):
         return f'id IN ({", ".join("?" for _ in self.item_ids)})'
 
     def get_rows(self, table, keys):
-        with self.connection.open():
+        with self.cache.session():
             return self.get_cached_list_values(table, keys, self.item_ids, self.conditions) or ()
 
     @cached_property

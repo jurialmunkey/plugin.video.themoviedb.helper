@@ -123,11 +123,18 @@ class PlayerItem():
 
     @property
     def infolabel_uniqueid_tmdb(self):
-        return self.meta.get('UniqueID.tmdb')
+        return self.get_meta_tmdb_id('UniqueID.tmdb')
 
     @property
     def infolabel_uniqueid_tvshow_tmdb(self):
-        return self.meta.get('UniqueID.tvshow.tmdb')
+        return self.get_meta_tmdb_id('UniqueID.tvshow.tmdb')
+
+    def get_meta_tmdb_id(self, key):
+        """TMDb IDs are integers; other add-ons may set values such as whitespace that are missing IDs."""
+        try:
+            return int(self.meta[key])
+        except (KeyError, ValueError, TypeError):
+            return
 
     @cached_property
     def identifier_id(self):

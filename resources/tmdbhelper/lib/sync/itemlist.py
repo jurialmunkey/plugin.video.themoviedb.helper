@@ -140,7 +140,7 @@ class ItemListSyncData(ItemListSyncDataProperties, ItemListSyncDataMethods):
         try:
             return (self.sort_method[0], *self.item_keys)
         except TypeError:  # No sort method
-            return
+            return ()
 
     def get_reverse(self):
         try:

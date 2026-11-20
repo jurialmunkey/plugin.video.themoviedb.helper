@@ -101,6 +101,7 @@ class Tvshow(MediaItem):
             'basemeta_db_art_poster_english_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_poster_null_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_fanart_tvshow': self.config_basemeta_db_tvshow,
+            'basemeta_db_art_extrafanart_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_landscape_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_landscape_country_tvshow': self.config_basemeta_db_tvshow,
             'basemeta_db_art_landscape_language_tvshow': self.config_basemeta_db_tvshow,

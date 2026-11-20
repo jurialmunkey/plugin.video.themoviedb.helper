@@ -166,7 +166,7 @@ class CollectionClient:
         if type(movie_id) is not int or movie_id <= 0:
             raise ValueError(f'Collection {collection_id}: invalid movie ID')
         if release is not None:
-            datetime.strptime(release, '%Y-%m-%d')
+            time.strptime(release, '%Y-%m-%d')
         return movie_id, release
 
     @staticmethod

@@ -48,8 +48,8 @@ class DetailsStoredMetadataCopy:
 class DetailsStoredMetadata:
     """Stored copies of assembled item metadata, so a cold start can skip assembling items.
 
-    Reader threads read stored copies on their own connections and queue new copies. Only
-    the coordinator writes, while no reads are in flight. Saves delete the stored copies
+    Reader threads read stored copies on their own sessions and queue new copies. Only
+    the coordinator writes, on its session, while no reads are in flight. Saves delete the stored copies
     they can change in the same transaction as the item, and every memory cache clear
     also clears the stored copies, so a stored copy is never older than its item.
     """
@@ -87,28 +87,23 @@ class DetailsStoredMetadata:
     def has_work(self):
         return bool(self.pending or self.touched or self.wiping)
 
-    def prepare(self, cursor):
+    def prepare(self):
         """Clear copies built by another add-on version or with other settings."""
-        row = cursor.execute("SELECT data FROM stored_metadata_state WHERE id='fingerprint'").fetchone()
+        row = self.database.fetch_one("SELECT data FROM stored_metadata_state WHERE id='fingerprint'")
         if row is not None and row[0] == self.fingerprint:
             return
-        cursor.execute('BEGIN')
-        try:
-            cursor.execute('DELETE FROM stored_metadata')
-            cursor.execute(
+        with self.database.transaction() as connection:
+            connection.execute('DELETE FROM stored_metadata')
+            connection.execute(
                 "INSERT OR REPLACE INTO stored_metadata_state(id, data) VALUES ('fingerprint', ?)",
                 (self.fingerprint, ))
-            cursor.execute('COMMIT')
-        except BaseException:
-            cursor.execute('ROLLBACK')
-            raise
 
-    def read(self, key, cursor):
+    def read(self, key):
         """Return a stored copy, or None. Copies are not read while a clear is waiting."""
         if self.wiping:
             return
         stored = DetailsStoredMetadataCopy(key)
-        row = cursor.execute('SELECT data, used FROM stored_metadata WHERE id=?', (stored.hash, )).fetchone()
+        row = self.database.fetch_one('SELECT data, used FROM stored_metadata WHERE id=?', (stored.hash, ))
         if row is None:
             return
         if row[1] != self.today:
@@ -144,12 +139,12 @@ class DetailsStoredMetadata:
             self.touched.clear()
             self.wiping = True
 
-    def delete_saved(self, factory, cursor):
+    def delete_saved(self, factory):
         """Delete stored copies that a save can change, inside the save's transaction."""
         if factory.metadata_save_scope != 'family':
-            cursor.execute('DELETE FROM stored_metadata')
+            self.database.execute_sql('DELETE FROM stored_metadata')
             return
-        cursor.execute(
+        self.database.execute_sql(
             'DELETE FROM stored_metadata WHERE family_id=? OR reads_other_items=1',
             (DetailsSavedItemScope(factory.item_id, ()).family_id, ))
 
@@ -163,28 +158,23 @@ class DetailsStoredMetadata:
             for stored in pending
         ]
 
-    def flush(self, cursor):
+    def flush(self):
         """Write queued copies and use dates. Copies of deleted items are skipped."""
         with self.lock:
             wiping = self.wiping
             pending, self.pending = tuple(self.pending.values()), {}
             touched, self.touched = tuple(self.touched), set()
-        cursor.execute('BEGIN')
-        try:
+        with self.database.transaction() as connection:
             if wiping:
-                cursor.execute('DELETE FROM stored_metadata')
-            cursor.executemany(
+                connection.execute('DELETE FROM stored_metadata')
+            connection.executemany(
                 'INSERT OR REPLACE INTO stored_metadata'
                 '(id, item_id, family_id, reads_other_items, data, used) '
                 'SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM baseitem WHERE id=?)',
                 self.get_pending_rows(pending))
-            cursor.executemany(
+            connection.executemany(
                 'UPDATE stored_metadata SET used=? WHERE id=?',
                 [(self.today, stored_hash) for stored_hash in touched])
-            cursor.execute('COMMIT')
-        except BaseException:
-            cursor.execute('ROLLBACK')
-            raise
         if not wiping:
             return
         # Clears and flushes both run on the coordinator thread, so none arrived meanwhile.

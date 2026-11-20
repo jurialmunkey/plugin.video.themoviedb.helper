@@ -3,12 +3,16 @@ from threading import RLock, local
 from traceback import format_exc
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.logger import kodi_log
+from tmdbhelper.lib.files.dbconnection import DatabaseHold
+from tmdbhelper.lib.files.dbworkers import DatabaseWorkerPool
+from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
 from tmdbhelper.lib.items.database.details.apis import DetailsAPIs
 from tmdbhelper.lib.items.database.details.ratings.awards import DetailsRatingsAwards
 from tmdbhelper.lib.items.database.details.ratings.job import DetailsRatingsJob
 from tmdbhelper.lib.items.database.details.ratings.lookup import DetailsRatingsItem, DetailsRatingsLookup
 from tmdbhelper.lib.items.database.details.ratings.memory import DetailsRatingsMemory
 from tmdbhelper.lib.items.database.details.ratings.partial import DetailsRatingsPartial
+from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 from tmdbhelper.lib.sync.providers.ratings_settings import RatingsProviderSettings
 
 
@@ -24,6 +28,9 @@ class DetailsRatingsWorker:
     lane that is never replaced. Every request for an item shares its lookup in progress.
     Ratings are returned first and saved afterwards. Expired ratings are returned at once
     and refreshed on their own lane, so that refreshes never hold up either lane.
+
+    The single-thread monitor, save and refresh lanes hold their connections for their
+    lifetime. The list lane has more threads, so each lookup on it opens its own.
     """
 
     list_workers = 8
@@ -37,10 +44,11 @@ class DetailsRatingsWorker:
         self.memory = DetailsRatingsMemory()
         self.apis = DetailsAPIs()
         self.local = local()
-        self.monitor_lane = ThreadPoolExecutor(max_workers=1, thread_name_prefix='TMDbHelper ratings')
+        self.databases = (ItemDetailsDatabase(), FindQueriesDatabase())
+        self.monitor_lane = DatabaseWorkerPool(self.databases, thread_name_prefix='TMDbHelper ratings')
         self.list_lane = ThreadPoolExecutor(max_workers=self.list_workers, thread_name_prefix='TMDbHelper list ratings')
-        self.saves = ThreadPoolExecutor(max_workers=1, thread_name_prefix='TMDbHelper ratings save')
-        self.refresh_lane = ThreadPoolExecutor(max_workers=1, thread_name_prefix='TMDbHelper ratings refresh')
+        self.saves = DatabaseWorkerPool(self.databases, thread_name_prefix='TMDbHelper ratings save')
+        self.refresh_lane = DatabaseWorkerPool(self.databases, thread_name_prefix='TMDbHelper ratings refresh')
 
     @cached_property
     def awards_database(self):
@@ -135,7 +143,8 @@ class DetailsRatingsWorker:
 
     def lookup(self, job):
         try:
-            return self.get_lookup_ratings(job)
+            with DatabaseHold(*self.databases):
+                return self.get_lookup_ratings(job)
         except Exception:
             kodi_log(f'Item ratings lookup failed for {job.item.key}:\n{format_exc()}', 1)
             raise

@@ -22,10 +22,18 @@ class Router():
     def get_directory(self, items_only=False, build_items=True):
         from tmdbhelper.lib.items.routes import get_container
         container = get_container(self.params.get('info'))(self.handle, self.paramstring, **self.params)
-        container.get_tmdb_id()  # TODO: Only get this as necessary
+        container.get_tmdb_id()  # Containers declare their lookup inputs in tmdb_id_lookup_params
         return container.get_directory(items_only, build_items)
 
     def run(self):
         if self.params.get('info') == 'play':
             return self.play_player()
-        self.get_directory()
+        self.get_held_directory()
+
+    def get_held_directory(self):
+        """The directory reuses its connections for its lifespan; its worker threads open their own."""
+        from tmdbhelper.lib.files.dbconnection import DatabaseHold
+        from tmdbhelper.lib.items.database.database import ItemDetailsDatabase
+        from tmdbhelper.lib.query.database.database import FindQueriesDatabase
+        with DatabaseHold(FindQueriesDatabase(), ItemDetailsDatabase()):
+            self.get_directory()

@@ -138,6 +138,12 @@ TMDbHelper 6.21.3 or later in `addon.xml`.
 
 Providers declare:
 
+- `validate_setup()`: optional interactive validation before the Default/Custom
+  setup dialog. Return `True` to proceed or `False` to stop; the provider owns
+  failure feedback. The inherited default returns `True`, preserving existing
+  providers. Keep network tests here rather than in discovery or
+  `is_authorized()`. This additive hook requires core 6.22.2 and retains
+  interface version 4. It does not gate ordinary feature selectors or sync.
 - `interface_version = 4` explicitly on the Provider class. See
   [Interface versions](#interface-versions) for the supported range and policy.
 - `sync_classes`: sync-type names from `SYNC_FEATURES` to DataType subclasses,
@@ -468,6 +474,26 @@ and the loader rejects provider getters that do not override them.
 filter another getter, such as `shows_in_progress`, inherit `SyncDataGetter` and
 derive both values from their parent getter.
 
+For `SyncDataGetterAll` subclasses, configure query parts through attributes:
+
+- `query_clauses`: WHERE predicates joined with `AND`.
+- `clause_keys`: columns checked with `IS NOT NULL`, joined with `operator` and
+  appended to the WHERE predicates.
+- `query_values`: bound SQL parameter values in placeholder order.
+- `filter_keys`: additional source columns needed by WHERE predicates. These are
+  appended after `additional_keys` in the sync columns and default SELECT output;
+  they do not add WHERE predicates.
+- `query_keys`: SELECT columns or expressions. Declare fixed values directly as
+  a class attribute; use `get_query_keys()` when constructing them requires
+  instance configuration. By default, these are the columns in `keys`.
+- `query_grouping`: expressions after `GROUP BY`, or `None` to omit grouping.
+- `query_ordering`: expressions after `ORDER BY`, or `None` to omit ordering.
+
+Do not override `get_clause()`. The base implementation assembles the WHERE
+predicates, then appends grouping and ordering when configured. For example,
+`query_ordering = 'season_number, episode_number'` sorts episodes numerically.
+Configure attributes before accessing the cached `clause` or `items` properties.
+
 ## Interface versions
 
 `SyncProviderLoader` accepts providers whose `interface_version` lies between its
@@ -500,6 +526,23 @@ import compatibility with older Trakt modules during the update window. Core
 ignores their `stats_class` registration and never constructs these suppliers.
 Remove this shim once users have updated their Trakt module. The provider
 interface remains version 4; the remaining capabilities are unchanged.
+
+## Sync actions availability
+
+`SyncActionsAvailability` in `tmdbhelper.lib.script.actions.availability` decides
+whether the sync options menu has any actions, using `ActionDiscovery.is_available`:
+an authorized selected provider supplying an item action, or any authorized
+provider supplying service actions. The answer is cached in a window property tied
+to the add-on version and the selected watched, watchlist, and collection providers.
+
+Skins can use `Window(Home).Property(TMDbHelper.SyncActions.IsAvailable)`, which is
+`True` when actions are available and empty otherwise. It replaces the legacy
+`TraktIsAuth` property for this purpose and does not depend on the
+`contextmenu_sync_options` setting. The service publishes it at startup and every
+ten minutes, and again when TMDbHelper settings change the selected providers.
+Signing in or out of a provider without changing those selections is reflected at
+the next ten-minute refresh. Context menu builds also update it whenever they work
+the answer out again.
 
 ## List actions
 

@@ -47,7 +47,6 @@ class ItemDetailsDatabaseAccess(DatabaseAccess):
         self.cache.execute_sql(
             'UPDATE baseitem SET deletion=MAX(deletion, ?) WHERE id=?',
             data=[(deletion, item_id) for item_id in item_ids],
-            connection=self.open_connection,
         )
 
     @cached_property

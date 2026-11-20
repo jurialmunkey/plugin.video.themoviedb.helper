@@ -51,7 +51,7 @@ class ListAiringNextProperties(ListSliceProperties):
         from tmdbhelper.lib.addon.thread import ParallelThread
 
         class ParallelThreadLimited(ParallelThread):
-            max_thread = min((40, ParallelThread.thread_max or 40))
+            thread_max = min((40, ParallelThread.thread_max or 40))
 
         with ParallelThreadLimited(self.seed_items, self.get_threaded_item) as pt:
             item_queue = pt.queue

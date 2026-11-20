@@ -11,6 +11,7 @@ ADDON = KODIPLUGIN._addon
 ADDONPATH = KODIPLUGIN._addon_path
 ADDONNAME = KODIPLUGIN._addon_name
 ADDONDATA = 'special://profile/addon_data/plugin.video.themoviedb.helper/'
+IMAGECACHE = 'special://temp/tmdbhelper/images/'  # Kodi uses special://temp images directly without copying them to its texture cache
 PLUGINPATH = u'plugin://plugin.video.themoviedb.helper/'
 
 get_setting = KODIPLUGIN.get_setting

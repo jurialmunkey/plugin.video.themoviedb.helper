@@ -75,11 +75,14 @@ class MonitorItemDetails(ImageManipulations):
 
     @cached_property
     def infolabel_uniqueid_tmdb(self):
-        return self.get_infolabel('UniqueId(tmdb)') or self.get_infolabel('Property(tmdb_id)')
+        return self.get_infolabel_tmdb_id('UniqueId(tmdb)') or self.get_infolabel_tmdb_id('Property(tmdb_id)')
 
     @cached_property
     def infolabel_uniqueid_tvshow_tmdb(self):
-        return self.get_infolabel('UniqueId(tvshow.tmdb)') or self.get_infolabel('Property(tvshow.tmdb_id)')
+        return (
+            self.get_infolabel_tmdb_id('UniqueId(tvshow.tmdb)')
+            or self.get_infolabel_tmdb_id('Property(tvshow.tmdb_id)')
+        )
 
     @cached_property
     def infolabel_uniqueid_imdb(self):
@@ -292,6 +295,13 @@ class MonitorItemDetails(ImageManipulations):
 
     def get_infolabel(self, info):
         return self.parent.get_infolabel(info, self.position)
+
+    def get_infolabel_tmdb_id(self, info):
+        """TMDb IDs are integers; other add-ons may set values such as whitespace that are missing IDs."""
+        try:
+            return int(self.get_infolabel(info))
+        except (ValueError, TypeError):
+            return
 
     @cached_property
     def partial_ratings(self):
