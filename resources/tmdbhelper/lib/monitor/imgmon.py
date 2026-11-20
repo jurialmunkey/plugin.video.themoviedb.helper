@@ -1,6 +1,7 @@
 from functools import partial
 from threading import RLock
 from tmdbhelper.lib.monitor.images import ImageManipulations
+from tmdbhelper.lib.monitor.imagecycle import ImageArtworkCycles
 from tmdbhelper.lib.monitor.imageworkers import ImageManipulationWorkers
 from tmdbhelper.lib.monitor.itemdetails import MonitorItemDetails
 from tmdbhelper.lib.monitor.poller import Poller, POLL_MIN_INCREMENT
@@ -66,6 +67,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
     def __init__(self, parent):
         SafeThread.__init__(self)
+        self.artwork_cycles = ImageArtworkCycles()
         self.reset_current_item()
         self._next_refresh = 0
         self._this_refresh = 0
@@ -145,6 +147,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         # Check if the item has changed before retrieving details again
         if not self.is_same_item(update=True) or not self.is_same_window(update=True):
             self.reset_prewarm()
+            self.artwork_cycles.reset()
             return True
 
         # Set refresh time if not set yet and still on same item
@@ -181,6 +184,7 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
 
         self._this_refresh = 0
         self._next_refresh = 0
+        self.artwork_cycles.advance()
 
         jobs = self.submit_image_manipulations()
 
@@ -200,6 +204,10 @@ class ImagesMonitor(SafeThread, ListItemInfoGetter, ImageManipulations, Poller):
         )
         set_properties = partial(self.set_properties, use_current_window=self.is_current_window_images)
         return self.image_workers.submit(requests, set_properties)
+
+    def get_cycled_artwork(self, key, get_slots, resolve):
+        """ Draw the next image of the cycle kept for the current item """
+        return self.artwork_cycles.get_artwork(key, get_slots, resolve)
 
     def prewarm_artwork(self):
         """ Generate images for the next upcoming item each cycle that the workers are idle """
