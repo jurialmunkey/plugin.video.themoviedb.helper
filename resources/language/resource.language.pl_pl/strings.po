@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-11-10 12:00+0100\n"
+"PO-Revision-Date: 2026-11-20 12:00+0100\n"
 "Last-Translator: 3vtv\n"
 "Language-Team: POLISH\n"
 "Language: pl_PL\n"
@@ -3594,3 +3594,13 @@ msgstr "Brak pozycji możliwych do odtworzenia."
 msgctxt "#32770"
 msgid "Browse next episodes"
 msgstr "Przeglądaj następne odcinki"
+
+#: /resources/settings.xml
+msgctxt "#32771"
+msgid "Extra fanart slots to cycle"
+msgstr "Dodatkowe sloty fanartów do wyświetlania cyklicznego"
+
+#: /resources/settings.xml
+msgctxt "#32772"
+msgid "Choose which extra fanart slots (fanart1 to fanart9) are included when cycling image sources such as Art(fanart{x}). The main fanart is always included."
+msgstr "Wybierz, które dodatkowe sloty fanartów (fanart1 do fanart9) mają być uwzględnione podczas cyklicznego wyświetlania źródeł obrazów, takich jak Art(fanart{x}). Główny fanart jest zawsze uwzględniany."
