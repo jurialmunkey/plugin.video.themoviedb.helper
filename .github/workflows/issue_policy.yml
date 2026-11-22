@@ -1,0 +1,167 @@
+name: Issue policy
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: issue-policy-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate issue form
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check bug report or feature request
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issueParams = { owner, repo, issue_number: context.payload.issue.number };
+            const { data: issue } = await github.rest.issues.get(issueParams);
+            if (issue.state !== 'open') return;
+
+            const updated = 'I have updated TMDbHelper to the most recent version.';
+            const readPolicy = 'I have read the [AI usage policy](https://github.com/jurialmunkey/plugin.video.themoviedb.helper/blob/nexus/AI_USAGE.md).';
+            const debugLog = 'Debug log';
+            // Keep the required labels and checklist text in sync with .github/ISSUE_TEMPLATE.
+            const forms = [
+              {
+                name: 'Bug report',
+                fields: ['Describe the bug', 'Steps To Reproduce', debugLog],
+                checklist: [
+                  'I have searched the issues and this bug has not been reported.',
+                  updated,
+                  'I have described the bug and included steps to reproduce the issue',
+                  'I have uploaded my debug log.',
+                  readPolicy,
+                ],
+              },
+              {
+                name: 'Feature request',
+                fields: ["Describe the feature that you'd like", 'Why is this feature needed? What problem does it solve?'],
+                checklist: [
+                  'I have searched the issues and this feature has not been requested.',
+                  updated,
+                  readPolicy,
+                ],
+              },
+            ];
+
+            const sections = new Map();
+            let section;
+            let fence;
+            const body = (issue.body ?? '').replace(/<!--[\s\S]*?(?:-->|$)/g, '');
+            for (const line of body.split(/\r?\n/)) {
+              const fenceMatch = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+              if (fenceMatch) {
+                const [, delimiter, suffix] = fenceMatch;
+                if (!fence && (delimiter[0] === '~' || !suffix.includes('`'))) {
+                  fence = delimiter;
+                  continue;
+                }
+                if (fence && delimiter.startsWith(fence) && !suffix.trim()) {
+                  fence = undefined;
+                  continue;
+                }
+              }
+              const heading = !fence && line.match(/^ {0,3}#{1,3}[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$/);
+              if (heading) {
+                section = [];
+                sections.set(heading[1].toLowerCase(), section);
+              } else if (section) {
+                section.push({ text: line, fenced: Boolean(fence) });
+              }
+            }
+
+            const getSection = (title, includeCode = false) => (sections.get(title.toLowerCase()) ?? [])
+              .filter(line => includeCode || !line.fenced)
+              .map(line => line.text);
+            const hasAnswer = lines => {
+              const text = lines.join('').replace(/[\p{P}\p{S}\s]/gu, '');
+              return !/^(?:noresponse|na|none|tbd)?$/i.test(text);
+            };
+            const checked = new Set(getSection('Checklist').flatMap(line => {
+              const match = line.match(/^ {0,3}[-*+]\s+\[[xX]\]\s+(.+?)\s*$/);
+              return match ? [match[1]] : [];
+            }));
+            const hasLogLink = text => (text.match(/https:\/\/[^\s<>()\[\]`]+/gi) ?? []).some(value => {
+              const url = URL.parse(value.replace(/[.,]+$/, ''));
+              if (url?.origin === 'https://paste.kodi.tv') return /^\/[a-z\d][a-z\d._-]*$/i.test(url.pathname);
+              const attachment = /^\/(?:user-attachments|[^/]+\/[^/]+)\/files\/\d+\/[^/]+\.(?:log(?:\.old)?|txt|zip|gz|tgz)$/i;
+              return url?.origin === 'https://github.com' && attachment.test(url.pathname);
+            });
+
+            const results = forms.map(form => {
+              const failures = [];
+              for (const title of form.fields) {
+                if (title === debugLog) {
+                  if (!hasLogLink(getSection(title).join('\n'))) {
+                    failures.push('Add a [Kodi paste link](https://paste.kodi.tv/) or attach the full Kodi log under **Debug log**.');
+                  }
+                } else if (!hasAnswer(getSection(title, true))) {
+                  failures.push(`Fill in **${title}**.`);
+                }
+              }
+              const unchecked = form.checklist.filter(item => !checked.has(item));
+              if (unchecked.length) {
+                failures.push(`Check the required items under **Checklist**:\n${unchecked.map(item => `  - ${item}`).join('\n')}`);
+              }
+              const matchedFields = form.fields.filter(title => sections.has(title.toLowerCase())).length;
+              return { name: form.name, failures, matchedFields };
+            });
+            const valid = results.some(result => !result.failures.length);
+
+            const label = 'needs-info';
+            const hasLabel = issue.labels.some(item => item.name === label);
+            if (valid && !hasLabel) return;
+
+            if (!valid && !hasLabel) {
+              const labelParams = { owner, repo, name: label };
+              try {
+                await github.rest.issues.getLabel(labelParams);
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                try {
+                  await github.rest.issues.createLabel({
+                    ...labelParams,
+                    color: 'fbca04',
+                    description: 'The issue policy found missing information.',
+                  });
+                } catch (error) {
+                  if (error.status !== 422) throw error;
+                  await github.rest.issues.getLabel(labelParams);
+                }
+              }
+              await github.rest.issues.addLabels({ ...issueParams, labels: [label] });
+            }
+
+            const marker = '<!-- tmdbhelper-issue-policy -->';
+            const comments = await github.paginate(github.rest.issues.listComments, { ...issueParams, per_page: 100 });
+            const existing = comments.find(comment =>
+              comment.user?.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
+            );
+            if (valid) {
+              if (existing) await github.rest.issues.deleteComment({ owner, repo, comment_id: existing.id });
+              await github.rest.issues.removeLabel({ ...issueParams, name: label });
+              return;
+            }
+
+            const [closest, other] = results.toSorted((a, b) => b.matchedFields - a.matchedFields);
+            const chooser = `${context.serverUrl}/${owner}/${repo}/issues/new/choose`;
+            const guidance = closest.matchedFields > other.matchedFields
+              ? `The **${closest.name}** form is missing the following:\n\n${closest.failures.map(item => `- ${item}`).join('\n')}`
+              : `Please use either the **Bug report** or **Feature request** form and complete its required fields.`;
+            const comment = `${marker}\n## Issue policy\n\n${guidance}\n\n`
+              + `See the [issue forms](${chooser}) for the required sections. Editing this issue will rerun the check.`;
+
+            if (!existing) {
+              await github.rest.issues.createComment({ ...issueParams, body: comment });
+            } else if (existing.body !== comment) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body: comment });
+            }
