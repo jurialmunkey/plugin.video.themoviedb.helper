@@ -102,7 +102,7 @@ class RatingsProviderEntry:
         return self.get_state()
 
     def get_state(self):
-        if self.stored_expiry is None:
+        if self.stored_expiry is None or not self.stored_values:
             return 'missing'
         if self.stored_expiry >= self.level.current_time:
             return 'fresh'
