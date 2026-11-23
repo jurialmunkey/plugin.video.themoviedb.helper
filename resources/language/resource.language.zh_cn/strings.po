@@ -3592,3 +3592,14 @@ msgstr "未找到可播放的项目。"
 msgctxt "#32770"
 msgid "Browse next episodes"
 msgstr "浏览下一集"
+
+
+#: /resources/settings.xml
+msgctxt "#32771"
+msgid "Extra fanart slots to cycle"
+msgstr "轮播的额外背景图位"
+
+#: /resources/settings.xml
+msgctxt "#32772"
+msgid "Choose which extra fanart slots (fanart1 to fanart9) are included when cycling image sources such as Art(fanart{x}). The main fanart is always included."
+msgstr "选择轮播图像来源（如 Art(fanart{x})）时包含哪些额外背景图位（fanart1 至 fanart9）。主背景图始终包含。"
