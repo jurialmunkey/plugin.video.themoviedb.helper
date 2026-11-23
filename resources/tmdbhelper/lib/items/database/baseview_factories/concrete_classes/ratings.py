@@ -1,6 +1,7 @@
 from threading import Lock
 from jurialmunkey.ftools import cached_property
 from tmdbhelper.lib.addon.consts import DAY_IN_SECONDS
+from tmdbhelper.lib.files.dbdata import DatabaseStatements
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.baseclass import BaseList
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.ratings_entries import (
     RatingsProviderEntry,
@@ -237,19 +238,29 @@ class RatingsDict(BaseList):
 
     def save_online_ratings(self):
         """ Replace the saved values of each provider retrieved online, in one transaction.
-        Saving does not wait for item details: the placeholder row never replaces them """
-        with self.cache.transaction():
-            self.set_or_update_null_cached_list_values('baseitem', self.placeholder_keys, self.placeholder_values)
+        The placeholder preserves any existing item details. Use the transaction connection
+        so that a failed statement triggers rollback.
+        """
+        with self.cache.transaction() as connection:
+            connection.execute(
+                DatabaseStatements.insert_or_update_if_null('baseitem', self.placeholder_keys),
+                self.placeholder_values,
+            )
             for entry in self.unsaved_entries:
-                self.save_entry(entry)
-            self.set_cached_deletion((self.item_id, ), self.deletion)  # Keep the item while its ratings can be shown
+                self.save_entry(connection, entry)
+            connection.execute(
+                'UPDATE baseitem SET deletion=MAX(deletion, ?) WHERE id=?',
+                (self.deletion, self.item_id),
+            )
 
-    def save_entry(self, entry):
+    def save_entry(self, connection, entry):
         """ Keys that the provider no longer returns are removed with its previous values """
-        self.cache.del_list_values(
-            self.table, values=entry.key, conditions='id=? AND provider=?')
-        self.set_cached_list_values(self.table, self.keys, entry.saved_rows, overwrite=True)
-        self.set_cached_list_values(self.provider_table, self.provider_keys, entry.saved_expiry_row, overwrite=True)
+        connection.execute(DatabaseStatements.delete_item(self.table, 'id=? AND provider=?'), entry.key)
+        connection.executemany(DatabaseStatements.insert_or_replace(self.table, self.keys), entry.saved_rows)
+        connection.execute(
+            DatabaseStatements.insert_or_replace(self.provider_table, self.provider_keys),
+            entry.saved_expiry_row,
+        )
 
 
 class RatingsSeasonsDict(RatingsDict):

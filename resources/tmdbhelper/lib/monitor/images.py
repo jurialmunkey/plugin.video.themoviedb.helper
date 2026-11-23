@@ -3,15 +3,16 @@ import io
 import xbmcvfs
 import colorsys
 import hashlib
-import random
 import re
-from xbmc import getCacheThumbName, skinHasImage, Monitor, sleep
-from tmdbhelper.lib.addon.plugin import get_infolabel, get_setting, get_condvisibility, ADDONDATA
+from functools import partial
+from xbmc import skinHasImage, Monitor
+from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, IMAGECACHE, ADDON
+from tmdbhelper.lib.monitor.imagecycle import ImageArtworkCycle
 from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
 from tmdbhelper.lib.addon.thread import SafeThread
-import urllib.request as urllib
+from urllib.parse import quote
 from tmdbhelper.lib.addon.logger import kodi_log
 
 CROPIMAGE_SOURCE = "Art(artist.clearlogo)|Art(tvshow.clearlogo)|Art(clearlogo)"
@@ -21,6 +22,19 @@ ARTWORK_LOOKUP_TABLE = {
     'fanart': ['Art(fanart)', 'Art(thumb)'],
     'landscape': ['Art(landscape)', 'Art(fanart)', 'Art(thumb)'],
     'thumb': ['Art(thumb)']}
+
+# Extra artwork slots that can be enabled in settings mapped to their x position in e.g. "Art(fanart{x})"
+EXTRAFANART_SLOTS = {
+    'fanart1': 1,
+    'fanart2': 2,
+    'fanart3': 3,
+    'fanart4': 4,
+    'fanart5': 5,
+    'fanart6': 6,
+    'fanart7': 7,
+    'fanart8': 8,
+    'fanart9': 9,
+}
 
 # PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
 # Lazy import PIL to avoid using it unless user requires ImageFunctions
@@ -79,7 +93,7 @@ def _add_corners(image, destination, radius=40, aa_factor=4):
     alpha.paste(circle.crop((radius, radius, diameter, diameter)), (w - radius, h - radius))
     image.putalpha(alpha)
 
-    _saveimage(image, destination)
+    _saveimage_png(image, destination)
     image.close()
 
 
@@ -109,92 +123,71 @@ def _add_tile(image, destination):
     image_flip = image_flip.transpose(Image.FLIP_TOP_BOTTOM)
     image_tile.paste(image_flip, (0, 0))
 
-    _saveimage(image_tile, destination)
+    _saveimage_jpeg(image_tile, destination)
 
     image_flip.close()
     image_tile.close()
 
 
-def _closeimage(image, targetfile=None):
-    image.close()
-    if not targetfile:
-        return
-    xbmcvfs.delete(targetfile)
+def _get_wrapped_image(image):
+    """ Wrap source in image:// so that opening it caches the source in Kodi's texture cache """
+    if image.startswith('image://'):
+        return image
+    return f'image://{quote(image, safe="")}/'
 
 
-def _openimage(image, targetpath, filename):
-    """ Open image helper with thanks to sualfred """
-    # some paths require unquoting to get a valid cached thumb hash
-    cached_image_path = urllib.unquote(image.replace('image://', ''))
-    if cached_image_path.endswith('/'):
-        cached_image_path = cached_image_path[:-1]
-
-    cached_files = []
-    for path in [getCacheThumbName(cached_image_path), getCacheThumbName(image)]:
-        cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.jpg'))
-        cached_files.append(os.path.join('special://profile/Thumbnails/', path[0], path[:-4] + '.png'))
-        cached_files.append(os.path.join('special://profile/Thumbnails/Video/', path[0], path))
-
-    for i in range(1, 4):
-        try:
-            ''' Try to get cached image at first
-            '''
-            for cache in cached_files:
-                if xbmcvfs.exists(cache):
-                    try:
-                        img = _imageopen(xbmcvfs.translatePath(cache))
-                        return (img, None)
-
-                    except Exception as error:
-                        kodi_log('Image error: Could not open cached image --> %s' % error, 2)
-
-            ''' Skin images will be tried to be accessed directly. For all other ones
-                the source will be copied to the addon_data folder to get access.
-            '''
-            if skinHasImage(image):
-                if '://' not in image and not os.path.isabs(image):
-                    image = os.path.join('special://skin/media/', image)
-
-                try:  # in case image is packed in textures.xbt
-                    img = _imageopen(xbmcvfs.translatePath(image))
-                    return (img, None)
-
-                except Exception:
-                    return ('', None)
-
-            else:
-                targetfile = os.path.join(targetpath, f'temp_{filename}')  # Use temp file to avoid Kodi writing early
-                if not xbmcvfs.exists(targetfile):
-                    xbmcvfs.copy(image, targetfile)
-
-                img = _imageopen(targetfile)
-                return (img, targetfile)
-
-        except Exception as error:
-            kodi_log('Image error: Could not get image for %s (try %d) -> %s' % (image, i, error), 2)
-            sleep(500)
-            pass
-
-    return ('', None)
+def _openimage(image):
+    """ Open skin images directly and all other images via Kodi's texture cache """
+    if not skinHasImage(image):
+        return _imageopen(_get_wrapped_image(image))
+    if '://' not in image and not os.path.isabs(image):
+        image = os.path.join('special://skin/media/', image)
+    return _imageopen(xbmcvfs.translatePath(image))
 
 
-def _saveimage(image, targetfile):
+def _get_crop_bbox(img):
+    """ Get bounding box of visible area for cropping """
+    if 'A' in img.getbands():
+        # Visible area is wherever alpha is non-zero
+        return img.getchannel('A').getbbox()
+    try:
+        # Errors with single channel L conversion to RGBa so catch exceptions
+        return img.convert('RGBa').getbbox()
+    except Exception:
+        # If we get a conversion error just try getting bounding box with current channel
+        # We'll probably be okay with single channel texture since Kodi now handles these better
+        return img.getbbox()
+
+
+def _saveimage(image, targetfile, image_format='PNG', **kwargs):
     """ Save image object to disk
     Uses flush() and os.fsync() to ensure file is written to disk before continuing
     Used to prevent Kodi from attempting to cache the image before writing is complete
     """
     with xbmcvfs.File(targetfile, 'wb') as f:
-        image.save(f, 'PNG')
+        image.save(f, image_format, **kwargs)
         # f.flush()
         # os.fsync(f)
 
 
+def _saveimage_jpeg(image, targetfile):
+    """ Save image object without alpha channel as JPEG for faster encoding and decoding """
+    _saveimage(image, targetfile, image_format='JPEG', quality=90)
+
+
+def _saveimage_png(image, targetfile):
+    """ Save image object as PNG with low compression for faster encoding """
+    _saveimage(image, targetfile, image_format='PNG', compress_level=1)
+
+
 class ImageFunctions(SafeThread, WindowPropertySetter):
-    save_path = f"{get_setting('image_location', 'str') or ADDONDATA}{{}}/"
+    save_path = f'{IMAGECACHE}{{}}/'
     blur_size = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Size)')) or 480
     crop_size = (800, 310)
     radius = try_int(get_infolabel('Skin.String(TMDbHelper.Blur.Radius)')) or 40
     corner = try_int(get_infolabel('Skin.String(TMDbHelper.Corner.Radius)')) or 20
+    blur_scale = max(1, min(4, radius // 10))  # Heavy blurs are processed at reduced size then scaled back up
+    blur_work_size = blur_size // blur_scale
 
     def __init__(self, method=None, artwork=None, is_thread=True, prefix='ListItem'):
         if is_thread:
@@ -205,22 +198,22 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         self.save_prop = None
         if method == 'blur':
             self.func = self.blur
-            self.save_path = make_path(self.save_path.format('blur_v3'))
+            self.save_path = make_path(self.save_path.format('blur'))
             self.save_prop = f'{prefix}.BlurImage'
             self.save_orig = True
         elif method == 'crop':
             self.func = self.crop
-            self.save_path = make_path(self.save_path.format('crop_v2'))
+            self.save_path = make_path(self.save_path.format('crop'))
             self.save_prop = f'{prefix}.CropImage'
             self.save_orig = True
         elif method == 'desaturate':
             self.func = self.desaturate
-            self.save_path = make_path(self.save_path.format('desaturate_v2'))
+            self.save_path = make_path(self.save_path.format('desaturate'))
             self.save_prop = f'{prefix}.DesaturateImage'
             self.save_orig = True
         elif method == 'colors':
             self.func = self.colors
-            self.save_path = make_path(self.save_path.format('colors_v2'))
+            self.save_path = make_path(self.save_path.format('colors'))
             self.save_prop = f'{prefix}.Colors'
 
     def run(self):
@@ -248,18 +241,11 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # Used to do os.utime(destination, None) on existing here
-                img, targetfile = _openimage(source, self.save_path, filename)
-                try:
-                    # Errors with single channel L conversion to RGBa so catch exceptions
-                    img_rgba = img.convert('RGBa')
-                    img = img.crop(img_rgba.getbbox())
-                except Exception:
-                    # If we get a conversion error just try getting bounding box with current channel
-                    # We'll probably be okay with single channel texture since Kodi now handles these better
-                    img = img.crop(img.getbbox())
+                img = _openimage(source)
+                img = img.crop(_get_crop_bbox(img))
                 img.thumbnail(self.crop_size)
-                _saveimage(img, destination)
-                _closeimage(img, targetfile)
+                _saveimage_png(img, destination)
+                img.close()
 
             return destination
 
@@ -275,11 +261,13 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         tile_destination = os.path.join(self.save_path, f'{filename}-tiled.jpg')
         try:
             if not xbmcvfs.exists(destination) or (diffuse_destination and not xbmcvfs.exists(diffuse_destination)):  # os.utime(destination, None)
-                img, targetfile = _openimage(source, self.save_path, filename)
-                img.thumbnail((self.blur_size, self.blur_size))
+                img = _openimage(source)
+                img.draft(None, (self.blur_work_size, self.blur_work_size))  # JPEG sources decode directly at reduced scale
+                img.thumbnail((self.blur_work_size, self.blur_work_size))
                 img = img.convert('RGB')
-                img = img.filter(ImageFilter.GaussianBlur(self.radius))
-                _saveimage(img, destination)
+                img = img.filter(ImageFilter.GaussianBlur(self.radius / self.blur_scale))
+                img = img.resize((img.width * self.blur_scale, img.height * self.blur_scale), Image.BILINEAR)
+                _saveimage_jpeg(img, destination)
 
                 if diffuse_destination:
                     _add_corners(img, diffuse_destination, radius=self.corner)
@@ -287,7 +275,7 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
                 if tile_destination:
                     _add_tile(img, tile_destination)
 
-                _closeimage(img, targetfile)
+                img.close()
 
             return destination
 
@@ -300,10 +288,10 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         destination = os.path.join(self.save_path, filename)
         try:
             if not xbmcvfs.exists(destination):  # os.utime(destination, None)
-                img, targetfile = _openimage(source, self.save_path, filename)
+                img = _openimage(source)
                 img = img.convert('LA')
-                _saveimage(img, destination)
-                _closeimage(img, targetfile)
+                _saveimage_png(img, destination)
+                img.close()
 
             return destination
 
@@ -377,54 +365,53 @@ class ImageFunctions(SafeThread, WindowPropertySetter):
         self.get_property(propname, set_property=end_hex)
         return end_hex
 
-    @lazyimport_pil
     def colors(self, source):
+        colors = self.get_colors(source)
+        if not colors:
+            return ''
+        self.set_colors_properties(*colors)
+        return colors[0]
+
+    @lazyimport_pil
+    def get_colors(self, source):
+        """ Returns main and complementary colors of image as hex values """
         filename = f'{md5hash(source)}.png'
         destination = self.save_path + filename
-        targetfile = None
 
         try:
             if xbmcvfs.exists(destination):  # os.utime(destination, None)
                 img = _imageopen(xbmcvfs.translatePath(destination))
             else:
-                img, targetfile = _openimage(source, self.save_path, filename)
+                img = _openimage(source)
                 img.thumbnail((128, 128))
                 img = img.convert('RGB')
-                _saveimage(img, destination)
+                _saveimage_png(img, destination)
 
             maincolor_rgb = self.get_maincolor(img)
             maincolor_hex = self.rgb_to_hex(*self.get_color_lumsat(*maincolor_rgb))
             compcolor_rgb = self.get_compcolor(*maincolor_rgb)
             compcolor_hex = self.rgb_to_hex(*self.get_color_lumsat(*compcolor_rgb))
 
-            maincolor_propname = self.save_prop + '.Main'
-            maincolor_propchek = self.save_prop + '.MainCheck'
-            maincolor_propvalu = self.get_property(maincolor_propname)
-            if not maincolor_propvalu:
-                self.get_property(maincolor_propname, set_property=maincolor_hex)
-            else:
-                self.get_property(maincolor_propchek, set_property=maincolor_propvalu)
-                thread_maincolor = SafeThread(target=self.set_prop_colorgradient, args=[
-                    maincolor_propname, maincolor_propvalu, maincolor_hex, maincolor_propchek])
-                thread_maincolor.start()
-
-            compcolor_propname = self.save_prop + '.Comp'
-            compcolor_propchek = self.save_prop + '.CompCheck'
-            compcolor_propvalu = self.get_property(compcolor_propname)
-            if not compcolor_propvalu:
-                self.get_property(compcolor_propname, set_property=compcolor_hex)
-            else:
-                self.get_property(compcolor_propchek, set_property=compcolor_propvalu)
-                thread_compcolor = SafeThread(target=self.set_prop_colorgradient, args=[
-                    compcolor_propname, compcolor_propvalu, compcolor_hex, compcolor_propchek])
-                thread_compcolor.start()
-
-            _closeimage(img, targetfile)
-            return maincolor_hex
+            img.close()
+            return (maincolor_hex, compcolor_hex)
 
         except Exception as exc:
             kodi_log(exc, 1)
-            return ''
+            return
+
+    def set_colors_properties(self, maincolor_hex, compcolor_hex):
+        self.set_color_property(f'{self.save_prop}.Main', maincolor_hex)
+        self.set_color_property(f'{self.save_prop}.Comp', compcolor_hex)
+
+    def set_color_property(self, propname, color_hex):
+        """ Set color immediately if unset otherwise fade from current color in background """
+        current_hex = self.get_property(propname)
+        if not current_hex:
+            self.get_property(propname, set_property=color_hex)
+            return
+        checkprop = f'{propname}Check'
+        self.get_property(checkprop, set_property=current_hex)
+        SafeThread(target=self.set_prop_colorgradient, args=[propname, current_hex, color_hex, checkprop]).start()
 
 
 class ImageArtworkGetter():
@@ -480,38 +467,21 @@ class ImageArtworkGetter():
         return next((j for j in (self.get_artwork_item(i, prebuilt=True) for i in self.infolabels) if j), None)
 
     def get_artwork_item(self, item, prebuilt=False):
-
-        def _get_artwork_item(i, x=''):
-            if not prebuilt:
-                return self._parent.get_infolabel(i.format(x=x))
-            if not i.startswith('art('):
-                return
-            return self.built_artwork.get(i.format(x=x)[4:-1])
-
-        # Check if we're getting a random x position item e.g. "Art(fanart{x})"
+        # Check if we're getting a cycled x position item e.g. "Art(fanart{x})"
         if '{x}' not in item:
-            return _get_artwork_item(item)
+            return self.get_artwork_slot(item, prebuilt=prebuilt)
+        return self._parent.get_cycled_artwork(
+            (item, prebuilt),
+            self._parent.get_extrafanart_slots,
+            partial(self.get_artwork_slot, item, prebuilt=prebuilt),
+        )
 
-        # If we cant get the base item e.g. "Art(fanart)" then unlikely we have extra art so exit now
-        artwork0 = _get_artwork_item(item)
-        if not artwork0:
+    def get_artwork_slot(self, item, x='', prebuilt=False):
+        if not prebuilt:
+            return self._parent.get_infolabel(item.format(x=x))
+        if not item.startswith('art('):
             return
-
-        # If we can't get the first extra item e.g. "Art(fanart1)" then unlikely we'd have "Art(fanart2)" etc. so just return "Art(fanart)"
-        artwork1 = _get_artwork_item(item, x=1)
-        if not artwork1:
-            return artwork0
-
-        # Build a list of available artworks that the item has
-        artworks = [artwork0, artwork1]
-        for x in range(2, 9):
-            artwork = _get_artwork_item(item, x=x)
-            if not artwork:
-                break
-            artworks.append(artwork)
-
-        # Then choose an artwork from the available artworks list at random
-        return random.choice(artworks)
+        return self.built_artwork.get(item.format(x=x)[4:-1])
 
 
 class ImageManipulations(WindowPropertySetter):
@@ -523,6 +493,17 @@ class ImageManipulations(WindowPropertySetter):
 
     def get_builtartwork(self):
         return
+
+    def get_extrafanart_slots(self):
+        """ Base slot is always included followed by the extra slots enabled in settings """
+        return (
+            '',
+            *(EXTRAFANART_SLOTS[i] for i in ADDON.getSettings().getStringList('service_extrafanart_slots')),
+        )
+
+    def get_cycled_artwork(self, key, get_slots, resolve):
+        """ Without a kept cycle each request draws the first available image of a fresh shuffle """
+        return ImageArtworkCycle(get_slots).get_next(resolve)
 
     def get_artwork(self, source='', build_fallback=False, built_artwork=None):
         source = source or ''
@@ -542,10 +523,16 @@ class ImageManipulations(WindowPropertySetter):
         variable = re.fullmatch(r'\$SKINVAR\[([^\[\],]+)\]', fallback or '')
         return get_infolabel(f'$VAR[{variable[1]}]') if variable else fallback
 
-    def get_image_manipulations(self, use_winprops=False, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', )):
-        images = {}
+    def get_image_manipulation_requests(self, built_artwork=None, allow_list=('crop', 'blur', 'desaturate', 'colors', )):
+        """ Source image for each manipulation that is allowed and enabled by the skin """
+        return {
+            i['method']: i['images']()
+            for i in self.get_image_manipulation_configs(built_artwork)
+            if i['method'] in allow_list and i['active']()
+        }
 
-        _manipulations = (
+    def get_image_manipulation_configs(self, built_artwork=None):
+        return (
             {'method': 'crop',
                 'active': lambda: get_condvisibility("Skin.HasSetting(TMDbHelper.EnableCrop)"),
                 'images': lambda: self.get_artwork(
@@ -573,19 +560,3 @@ class ImageManipulations(WindowPropertySetter):
                     build_fallback=True,
                     built_artwork=built_artwork)
                 or self.get_property('Colors.Fallback')},)
-
-        for i in _manipulations:
-            if i['method'] not in allow_list:
-                continue
-            if not i['active']():
-                continue
-            imgfunc = ImageFunctions(method=i['method'], is_thread=False, artwork=i['images']())
-
-            output = imgfunc.func(imgfunc.image)
-            images[f'{i["method"]}image'] = output
-            images[f'{i["method"]}image.original'] = imgfunc.image
-
-            if use_winprops:
-                imgfunc.set_properties(output)
-
-        return images

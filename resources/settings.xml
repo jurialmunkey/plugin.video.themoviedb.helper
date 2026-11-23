@@ -968,6 +968,29 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
+                <setting id="service_extrafanart_slots" type="list[string]" label="32771" help="32772">
+                    <level>0</level>
+                    <default>fanart1|fanart2|fanart3|fanart4|fanart5|fanart6|fanart7|fanart8|fanart9</default>
+                    <constraints>
+                        <options>
+                            <option>fanart1</option>
+                            <option>fanart2</option>
+                            <option>fanart3</option>
+                            <option>fanart4</option>
+                            <option>fanart5</option>
+                            <option>fanart6</option>
+                            <option>fanart7</option>
+                            <option>fanart8</option>
+                            <option>fanart9</option>
+                        </options>
+                        <delimiter>|</delimiter>
+                        <minimumitems>0</minimumitems>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>32771</heading>
+                        <multiselect>true</multiselect>
+                    </control>
+                </setting>
             </group>
             <group id="2" label="32732">
                 <setting id="dummy_duration" type="string" label="32352" help="32687">
@@ -1046,19 +1069,6 @@
                     </constraints>
                     <control type="button" format="path">
                         <heading>32409</heading>
-                    </control>
-                </setting>
-                <setting id="image_location" type="path" label="32472" help="32694">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <sources>
-                            <source>files</source>
-                        </sources>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="button" format="path">
-                        <heading>32472</heading>
                     </control>
                 </setting>
                 <setting id="image_cache_size" type="integer" label="32564" help="32565">

@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 
 
 class ListSearchDir(ContainerDirectory):
+    tmdb_id_lookup_params = ()  # Search history entries do not resolve a tmdb_id
 
     @staticmethod
     def get_searchdir(tmdb_type, clear_cache_item=True, append_type=False, **kwargs):  # list_searchdir
@@ -119,6 +120,7 @@ class ListSearchProperties(ListStandardProperties):
 class ListSearch(ListStandard):
 
     list_properties_class = ListSearchProperties
+    tmdb_id_lookup_params = ()  # The query is search text, not an item to resolve to a tmdb_id
 
     def configure_list_properties(self, list_properties):
         list_properties = super().configure_list_properties(list_properties)
