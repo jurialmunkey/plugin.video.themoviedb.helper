@@ -13,10 +13,22 @@ class TMDbImagePath:
         quality = get_setting(f'artwork_quality_{artwork_type}', 'int')
         return self.artwork_quality if quality == -1 else quality
 
+    def get_artwork_quality_poster_auto(self):
+        from tmdbhelper.lib.addon.consts import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_SMALLPOSTER
+        if self.is_small_gui:
+            return IMAGEPATH_SMALLPOSTER
+        return IMAGEPATH_QUALITY_POSTER[self.artwork_quality]
+
+    def get_artwork_quality_poster(self):
+        from tmdbhelper.lib.addon.consts import IMAGEPATH_QUALITY_POSTER, IMAGEPATH_QUALITY_POSTER_AUTO
+        quality = self.get_artwork_quality('poster')
+        if quality == IMAGEPATH_QUALITY_POSTER_AUTO:
+            return self.get_artwork_quality_poster_auto()
+        return IMAGEPATH_QUALITY_POSTER[quality]
+
     @cached_property
     def artwork_quality_poster(self):
-        from tmdbhelper.lib.addon.consts import IMAGEPATH_QUALITY_POSTER
-        return IMAGEPATH_QUALITY_POSTER[self.get_artwork_quality('poster')]
+        return self.get_artwork_quality_poster()
 
     @cached_property
     def artwork_quality_fanart(self):
@@ -32,6 +44,15 @@ class TMDbImagePath:
     def artwork_quality_clogos(self):
         from tmdbhelper.lib.addon.consts import IMAGEPATH_QUALITY_CLOGOS
         return IMAGEPATH_QUALITY_CLOGOS[self.artwork_quality]
+
+    @cached_property
+    def is_small_gui(self):
+        return self.get_is_small_gui()
+
+    def get_is_small_gui(self):
+        from xbmcgui import getScreenHeight
+        from tmdbhelper.lib.addon.consts import IMAGEPATH_SMALL_MAXHEIGHT
+        return getScreenHeight() <= IMAGEPATH_SMALL_MAXHEIGHT
 
     @cached_property
     def artwork_quality_origin(self):

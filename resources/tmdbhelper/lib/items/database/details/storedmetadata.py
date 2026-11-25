@@ -73,13 +73,16 @@ class DetailsStoredMetadata:
         return self.get_fingerprint()
 
     def get_fingerprint(self):
-        """Only the settings read while assembling items change what stored copies contain."""
+        """Only the settings read while assembling items change what stored copies contain,
+        and the GUI size when auto image sizes pick small images for it."""
         from tmdbhelper.lib.addon.plugin import get_version
+        from tmdbhelper.lib.api.tmdb.images import TMDbImagePath
         from tmdbhelper.lib.items.database.details.settings import DetailsSettings
         state = {
             'version': get_version(),
             'format_version': self.format_version,
             'settings': DetailsSettings().get_stored_metadata_snapshot(),
+            'small_gui': TMDbImagePath().is_small_gui,
         }
         return sha1(json.dumps(state, sort_keys=True).encode('utf-8')).hexdigest()
 

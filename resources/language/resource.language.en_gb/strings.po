@@ -3583,3 +3583,8 @@ msgstr ""
 msgctxt "#32772"
 msgid "Choose which extra fanart slots (fanart1 to fanart9) are included when cycling image sources such as Art(fanart{x}). The main fanart is always included."
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32773"
+msgid "Choose the resolution of TMDb posters and actor portraits, or use the default image quality setting. Auto uses low quality when Kodi renders its interface at 1080 lines or less, and the default image quality above that."
+msgstr ""
