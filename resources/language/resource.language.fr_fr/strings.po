@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-10-26 17:05+0000\n"
-"PO-Revision-Date: 2026-11-06 12:00+0100\n"
+"PO-Revision-Date: 2026-11-19 12:00+0100\n"
 "Last-Translator: Sch-Caseb\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -110,7 +110,7 @@ msgstr "Anglais (Canada)"
 
 msgctxt "#32022"
 msgid "Clear sync data"
-msgstr "Effacer les données de synchronisation"
+msgstr "Effacer les données de synchro"
 
 msgctxt "#30015"
 msgid "English (United Kingdom)"
@@ -1382,7 +1382,7 @@ msgstr "Récupération des illustrations"
 
 msgctxt "#32403"
 msgid "Sync"
-msgstr "Synchronisation"
+msgstr "Synchro"
 
 msgctxt "#32387"
 msgid "Delete {} Cache"
@@ -2054,7 +2054,7 @@ msgstr "Lecteur d'épisodes"
 
 msgctxt "#32549"
 msgid "Sync options"
-msgstr "Options de synchronisation"
+msgstr "Options de synchro"
 
 msgctxt "#32550"
 msgid "TMDbHelper Sync Provider"
@@ -2239,10 +2239,6 @@ msgstr "Groupe"
 msgctxt "#32597"
 msgid "Use TMDb numbers, ask for a group, or use the current group. Individual players can override this choice."
 msgstr "Utilise la numérotation TMDb, demande un groupe ou utilise le groupe actuel. Chaque lecteur peut remplacer ce choix."
-
-msgctxt "#32598"
-msgid "Statistics"
-msgstr "Statistiques"
 
 msgctxt "#32599"
 msgid "Choose providers to receive playback activity. Clear all selections to disable scrobbling."
@@ -2551,10 +2547,6 @@ msgstr "Choisissez un fournisseur de liste de suivi, installez-en un ou sélecti
 msgctxt "#32678"
 msgid "Choose a collection provider, install one, or select None to disable collection lists."
 msgstr "Choisissez un fournisseur de collection, installez-en un ou sélectionnez Aucun pour désactiver les listes de collection."
-
-msgctxt "#32679"
-msgid "Choose a statistics provider, install one, or select None to disable statistics lists."
-msgstr "Choisissez un fournisseur de statistiques, installez-en un ou sélectionnez Aucun pour désactiver les listes de statistiques."
 
 msgctxt "#32680"
 msgid "Choose a supported sync provider to install or enable."
@@ -2867,3 +2859,43 @@ msgstr "Basique"
 msgctxt "#32760"
 msgid "Detailed"
 msgstr "Détaillé"
+
+msgctxt "#32761"
+msgid "Show expired widget lists for up to"
+msgstr "Afficher les listes de widgets expirées jusqu'à"
+
+msgctxt "#32762"
+msgid "When a widget's TMDb list is older than its normal 6 hour cache, show the saved list straight away and download the new list after the widget has loaded. The new list appears the next time Kodi reloads the widget. Lists for today, such as Airing Today, always wait for new data. Off waits for new data every time."
+msgstr "Lorsque la liste TMDb d'un widget dépasse son cache normal de 6 heures, affiche immédiatement la liste enregistrée et télécharge la nouvelle liste une fois le widget chargé. La nouvelle liste apparaît au prochain rechargement du widget par Kodi. Les listes du jour, comme « Diffusé aujourd'hui », attendent toujours les nouvelles données. « Désactivé » attend les nouvelles données à chaque fois."
+
+msgctxt "#32763"
+msgid "Off"
+msgstr "Désactivé"
+
+msgctxt "#32764"
+msgid "24 hours"
+msgstr "24 heures"
+
+msgctxt "#32765"
+msgid "48 hours"
+msgstr "48 heures"
+
+msgctxt "#32766"
+msgid "72 hours"
+msgstr "72 heures"
+
+msgctxt "#32767"
+msgid "Play random"
+msgstr "Lecture aléatoire"
+
+msgctxt "#32768"
+msgid "Show an option in the context menu to play a random movie or episode from a folder, choosing from the current page at each level."
+msgstr "Affiche une option dans le menu contextuel pour lire un film ou un épisode au hasard depuis un dossier, en choisissant parmi la page actuelle à chaque niveau."
+
+msgctxt "#32769"
+msgid "No playable items found."
+msgstr "Aucun élément lisible trouvé."
+
+msgctxt "#32770"
+msgid "Browse next episodes"
+msgstr "Parcourir les prochains épisodes"
