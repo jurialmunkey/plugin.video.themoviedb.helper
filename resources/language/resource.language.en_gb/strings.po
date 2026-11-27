@@ -3573,3 +3573,13 @@ msgstr ""
 msgctxt "#32770"
 msgid "Browse next episodes"
 msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32771"
+msgid "Extra fanart slots to cycle"
+msgstr ""
+
+#: /resources/settings.xml
+msgctxt "#32772"
+msgid "Choose which extra fanart slots (fanart1 to fanart9) are included when cycling image sources such as Art(fanart{x}). The main fanart is always included."
+msgstr ""

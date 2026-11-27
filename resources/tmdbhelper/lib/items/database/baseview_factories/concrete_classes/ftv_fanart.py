@@ -1,4 +1,4 @@
-import requests
+from tmdbhelper.lib.api.fanarttv.images import get_imagepath_requoted
 from tmdbhelper.lib.items.database.baseview_factories.concrete_classes.fanart import FanartMediaList
 from tmdbhelper.lib.addon.consts import DATALEVEL_MIN, SQLITE_TRUE
 from tmdbhelper.lib.addon.plugin import get_localized
@@ -27,7 +27,7 @@ class FTVFanartMediaList(FanartMediaList):
         return (self.item_id, self.cached_data_value_type, self.current_time, DATALEVEL_MIN, SQLITE_TRUE)
 
     def image_path_func(self, v):
-        return requests.utils.requote_uri(v)
+        return get_imagepath_requoted(v)
 
     @staticmethod
     def map_label2(i):

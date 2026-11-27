@@ -3,10 +3,11 @@ import io
 import xbmcvfs
 import colorsys
 import hashlib
-import random
 import re
+from functools import partial
 from xbmc import skinHasImage, Monitor
-from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, IMAGECACHE
+from tmdbhelper.lib.addon.plugin import get_infolabel, get_condvisibility, IMAGECACHE, ADDON
+from tmdbhelper.lib.monitor.imagecycle import ImageArtworkCycle
 from jurialmunkey.window import WindowPropertySetter
 from jurialmunkey.parser import try_int, try_float
 from tmdbhelper.lib.files.futils import make_path
@@ -21,6 +22,19 @@ ARTWORK_LOOKUP_TABLE = {
     'fanart': ['Art(fanart)', 'Art(thumb)'],
     'landscape': ['Art(landscape)', 'Art(fanart)', 'Art(thumb)'],
     'thumb': ['Art(thumb)']}
+
+# Extra artwork slots that can be enabled in settings mapped to their x position in e.g. "Art(fanart{x})"
+EXTRAFANART_SLOTS = {
+    'fanart1': 1,
+    'fanart2': 2,
+    'fanart3': 3,
+    'fanart4': 4,
+    'fanart5': 5,
+    'fanart6': 6,
+    'fanart7': 7,
+    'fanart8': 8,
+    'fanart9': 9,
+}
 
 # PIL causes issues (via numpy) on Linux systems using python versions higher than 3.8.5
 # Lazy import PIL to avoid using it unless user requires ImageFunctions
@@ -453,38 +467,21 @@ class ImageArtworkGetter():
         return next((j for j in (self.get_artwork_item(i, prebuilt=True) for i in self.infolabels) if j), None)
 
     def get_artwork_item(self, item, prebuilt=False):
-
-        def _get_artwork_item(i, x=''):
-            if not prebuilt:
-                return self._parent.get_infolabel(i.format(x=x))
-            if not i.startswith('art('):
-                return
-            return self.built_artwork.get(i.format(x=x)[4:-1])
-
-        # Check if we're getting a random x position item e.g. "Art(fanart{x})"
+        # Check if we're getting a cycled x position item e.g. "Art(fanart{x})"
         if '{x}' not in item:
-            return _get_artwork_item(item)
+            return self.get_artwork_slot(item, prebuilt=prebuilt)
+        return self._parent.get_cycled_artwork(
+            (item, prebuilt),
+            self._parent.get_extrafanart_slots,
+            partial(self.get_artwork_slot, item, prebuilt=prebuilt),
+        )
 
-        # If we cant get the base item e.g. "Art(fanart)" then unlikely we have extra art so exit now
-        artwork0 = _get_artwork_item(item)
-        if not artwork0:
+    def get_artwork_slot(self, item, x='', prebuilt=False):
+        if not prebuilt:
+            return self._parent.get_infolabel(item.format(x=x))
+        if not item.startswith('art('):
             return
-
-        # If we can't get the first extra item e.g. "Art(fanart1)" then unlikely we'd have "Art(fanart2)" etc. so just return "Art(fanart)"
-        artwork1 = _get_artwork_item(item, x=1)
-        if not artwork1:
-            return artwork0
-
-        # Build a list of available artworks that the item has
-        artworks = [artwork0, artwork1]
-        for x in range(2, 9):
-            artwork = _get_artwork_item(item, x=x)
-            if not artwork:
-                break
-            artworks.append(artwork)
-
-        # Then choose an artwork from the available artworks list at random
-        return random.choice(artworks)
+        return self.built_artwork.get(item.format(x=x)[4:-1])
 
 
 class ImageManipulations(WindowPropertySetter):
@@ -496,6 +493,17 @@ class ImageManipulations(WindowPropertySetter):
 
     def get_builtartwork(self):
         return
+
+    def get_extrafanart_slots(self):
+        """ Base slot is always included followed by the extra slots enabled in settings """
+        return (
+            '',
+            *(EXTRAFANART_SLOTS[i] for i in ADDON.getSettings().getStringList('service_extrafanart_slots')),
+        )
+
+    def get_cycled_artwork(self, key, get_slots, resolve):
+        """ Without a kept cycle each request draws the first available image of a fresh shuffle """
+        return ImageArtworkCycle(get_slots).get_next(resolve)
 
     def get_artwork(self, source='', build_fallback=False, built_artwork=None):
         source = source or ''
